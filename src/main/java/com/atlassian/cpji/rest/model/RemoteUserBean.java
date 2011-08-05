@@ -4,25 +4,25 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * @since v2.0
+ * @since v1.3
  */
-@XmlRootElement (name = "userBean")
-public class UserBean
+@XmlRootElement (name = "remoteUserBean")
+public class RemoteUserBean
 {
-     @XmlElement
+    @XmlElement
     private String userName;
 
     @XmlElement
-    private String email;
+    private String fullName;
 
     @SuppressWarnings("unused")
-    public UserBean(){}
+    public RemoteUserBean(){}
 
 
-    public UserBean(String userName, String email)
+    public RemoteUserBean(String userName, String fullName)
     {
         this.userName = userName;
-        this.email = email;
+        this.fullName = fullName;
     }
 
     public String getUserName()
@@ -30,8 +30,8 @@ public class UserBean
         return userName;
     }
 
-    public String getEmail()
+    public String getFullName()
     {
-        return email;
+        return fullName;
     }
 }

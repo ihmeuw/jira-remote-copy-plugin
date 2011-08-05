@@ -22,8 +22,8 @@ import com.atlassian.cpji.rest.model.ErrorBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
+import com.atlassian.cpji.rest.model.RemoteUserBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
-import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
@@ -287,7 +287,7 @@ public class CopyIssueResource
         {
             return Response.serverError().entity(ErrorBean.convertErrorCollection(result.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
-        UserBean userBean = new UserBean(authenticationContext.getLoggedInUser().getName(), authenticationContext.getLoggedInUser().getDisplayName());
+        RemoteUserBean userBean = new RemoteUserBean(authenticationContext.getLoggedInUser().getName(), authenticationContext.getLoggedInUser().getDisplayName());
         boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, authenticationContext.getLoggedInUser());
         boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, authenticationContext.getLoggedInUser());
 

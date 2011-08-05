@@ -11,7 +11,7 @@ import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.rest.UnauthorizedResponseException;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
-import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.cpji.rest.model.RemoteUserBean;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.issue.MutableIssue;
@@ -122,7 +122,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             checkIssueTypes(copyInformationBean.getIssueTypes().getGetTypes());
             remoteAttachmentsEnabled = copyInformationBean.getAttachmentsEnabled();
             hasCreateAttachmentsPermission = copyInformationBean.getHasCreateAttachmentPermission();
-            UserBean user = copyInformationBean.getRemoteUser();
+            RemoteUserBean user = copyInformationBean.getRemoteUser();
             remoteUserName = user.getUserName();
             remoteFullUserName = copyInformationBean.getRemoteUser().getFullName();
         }

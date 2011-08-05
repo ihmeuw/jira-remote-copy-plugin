@@ -19,7 +19,7 @@ public class CopyInformationBean
     private Boolean hasCreateAttachmentPermission;
 
     @XmlElement( name = "user")
-    private UserBean user;
+    private RemoteUserBean user;
 
     @XmlElement( name = "hasCreateIssuePermission")
     private Boolean hasCreateIssuePermission;
@@ -33,7 +33,7 @@ public class CopyInformationBean
             (
                     final IssueTypeBean issueTypes,
                     final Boolean attachmentsEnabled,
-                    final UserBean user,
+                    final RemoteUserBean user,
                     final Boolean hasCreateIssuePermission,
                     final Boolean hasCreateAttachmentPermission)
     {
@@ -54,7 +54,7 @@ public class CopyInformationBean
         return attachmentsEnabled;
     }
 
-    public UserBean getRemoteUser()
+    public RemoteUserBean getRemoteUser()
     {
         return user;
     }

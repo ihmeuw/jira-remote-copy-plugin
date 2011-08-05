@@ -178,6 +178,11 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
         }
     }
 
+    public UserMappingType getUserMappingType()
+    {
+        return UserMappingType.BY_USERNAME;
+    }
+
 
 }
 

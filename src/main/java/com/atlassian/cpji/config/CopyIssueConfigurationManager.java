@@ -16,4 +16,6 @@ public interface CopyIssueConfigurationManager
     public List<CommentSecurityLevel> getSecurityLevels(Project project);
 
     public CommentSecurityLevel getCommentSecurityLevel(final Project project);
+
+    UserMappingType getUserMappingType();
 }
