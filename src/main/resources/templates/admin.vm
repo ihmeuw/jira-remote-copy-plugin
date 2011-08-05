@@ -21,9 +21,9 @@
          <div class="field-group">
              <label for"commentSecurityLevel">Comment security</label>
              <select class="select" name="commentSecurityLevel" id="commentSecurityLevel">
-                <option value=""  #if($action.getSelectedSecurityLevel() == "") selected="" #end>none</option>
+                <option value=""  #if(!$action.getSelectedSecurityLevel()) selected="" #end>none</option>
                 #foreach( $securityLevel in $action.getSecurityLevels() )
-                   <option value="$securityLevel.getType()#$securityLevel.getId()"  #if($action.getSelectedSecurityLevel().getId() == $securityLevel.getId() && $action.getSelectedSecurityLevel().getType() == $securityLevel.getType()) selected="" #end>$securityLevel.getLabel()</option>
+                   <option value="$securityLevel.getType()#$securityLevel.getId()"  #if($action.getSelectedSecurityLevel() && $action.getSelectedSecurityLevel().getId() == $securityLevel.getId() && $action.getSelectedSecurityLevel().getType() == $securityLevel.getType()) selected="" #end>$securityLevel.getLabel()</option>
                 #end
              </select>
              <div class="description">
