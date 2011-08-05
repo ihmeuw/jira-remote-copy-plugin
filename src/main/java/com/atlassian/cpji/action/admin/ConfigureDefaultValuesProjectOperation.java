@@ -1,12 +1,12 @@
 package com.atlassian.cpji.action.admin;
 
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.plugin.projectoperation.PluggableProjectOperation;
 import com.atlassian.jira.plugin.projectoperation.ProjectOperationModuleDescriptor;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
-import com.opensymphony.user.User;
 
 import static java.lang.String.format;
 

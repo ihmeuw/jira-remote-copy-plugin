@@ -47,7 +47,7 @@
     <dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>atlassian-jira</artifactId>
+            <artifactId>jira-core</artifactId>
             <version>${jira.compile.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -137,12 +137,12 @@
     </build>
 
     <properties>
-        <jira.version>4.4-rc3</jira.version>
-        <jira.compile.version>4.3</jira.compile.version>
+        <jira.version>5.0-alpha4</jira.version>
+        <jira.compile.version>5.0-alpha4</jira.compile.version>
         <jira.data.version>4.1.1</jira.data.version>
-        <my.sal.version>2.6.0-alpha1</my.sal.version>
-        <rest.version>2.4.1-alpha1</rest.version>
-        <applinks.version>3.3</applinks.version>
+        <my.sal.version>2.6.1</my.sal.version>
+        <rest.version>2.5.0</rest.version>
+        <applinks.version>3.5.6</applinks.version>
         <cpji.build.directory>target</cpji.build.directory>
     </properties>
 
