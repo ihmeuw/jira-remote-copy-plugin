@@ -1,0 +1,102 @@
+<body class="nl">
+
+<div id="stepped-process">
+    <div class="steps-wrap">
+        <div class="steps-container">
+            <ol class="steps">
+                <li class="done">Select project</li>
+                <li class="done">Select Issue Type</li>
+                <li class="current">Confirm new values</li>
+            </ol>
+        </div>
+        <div class="current-step">
+            <form #if ($action.canCopyIssue()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui" >
+            <h2>Confirm new values</h2>
+            #if(!$action.canCopyIssue())
+                <div class="aui-message error"><span class="aui-icon icon-error"></span><p>Can't copy the issue, because of the following fields.</p>
+                   <ul>
+                     #foreach( $permission in $action.getSystemFieldPermissions() )
+                       #if (!$permission.canCopyIssue())<li>$permission.fieldName</li>#end
+                    #end
+                    #foreach( $permission in $action.getCustomFieldPermissions() )
+                        #if (!$permission.canCopyIssue())<li>$permission.fieldName</li>#end
+                    #end
+                   </ul>
+                </div>
+            #elseif (!$action.getSystemFieldPermissions().isEmpty() || !$action.getCustomFieldPermissions().isEmpty())
+                <div class="aui-message warning"><span class="aui-icon icon-warning"></span><p>The issue can be copied, but there are warnings related to the values of the following fields.</p>
+                    <ul>
+                    #foreach( $permission in $action.getSystemFieldPermissions() )
+                       <li>$permission.fieldName</li>
+                    #end
+                    #foreach( $permission in $action.getCustomFieldPermissions() )
+                       <li>$permission.fieldName</li>
+                    #end
+                    </ul>
+                </div>
+            #end
+            <h4 class="sub-heading">System fields</h4>
+            #if ($action.getSystemFieldPermissions().isEmpty())
+                <div class="aui-message info"><span class="aui-icon icon-info"></span><p>All system field values will be retained</p></div>
+            #else
+                <table class="aui" id="permission-checks">
+                    <thead>
+                    <tr>
+                        <th id="system-field-id">Field</th>
+                        <th id="system-field-permission">New field value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach( $permission in $action.getSystemFieldPermissions() )
+                            <tr>
+                                <td headers="system-field-id" #if (!$permission.canCopyIssue()) class="status-inactive" #end>$permission.fieldName</td>
+                                <td headers="system-field-permission"> $permission.getValidationMessage() </td>
+                            </tr>
+                        #end
+                    </tbody>
+                </table>
+            #end
+            <h4 class="sub-heading">Custom fields</h4>
+            #if ($action.getCustomFieldPermissions().isEmpty())
+                <div class="aui-message info"><span class="aui-icon icon-info"></span><p>All custom field values will be retained</p></div>
+            #else
+                <table class="aui" id="custom-field-permission-checks">
+                    <thead>
+                    <tr>
+                        <th id="custom-field-id">Field</th>
+                        <th id="custom-field-permission">New field value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        #foreach( $permission in $action.getCustomFieldPermissions() )
+                            <tr>
+                                <td headers="custom-field-id" #if (!$permission.canCopyIssue()) class="status-inactive" #end>$permission.fieldName</td>
+                                <td headers="custom-field-permission"> $permission.getValidationMessage()</td>
+                            </tr>
+                        #end
+                    </tbody>
+                </table>
+            #end
+                <div class="button-container">
+                    <div class="buttons">
+                       #if ($action.canCopyIssue())
+                        <input type="submit" value="Copy Issue" class="button submit"/>
+                       #else
+                        <input type="submit" value="Cancel" class="button submit"/>
+                       #end
+                    </div>
+                </div>
+                <input type="hidden" name="atl_token" value="$action.getXsrfToken()"/>
+                <input type="hidden" name="id" value="$action.getId()"/>
+                <input type="hidden" name="targetEntityLink" value="$action.targetEntityLink"/>
+                <input type="hidden" name="issueType" value="$action.getIssueType()"/>
+                <input type="hidden" name="copyAttachments" value="$action.copyAttachments()"/>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+
+
+

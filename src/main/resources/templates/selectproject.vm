@@ -1,0 +1,39 @@
+<body class="nl">
+
+<div id="stepped-process">
+    <div class="steps-wrap">
+        <div class="steps-container">
+            <ol class="steps">
+                <li class="current">Select project</li>
+                <li class="todo">Select Issue Type</li>
+                <li class="todo">Confirmation</li>
+            </ol>
+        </div>
+        <div class="current-step">
+            <form action="SelectTargetProjectAction.jspa" class="aui" method="post">
+                <h2>Select project</h2>
+                <fieldset>
+                    <div class="field-group">
+                        <label for="targetEntityLink">Project</label>
+                        <select name="targetEntityLink" id="targetEntityLink">
+                            #foreach( $entityLink in $action.getLinkedJiraProjects() )
+                                <option value="$entityLink.getApplicationLink().getId()%7C$entityLink.getKey()">($entityLink.getApplicationLink().getName())  $entityLink.getName() ($entityLink.getKey())</option>
+                            #end
+                        </select>
+                    </div>
+                </fieldset>
+                <div class="button-container">
+                    <div class="buttons">
+                        <input type="submit" value="Next" class="button submit"/>
+                    </div>
+                </div>
+                <input type="hidden" name="id" value="$action.getId()"/>
+                <input type="hidden" name="atl_token" value="$action.getXsrfToken()"/>
+            </form>
+
+        </div>
+    </div>
+</div>
+</body>
+
+

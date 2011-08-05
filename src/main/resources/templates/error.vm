@@ -1,0 +1,8 @@
+<div class="aui-message error"><span class="aui-icon icon-error"></span>
+    <p>An error occurred.</p>
+    <ul>
+    #foreach( $error in $action.getErrorMessages() )
+        <li>$error</li>
+    #end
+    </ul>
+</div>

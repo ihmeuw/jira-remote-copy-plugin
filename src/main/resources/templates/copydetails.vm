@@ -1,0 +1,75 @@
+<body class="nl">
+
+<div id="stepped-process">
+    <div class="steps-wrap">
+        <div class="steps-container">
+            <ol class="steps">
+                <li class="done">Select project</li>
+                <li class="current">Select Issue Type</li>
+                <li class="todo">Confirmation</li>
+            </ol>
+        </div>
+        <div class="current-step">
+            <form action="PermissionChecksAction.jspa" class="aui" method="post">
+                <h2>Issue type</h2>
+                <fieldset>
+                    <div class="field-group">
+                        <label for="issueType">Issue Type</label>
+                        <select name="issueType" id="issueType">
+                            #foreach( $issueType in $action.getAvailableIssueTypes())
+                                <option #if(${issueType.isSelected()}) selected #end  value="${issueType.value}">${issueType.value}</option>
+                            #end
+                        </select>
+                    </div>
+                </fieldset>
+                <h2>Remote user</h2>
+                <fieldset>
+                    <div class="field-group">
+                        <label>User name</label>
+                        <span class="field-value">$action.getRemoteUserName()</span>
+                    </div>
+                    <div class="field-group">
+                        <label>User Full Name</label>
+                        <span class="field-value">$action.getRemoteFullUserName()</span>
+                    </div>
+                </fieldset>
+
+                #if ($action.isSALUpgradeRequired() && $action.attachmentsEnabled())
+                    <div class="field-group">
+                        <label for="attachments">Attachments</label>
+                         <span class="field-value">
+                             Attachments are not moved until we have upgraded JIRA's SAL version.
+                         </span>
+                        <input type="hidden" name="copyAttachments" value="false"/>
+                    </div>
+                #elseif ($action.attachmentsEnabled())
+                    <div class="field-group">
+                        <label for="attachments">Attachments</label>
+                     <span class="field-value">
+                         #if ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
+                             Attachments will be moved.
+                             <input type="hidden" name="copyAttachments" value="true"/>
+                         #elseif (!$action.remoteAttachmentsEnabled())
+                             Attachments are disabled in the remote JIRA instance.
+                             <input type="hidden" name="copyAttachments" value="false"/>
+                         #elseif(!$action.hasCreateAttachmentsPermission())
+                             You don't have the create attachments permission in the remote JIRA instance.
+                             <input type="hidden" name="copyAttachments" value="false"/>
+                         #end
+                     </span>
+                    </div>
+                #end
+                <div class="button-container">
+                    <div class="buttons">
+                        <input type="submit" value="Next" class="button submit"/>
+                    </div>
+                </div>
+                <input type="hidden" name="id" value="$action.getId()"/>
+                <input type="hidden" name="atl_token" value="$action.getXsrfToken()"/>
+                <input type="hidden" name="targetEntityLink" value="$action.targetEntityLink"/>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+

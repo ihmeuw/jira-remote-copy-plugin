@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>com.atlassian.pom</groupId>
+        <artifactId>atlassian-public-pom</artifactId>
+        <version>22</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.atlassian.cpji</groupId>
+    <artifactId>cpji-jira-plugin</artifactId>
+    <version>2.0-SNAPSHOT</version>
+
+    <organization>
+        <name>Atlassian</name>
+        <url>http://www.atlassian.com</url>
+    </organization>
+
+    <profiles>
+        <profile>
+            <id>jira1</id>
+            <properties>
+                <cpji.build.directory>${basedir}/target_jira1</cpji.build.directory>
+                <http.port>5990</http.port>
+                <jvm.debug.port>5002</jvm.debug.port>
+                <cli.port>1234</cli.port>
+            </properties>
+        </profile>
+        <profile>
+            <id>jira2</id>
+            <properties>
+                <cpji.build.directory>${basedir}/target_jira2</cpji.build.directory>
+                <http.port>5991</http.port>
+                <jvm.debug.port>5003</jvm.debug.port>
+                <cli.port>5678</cli.port>
+            </properties>
+        </profile>
+    </profiles>
+
+    <name>Remote copying of issues (cpji-jira-plugin)</name>
+    <description>Plugin that copies issues from one JIRA instance to another</description>
+    <packaging>atlassian-plugin</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>atlassian-jira</artifactId>
+            <version>${jira.compile.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.selenium</groupId>
+            <artifactId>atlassian-selenium</artifactId>
+            <version>2.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- REST dependencies-->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugins.rest</groupId>
+            <artifactId>atlassian-rest-common</artifactId>
+            <version>${rest.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugins.rest</groupId>
+            <artifactId>atlassian-rest-module</artifactId>
+            <version>${rest.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- UAL dependencies -->
+        <dependency>
+            <groupId>com.atlassian.applinks</groupId>
+            <artifactId>applinks-api</artifactId>
+            <version>${applinks.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.sal</groupId>
+            <artifactId>sal-api</artifactId>
+            <version>${my.sal.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <directory>${cpji.build.directory}</directory>
+        <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-jira-plugin</artifactId>
+                <version>3.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <productVersion>${jira.version}</productVersion>
+                    <productDataVersion>${jira.data.version}</productDataVersion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <jira.version>4.4-rc3</jira.version>
+        <jira.compile.version>4.3</jira.compile.version>
+        <jira.data.version>4.1.1</jira.data.version>
+        <my.sal.version>2.6.0-alpha1</my.sal.version>
+        <rest.version>2.4.1-alpha1</rest.version>
+        <applinks.version>3.3</applinks.version>
+        <cpji.build.directory>target</cpji.build.directory>
+    </properties>
+
+    <scm>
+        <connection>scm:svn:https://labs.atlassian.com/svn/CPJI/trunk</connection>
+        <developerConnection>scm:svn:https://labs.atlassian.com/svn/CPJI/trunk</developerConnection>
+        <url>https://labs.atlassian.com/svn/CPJI/trunk</url>
+    </scm>
+
+</project>

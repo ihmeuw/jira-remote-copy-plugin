@@ -1,0 +1,104 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+    </plugin-info>
+
+    <web-item key="copy-issue" i18n-name-key="webfragments.view.issue.opsbar.operations.copy" name="Copy this issue" section="operations-operations" weight="140">
+        <label key="issue.operations.copy.to.other.instance"/>
+        <tooltip key="issue.operations.simple.copy"/>
+        <styleClass>issueaction-movie-issue</styleClass>
+        <link linkId="copy-issue-to-other-instance">
+            /secure/SelectTargetProjectAction!default.jspa?id=${issueId}
+        </link>
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
+        <condition class="com.atlassian.cpji.EntityLinkToJIRAProjectConfiguredCondition"/>
+    </web-item>
+
+    <webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
+        <actions>
+            <action name="com.atlassian.cpji.action.SelectTargetProjectAction" alias="SelectTargetProjectAction">
+                <view name="success">/templates/selectproject.vm</view>
+                <view name="error">/templates/error.vm</view>
+                <view name="authorize">/templates/authorize.vm</view>
+                <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
+                <view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
+            </action>
+        </actions>
+    </webwork1>
+
+    <webwork1 key="copydetails-action" name="Copy Issue to another JIRA instance" class="java.lang.Object">
+        <actions>
+            <action name="com.atlassian.cpji.action.CopyDetailsAction" alias="CopyDetailsAction">
+                <view name="success">/templates/copydetails.vm</view>
+                <view name="error">/templates/error.vm</view>
+                <view name="authorize">/templates/authorize.vm</view>
+                <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
+                <view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
+            </action>
+        </actions>
+    </webwork1>
+
+    <webwork1 key="check-project-permissions" name="check the permissions" class="java.lang.Object">
+        <actions>
+            <action name="com.atlassian.cpji.action.PermissionChecksAction" alias="PermissionChecksAction">
+                <view name="success">/templates/permissionchecks.vm</view>
+                <view name="error">/templates/error.vm</view>
+                <view name="authorize">/templates/authorize.vm</view>
+                <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
+                <view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
+            </action>
+        </actions>
+    </webwork1>
+
+    <webwork1 key="copyissue-action" name="Copy Issue to another JIRA instance" class="java.lang.Object">
+        <actions>
+            <action name="com.atlassian.cpji.action.CopyIssueToInstanceAction" alias="CopyIssueToInstanceAction">
+                <view name="success">/templates/copied.vm</view>
+                <view name="error">/templates/error.vm</view>
+                <view name="authorize">/templates/authorize.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+
+    <project-operation name="Project Operation for Copy Issues Default values " key="cpji-copy-issues-default-values"
+                       class="com.atlassian.cpji.action.admin.ConfigureDefaultValuesProjectOperation">
+        <resource name="view" type="velocity" location="templates/admin.vm"/>
+    </project-operation>
+
+    <webwork1 key="admin-default-values-action" name="Administration UI for default values" class="java.lang.Object">
+        <actions>
+            <action name="com.atlassian.cpji.action.admin.ConfigureCopyIssuesAdminAction" alias="ConfigureCopyIssuesAdminAction">
+                <view name="success">/templates/admin.vm</view>
+                <view name="error">/templates/error.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+
+   <component key="fieldMapperFactory" class="com.atlassian.cpji.fields.FieldMapperFactory"/>
+   <component key="defaultFieldValuesManager" class="com.atlassian.cpji.fields.value.DefaultFieldValuesManager"/>
+   <component key="copyIssueConfigurationManager" class="com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager"/>
+   <component key="copyIssuePermissionManager" class="com.atlassian.cpji.action.admin.CopyIssuePermissionManager"/>
+   <component key="fieldLayoutItemsRetriever" class="com.atlassian.cpji.fields.FieldLayoutItemsRetriever"/>
+   <component key="commenter" class="com.atlassian.cpji.config.Commenter"/>
+
+
+    <resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>
+
+    <rest key="copy-issue-rest-end-point" path="/copyissue" version="1.0">
+        <description>
+            The rest endpoint are used to copy one issue from one JIRA instance to another.
+        </description>
+        <package>com.atlassian.cpji.rest</package>
+    </rest>
+
+    <component-import key="entityLinkService">
+      <interface>com.atlassian.applinks.api.EntityLinkService</interface>
+    </component-import>
+
+    <component-import key="pluginSettingsFactory">
+        <interface>com.atlassian.sal.api.pluginsettings.PluginSettingsFactory</interface>
+    </component-import>
+
+</atlassian-plugin>
