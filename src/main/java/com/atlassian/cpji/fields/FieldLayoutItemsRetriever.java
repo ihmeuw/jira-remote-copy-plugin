@@ -6,7 +6,6 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.issue.fields.layout.field.FieldLayoutStorageException;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.google.common.base.Predicate;
@@ -34,26 +33,19 @@ public class FieldLayoutItemsRetriever
 
     public Iterable<FieldLayoutItem> getAllVisibleFieldLayoutItems(final Project project, final IssueType issueType)
     {
-        try
+        FieldLayout fieldLayout = fieldLayoutManager.getFieldLayout(project, issueType.getId());
+        return Iterables.filter(fieldLayout.getFieldLayoutItems(), new Predicate<FieldLayoutItem>()
         {
-            FieldLayout fieldLayout = fieldLayoutManager.getFieldLayout(project, issueType.getId());
-            return Iterables.filter(fieldLayout.getFieldLayoutItems(), new Predicate<FieldLayoutItem>()
+            public boolean apply(final FieldLayoutItem input)
             {
-                public boolean apply(final FieldLayoutItem input)
+                if (fieldManager.isCustomField(input.getOrderableField()))
                 {
-                    if (fieldManager.isCustomField(input.getOrderableField()))
-                    {
-                        CustomField customField = (CustomField) input.getOrderableField();
-                        boolean inScope = customField.isInScope(project, Lists.newArrayList(issueType.getName()));
-                        return !input.isHidden() && inScope;
-                    }
-                    return !input.isHidden();
+                    CustomField customField = (CustomField) input.getOrderableField();
+                    boolean inScope = customField.isInScope(project, Lists.newArrayList(issueType.getName()));
+                    return !input.isHidden() && inScope;
                 }
-            });
-        }
-        catch (FieldLayoutStorageException e)
-        {
-            throw new RuntimeException(e);
-        }
+                return !input.isHidden();
+            }
+        });
     }
 }

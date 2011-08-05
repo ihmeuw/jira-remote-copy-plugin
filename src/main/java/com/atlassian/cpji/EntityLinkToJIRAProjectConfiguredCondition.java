@@ -3,10 +3,10 @@ package com.atlassian.cpji;
 import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractIssueCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
-import com.opensymphony.user.User;
 
 /**
  * @since v1.0
