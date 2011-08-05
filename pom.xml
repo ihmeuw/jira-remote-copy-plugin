@@ -147,9 +147,9 @@
     </properties>
 
     <scm>
-        <connection>scm:svn:https://labs.atlassian.com/svn/CPJI/trunk</connection>
-        <developerConnection>scm:svn:https://labs.atlassian.com/svn/CPJI/trunk</developerConnection>
-        <url>https://labs.atlassian.com/svn/CPJI/trunk</url>
+        <connection>scm:hg:ssh://hg@bitbucket.org/fschmitz/remotecopy</connection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org/fschmitz/remotecopy</developerConnection>
+        <url>scm:hg:ssh://hg@bitbucket.org/fschmitz/remotecopy</url>
     </scm>
 
 </project>
