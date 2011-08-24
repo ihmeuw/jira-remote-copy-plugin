@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>cpji-jira</artifactId>
+        <groupId>com.atlassian.cpji</groupId>
+        <version>2.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cpji-jira-plugin-test</artifactId>
+    <name>Remote copying of issues - Integration Tests</name>
+    <description>Tests for copying issues between remote JIRA instances</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atlassian.cpji</groupId>
+            <artifactId>cpji-jira-plugin</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.selenium</groupId>
+            <artifactId>atlassian-pageobjects-api</artifactId>
+            <version>${atlassian.selenium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.selenium</groupId>
+            <artifactId>atlassian-webdriver-jira</artifactId>
+            <version>${atlassian.selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-amps-plugin</artifactId>
+                <version>3.5-m1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <systemPropertyVariables>
+                        <xvfb.enable>${xvfb.enable}</xvfb.enable>
+                    </systemPropertyVariables>
+
+                    <products>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira1</instanceId>
+                            <version>${jira.version}</version>
+                            <dataVersion>${jira.data.version}</dataVersion>
+                        </product>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira2</instanceId>
+                            <version>${jira.version}</version>
+                            <httpPort>2991</httpPort>
+                        </product>
+                    </products>
+
+                    <testGroups>
+                        <testGroup>
+                            <id>jira-tests</id>
+                            <productIds>
+                                <productId>jira1</productId>
+                                <productId>jira2</productId>
+                            </productIds>
+                            <includes>
+                                <include>it/**</include>
+                            </includes>
+                            <systemProperties>
+                                <tested.app>com.atlassian.webdriver.jira.JiraTestedProduct</tested.app>
+                            </systemProperties>
+                        </testGroup>
+                    </testGroups>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>it/**/*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <!-- Whether the tests should be run detached from the current screen -->
+        <xvfb.enable>true</xvfb.enable>
+    </properties>
+ 
+</project>

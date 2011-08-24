@@ -1,2 +1,9 @@
-target/
+syntax: glob
 
+target/
+target_jira1/
+target_jira2/
+
+# Intellij files
+*.iml
+*.iws
