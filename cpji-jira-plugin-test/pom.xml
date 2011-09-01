@@ -27,12 +27,27 @@
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-pageobjects-api</artifactId>
             <version>${atlassian.selenium.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-webdriver-jira</artifactId>
             <version>${atlassian.selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>atlassian-jira-pageobjects</artifactId>
+            <version>${jira.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-selenium-tests</artifactId>
+            <version>${jira.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -42,7 +57,7 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-amps-plugin</artifactId>
-                <version>3.5-m1</version>
+                <version>3.5-m8</version>
                 <extensions>true</extensions>
                 <configuration>
                     <systemPropertyVariables>
@@ -54,13 +69,28 @@
                             <id>jira</id>
                             <instanceId>jira1</instanceId>
                             <version>${jira.version}</version>
-                            <dataVersion>${jira.data.version}</dataVersion>
+                            <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
+                            <pluginArtifacts>
+                                <pluginArtifact>
+                                    <groupId>com.atlassian.cpji</groupId>
+                                    <artifactId>cpji-jira-plugin</artifactId>
+                                    <version>${project.version}</version>
+                                </pluginArtifact>
+                            </pluginArtifacts>
                         </product>
                         <product>
                             <id>jira</id>
                             <instanceId>jira2</instanceId>
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
+                            <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
+                            <pluginArtifacts>
+                                <pluginArtifact>
+                                    <groupId>com.atlassian.cpji</groupId>
+                                    <artifactId>cpji-jira-plugin</artifactId>
+                                    <version>${project.version}</version>
+                                </pluginArtifact>
+                            </pluginArtifacts>
                         </product>
                     </products>
 
@@ -74,9 +104,6 @@
                             <includes>
                                 <include>it/**</include>
                             </includes>
-                            <systemProperties>
-                                <tested.app>com.atlassian.webdriver.jira.JiraTestedProduct</tested.app>
-                            </systemProperties>
                         </testGroup>
                     </testGroups>
                 </configuration>

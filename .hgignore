@@ -7,3 +7,6 @@ target_jira2/
 # Intellij files
 *.iml
 *.iws
+
+# Mac OS X files
+.DS_Store
