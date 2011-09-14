@@ -1,8 +1,6 @@
 package com.atlassian.cpji.fields;
 
-import com.atlassian.cpji.fields.custom.CustomFieldMapper;
-import com.atlassian.cpji.fields.custom.DateCFMapper;
-import com.atlassian.cpji.fields.custom.SelectListCFMapper;
+import com.atlassian.cpji.fields.custom.*;
 import com.atlassian.cpji.fields.system.AffectedVersionsFieldMapper;
 import com.atlassian.cpji.fields.system.AssigneeFieldMapper;
 import com.atlassian.cpji.fields.system.CommentFieldMapper;
@@ -133,10 +131,11 @@ public class FieldMapperFactory
         SystemFieldPostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"), voteService, permissionManager, userManager, jiraAuthenticationContext);
         postIssueCreationFieldMapper.add(votersFieldMapper);
 
-        CustomFieldMapper selectListCFMapper = new SelectListCFMapper();
-        customFieldFieldMappers.add(selectListCFMapper);
-
+        customFieldFieldMappers.add(new SelectListCFMapper());
         customFieldFieldMappers.add(new DateCFMapper(datePickerConverter));
+        customFieldFieldMappers.add(new NumberCFMapper());
+        customFieldFieldMappers.add(new TextAreaCFMapper());
+        customFieldFieldMappers.add(new MultiGroupCFMapper(groupManager));
     }
 
     private OrderableField getOrderableField(final FieldManager fieldManager, final String id)

@@ -1,11 +1,7 @@
 package com.atlassian.cpji.rest;
 
 import com.atlassian.cpji.config.Commenter;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapper;
-import com.atlassian.cpji.fields.FieldMapperFactory;
-import com.atlassian.cpji.fields.IssueCreationFieldMapper;
-import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.*;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
@@ -180,8 +176,8 @@ public class CopyIssueResource
                     CustomFieldBean matchingRemoteCustomField = CustomFieldMapperUtil.findMatchingRemoteCustomField(customField, copyIssueBean.getCustomFields());
                     if (matchingRemoteCustomField != null)
                     {
-                        MappingResult unmappedFieldValues = customFieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, issueType);
-                        if (!unmappedFieldValues.hasOneValidValue() && fieldLayoutItem.isRequired())
+                        CustomFieldMappingResult customFieldMappingResult = customFieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, issueType);
+                        if (!customFieldMappingResult.hasOneValidValue() && fieldLayoutItem.isRequired())
                         {
                             String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
                             if (defaultFieldValue != null)
@@ -191,7 +187,7 @@ public class CopyIssueResource
                         }
                         else
                         {
-                            customFieldMapper.populateInputParameters(inputParameters, matchingRemoteCustomField, customField, project, issueType);
+                            customFieldMapper.populateInputParameters(inputParameters, customFieldMappingResult, customField, project, issueType);
                         }
                     }
                     else if (fieldLayoutItem.isRequired())

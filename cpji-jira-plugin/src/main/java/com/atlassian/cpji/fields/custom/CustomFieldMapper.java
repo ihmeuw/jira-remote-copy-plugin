@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.CustomFieldMappingResult;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.jira.issue.Issue;
@@ -41,17 +42,17 @@ public interface CustomFieldMapper
      * @param issueType the destination IssueType on this JIRA instance
      * @return a MappingResult
      */
-    public MappingResult getMappingResult(final CustomFieldBean customFieldBean, final CustomField customField, final Project project, final IssueType issueType);
+    public CustomFieldMappingResult getMappingResult(final CustomFieldBean customFieldBean, final CustomField customField, final Project project, final IssueType issueType);
 
     /**
      * Applies the values in the given CustomFieldBean to the given IssueInputParameters for the CustomField, Project
      * and IssueType in the current JIRA instance.
      * 
      * @param inputParameters the input parameters to apply the custom field values to
-     * @param customFieldBean the bean containing the custom field values
+     * @param mappingResult the CustomFieldMappingResult containing the valid and invalid custom field values
      * @param customField the CustomField on this JIRA instance to set the value of for the new issue
      * @param project the Project on this JIRA instance in which the new issue is being created
      * @param issueType the IssueType of the issue to be created on this JIRA instance
      */
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CustomFieldBean customFieldBean, final CustomField customField, final Project project, final IssueType issueType);
+    public void populateInputParameters(final IssueInputParameters inputParameters, final CustomFieldMappingResult mappingResult, final CustomField customField, final Project project, final IssueType issueType);
 }

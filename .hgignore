@@ -7,3 +7,4 @@ target_jira2/
 # Intellij files
 *.iml
 *.iws
+*.ipr

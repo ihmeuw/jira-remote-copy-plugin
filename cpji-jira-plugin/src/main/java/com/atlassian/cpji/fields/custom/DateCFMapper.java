@@ -1,27 +1,20 @@
 package com.atlassian.cpji.fields.custom;
 
-import com.atlassian.cpji.fields.MappingResult;
-import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.cpji.util.DateUtil;
-import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
 import com.atlassian.jira.issue.customfields.impl.DateCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
-import com.google.common.collect.Lists;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Maps the {@link DateCFMapper} custom field type.
+ * Maps the {@link DateCFType} custom field type.
  *
- * @since v1.4
+ * @since v2.1
  */
-public class DateCFMapper implements CustomFieldMapper
+public class DateCFMapper extends AbstractSingleValueCFMapper<Date>
 {
     private final DatePickerConverter datePickerConverter;
 
@@ -30,62 +23,28 @@ public class DateCFMapper implements CustomFieldMapper
         this.datePickerConverter = datePickerConverter;
     }
 
+    @Override
     public String getType()
     {
         return DateCFType.class.getCanonicalName();
     }
 
-    public CustomFieldBean createFieldBean(final CustomField customField, final Issue issue)
+    @Override
+    protected String convertToString(final Date value)
     {
-        final Object value = customField.getValue(issue);
-        final List<String> values;
-        
-        if (value instanceof Date)
-        {
-            // Convert date to string
-            final String stringValue = DateUtil.toString((Date) value);
-            values = Lists.newArrayList(stringValue);
-        }
-        else
-        {
-            // Value is null or unrecognised type, ignore it
-            values = Collections.emptyList();
-        }
-
-        final String customFieldType = customField.getCustomFieldType().getClass().getCanonicalName();
-        return new CustomFieldBean(customFieldType, customField.getName(), customField.getId(), values);
+        return DateUtil.toString(value);
     }
 
-    public MappingResult getMappingResult(final CustomFieldBean customFieldBean, final CustomField customField, final Project project, final IssueType issueType)
+    @Override
+    protected String formatString(final String value)
     {
-        // Because the field is not a list, there will never be unmapped values
-        final List<String> unmappedValues = Collections.emptyList();
-
-        final String value = getValue(customFieldBean);
-        final boolean hasValidValue = (value != null) && DateUtil.isValidDate(value);
-
-        return new MappingResult(unmappedValues, hasValidValue, false);
+        final Date date = DateUtil.parseString(value);
+        return datePickerConverter.getString(date);
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CustomFieldBean customFieldBean, final CustomField customField, final Project project, final IssueType issueType)
+    @Override
+    protected boolean isValidValue(final String value, final CustomField customField, final Project project, final IssueType issueType)
     {
-        final String value = getValue(customFieldBean);
-        if (value != null)
-        {
-            final Date date = DateUtil.parseString(value);
-            final String formattedValue = datePickerConverter.getString(date);
-            inputParameters.addCustomFieldValue(customField.getId(), formattedValue);
-        }
-    }
-
-    private String getValue(final CustomFieldBean customFieldBean)
-    {
-        final List<String> values = customFieldBean.getValues();
-        if (values == null || values.isEmpty())
-        {
-            return null;
-        }
-        
-        return values.get(0);
+        return DateUtil.isValidDate(value);
     }
 }
