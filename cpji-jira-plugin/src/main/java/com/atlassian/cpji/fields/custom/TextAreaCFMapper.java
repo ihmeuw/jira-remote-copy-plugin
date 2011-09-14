@@ -25,7 +25,7 @@ public class TextAreaCFMapper extends AbstractSingleValueCFMapper<String>
     }
 
     @Override
-    protected String formatString(String value)
+    protected String formatString(final String value, final CustomField customField, final Project project, final IssueType issueType)
     {
         return value;
     }

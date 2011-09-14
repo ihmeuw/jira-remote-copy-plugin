@@ -36,9 +36,12 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
      * e.g. if the value is a Date, each JIRA instance may have a different format for representing dates as strings.
      *
      * @param value a String representing the custom field value
+     * @param customField
+     * @param project
+     * @param issueType
      * @return a formatted String recognisable by the current JIRA instance
      */
-    protected abstract String formatString(String value);
+    protected abstract String formatString(String value, CustomField customField, Project project, IssueType issueType);
 
     /**
      * Determines if the given value is value for the given custom field. The value will not be null.
@@ -112,7 +115,7 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
         final String value = getValue(mappingResult.getValidValues());
         if (value != null)
         {
-            final String formattedValue = formatString(value);
+            final String formattedValue = formatString(value, customField, project, issueType);
             inputParameters.addCustomFieldValue(customField.getId(), formattedValue);
         }
     }

@@ -29,6 +29,7 @@ import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
+import com.atlassian.jira.issue.customfields.converters.DoubleConverter;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
@@ -75,7 +76,8 @@ public class FieldMapperFactory
                     final WatcherService watcherService,
                     final FieldManager fieldManager,
                     final VoteService voteService,
-                    final DatePickerConverter datePickerConverter)
+                    final DatePickerConverter datePickerConverter,
+                    final DoubleConverter doubleConverter)
     {
         SystemFieldIssueCreationFieldMapper priorityFieldMapper = new PriorityFieldMapper(constantsManager, getOrderableField(fieldManager, IssueFieldConstants.PRIORITY));
         addFieldMapper(priorityFieldMapper.getField(), priorityFieldMapper);
@@ -133,7 +135,7 @@ public class FieldMapperFactory
 
         customFieldFieldMappers.add(new SelectListCFMapper());
         customFieldFieldMappers.add(new DateCFMapper(datePickerConverter));
-        customFieldFieldMappers.add(new NumberCFMapper());
+        customFieldFieldMappers.add(new NumberCFMapper(doubleConverter));
         customFieldFieldMappers.add(new TextAreaCFMapper());
         customFieldFieldMappers.add(new MultiGroupCFMapper(groupManager));
     }

@@ -36,7 +36,7 @@ public class DateCFMapper extends AbstractSingleValueCFMapper<Date>
     }
 
     @Override
-    protected String formatString(final String value)
+    protected String formatString(final String value, final CustomField customField, final Project project, final IssueType issueType)
     {
         final Date date = DateUtil.parseString(value);
         return datePickerConverter.getString(date);
