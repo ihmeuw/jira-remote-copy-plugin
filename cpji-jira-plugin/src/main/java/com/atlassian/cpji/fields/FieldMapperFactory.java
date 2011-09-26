@@ -1,7 +1,6 @@
 package com.atlassian.cpji.fields;
 
-import com.atlassian.cpji.fields.custom.CustomFieldMapper;
-import com.atlassian.cpji.fields.custom.SelectListCFMapper;
+import com.atlassian.cpji.fields.custom.*;
 import com.atlassian.cpji.fields.system.AffectedVersionsFieldMapper;
 import com.atlassian.cpji.fields.system.AssigneeFieldMapper;
 import com.atlassian.cpji.fields.system.CommentFieldMapper;
@@ -29,6 +28,8 @@ import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueFieldConstants;
+import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
+import com.atlassian.jira.issue.customfields.converters.DoubleConverter;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
@@ -74,7 +75,9 @@ public class FieldMapperFactory
                     final JiraAuthenticationContext jiraAuthenticationContext,
                     final WatcherService watcherService,
                     final FieldManager fieldManager,
-                    final VoteService voteService)
+                    final VoteService voteService,
+                    final DatePickerConverter datePickerConverter,
+                    final DoubleConverter doubleConverter)
     {
         SystemFieldIssueCreationFieldMapper priorityFieldMapper = new PriorityFieldMapper(constantsManager, getOrderableField(fieldManager, IssueFieldConstants.PRIORITY));
         addFieldMapper(priorityFieldMapper.getField(), priorityFieldMapper);
@@ -130,8 +133,11 @@ public class FieldMapperFactory
         SystemFieldPostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"), voteService, permissionManager, userManager, jiraAuthenticationContext);
         postIssueCreationFieldMapper.add(votersFieldMapper);
 
-        CustomFieldMapper selectListCFMapper = new SelectListCFMapper();
-        customFieldFieldMappers.add(selectListCFMapper);
+        customFieldFieldMappers.add(new SelectListCFMapper());
+        customFieldFieldMappers.add(new DateCFMapper(datePickerConverter));
+        customFieldFieldMappers.add(new NumberCFMapper(doubleConverter));
+        customFieldFieldMappers.add(new TextAreaCFMapper());
+        customFieldFieldMappers.add(new MultiGroupCFMapper(groupManager));
     }
 
     private OrderableField getOrderableField(final FieldManager fieldManager, final String id)
