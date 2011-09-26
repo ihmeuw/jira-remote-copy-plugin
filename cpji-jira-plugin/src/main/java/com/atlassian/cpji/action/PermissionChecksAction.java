@@ -155,7 +155,11 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
                     {
                         canCopyIssue = false;
                     }
-                    customFieldPermissions.add(new FieldPermission(customFieldPermissionBean.getFieldName(), getI18nHelper().getText(validationCode.getI18nKey()), validationCode.canCopyIssue()));
+
+                    if (!ValidationCode.OK.equals(validationCode))
+                    {
+                        customFieldPermissions.add(new FieldPermission(customFieldPermissionBean.getFieldName(), getI18nHelper().getText(validationCode.getI18nKey()), validationCode.canCopyIssue()));
+                    }
                 }
             }
             return SUCCESS;
