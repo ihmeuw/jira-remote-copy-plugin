@@ -59,6 +59,14 @@
                      </span>
                     </div>
                 #end
+                <div class="field-group">
+                    <label for="remoteIssueLink">Create Issue Link</label>
+                    <select name="remoteIssueLink" id="remoteIssueLink">
+                        #foreach( $issueLink in $action.getIssueLinkOptions())
+                            <option value="${issueLink.value}">${issueLink.label}</option>
+                        #end
+                    </select>
+                </div>
                 <div class="button-container">
                     <div class="buttons">
                         <input type="submit" value="Next" class="button submit"/>

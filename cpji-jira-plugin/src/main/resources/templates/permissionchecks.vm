@@ -91,6 +91,7 @@
                 <input type="hidden" name="targetEntityLink" value="$action.targetEntityLink"/>
                 <input type="hidden" name="issueType" value="$action.getIssueType()"/>
                 <input type="hidden" name="copyAttachments" value="$action.copyAttachments()"/>
+                <input type="hidden" name="remoteIssueLink" value="$action.remoteIssueLink()"/>
             </form>
         </div>
     </div>

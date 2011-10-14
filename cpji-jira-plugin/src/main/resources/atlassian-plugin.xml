@@ -82,6 +82,7 @@
    <component key="copyIssuePermissionManager" class="com.atlassian.cpji.action.admin.CopyIssuePermissionManager"/>
    <component key="fieldLayoutItemsRetriever" class="com.atlassian.cpji.fields.FieldLayoutItemsRetriever"/>
    <component key="commenter" class="com.atlassian.cpji.config.Commenter"/>
+   <component key="issueLinkClient" class="com.atlassian.cpji.util.IssueLinkClient"/>
 
 
     <resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>

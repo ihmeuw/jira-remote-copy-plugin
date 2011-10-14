@@ -1,7 +1,11 @@
 package com.atlassian.cpji.rest;
 
-import com.atlassian.cpji.config.Commenter;
-import com.atlassian.cpji.fields.*;
+import com.atlassian.cpji.fields.CustomFieldMappingResult;
+import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
+import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.FieldMapperFactory;
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
+import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
@@ -39,8 +43,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.util.ErrorCollection;
-import com.atlassian.jira.util.SimpleErrorCollection;
+import com.atlassian.jira.util.BuildUtilsInfo;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -81,7 +84,7 @@ public class CopyIssueResource
     private final FieldManager fieldManager;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
-    private Commenter commenter;
+    private final BuildUtilsInfo buildUtilsInfo;
 
     private static final Logger log = Logger.getLogger(CopyIssueResource.class);
 
@@ -98,7 +101,7 @@ public class CopyIssueResource
                     final FieldManager fieldManager,
                     final DefaultFieldValuesManager defaultFieldValuesManager,
                     final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-                    final Commenter commenter)
+                    final BuildUtilsInfo buildUtilsInfo)
     {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
@@ -111,7 +114,7 @@ public class CopyIssueResource
         this.fieldManager = fieldManager;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
-        this.commenter = commenter;
+        this.buildUtilsInfo = buildUtilsInfo;
     }
 
 
@@ -217,9 +220,6 @@ public class CopyIssueResource
 
         if (createIssueResult.isValid())
         {
-            String link = copyIssueBean.getBaseUrl() + "/browse/" + copyIssueBean.getOriginalKey();
-            ErrorCollection errorCollection = new SimpleErrorCollection();
-            commenter.addCommentToIssue(createIssueResult.getIssue(), "Copy of issue " + link, errorCollection);
             final List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = fieldMapperFactory.getPostIssueCreationFieldMapper();
             final List<String> errors = new ArrayList<String>();
             for (SystemFieldPostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper)
@@ -234,7 +234,7 @@ public class CopyIssueResource
                     errors.add(e.getMessage());
                 }
             }
-            IssueCreationResultBean resultBean = new IssueCreationResultBean(createIssueResult.getIssue().getKey(), createIssueResult.getIssue().getProjectObject().getKey());
+            IssueCreationResultBean resultBean = new IssueCreationResultBean(createIssueResult.getIssue().getKey(), createIssueResult.getIssue().getProjectObject().getKey(), createIssueResult.getIssue().getId());
             if (!errors.isEmpty())
             {
                 errors.add(0, "Created issue '" + createIssueResult.getIssue().getKey() + "'. But there were some errors.'");
@@ -297,12 +297,12 @@ public class CopyIssueResource
             }
             IssueTypeBean issueTypesBean = new IssueTypeBean(issueTypes);
             boolean attachmentsDisabled = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS);
-            CopyInformationBean copyInformationBean = new CopyInformationBean(issueTypesBean, attachmentsDisabled, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission);
+            CopyInformationBean copyInformationBean = new CopyInformationBean(issueTypesBean, attachmentsDisabled, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
             return Response.ok(copyInformationBean).cacheControl(RESTException.never()).build();
         }
         else
         {
-            CopyInformationBean copyInformationBean = new CopyInformationBean(null, true, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission);
+            CopyInformationBean copyInformationBean = new CopyInformationBean(null, true, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
             return Response.ok(copyInformationBean).cacheControl(RESTException.never()).build();
         }
     }

@@ -1,5 +1,7 @@
 package com.atlassian.cpji.rest.model;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -7,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since v1.0
  */
 @XmlRootElement (name = "copyInformation")
+@JsonIgnoreProperties (ignoreUnknown = true)
 public class CopyInformationBean
 {
     @XmlElement (name = "issueTypes")
@@ -24,6 +27,9 @@ public class CopyInformationBean
     @XmlElement( name = "hasCreateIssuePermission")
     private Boolean hasCreateIssuePermission;
 
+    @XmlElement (name = "version")
+    private String version;
+
     @SuppressWarnings("unused")
     public CopyInformationBean()
     {
@@ -35,13 +41,15 @@ public class CopyInformationBean
                     final Boolean attachmentsEnabled,
                     final RemoteUserBean user,
                     final Boolean hasCreateIssuePermission,
-                    final Boolean hasCreateAttachmentPermission)
+                    final Boolean hasCreateAttachmentPermission,
+                    final String version)
     {
         this.issueTypes = issueTypes;
         this.attachmentsEnabled = attachmentsEnabled;
         this.user = user;
         this.hasCreateIssuePermission = hasCreateIssuePermission;
         this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
+        this.version = version;
     }
 
     public IssueTypeBean getIssueTypes()
@@ -69,4 +77,8 @@ public class CopyInformationBean
         return hasCreateAttachmentPermission;
     }
 
+    public String getVersion()
+    {
+        return version;
+    }
 }

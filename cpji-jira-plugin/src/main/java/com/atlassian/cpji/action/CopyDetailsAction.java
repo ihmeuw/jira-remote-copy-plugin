@@ -18,12 +18,14 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -38,17 +40,26 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
     private String remoteFullUserName;
 
     private Collection<Option> availableIssueTypes;
-
+    private List<Option> issueLinkOptions;
+    private final I18nHelper.BeanFactory beanFactory;
 
     public class Option
     {
         private final String value;
         private final boolean selected;
+        private String label;
 
         Option(String value, boolean selected)
         {
             this.value = value;
             this.selected = selected;
+        }
+
+        Option(String value, boolean selected, final String label)
+        {
+            this.value = value;
+            this.selected = selected;
+            this.label = label;
         }
 
         public String getValue()
@@ -59,6 +70,11 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         public boolean isSelected()
         {
             return selected;
+        }
+
+        public String getLabel()
+        {
+            return label;
         }
     }
 
@@ -71,9 +87,11 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             final FieldManager fieldManager,
             final FieldMapperFactory fieldMapperFactory,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final CopyIssuePermissionManager copyIssuePermissionManager)
+            final CopyIssuePermissionManager copyIssuePermissionManager,
+            final BeanFactory beanFactory)
     {
         super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager);
+        this.beanFactory = beanFactory;
     }
 
     @Override
@@ -119,6 +137,16 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
                 addErrorMessage("You don't have the create issue permission for this JIRA project!");
                 return ERROR;
             }
+            issueLinkOptions = new ArrayList<Option>();
+            I18nHelper i18nHelper = beanFactory.getInstance(getLoggedInUser());
+            String remoteJiraVersion = copyInformationBean.getVersion();
+            if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5.0"))
+            {
+                issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, i18nHelper.getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
+                issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, i18nHelper.getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
+            }
+            issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, i18nHelper.getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
+            issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, i18nHelper.getText(RemoteIssueLinkType.NONE.getI18nKey())));
             checkIssueTypes(copyInformationBean.getIssueTypes().getGetTypes());
             remoteAttachmentsEnabled = copyInformationBean.getAttachmentsEnabled();
             hasCreateAttachmentsPermission = copyInformationBean.getHasCreateAttachmentPermission();
@@ -193,6 +221,11 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
                 availableIssueTypes.add(new Option(value, false));
             }
         }
+    }
+
+    public List<Option> getIssueLinkOptions()
+    {
+        return issueLinkOptions;
     }
 
     public Collection<Option> getAvailableIssueTypes()
