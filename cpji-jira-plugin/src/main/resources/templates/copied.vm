@@ -1,38 +1,38 @@
-<body class="nl">
+<html>
+<body>
 
-<div id="stepped-process">
-    <div class="steps-wrap">
-        <div class="steps-container">
-            <ol class="steps">
+<div id="stepped-process" class="content-container">
+    <div class="content-related">
+    <ol class="steps">
                 <li class="done">Select project</li>
                 <li class="done">Select Issue Type</li>
                 <li class="current">Confirmation</li>
             </ol>
-        </div>
-        <div class="current-step">
-           <div class="aui-message success"><span class="aui-icon icon-success"></span>
-               <p class="title"><strong>Copy successful</strong></p>
-               <p><a href="../browse/$action.getIssueKey()">$action.getIssueKey()</a> has been copied to <a href="$action.linkToNewIssue" target="_blank">$action.copiedIssueKey</a></p>
-           </div>
-           #if ($action.invalidInput())
-           <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
-                 <p>There were some problems during issue creation.</p>
-                 <ul>
-                    #foreach( $error in $action.getErrorMessages() )
-                      <li>$error</li>
-                    #end
-                 </ul>
+    </div>
+    <div class="content-body aui-panel">
+       <div class="aui-message success"><span class="aui-icon icon-success"></span>
+           <p class="title"><strong>Copy successful</strong></p>
+           <p><a href="../browse/$action.getIssueKey()">$action.getIssueKey()</a> has been copied to <a href="$action.linkToNewIssue" target="_blank">$action.copiedIssueKey</a></p>
+       </div>
+       #if ($action.invalidInput())
+       <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
+             <p>There were some problems during issue creation.</p>
+             <ul>
+                #foreach( $error in $action.getErrorMessages() )
+                  <li>$error</li>
+                #end
+             </ul>
+            </div>
+       </div>
+       #end
+       <form action="../browse/$action.getIssueKey()" class="aui" method="get">
+           <div class="button-container">
+                <div class="buttons">
+                    <input type="submit" value="Back to issue" class="button submit"/>
                 </div>
            </div>
-           #end
-           <form action="../browse/$action.getIssueKey()" class="aui" method="get">
-               <div class="button-container">
-                    <div class="buttons">
-                        <input type="submit" value="Back to issue" class="button submit"/>
-                    </div>
-               </div>
-           </form>
-        </div>
+       </form>
     </div>
 </div>
 </body>
+</html>
