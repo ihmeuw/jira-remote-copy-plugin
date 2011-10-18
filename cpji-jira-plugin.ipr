@@ -2679,17 +2679,6 @@
         <root url="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.15/log4j-1.2.15-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: log4j:log4j:1.2.7">
-      <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.7/log4j-1.2.7.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.7/log4j-1.2.7-javadoc.jar!/" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.7/log4j-1.2.7-sources.jar!/" />
-      </SOURCES>
-    </library>
     <library name="Maven: mockobjects:alt-jdk1.3:0.07">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/mockobjects/alt-jdk1.3/0.07/alt-jdk1.3-0.07.jar!/" />

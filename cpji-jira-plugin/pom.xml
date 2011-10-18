@@ -20,18 +20,14 @@
         <profile>
             <id>jira1</id>
             <properties>
-                <cpji.build.directory>${basedir}/target_jira1</cpji.build.directory>
-                <http.port>5990</http.port>
-                <jvm.debug.port>5002</jvm.debug.port>
+                <http.port>2990</http.port>
                 <cli.port>1234</cli.port>
             </properties>
         </profile>
         <profile>
             <id>jira2</id>
             <properties>
-                <cpji.build.directory>${basedir}/target_jira2</cpji.build.directory>
-                <http.port>5991</http.port>
-                <jvm.debug.port>5003</jvm.debug.port>
+                <http.port>2991</http.port>
                 <cli.port>5678</cli.port>
             </properties>
         </profile>
@@ -130,13 +126,31 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
-                <version>3.3</version>
+                <artifactId>maven-amps-plugin</artifactId>
+                <version>3.5-m8</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <productVersion>${jira.version}</productVersion>
-                    <productDataVersion>${jira.data.version}</productDataVersion>
+
+                    <products>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira1</instanceId>
+                            <version>${jira.version}</version>
+                            <httpPort>2990</httpPort>
+                            <jvmDebugPort>5002</jvmDebugPort>
+                            <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
+                        </product>
+                        <product>
+                            <id>jira</id>
+                            <instanceId>jira2</instanceId>
+                            <version>${jira.version}</version>
+                            <httpPort>2991</httpPort>
+                            <jvmDebugPort>5003</jvmDebugPort>
+                            <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
+                        </product>
+                    </products>
                 </configuration>
+
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
