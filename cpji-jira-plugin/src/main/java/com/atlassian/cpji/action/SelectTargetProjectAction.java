@@ -42,6 +42,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     public enum ResponseStatus
     {
         AUTHORIZATION_REQUIRED,
+        AUTHENTICATION_FAILED,
         PLUGIN_NOT_INSTALLED,
         OK
     }
@@ -76,7 +77,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        EntityLink selectedEntityLink;
+        final EntityLink selectedEntityLink;
         try
         {
             selectedEntityLink = getSelectedEntityLink();
@@ -106,11 +107,17 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
                     {
                         log.debug("Response is: " + response.getResponseBodyAsString());
                     }
+                    if (response.getStatusCode() == 401)
+                    {
+                        log.debug("Authentication failed to remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "'");
+                        return ResponseStatus.AUTHENTICATION_FAILED;
+                    }
                     if ("installed".equals(response.getResponseBodyAsString().toLowerCase()))
                     {
-                        log.debug("Remote JIRA instance has the CPJI plugin installed.");
+                        log.debug("Remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "' has the CPJI plugin installed.");
                         return ResponseStatus.OK;
                     }
+                    log.debug("Remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "' has the CPJI plugin NOT installed.");
                     return ResponseStatus.PLUGIN_NOT_INSTALLED;
                 }
             });
@@ -122,6 +129,11 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             {
                 log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
                 addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
+                return ERROR;
+            }
+            else if (ResponseStatus.AUTHENTICATION_FAILED.equals(responseStatus))
+            {
+                addErrorMessage("Authentication failed. Check the authentication configuration.");
                 return ERROR;
             }
         }

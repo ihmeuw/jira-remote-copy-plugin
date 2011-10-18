@@ -48,6 +48,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -69,8 +70,8 @@ import javax.ws.rs.core.Response;
  * @since v1.0
  */
 @Path ("copyissue")
-@Consumes ( { MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-@Produces ( { MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Consumes ({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+@Produces ({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class CopyIssueResource
 {
     private final IssueService issueService;
@@ -139,7 +140,7 @@ public class CopyIssueResource
         IssueInputParametersImpl inputParameters = new IssueInputParametersImpl();
         IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
         projectFieldMapper.populateInputParameters(inputParameters, copyIssueBean, null, project);
-        Map<String,FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
+        Map<String, FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
         for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems)
         {
             OrderableField orderableField = fieldLayoutItem.getOrderableField();
@@ -204,7 +205,7 @@ public class CopyIssueResource
                 }
                 else
                 {
-                   log.warn("No support yet for custom field type '" + customField.getCustomFieldType().getClass().getCanonicalName() + "'");
+                    log.warn("No support yet for custom field type '" + customField.getCustomFieldType().getClass().getCanonicalName() + "'");
                 }
             }
         }
@@ -310,69 +311,76 @@ public class CopyIssueResource
     @PUT
     @Path ("fieldPermissions")
     public Response checkFieldPermissions(final CopyIssueBean copyIssueBean)
-            throws FieldLayoutStorageException
     {
-        ProjectService.GetProjectResult result = projectService.getProjectByKey(authenticationContext.getLoggedInUser(), copyIssueBean.getTargetProjectKey());
-        Project project;
-        if (result.isValid())
+        try
         {
-            project = result.getProject();
-        }
-        else
-        {
-            return Response.serverError().entity(ErrorBean.convertErrorCollection(result.getErrorCollection())).cacheControl(RESTException.never()).build();
-        }
-        final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
-        FieldLayout fieldLayout = fieldLayoutManager.getFieldLayout(project, issueType.getId());
-
-        Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType);
-
-        final List<SystemFieldPermissionBean> systemFieldPermissionBeans = new ArrayList<SystemFieldPermissionBean>();
-        final List<CustomFieldPermissionBean> customFieldPermissionBeans = new ArrayList<CustomFieldPermissionBean>();
-        SystemFieldMappingChecker systemFieldMappingChecker = new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout);
-        CustomFieldMappingChecker customFieldMappingChecker = new CustomFieldMappingChecker(defaultFieldValuesManager, copyIssueBean, project, fieldLayout, fieldManager, fieldMapperFactory, issueTypeSchemeManager);
-
-        systemFieldPermissionBeans.addAll(systemFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
-        customFieldPermissionBeans.addAll(customFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
-
-        Iterable<String> orderableFieldIds = Iterables.transform(fieldLayoutItems, new Function<FieldLayoutItem, String>()
-        {
-            public String apply(final FieldLayoutItem from)
+            ProjectService.GetProjectResult result = projectService.getProjectByKey(authenticationContext.getLoggedInUser(), copyIssueBean.getTargetProjectKey());
+            Project project;
+            if (result.isValid())
             {
-                return from.getOrderableField().getId();
-            }
-        });
-        ArrayList<String> fieldIds = Lists.newArrayList(orderableFieldIds);
-        Map<String,NonOrderableSystemFieldMapper> nonOrderableSystemFieldMappers = fieldMapperFactory.getNonOrderableSystemFieldMappers();
-        for (NonOrderableSystemFieldMapper nonOrderableSystemFieldMapper : nonOrderableSystemFieldMappers.values())
-        {
-            if (nonOrderableSystemFieldMapper.isVisible())
-            {
-                fieldIds.add(nonOrderableSystemFieldMapper.getFieldId());
-            }
-        }
-
-        for (String fieldId : fieldIds)
-        {
-            if (fieldManager.isCustomField(fieldId))
-            {
-                CustomFieldPermissionBean customFieldPermissionBean = customFieldMappingChecker.getFieldPermission(fieldId);
-                if (customFieldPermissionBean != null)
-                {
-                    customFieldPermissionBeans.add(customFieldPermissionBean);
-                }
+                project = result.getProject();
             }
             else
             {
-                SystemFieldPermissionBean fieldPermission = systemFieldMappingChecker.getFieldPermission(fieldId);
-                if (fieldPermission != null)
+                return Response.serverError().entity(ErrorBean.convertErrorCollection(result.getErrorCollection())).cacheControl(RESTException.never()).build();
+            }
+            final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
+            FieldLayout fieldLayout = fieldLayoutManager.getFieldLayout(project, issueType.getId());
+
+            Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType);
+
+            final List<SystemFieldPermissionBean> systemFieldPermissionBeans = new ArrayList<SystemFieldPermissionBean>();
+            final List<CustomFieldPermissionBean> customFieldPermissionBeans = new ArrayList<CustomFieldPermissionBean>();
+            SystemFieldMappingChecker systemFieldMappingChecker = new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout);
+            CustomFieldMappingChecker customFieldMappingChecker = new CustomFieldMappingChecker(defaultFieldValuesManager, copyIssueBean, project, fieldLayout, fieldManager, fieldMapperFactory, issueTypeSchemeManager);
+
+            systemFieldPermissionBeans.addAll(systemFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
+            customFieldPermissionBeans.addAll(customFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
+
+            Iterable<String> orderableFieldIds = Iterables.transform(fieldLayoutItems, new Function<FieldLayoutItem, String>()
+            {
+                public String apply(final FieldLayoutItem from)
                 {
-                    systemFieldPermissionBeans.add(fieldPermission);
+                    return from.getOrderableField().getId();
+                }
+            });
+            ArrayList<String> fieldIds = Lists.newArrayList(orderableFieldIds);
+            Map<String, NonOrderableSystemFieldMapper> nonOrderableSystemFieldMappers = fieldMapperFactory.getNonOrderableSystemFieldMappers();
+            for (NonOrderableSystemFieldMapper nonOrderableSystemFieldMapper : nonOrderableSystemFieldMappers.values())
+            {
+                if (nonOrderableSystemFieldMapper.isVisible())
+                {
+                    fieldIds.add(nonOrderableSystemFieldMapper.getFieldId());
                 }
             }
-        }
 
-        return Response.ok(new FieldPermissionsBean(systemFieldPermissionBeans, customFieldPermissionBeans)).cacheControl(RESTException.never()).build();
+            for (String fieldId : fieldIds)
+            {
+                if (fieldManager.isCustomField(fieldId))
+                {
+                    CustomFieldPermissionBean customFieldPermissionBean = customFieldMappingChecker.getFieldPermission(fieldId);
+                    if (customFieldPermissionBean != null)
+                    {
+                        customFieldPermissionBeans.add(customFieldPermissionBean);
+                    }
+                }
+                else
+                {
+                    SystemFieldPermissionBean fieldPermission = systemFieldMappingChecker.getFieldPermission(fieldId);
+                    if (fieldPermission != null)
+                    {
+                        systemFieldPermissionBeans.add(fieldPermission);
+                    }
+                }
+            }
+
+            return Response.ok(new FieldPermissionsBean(systemFieldPermissionBeans, customFieldPermissionBeans)).cacheControl(RESTException.never()).build();
+        }
+        catch (Exception ex)
+        {
+            log.error("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "'", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "' Error: '" + (ex.getMessage() == null ? ex.getClass().getName() : ex.getMessage()) + "' Stacktrace: '" + ExceptionUtils.getStackTrace(ex) + "'").cacheControl(RESTException.never()).build();
+        }
     }
 
 }

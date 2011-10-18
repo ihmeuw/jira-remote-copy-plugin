@@ -14,8 +14,8 @@ import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.rest.UnauthorizedResponseException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
-import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
+import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -94,7 +94,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        EntityLink entityLink = getSelectedEntityLink();
+        final EntityLink entityLink = getSelectedEntityLink();
         if (entityLink == null)
         {
             addErrorMessage("Failed to find the entity link.");
@@ -115,9 +115,13 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
 
                 public FieldPermissionsBean handle(final Response response) throws ResponseException
                 {
-                    if (!response.isSuccessful() && (response.getStatusCode() == 401))
+                    if (response.getStatusCode() == 401)
                     {
                         throw new UnauthorizedResponseException();
+                    }
+                    if (!response.isSuccessful())
+                    {
+                        throw new RuntimeException("Error from remote JIRA instance '" + entityLink.getApplicationLink().getRpcUrl() + "' Status code: '" + response.getStatusCode() + "' Response: '" + response.getResponseBodyAsString()+ "' ");
                     }
                     return response.getEntity(FieldPermissionsBean.class);
                 }

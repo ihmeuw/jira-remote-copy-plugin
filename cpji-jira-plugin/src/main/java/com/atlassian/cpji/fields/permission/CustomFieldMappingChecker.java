@@ -18,6 +18,7 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +35,8 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
     private final FieldManager fieldManager;
     private final FieldMapperFactory fieldMapperFactory;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
+
+    private static final Logger log = Logger.getLogger(CustomFieldMappingChecker.class);
 
     public CustomFieldMappingChecker(final DefaultFieldValuesManager defaultFieldValuesManager, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout, final FieldManager fieldManager, final FieldMapperFactory fieldMapperFactory, final IssueTypeSchemeManager issueTypeSchemeManager)
     {
@@ -89,8 +92,6 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
         }
     }
 
-
-
     public CustomFieldPermissionBean getFieldPermission(String fieldId)
     {
         final CustomField customField = fieldManager.getCustomField(fieldId);
@@ -114,7 +115,13 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                 return null;
             }
         }
+
         CustomFieldMapper fieldMapper = fieldMapperFactory.getCustomFieldMapper().get(customField.getCustomFieldType().getClass().getCanonicalName());
+        if (fieldMapper == null)
+        {
+            log.info("No mapper for custom field '" + customField.getCustomFieldType().getClass().getCanonicalName() + "' found.");
+            return null;
+        }
 
         final MappingResult mappingResult = fieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, findIssueType(copyIssueBean.getTargetIssueType(), project));
         PermissionBeanCreator<CustomFieldPermissionBean> beanCreator = new PermissionBeanCreator<CustomFieldPermissionBean>()
