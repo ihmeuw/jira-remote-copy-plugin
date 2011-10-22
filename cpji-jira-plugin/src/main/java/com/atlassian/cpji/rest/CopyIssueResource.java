@@ -22,8 +22,9 @@ import com.atlassian.cpji.rest.model.ErrorBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
-import com.atlassian.cpji.rest.model.RemoteUserBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
+import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
@@ -274,7 +275,8 @@ public class CopyIssueResource
     @Path ("issueTypeInformation/{project}")
     public Response getIssueTypeInformation(@PathParam ("project") String projectKey)
     {
-        ProjectService.GetProjectResult result = projectService.getProjectByKey(authenticationContext.getLoggedInUser(), projectKey);
+        User user = authenticationContext.getLoggedInUser();
+        ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
         Project project;
         if (result.isValid())
         {
@@ -284,9 +286,9 @@ public class CopyIssueResource
         {
             return Response.serverError().entity(ErrorBean.convertErrorCollection(result.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
-        RemoteUserBean userBean = new RemoteUserBean(authenticationContext.getLoggedInUser().getName(), authenticationContext.getLoggedInUser().getDisplayName());
-        boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, authenticationContext.getLoggedInUser());
-        boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, authenticationContext.getLoggedInUser());
+        UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
+        boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
+        boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 
         if (hasCreateIssuePermission)
         {

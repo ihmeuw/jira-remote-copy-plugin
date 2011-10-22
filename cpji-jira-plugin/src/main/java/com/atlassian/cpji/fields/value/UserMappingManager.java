@@ -1,8 +1,10 @@
 package com.atlassian.cpji.fields.value;
 
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
+import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.util.UserManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,9 +27,10 @@ public class UserMappingManager
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
     }
 
-    public User mapUser(UserBean userBean)
+    public User mapUser(UserBean userBean, final Project project)
     {
-        switch (copyIssueConfigurationManager.getUserMappingType())
+        UserMappingType userMappingType = copyIssueConfigurationManager.getUserMappingType(project);
+        switch (userMappingType)
         {
             case BY_E_MAIL:
                 return byEmail(userBean);
@@ -39,9 +42,17 @@ public class UserMappingManager
                 }
                 return null;
             case BY_USERNAME:
-                userManager.getUserObject(userBean.getUserName());
+                return userManager.getUserObject(userBean.getUserName());
+            default:
+                log.warn("No valid user mapping type '" + userMappingType + "' mapping user '" + userBean.getUserName() + "' by username.");
+                return userManager.getUserObject(userBean.getUserName());
         }
-        return null;
+    }
+
+    public UserBean createUserBean(final String userName)
+    {
+        User user = userManager.getUserObject(userName);
+        return new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
     }
 
     private User byEmail(final UserBean userBean)
@@ -60,15 +71,15 @@ public class UserMappingManager
         {
             if (user.getName().equalsIgnoreCase(userBean.getUserName()))
             {
-                log.debug("Mapped remote user with username: '" + userBean.getUserName() + "' and email: '" + userBean.getEmail() + "' to local user with username: '" + user.getName() + "'");
+                log.debug("Mapped remote user with user name: '" + userBean.getUserName() + "' and email: '" + userBean.getEmail() + "' to local user with user name: '" + user.getName() + "'");
                 return user;
             }
         }
-        log.warn("Could not find a local user for remote user with username: '" + userBean.getUserName() + "' and email: '" + userBean.getEmail() + "' returning no user");
+        log.warn("Could not find a local user for remote user with user name: '" + userBean.getUserName() + "' and email: '" + userBean.getEmail() + "' returning no user");
         return null;
     }
 
-    public List<User> getUsersByEmail(String email)
+    private List<User> getUsersByEmail(String email)
     {
         List<User> users = new ArrayList();
         String emailAddress = StringUtils.trimToNull(email);

@@ -1,7 +1,9 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.vote.VoteService;
 import com.atlassian.jira.issue.Issue;
@@ -10,7 +12,9 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.user.util.UserManager;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,19 +23,20 @@ import java.util.List;
 /**
  * @since v2.0
  */
-public class VoterFieldMapper extends AbstractFieldMapper implements SystemFieldPostIssueCreationFieldMapper, NonOrderableSystemFieldMapper
+public class VoterFieldMapper extends AbstractFieldMapper
+        implements SystemFieldPostIssueCreationFieldMapper, NonOrderableSystemFieldMapper
 {
     private final VoteService voteService;
-    private PermissionManager permissionManager;
-    private UserManager userManager;
-    private JiraAuthenticationContext jiraAuthenticationContext;
+    private final PermissionManager permissionManager;
+    private final UserMappingManager userMappingManager;
+    private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager, final UserManager userManager, final JiraAuthenticationContext jiraAuthenticationContext)
+    public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, final UserMappingManager userMappingManager)
     {
         super(field);
         this.voteService = voteService;
         this.permissionManager = permissionManager;
-        this.userManager = userManager;
+        this.userMappingManager = userMappingManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
     }
 
@@ -42,33 +47,40 @@ public class VoterFieldMapper extends AbstractFieldMapper implements SystemField
 
     public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
     {
-        final List<String> voters = bean.getVoters();
+        final List<UserBean> voters = bean.getVoters();
         if (voters == null)
         {
             return new MappingResult(Collections.<String>emptyList(), true, true);
         }
         if (!voteService.isVotingEnabled())
         {
-            return new MappingResult(voters, false, false);
+            ArrayList<String> unMappedUsers = Lists.newArrayList(Iterables.transform(voters, new Function<UserBean, String>()
+            {
+                public String apply(final UserBean from)
+                {
+                    return from.getUserName();
+                }
+            }));
+            return new MappingResult(unMappedUsers, false, false);
         }
         final List<String> unmappedUsers = new ArrayList<String>();
         final List<String> mappedUsers = new ArrayList<String>();
-        for (String voter : voters)
+        for (UserBean voter : voters)
         {
-            User user = userManager.getUserObject(voter);
+            User user = userMappingManager.mapUser(voter, project);
             if (user == null)
             {
-                unmappedUsers.add(voter);
+                unmappedUsers.add(voter.getUserName());
             }
             else
             {
                 if (!permissionManager.hasPermission(Permissions.BROWSE, project, user))
                 {
-                    unmappedUsers.add(voter);
+                    unmappedUsers.add(voter.getUserName());
                 }
                 else
                 {
-                    mappedUsers.add(voter);
+                    mappedUsers.add(voter.getUserName());
                 }
             }
         }
@@ -84,12 +96,12 @@ public class VoterFieldMapper extends AbstractFieldMapper implements SystemField
         if (permissionManager.hasPermission(Permissions.VIEW_VOTERS_AND_WATCHERS, issue.getProjectObject(), jiraAuthenticationContext.getLoggedInUser()) && voteService.isVotingEnabled())
         {
             final List<String> errors = new ArrayList<String>();
-            final List<String> voters = bean.getVoters();
+            final List<UserBean> voters = bean.getVoters();
             if (voters != null)
             {
-                for (String voter : voters)
+                for (UserBean voter : voters)
                 {
-                    User user = userManager.getUserObject(voter);
+                    User user = userMappingManager.mapUser(voter, issue.getProjectObject());
                     if (user != null)
                     {
                         VoteService.VoteValidationResult voteValidationResult = voteService.validateAddVote(jiraAuthenticationContext.getLoggedInUser(), user, issue);

@@ -12,6 +12,7 @@ import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
@@ -56,9 +57,10 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final FieldManager fieldManager,
             final FieldMapperFactory fieldMapperFactory,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final CopyIssuePermissionManager copyIssuePermissionManager)
+            final CopyIssuePermissionManager copyIssuePermissionManager,
+            final UserMappingManager userMappingManager)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
         this.hostApplication = hostApplication;
     }
 

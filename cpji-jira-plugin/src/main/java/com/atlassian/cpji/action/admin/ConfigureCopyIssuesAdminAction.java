@@ -4,6 +4,7 @@ import com.atlassian.cpji.config.CommentSecurityLevel;
 import com.atlassian.cpji.config.CommentSecurityType;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager;
+import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.crowd.embedded.api.Group;
@@ -33,6 +34,7 @@ import org.apache.log4j.Logger;
 import webwork.action.ActionContext;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private String projectKey;
     private List<IssueType> issueTypesForProject;
     private String selectedIssueTypeId;
+    private UserMappingType userMappingType;
 
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final IssueFactory issueFactory;
@@ -159,7 +162,13 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         }
         saveGroupPermission();
         saveCommentSecurityLevel();
+        saveUserMapping();
         return SUCCESS;
+    }
+
+    private void saveUserMapping()
+    {
+        copyIssueConfigurationManager.setUserMapping(userMappingType, getProject());
     }
 
     private void saveCommentSecurityLevel()
@@ -363,6 +372,16 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return copyIssueConfigurationManager.getCommentSecurityLevel(getProject());
     }
 
+    public List<UserMappingType> getUserMappingTypes()
+    {
+        return Arrays.asList(UserMappingType.values());
+    }
+
+    public UserMappingType getConfiguredUserMapping()
+    {
+        return copyIssueConfigurationManager.getUserMappingType(getProject());
+    }
+
     public void setCommentSecurityLevel(String commentSecurityLevelId)
     {
         StringTokenizer stringTokenizer = new StringTokenizer(commentSecurityLevelId, "#");
@@ -376,5 +395,10 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             String commentSecurityId = stringTokenizer.nextToken();
             selectedCommentSecurity = new CommentSecurityLevel(commentSecurityId, "", CommentSecurityType.valueOf(commentSecurityType));
         }
+    }
+
+    public void setUserMapping(String userMapping)
+    {
+        userMappingType = UserMappingType.valueOf(userMapping);
     }
 }

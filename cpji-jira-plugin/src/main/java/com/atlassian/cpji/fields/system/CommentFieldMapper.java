@@ -1,8 +1,10 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CommentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.comment.CommentService;
@@ -14,7 +16,6 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
-import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import org.apache.commons.lang.StringUtils;
 
@@ -28,18 +29,18 @@ public class CommentFieldMapper extends AbstractFieldMapper implements SystemFie
 {
     private final CommentService commentService;
     private final ProjectRoleManager projectRoleManager;
-    private final UserManager userManager;
     private final GroupManager groupManager;
     private final PermissionManager permissionsManager;
+    private final UserMappingManager userMappingManager;
 
-    public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, UserManager userManager, GroupManager groupManager, final PermissionManager permissionManager, final OrderableField field)
+    public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, GroupManager groupManager, final PermissionManager permissionManager, final OrderableField field, final UserMappingManager userMappingManager)
     {
         super(field);
         this.commentService = commentService;
         this.projectRoleManager = projectRoleManager;
-        this.userManager = userManager;
         this.groupManager = groupManager;
         this.permissionsManager = permissionManager;
+        this.userMappingManager = userMappingManager;
     }
 
     public void process(final Issue issue, final CopyIssueBean bean)
@@ -139,9 +140,9 @@ public class CommentFieldMapper extends AbstractFieldMapper implements SystemFie
         return new ResultHolder<Group>(true);
     }
 
-    private ResultHolder<User> findUser(final String username, final Project project)
+    private ResultHolder<User> findUser(final UserBean userBean, final Project project)
     {
-        User user = userManager.getUserObject(username);
+        User user = userMappingManager.mapUser(userBean, project);
         if (user == null)
         {
             return new ResultHolder<User>(false);

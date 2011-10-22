@@ -21,6 +21,7 @@ import com.atlassian.cpji.fields.system.SystemFieldIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.system.VoterFieldMapper;
 import com.atlassian.cpji.fields.system.WatcherFieldMapper;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.bc.issue.vote.VoteService;
 import com.atlassian.jira.bc.issue.watcher.WatcherService;
@@ -77,7 +78,8 @@ public class FieldMapperFactory
                     final FieldManager fieldManager,
                     final VoteService voteService,
                     final DatePickerConverter datePickerConverter,
-                    final DoubleConverter doubleConverter)
+                    final DoubleConverter doubleConverter,
+                    final UserMappingManager userMappingManager)
     {
         SystemFieldIssueCreationFieldMapper priorityFieldMapper = new PriorityFieldMapper(constantsManager, getOrderableField(fieldManager, IssueFieldConstants.PRIORITY));
         addFieldMapper(priorityFieldMapper.getField(), priorityFieldMapper);
@@ -85,7 +87,7 @@ public class FieldMapperFactory
         SystemFieldIssueCreationFieldMapper affectedVersionFieldMapper = new AffectedVersionsFieldMapper(versionManager, getOrderableField(fieldManager, IssueFieldConstants.AFFECTED_VERSIONS));
         addFieldMapper(affectedVersionFieldMapper.getField(), affectedVersionFieldMapper);
 
-        SystemFieldIssueCreationFieldMapper assigneeFieldMapper = new AssigneeFieldMapper(userManager, permissionManager, applicationProperties, getOrderableField(fieldManager, IssueFieldConstants.ASSIGNEE));
+        SystemFieldIssueCreationFieldMapper assigneeFieldMapper = new AssigneeFieldMapper(permissionManager, applicationProperties, getOrderableField(fieldManager, IssueFieldConstants.ASSIGNEE), userMappingManager);
         addFieldMapper(assigneeFieldMapper.getField(), assigneeFieldMapper);
 
         SystemFieldIssueCreationFieldMapper componentFieldMapper = new ComponentFieldMapper(projectComponentManager, getOrderableField(fieldManager, IssueFieldConstants.COMPONENTS));
@@ -106,7 +108,7 @@ public class FieldMapperFactory
         SystemFieldIssueCreationFieldMapper issueSecurityFieldMapper = new IssueSecurityFieldMapper(issueSecuritySchemeManager, issueSecurityLevelManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.SECURITY));
         addFieldMapper(issueSecurityFieldMapper.getField(), issueSecurityFieldMapper);
 
-        SystemFieldIssueCreationFieldMapper reporterFieldMapper = new ReporterFieldMapper(userManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.REPORTER));
+        SystemFieldIssueCreationFieldMapper reporterFieldMapper = new ReporterFieldMapper(permissionManager, getOrderableField(fieldManager, IssueFieldConstants.REPORTER), userMappingManager);
         addFieldMapper(reporterFieldMapper.getField(), reporterFieldMapper);
 
         SystemFieldIssueCreationFieldMapper summaryFieldMapper = new SummaryFieldMapper(getOrderableField(fieldManager, IssueFieldConstants.SUMMARY));
@@ -124,13 +126,13 @@ public class FieldMapperFactory
         /**
          * SystemFieldPostIssueCreationFieldMapper
          */
-        SystemFieldPostIssueCreationFieldMapper commentFieldMapper = new CommentFieldMapper(commentService, projectRoleManager, userManager, groupManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.COMMENT));
+        SystemFieldPostIssueCreationFieldMapper commentFieldMapper = new CommentFieldMapper(commentService, projectRoleManager, groupManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.COMMENT), userMappingManager);
         postIssueCreationFieldMapper.add(commentFieldMapper);
 
-        SystemFieldPostIssueCreationFieldMapper watcherFieldMapper = new WatcherFieldMapper(watcherService, permissionManager, jiraAuthenticationContext, userManager, createField(IssueFieldConstants.WATCHERS, "cpji.field.names.watchers"));
+        SystemFieldPostIssueCreationFieldMapper watcherFieldMapper = new WatcherFieldMapper(watcherService, permissionManager, jiraAuthenticationContext, createField(IssueFieldConstants.WATCHERS, "cpji.field.names.watchers"), userMappingManager);
         postIssueCreationFieldMapper.add(watcherFieldMapper);
 
-        SystemFieldPostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"), voteService, permissionManager, userManager, jiraAuthenticationContext);
+        SystemFieldPostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"), voteService, permissionManager, jiraAuthenticationContext, userMappingManager);
         postIssueCreationFieldMapper.add(votersFieldMapper);
 
         customFieldFieldMappers.add(new SelectListCFMapper());

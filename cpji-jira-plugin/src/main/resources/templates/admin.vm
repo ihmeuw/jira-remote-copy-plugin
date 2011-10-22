@@ -30,6 +30,17 @@
                  After copying the issue the plugin will add a comment with a link to the remote issue and apply this security level to the comment.
              </div>
          </div>
+         <div class="field-group">
+             <label for"userMapping">User Mapping</label>
+             <select class="select" name="userMapping" id="userMapping">
+                #foreach( $userMapping in $action.getUserMappingTypes() )
+                   <option value="$userMapping"  #if($action.getConfiguredUserMapping() == $userMapping) selected="" #end>$i18n.getText($userMapping.getI18nKey())</option>
+                #end
+             </select>
+             <div class="description">
+               Users from the remote JIRA instance are mapped by using the selected mapping type.
+             </div>
+         </div>
          <input type="hidden" name="projectKey" value="$action.getProjectKey()"/>
          <div class="buttons-container">
              <div class="buttons">

@@ -1,7 +1,9 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.ServiceOutcome;
 import com.atlassian.jira.bc.issue.watcher.WatcherService;
@@ -11,7 +13,6 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -25,15 +26,15 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
     private final WatcherService watcherService;
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
-    private final UserManager userManager;
+    private final UserMappingManager userMappingManager;
 
-    public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, final UserManager userManager, final Field field)
+    public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, final Field field, final UserMappingManager userMappingManager)
     {
         super(field);
         this.watcherService = watcherService;
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
-        this.userManager = userManager;
+        this.userMappingManager = userMappingManager;
     }
 
 
@@ -41,10 +42,10 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
     {
         if (watcherService.isWatchingEnabled() && permissionManager.hasPermission(Permissions.MANAGE_WATCHER_LIST, issue, jiraAuthenticationContext.getLoggedInUser()))
         {
-            List<String> watchers = makeSureNotNull(bean.getWatchers());
-            for (String username : watchers)
+            List<UserBean> watchers = makeSureNotNull(bean.getWatchers());
+            for (UserBean user : watchers)
             {
-                User watcher = findUser(username);
+                User watcher = findUser(user, issue.getProjectObject());
                 if (watcher != null)
                 {
                     ServiceOutcome<List<User>> serviceOutcome = watcherService.addWatcher(issue, jiraAuthenticationContext.getLoggedInUser(), watcher);
@@ -62,30 +63,30 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
     {
         List<String> unmappedValues = new ArrayList<String>();
         List<String> mappedValues = new ArrayList<String>();
-        List<String> watchers = makeSureNotNull(bean.getWatchers());
+        List<UserBean> watchers = makeSureNotNull(bean.getWatchers());
         if (watchers.isEmpty())
         {
             return new MappingResult(unmappedValues, true, true);
         }
-        for (String username : watchers)
+        for (UserBean user : watchers)
         {
-            User watcher = findUser(username);
+            User watcher = findUser(user, project);
             if (watcher == null)
             {
-                unmappedValues.add(username);
+                unmappedValues.add(user.getUserName());
             }
         }
         return new MappingResult(unmappedValues, !mappedValues.isEmpty(), false);
     }
 
-    private <T> List makeSureNotNull(List<T> inputList)
+    private <T>List makeSureNotNull(List<T> inputList)
     {
         return (inputList == null) ? Lists.newArrayList() : inputList;
     }
 
-    private User findUser(final String username)
+    private User findUser(final UserBean user, final Project project)
     {
-        return userManager.getUserObject(username);
+        return userMappingManager.mapUser(user, project);
     }
 
     public boolean isVisible()

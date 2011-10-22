@@ -16,7 +16,7 @@ public class CommentBean
     private String body;
 
     @XmlElement
-    private String author;
+    private UserBean author;
 
     @XmlElement
     private String roleLevel;
@@ -33,7 +33,7 @@ public class CommentBean
     @SuppressWarnings("unused")
     public CommentBean() {}
 
-    public CommentBean(final String body, final String author, final String roleLevel, final String groupLevel, final Date created, final Date updated)
+    public CommentBean(final String body, final UserBean author, final String roleLevel, final String groupLevel, final Date created, final Date updated)
     {
         this.body = body;
         this.author = author;
@@ -48,7 +48,7 @@ public class CommentBean
         return body;
     }
 
-    public String getAuthor()
+    public UserBean getAuthor()
     {
         return author;
     }

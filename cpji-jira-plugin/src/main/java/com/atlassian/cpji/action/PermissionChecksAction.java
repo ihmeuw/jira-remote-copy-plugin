@@ -11,6 +11,7 @@ import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.UnauthorizedResponseException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
@@ -50,9 +51,10 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
             final FieldMapperFactory fieldMapperFactory,
             final FieldManager fieldManager,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final CopyIssuePermissionManager copyIssuePermissionManager)
+            final CopyIssuePermissionManager copyIssuePermissionManager,
+            final UserMappingManager userMappingManager)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
         this.fieldMapperFactory = fieldMapperFactory;
     }
 

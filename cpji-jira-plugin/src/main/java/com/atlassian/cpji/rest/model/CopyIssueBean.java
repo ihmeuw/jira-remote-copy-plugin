@@ -25,11 +25,11 @@ public class CopyIssueBean
 
     private String priority;
 
-    private String reporter;
+    private UserBean reporter;
 
     private String environment;
 
-    private String assignee;
+    private UserBean assignee;
 
     private List<CommentBean> comments;
 
@@ -45,13 +45,13 @@ public class CopyIssueBean
 
     private List<VersionBean> fixedForVersions;
 
-    private List<String> watchers;
+    private List<UserBean> watchers;
 
     private List<String> visibleSystemFieldIds;
 
     private List<CustomFieldBean> customFields;
 
-    private List<String> voters;
+    private List<UserBean> voters;
 
     @XmlJavaTypeAdapter (DateAdapter.class)
     private Date dueDate;
@@ -131,12 +131,12 @@ public class CopyIssueBean
         return priority;
     }
 
-    public String getReporter()
+    public UserBean getReporter()
     {
         return reporter;
     }
 
-    public void setReporter(final String reporter)
+    public void setReporter(final UserBean reporter)
     {
         this.reporter = reporter;
     }
@@ -151,12 +151,12 @@ public class CopyIssueBean
         return environment;
     }
 
-    public String getAssignee()
+    public UserBean getAssignee()
     {
         return assignee;
     }
 
-    public void setAssignee(final String assignee)
+    public void setAssignee(final UserBean assignee)
     {
         this.assignee = assignee;
     }
@@ -231,22 +231,22 @@ public class CopyIssueBean
         this.fixedForVersions = fixedForVersions;
     }
 
-    public List<String> getWatchers()
+    public List<UserBean> getWatchers()
     {
         return watchers;
     }
 
-    public void setWatchers(final List<String> watchers)
+    public void setWatchers(final List<UserBean> watchers)
     {
         this.watchers = watchers;
     }
 
-    public List<String> getVoters()
+    public List<UserBean> getVoters()
     {
         return voters;
     }
 
-    public void setVoters(final List<String> voters)
+    public void setVoters(final List<UserBean> voters)
     {
         this.voters = voters;
     }

@@ -1,7 +1,9 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -12,9 +14,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.user.util.UserManager;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 
@@ -24,14 +24,14 @@ import java.util.Collections;
  */
 public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
 {
-    private final UserManager userManager;
     private final PermissionManager permissionManager;
+    private final UserMappingManager userMappingManager;
 
-    public ReporterFieldMapper(UserManager userManager, final PermissionManager permissionManager, final Field field)
+    public ReporterFieldMapper(final PermissionManager permissionManager, final Field field, final UserMappingManager userMappingManager)
     {
         super(field);
-        this.userManager = userManager;
         this.permissionManager = permissionManager;
+        this.userMappingManager = userMappingManager;
     }
 
     public Class<? extends OrderableField> getField()
@@ -41,7 +41,7 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
 
     public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
-        final User reporter = findUser(bean.getReporter());
+        final User reporter = findUser(bean.getReporter(), project);
         if (reporter != null)
         {
             inputParameters.setReporterId(reporter.getName());
@@ -59,21 +59,21 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
 
     public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
     {
-        if (StringUtils.isEmpty(bean.getReporter()))
+        if (bean.getReporter() == null)
         {
            return new MappingResult(Collections.<String>emptyList(), true, true);
         }
-        final User reporter = findUser(bean.getReporter());
+        final User reporter = findUser(bean.getReporter(), project);
         if (reporter == null)
         {
-            return new MappingResult(Lists.newArrayList(bean.getReporter()), false, false);
+            return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false);
         }
         return new MappingResult(Collections.<String>emptyList(), true, false);
     }
 
-    private User findUser(final String username)
+    private User findUser(final UserBean user, final Project project)
     {
-        return userManager.getUserObject(username);
+        return userMappingManager.mapUser(user, project);
     }
 
     public String getFieldId()

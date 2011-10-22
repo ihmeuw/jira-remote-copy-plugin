@@ -10,6 +10,7 @@ import com.atlassian.cpji.IssueAttachmentsClient;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.ResponseHolder;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.ErrorBean;
@@ -72,9 +73,10 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
                     final FieldMapperFactory fieldMapperFactory,
                     final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
                     final CopyIssuePermissionManager copyIssuePermissionManager,
-                    final IssueLinkClient issueLinkClient)
+                    final IssueLinkClient issueLinkClient,
+                    final UserMappingManager userMappingManager)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
         this.issueLinkClient = issueLinkClient;
     }
 

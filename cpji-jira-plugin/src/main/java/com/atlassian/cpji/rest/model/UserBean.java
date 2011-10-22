@@ -15,14 +15,18 @@ public class UserBean
     @XmlElement
     private String email;
 
+    @XmlElement
+    private String fullName;
+
     @SuppressWarnings("unused")
     public UserBean(){}
 
 
-    public UserBean(String userName, String email)
+    public UserBean(String userName, String email, final String fullName)
     {
         this.userName = userName;
         this.email = email;
+        this.fullName = fullName;
     }
 
     public String getUserName()
@@ -33,5 +37,10 @@ public class UserBean
     public String getEmail()
     {
         return email;
+    }
+
+    public String getFullName()
+    {
+        return fullName;
     }
 }

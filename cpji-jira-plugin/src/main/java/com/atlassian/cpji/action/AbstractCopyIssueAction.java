@@ -9,11 +9,13 @@ import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CommentBean;
 import com.atlassian.cpji.rest.model.ComponentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.cpji.rest.model.TimeTrackingBean;
+import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.cpji.rest.model.VersionBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.ServiceOutcome;
@@ -79,6 +81,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
     private final FieldMapperFactory fieldMapperFactory;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
+    private final UserMappingManager userMappingManager;
 
     public AbstractCopyIssueAction(final SubTaskManager subTaskManager,
             final EntityLinkService entityLinkService,
@@ -87,7 +90,8 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             final FieldManager fieldManager,
             final FieldMapperFactory fieldMapperFactory,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final CopyIssuePermissionManager copyIssuePermissionManager)
+            final CopyIssuePermissionManager copyIssuePermissionManager,
+            final UserMappingManager userMappingManager)
     {
         super(subTaskManager);
         this.entityLinkService = entityLinkService;
@@ -97,6 +101,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
         this.fieldMapperFactory = fieldMapperFactory;
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
+        this.userMappingManager = userMappingManager;
     }
 
     @SuppressWarnings ("unused")
@@ -119,7 +124,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
         }
         catch (UnsupportedEncodingException ex)
         {
-            throw new RuntimeException("UTF-8 encoding not supported",ex);
+            throw new RuntimeException("UTF-8 encoding not supported", ex);
         }
     }
 
@@ -148,7 +153,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
         Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(issueToCopy);
         List<String> visibleFieldIds = new ArrayList<String>();
         List<CustomFieldBean> customFieldBeans = new ArrayList<CustomFieldBean>();
-        Map<String,FieldMapper> systemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
+        Map<String, FieldMapper> systemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
         for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems)
         {
             OrderableField orderableField = fieldLayoutItem.getOrderableField();
@@ -176,7 +181,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             }
             else if (orderableField instanceof ReporterSystemField)
             {
-                copyIssueBean.setReporter(issueToCopy.getReporterId());
+                copyIssueBean.setReporter(userMappingManager.createUserBean(issueToCopy.getReporterId()));
             }
             else if (orderableField instanceof EnvironmentSystemField)
             {
@@ -184,7 +189,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             }
             else if (orderableField instanceof AssigneeSystemField)
             {
-                copyIssueBean.setAssignee(issueToCopy.getAssigneeId());
+                copyIssueBean.setAssignee(userMappingManager.createUserBean(issueToCopy.getAssigneeId()));
             }
             else if (orderableField instanceof DescriptionSystemField)
             {
@@ -258,7 +263,14 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
         if (watchingEnabled)
         {
             List<String> currentWatcherUsernames = getWatcherManager().getCurrentWatcherUsernames(issueToCopy);
-            copyIssueBean.setWatchers(currentWatcherUsernames);
+            Iterable<UserBean> userBeans = Iterables.transform(currentWatcherUsernames, new Function<String, UserBean>()
+            {
+                public UserBean apply(final String from)
+                {
+                    return userMappingManager.createUserBean(from);
+                }
+            });
+            copyIssueBean.setWatchers(Lists.<UserBean>newArrayList(userBeans));
             visibleFieldIds.add(IssueFieldConstants.WATCHERS);
         }
 
@@ -268,10 +280,10 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
         {
             visibleFieldIds.add(IssueFieldConstants.VOTERS);
             Collection<User> returnedValue = collectionServiceOutcome.getReturnedValue();
-            List<String> voters = new ArrayList<String>();
+            List<UserBean> voters = new ArrayList<UserBean>();
             for (User user : returnedValue)
             {
-                voters.add(user.getName());
+                voters.add(new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName()));
             }
             copyIssueBean.setVoters(voters);
         }
@@ -285,7 +297,8 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
 
             for (Comment comment : comments)
             {
-                CommentBean commentBean = new CommentBean(comment.getBody(), comment.getAuthor(), (comment.getRoleLevel() == null) ? null : comment.getRoleLevel().getName(), comment.getGroupLevel(), comment.getCreated(), comment.getUpdated());
+                UserBean userBean = userMappingManager.createUserBean(comment.getAuthor());
+                CommentBean commentBean = new CommentBean(comment.getBody(), userBean, (comment.getRoleLevel() == null) ? null : comment.getRoleLevel().getName(), comment.getGroupLevel(), comment.getCreated(), comment.getUpdated());
                 commentBeans.add(commentBean);
             }
             copyIssueBean.setComments(commentBeans);

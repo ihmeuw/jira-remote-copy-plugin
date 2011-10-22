@@ -14,6 +14,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +33,11 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
     private ProjectRoleManager projectRoleManager;
     public static final String TYPE = ".type";
 
-    public static final String CPJI_SECURITY_LEVEL_KEY = "cpji.security.level.%s";
+    private static final Logger log = Logger.getLogger(DefaultCopyIssueConfigurationManager.class);
+
+    public static final String CPJI = "cpji.";
+    public static final String CPJI_SECURITY_LEVEL_KEY = CPJI + "security.level.%s";
+    private static final String CPJI_USER_MAPPING_KEY = CPJI + "user.mapping.%s";
 
     public DefaultCopyIssueConfigurationManager
             (
@@ -62,16 +67,16 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
         else
         {
             final PluginSettings settings = pluginSettingsFactory.createSettingsForKey(project.getKey());
-            settings.put(createKey(project.getKey()), commentSecurityLevel.getId().toString());
-            settings.put(createKey(project.getKey()) + TYPE, commentSecurityLevel.getType().toString());
+            settings.put(createKeyForSecurityLevel(project.getKey()), commentSecurityLevel.getId().toString());
+            settings.put(createKeyForSecurityLevel(project.getKey()) + TYPE, commentSecurityLevel.getType().toString());
         }
     }
 
     public void clearCommentSecurityLevel(Project project)
     {
         final PluginSettings settings = pluginSettingsFactory.createSettingsForKey(project.getKey());
-        settings.remove(createKey(project.getKey()));
-        settings.remove(createKey(project.getKey()) + TYPE);
+        settings.remove(createKeyForSecurityLevel(project.getKey()));
+        settings.remove(createKeyForSecurityLevel(project.getKey()) + TYPE);
     }
 
     private CommentSecurityLevel findCommentSecurityLevel(final CommentSecurityLevel commentSecurityLevel, Project project)
@@ -117,9 +122,14 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
         }
     }
 
-    private String createKey(final String projectKey)
+    private String createKeyForSecurityLevel(final String projectKey)
     {
         return String.format(CPJI_SECURITY_LEVEL_KEY, projectKey);
+    }
+
+    private String createKeyForUserMapping(final String projectKey)
+    {
+        return String.format(CPJI_USER_MAPPING_KEY, projectKey);
     }
 
     public List<CommentSecurityLevel> getSecurityLevels(Project project)
@@ -161,8 +171,8 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
     {
         Assertions.notNull("project", project);
         final PluginSettings settings = pluginSettingsFactory.createSettingsForKey(project.getKey());
-        String commentSecurityLevelId = (String) settings.get(createKey(project.getKey()));
-        String commentSecurityLevelType = (String) settings.get(createKey(project.getKey()) + TYPE);
+        String commentSecurityLevelId = (String) settings.get(createKeyForSecurityLevel(project.getKey()));
+        String commentSecurityLevelType = (String) settings.get(createKeyForSecurityLevel(project.getKey()) + TYPE);
         if (commentSecurityLevelId == null || commentSecurityLevelType == null)
         {
             return null;
@@ -178,9 +188,32 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
         }
     }
 
-    public UserMappingType getUserMappingType()
+    public UserMappingType getUserMappingType(final Project project)
     {
-        return UserMappingType.BY_USERNAME;
+        PluginSettings settingsForKey = pluginSettingsFactory.createSettingsForKey(project.getKey());
+        Object userMappingType = settingsForKey.get(createKeyForUserMapping(project.getKey()));
+        if (userMappingType == null)
+        {
+            return UserMappingType.BY_USERNAME;
+        }
+        else
+        {
+            try
+            {
+                return UserMappingType.valueOf((String) userMappingType);
+            }
+            catch (Exception ex)
+            {
+                log.error("Failed to read user mapping type. Value '" + userMappingType + "' not a valid user mapping type. Using default '" + UserMappingType.BY_USERNAME + "'", ex);
+                return UserMappingType.BY_USERNAME;
+            }
+        }
+    }
+
+    public void setUserMapping(final UserMappingType userMapping, final Project project)
+    {
+        PluginSettings settingsForKey = pluginSettingsFactory.createSettingsForKey(project.getKey());
+        settingsForKey.put(createKeyForUserMapping(project.getKey()), userMapping.name());
     }
 
 
