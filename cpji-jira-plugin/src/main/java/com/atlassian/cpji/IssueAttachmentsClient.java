@@ -43,7 +43,7 @@ public class IssueAttachmentsClient
         ApplicationLinkRequest request;
         try
         {
-            request = authenticatedRequestFactory.createRequest(Request.MethodType.POST, "rest/api/2.0.alpha1/issue/" + issueKey + "/attachments");
+            request = authenticatedRequestFactory.createRequest(Request.MethodType.POST, "rest/api/latest/issue/" + issueKey + "/attachments");
         }
         catch (CredentialsRequiredException e)
         {
