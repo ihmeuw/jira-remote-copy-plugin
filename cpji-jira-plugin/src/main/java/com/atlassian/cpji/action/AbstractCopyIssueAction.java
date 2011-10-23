@@ -179,7 +179,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             {
                 copyIssueBean.setPriority(issueToCopy.getPriorityObject().getName());
             }
-            else if (orderableField instanceof ReporterSystemField)
+            else if (orderableField instanceof ReporterSystemField && StringUtils.isNotBlank(issueToCopy.getReporterId()))
             {
                 copyIssueBean.setReporter(userMappingManager.createUserBean(issueToCopy.getReporterId()));
             }
@@ -187,7 +187,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             {
                 copyIssueBean.setEnvironment(issueToCopy.getEnvironment());
             }
-            else if (orderableField instanceof AssigneeSystemField)
+            else if (orderableField instanceof AssigneeSystemField && StringUtils.isNotBlank(issueToCopy.getAssigneeId()))
             {
                 copyIssueBean.setAssignee(userMappingManager.createUserBean(issueToCopy.getAssigneeId()));
             }

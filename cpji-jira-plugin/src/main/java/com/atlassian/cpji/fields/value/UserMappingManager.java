@@ -6,6 +6,7 @@ import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.util.dbc.Assertions;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -51,6 +52,7 @@ public class UserMappingManager
 
     public UserBean createUserBean(final String userName)
     {
+        Assertions.notBlank("userName", userName);
         User user = userManager.getUserObject(userName);
         return new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
     }
