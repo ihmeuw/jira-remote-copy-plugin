@@ -235,7 +235,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cpji-jira.iml" filepath="$PROJECT_DIR$/cpji-jira.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cpji-jira.iml" filepath="$PROJECT_DIR$/cpji-jira.iml" />
       <module fileurl="file://$PROJECT_DIR$/cpji-jira-plugin/cpji-jira-plugin.iml" filepath="$PROJECT_DIR$/cpji-jira-plugin/cpji-jira-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cpji-jira-plugin/cpji-jira-plugin.iml" filepath="$PROJECT_DIR$/cpji-jira-plugin/cpji-jira-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cpji-jira-plugin-test/cpji-jira-plugin-test.iml" filepath="$PROJECT_DIR$/cpji-jira-plugin-test/cpji-jira-plugin-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/cpji-jira-plugin-test/cpji-jira-plugin-test.iml" filepath="$PROJECT_DIR$/cpji-jira-plugin-test/cpji-jira-plugin-test.iml" />
     </modules>
   </component>
