@@ -41,10 +41,13 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
 
     public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
-        final User reporter = findUser(bean.getReporter(), project);
-        if (reporter != null)
+        if (bean.getReporter() != null)
         {
-            inputParameters.setReporterId(reporter.getName());
+            final User reporter = findUser(bean.getReporter(), project);
+            if (reporter != null)
+            {
+                inputParameters.setReporterId(reporter.getName());
+            }
         }
         else if(fieldLayoutItem.isRequired())
         {
