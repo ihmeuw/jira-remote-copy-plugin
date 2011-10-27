@@ -6,8 +6,10 @@ import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.ErrorCollection;
@@ -24,15 +26,16 @@ import com.atlassian.sal.api.net.ReturningResponseHandler;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Component for create (remote) issue links.
  */
 public class IssueLinkClient
 {
-    private static final String JSON_CONTENT_TYPE = "application/json";
     private static final String REST_BASE_URL = "rest/api/2/issue";
     private static final String REMOTE_LINK_RESOURCE = "remotelink";
+
     private final InternalHostApplication internalHostApplication;
     private final RemoteIssueLinkService remoteIssueLinkService;
     private final JiraAuthenticationContext jiraAuthenticationContext;
@@ -46,36 +49,39 @@ public class IssueLinkClient
         this.jiraAuthenticationContext = jiraAuthenticationContext;
     }
 
-    public RestResponse createRemoteIssueLinkFromIssue(final Issue issue, final ApplicationLink applicationLink, final String remoteIssueKey, final String relationship)
+    public RestResponse createLinkFromRemoteIssue(final Issue localIssue, final ApplicationLink applicationLink, final String remoteIssueKey, final String relationship)
             throws CredentialsRequiredException, ResponseException
     {
         final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
-        request.setRequestContentType(JSON_CONTENT_TYPE);
-        request.setRequestBody(getJsonForCreateRemoteIssueLink(internalHostApplication, issue, relationship));
+        request.setRequestContentType(MediaType.APPLICATION_JSON);
+        request.setRequestBody(getJsonForCreateRemoteIssueLink(internalHostApplication, localIssue, relationship));
         return request.executeAndReturn(new RestResponseHandler());
     }
 
-    public void createRemoteLinkToIssue(final Issue sourceIssue, final ApplicationLink applicationLink, final String targetIssueKey, final Long targetIssueId)
+    public void createLinkToRemoteIssue(final Issue localIssue, final ApplicationLink applicationLink, final String remoteIssueKey, final Long remoteIssueId, final String relationship)
     {
-        RemoteIssueLinkBuilder remoteIssueLinkBuilder = new RemoteIssueLinkBuilder();
-        String globalId = encodeGlobalId(applicationLink.getId(), targetIssueId);
-        remoteIssueLinkBuilder.globalId(globalId);
-        remoteIssueLinkBuilder.applicationType("com.atlassian.jira");
-        remoteIssueLinkBuilder.relationship("copied to");
-        String url = buildIssueUrl(applicationLink.getDisplayUrl().toASCIIString(), targetIssueKey);
-        remoteIssueLinkBuilder.url(url);
-        remoteIssueLinkBuilder.applicationName(applicationLink.getName());
-        remoteIssueLinkBuilder.issueId(sourceIssue.getId());
-        remoteIssueLinkBuilder.title(targetIssueKey);
+        final String globalId = encodeGlobalId(applicationLink.getId(), remoteIssueId);
+        final String url = buildIssueUrl(applicationLink.getDisplayUrl().toASCIIString(), remoteIssueKey);
 
-        RemoteIssueLinkService.CreateValidationResult issueLinkValidationResult = remoteIssueLinkService.validateCreate(jiraAuthenticationContext.getLoggedInUser(), remoteIssueLinkBuilder.build());
+        final RemoteIssueLink remoteIssueLink = new RemoteIssueLinkBuilder()
+                .globalId(globalId)
+                .applicationType(RemoteIssueLink.APPLICATION_TYPE_JIRA)
+                .relationship(relationship)
+                .url(url)
+                .applicationName(applicationLink.getName())
+                .issueId(localIssue.getId())
+                .title(remoteIssueKey)
+                .build();
+
+        final User user = callingUser();
+        final RemoteIssueLinkService.CreateValidationResult issueLinkValidationResult = remoteIssueLinkService.validateCreate(user, remoteIssueLink);
         if (issueLinkValidationResult.isValid())
         {
-            RemoteIssueLinkService.RemoteIssueLinkResult remoteIssueLinkResult = remoteIssueLinkService.create(jiraAuthenticationContext.getLoggedInUser(), issueLinkValidationResult);
+            final RemoteIssueLinkService.RemoteIssueLinkResult remoteIssueLinkResult = remoteIssueLinkService.create(user, issueLinkValidationResult);
         }
         else
         {
-           log.error("Failed to create issue link to remote JIRA issue with key '" + targetIssueKey + "' Error(s): " + issueLinkValidationResult.getErrorCollection());
+           log.error("Failed to create issue link to remote JIRA issue with key '" + remoteIssueKey + "' Error(s): " + issueLinkValidationResult.getErrorCollection());
         }
     }
 
@@ -89,7 +95,7 @@ public class IssueLinkClient
             json.put("globalId", globalId);
 
             final JSONObject application = new JSONObject();
-            application.put("type", "com.atlassian.jira");
+            application.put("type", RemoteIssueLink.APPLICATION_TYPE_JIRA);
             application.put("name", internalHostApplication.getName());
             json.put("application", application);
 
@@ -186,5 +192,10 @@ public class IssueLinkClient
 
             return new RestResponse(errors, response.getStatusCode(), response.getStatusText(), response.isSuccessful());
         }
+    }
+
+    private User callingUser()
+    {
+        return jiraAuthenticationContext.getLoggedInUser();
     }
 }

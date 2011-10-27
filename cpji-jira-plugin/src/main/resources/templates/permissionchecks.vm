@@ -1,3 +1,4 @@
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.PermissionChecksAction" *#
 <html>
 <body>
 <div id="stepped-process" class="content-container">
@@ -90,6 +91,7 @@
             <input type="hidden" name="targetEntityLink" value="$action.targetEntityLink"/>
             <input type="hidden" name="issueType" value="$action.getIssueType()"/>
             <input type="hidden" name="copyAttachments" value="$action.copyAttachments()"/>
+            <input type="hidden" name="copyIssueLinks" value="$action.copyIssueLinks()"/>
             <input type="hidden" name="remoteIssueLink" value="$action.remoteIssueLink()"/>
         </form>
     </div>

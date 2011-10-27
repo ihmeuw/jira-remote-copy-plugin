@@ -41,6 +41,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
     private boolean canCopyIssue = true;
     private final FieldMapperFactory fieldMapperFactory;
     private boolean copyAttachments;
+    private boolean copyIssueLinks;
     private String remoteIssueLink;
 
     public PermissionChecksAction(
@@ -231,6 +232,16 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
     public void setCopyAttachments(final boolean copyAttachments)
     {
         this.copyAttachments = copyAttachments;
+    }
+
+    public boolean copyIssueLinks()
+    {
+        return copyIssueLinks;
+    }
+
+    public void setCopyIssueLinks(final boolean copyIssueLinks)
+    {
+        this.copyIssueLinks = copyIssueLinks;
     }
 
     public String remoteIssueLink()

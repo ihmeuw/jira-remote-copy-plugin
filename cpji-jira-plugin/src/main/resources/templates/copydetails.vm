@@ -58,6 +58,16 @@
                  </span>
                 </div>
             #end
+
+            <fieldset class="group">
+                <legend>
+                    <span>Copy Issue Links</span>
+                </legend>
+                <div class="checkbox">
+                    <input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
+                </div>
+            </fieldset>
+
             <div class="field-group">
                 <label for="remoteIssueLink">Create Issue Link</label>
                 <select name="remoteIssueLink" id="remoteIssueLink">

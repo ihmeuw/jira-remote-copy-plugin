@@ -1,11 +1,6 @@
 package com.atlassian.cpji.action;
 
-import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.applinks.api.ApplicationLinkRequest;
-import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
-import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
-import com.atlassian.applinks.api.EntityLink;
-import com.atlassian.applinks.api.EntityLinkService;
+import com.atlassian.applinks.api.*;
 import com.atlassian.cpji.IssueAttachmentsClient;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -19,10 +14,15 @@ import com.atlassian.cpji.rest.util.Holder;
 import com.atlassian.cpji.util.IssueLinkClient;
 import com.atlassian.cpji.util.RestResponse;
 import com.atlassian.jira.config.SubTaskManager;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.link.IssueLink;
+import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.IssueLinkType;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
@@ -40,11 +40,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     public static final int CONNECTION_TIMEOUTS = 100000;
     private String copiedIssueKey;
     private boolean copyAttachments;
+    private boolean copyIssueLinks;
     private String issueType;
     private String remoteIssueLink;
 
     private static final Logger log = Logger.getLogger(CopyIssueToInstanceAction.class);
     private final IssueLinkClient issueLinkClient;
+    private final IssueLinkManager issueLinkManager;
+    private final RemoteIssueLinkManager remoteIssueLinkManager;
 
     private class CreationResult
     {
@@ -74,10 +77,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
                     final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
                     final CopyIssuePermissionManager copyIssuePermissionManager,
                     final IssueLinkClient issueLinkClient,
-                    final UserMappingManager userMappingManager)
+                    final UserMappingManager userMappingManager,
+                    final IssueLinkManager issueLinkManager,
+                    final RemoteIssueLinkManager remoteIssueLinkManager)
     {
         super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
         this.issueLinkClient = issueLinkClient;
+        this.issueLinkManager = issueLinkManager;
+        this.remoteIssueLinkManager = remoteIssueLinkManager;
     }
 
     @Override
@@ -89,9 +96,10 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        EntityLink linkToTargetEntity = getSelectedEntityLink();
-        ApplicationLink targetApplication = linkToTargetEntity.getApplicationLink();
-        ApplicationLinkRequestFactory authenticatedRequestFactory = targetApplication.createAuthenticatedRequestFactory();
+        
+        final EntityLink linkToTargetEntity = getSelectedEntityLink();
+        final ApplicationLink appLink = linkToTargetEntity.getApplicationLink();
+        final ApplicationLinkRequestFactory authenticatedRequestFactory = appLink.createAuthenticatedRequestFactory();
 
         ApplicationLinkRequest request = authenticatedRequestFactory.createRequest(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/copy");
         request.setSoTimeout(CONNECTION_TIMEOUTS);
@@ -128,17 +136,23 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
             copiedIssueKey = resultHolder.value.getIssueKey();
             if (copyAttachments() && !issueToCopy.getAttachments().isEmpty())
             {
-                IssueAttachmentsClient issueAttachmentsClient = new IssueAttachmentsClient(targetApplication);
+                IssueAttachmentsClient issueAttachmentsClient = new IssueAttachmentsClient(appLink);
                 ResponseHolder copyAttachmentResponse = issueAttachmentsClient.addAttachment(copiedIssueKey, issueToCopy.getAttachments());
                 if (!copyAttachmentResponse.isSuccessful())
                 {
                     addErrorMessage("Failed to copy attachments. " + copyAttachmentResponse.getResponse());
                 }
             }
+
+            if (copyIssueLinks() && issueLinkManager.isLinkingEnabled())
+            {
+                copyLocalIssueLinks(issueToCopy, resultHolder.value.getIssueKey(), resultHolder.value.getIssueId(), appLink);
+            }
+
             RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
             if (remoteIssueLinkType.equals(RemoteIssueLinkType.INCOMING) || remoteIssueLinkType.equals(RemoteIssueLinkType.RECIPROCAL))
             {
-                 RestResponse remoteIssueLinkResponse = issueLinkClient.createRemoteIssueLinkFromIssue(issueToCopy, targetApplication, copiedIssueKey, "copied from");
+                 RestResponse remoteIssueLinkResponse = issueLinkClient.createLinkFromRemoteIssue(issueToCopy, appLink, copiedIssueKey, "copied from");
                  if (!remoteIssueLinkResponse.isSuccessful())
                  {
                      log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + issueToCopy.getKey() + "'");
@@ -146,12 +160,42 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
             }
             if (remoteIssueLinkType.equals(RemoteIssueLinkType.OUTGOING) || remoteIssueLinkType.equals(RemoteIssueLinkType.RECIPROCAL))
             {
-                issueLinkClient.createRemoteLinkToIssue(issueToCopy, targetApplication, resultHolder.value.getIssueKey(), resultHolder.value.getIssueId());
+                issueLinkClient.createLinkToRemoteIssue(issueToCopy, appLink, resultHolder.value.getIssueKey(), resultHolder.value.getIssueId(), "copied to");
             }
             return SUCCESS;
         }
         addErrorMessages(copied.errorMessages);
         return ERROR;
+    }
+
+    private void copyLocalIssueLinks(final Issue issueToCopy, final String copiedIssueKey, final Long copiedIssueId, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
+    {
+        for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(issueToCopy.getId()))
+        {
+            final IssueLinkType type = inwardLink.getIssueLinkType();
+            copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId, type.getOutward(), type.getInward(), appLink);
+        }
+
+        for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(issueToCopy.getId()))
+        {
+            final IssueLinkType type = outwardLink.getIssueLinkType();
+            copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type.getInward(), type.getOutward(), appLink);
+        }
+    }
+
+    private void copyLocalIssueLink(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId, final String localRelationship, final String remoteRelationship, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
+    {
+        // Create link from the copied issue
+        final RestResponse remoteIssueLinkResponse = issueLinkClient.createLinkFromRemoteIssue(
+                localIssue, appLink, copiedIssueKey, remoteRelationship);
+
+        if (!remoteIssueLinkResponse.isSuccessful())
+        {
+            log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
+        }
+
+        // Create link from the local source issue
+        issueLinkClient.createLinkToRemoteIssue(localIssue, appLink, copiedIssueKey, copiedIssueId, localRelationship);
     }
 
     public String getLinkToNewIssue()
@@ -173,6 +217,16 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     public void setCopyAttachments(final boolean copyAttachments)
     {
         this.copyAttachments = copyAttachments;
+    }
+
+    public boolean copyIssueLinks()
+    {
+        return copyIssueLinks;
+    }
+
+    public void setCopyIssueLinks(final boolean copyIssueLinks)
+    {
+        this.copyIssueLinks = copyIssueLinks;
     }
 
     public String getIssueType()
