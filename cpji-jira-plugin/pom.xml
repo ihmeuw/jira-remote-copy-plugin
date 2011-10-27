@@ -71,6 +71,15 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Remote Issue Links dependencies -->
+        <!-- TODO, once a newer version of 5.0 is released (e.g. beta3), change this dependency to the jira-view-issue-plugin -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.0</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

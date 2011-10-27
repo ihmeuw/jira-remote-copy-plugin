@@ -19,10 +19,7 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.issue.link.IssueLink;
-import com.atlassian.jira.issue.link.IssueLinkManager;
-import com.atlassian.jira.issue.link.IssueLinkType;
-import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
+import com.atlassian.jira.issue.link.*;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
@@ -147,6 +144,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
             if (copyIssueLinks() && issueLinkManager.isLinkingEnabled())
             {
                 copyLocalIssueLinks(issueToCopy, resultHolder.value.getIssueKey(), resultHolder.value.getIssueId(), appLink);
+                copyRemoteIssueLinks(issueToCopy, resultHolder.value.getIssueKey(), appLink);
+                convertIssueLinks(copiedIssueKey, authenticatedRequestFactory);
             }
 
             RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
@@ -168,15 +167,15 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         return ERROR;
     }
 
-    private void copyLocalIssueLinks(final Issue issueToCopy, final String copiedIssueKey, final Long copiedIssueId, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
+    private void copyLocalIssueLinks(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
     {
-        for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(issueToCopy.getId()))
+        for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(localIssue.getId()))
         {
             final IssueLinkType type = inwardLink.getIssueLinkType();
             copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId, type.getOutward(), type.getInward(), appLink);
         }
 
-        for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(issueToCopy.getId()))
+        for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(localIssue.getId()))
         {
             final IssueLinkType type = outwardLink.getIssueLinkType();
             copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type.getInward(), type.getOutward(), appLink);
@@ -186,16 +185,37 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     private void copyLocalIssueLink(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId, final String localRelationship, final String remoteRelationship, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
     {
         // Create link from the copied issue
-        final RestResponse remoteIssueLinkResponse = issueLinkClient.createLinkFromRemoteIssue(
+        final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(
                 localIssue, appLink, copiedIssueKey, remoteRelationship);
 
-        if (!remoteIssueLinkResponse.isSuccessful())
+        if (!response.isSuccessful())
         {
             log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
         }
 
         // Create link from the local source issue
         issueLinkClient.createLinkToRemoteIssue(localIssue, appLink, copiedIssueKey, copiedIssueId, localRelationship);
+    }
+
+    private void copyRemoteIssueLinks(final Issue localIssue, final String copiedIssueKey, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
+    {
+        for (final RemoteIssueLink remoteIssueLink : remoteIssueLinkManager.getRemoteIssueLinksForIssue(localIssue))
+        {
+            final RestResponse response = issueLinkClient.createRemoteIssueLink(remoteIssueLink, copiedIssueKey, appLink);
+            if (!response.isSuccessful())
+            {
+                log.error("Failed to copy remote issue link. Error: Status " + response.getStatusCode() + ", Message: " + response.getStatusText());
+            }
+        }
+    }
+
+    private void convertIssueLinks(final String copiedIssueKey, final ApplicationLinkRequestFactory authenticatedRequestFactory) throws CredentialsRequiredException, ResponseException
+    {
+        // TODO alert the user when it fails to convert the links
+        ApplicationLinkRequest request = authenticatedRequestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + CONVERT_ISSUE_LINKS_RESOURCE_PATH + "/" + copiedIssueKey);
+        request.setSoTimeout(CONNECTION_TIMEOUTS);
+        request.setConnectionTimeout(CONNECTION_TIMEOUTS);
+        request.execute();
     }
 
     public String getLinkToNewIssue()

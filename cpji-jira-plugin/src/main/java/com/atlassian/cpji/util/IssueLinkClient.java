@@ -54,7 +54,7 @@ public class IssueLinkClient
     {
         final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
         request.setRequestContentType(MediaType.APPLICATION_JSON);
-        request.setRequestBody(getJsonForCreateRemoteIssueLink(internalHostApplication, localIssue, relationship));
+        request.setRequestBody(getJsonForCreateRemoteLinkToLocalIssue(internalHostApplication, localIssue, relationship));
         return request.executeAndReturn(new RestResponseHandler());
     }
 
@@ -85,7 +85,15 @@ public class IssueLinkClient
         }
     }
 
-    private String getJsonForCreateRemoteIssueLink(final InternalHostApplication internalHostApplication, final Issue issue, final String relationship)
+    public RestResponse createRemoteIssueLink(final RemoteIssueLink remoteIssueLink, final String remoteIssueKey, final ApplicationLink applicationLink) throws CredentialsRequiredException, ResponseException
+    {
+        final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
+        request.setRequestContentType(MediaType.APPLICATION_JSON);
+        request.setRequestBody(getJsonForCreateRemoteIssueLink(remoteIssueLink));
+        return request.executeAndReturn(new RestResponseHandler());
+    }
+
+    private String getJsonForCreateRemoteLinkToLocalIssue(final InternalHostApplication internalHostApplication, final Issue issue, final String relationship)
     {
         try
         {
@@ -105,6 +113,50 @@ public class IssueLinkClient
             final JSONObject object = new JSONObject();
             object.put("url", buildIssueUrl(internalHostApplication.getBaseUrl().toASCIIString(), issue.getKey()));
             object.put("title", issue.getKey());
+            json.put("object", object);
+
+            return json.toString();
+        }
+        catch (final JSONException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getJsonForCreateRemoteIssueLink(final RemoteIssueLink remoteIssueLink)
+    {
+        try
+        {
+            final JSONObject json = new JSONObject();
+
+            json.put("globalId", remoteIssueLink.getGlobalId());
+
+            final JSONObject application = new JSONObject();
+            application.put("type", remoteIssueLink.getApplicationType());
+            application.put("name", remoteIssueLink.getApplicationName());
+            json.put("application", application);
+
+            json.put("relationship", remoteIssueLink.getRelationship());
+
+            final JSONObject object = new JSONObject();
+            object.put("url", remoteIssueLink.getUrl());
+            object.put("title", remoteIssueLink.getTitle());
+            object.put("summary", remoteIssueLink.getSummary());
+
+            final JSONObject icon = new JSONObject();
+            icon.put("url16x16", remoteIssueLink.getIconUrl());
+            icon.put("title", remoteIssueLink.getIconTitle());
+            object.put("icon", icon);
+
+            final JSONObject status = new JSONObject();
+            status.put("resolved", remoteIssueLink.isResolved());
+            final JSONObject statusIcon = new JSONObject();
+            statusIcon.put("url16x16", remoteIssueLink.getStatusIconUrl());
+            statusIcon.put("title", remoteIssueLink.getStatusIconTitle());
+            statusIcon.put("link", remoteIssueLink.getStatusIconLink());
+            status.put("icon", statusIcon);
+            object.put("status", status);
+
             json.put("object", object);
 
             return json.toString();

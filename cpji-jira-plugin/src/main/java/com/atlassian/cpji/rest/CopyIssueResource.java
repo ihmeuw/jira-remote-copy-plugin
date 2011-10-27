@@ -1,5 +1,6 @@
 package com.atlassian.cpji.rest;
 
+import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
@@ -26,9 +27,12 @@ import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
+import com.atlassian.jira.bc.issue.link.IssueLinkService;
+import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParametersImpl;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -40,6 +44,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutStorageException;
 import com.atlassian.jira.issue.issuetype.IssueType;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
@@ -47,16 +52,21 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.BuildUtilsInfo;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -75,6 +85,8 @@ import javax.ws.rs.core.Response;
 @Produces ({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 public class CopyIssueResource
 {
+    private static final List<String> GLOBAL_ID_KEYS = ImmutableList.of("appId", "issueId");
+
     private final IssueService issueService;
     private final JiraAuthenticationContext authenticationContext;
     private final PermissionManager permissionManager;
@@ -87,6 +99,9 @@ public class CopyIssueResource
     private final DefaultFieldValuesManager defaultFieldValuesManager;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final BuildUtilsInfo buildUtilsInfo;
+    private final InternalHostApplication internalHostApplication;
+    private final IssueLinkService issueLinkService;
+    private final RemoteIssueLinkService remoteIssueLinkService;
 
     private static final Logger log = Logger.getLogger(CopyIssueResource.class);
 
@@ -103,7 +118,10 @@ public class CopyIssueResource
                     final FieldManager fieldManager,
                     final DefaultFieldValuesManager defaultFieldValuesManager,
                     final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-                    final BuildUtilsInfo buildUtilsInfo)
+                    final BuildUtilsInfo buildUtilsInfo,
+                    final InternalHostApplication internalHostApplication,
+                    final IssueLinkService issueLinkService,
+                    final RemoteIssueLinkService remoteIssueLinkService)
     {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
@@ -117,6 +135,9 @@ public class CopyIssueResource
         this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.buildUtilsInfo = buildUtilsInfo;
+        this.internalHostApplication = internalHostApplication;
+        this.issueLinkService = issueLinkService;
+        this.remoteIssueLinkService = remoteIssueLinkService;
     }
 
 
@@ -124,7 +145,7 @@ public class CopyIssueResource
     @Path ("copy")
     public Response copyIssue(final CopyIssueBean copyIssueBean) throws FieldLayoutStorageException
     {
-        ProjectService.GetProjectResult result = projectService.getProjectByKey(authenticationContext.getLoggedInUser(), copyIssueBean.getTargetProjectKey());
+        ProjectService.GetProjectResult result = projectService.getProjectByKey(callingUser(), copyIssueBean.getTargetProjectKey());
         Project project;
         if (result.isValid())
         {
@@ -211,14 +232,14 @@ public class CopyIssueResource
             }
         }
 
-        IssueService.CreateValidationResult validationResult = issueService.validateCreate(authenticationContext.getLoggedInUser(), inputParameters);
+        IssueService.CreateValidationResult validationResult = issueService.validateCreate(callingUser(), inputParameters);
 
         if (!validationResult.isValid())
         {
             return Response.serverError().entity(ErrorBean.convertErrorCollection(validationResult.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
 
-        IssueService.IssueResult createIssueResult = issueService.create(authenticationContext.getLoggedInUser(), validationResult);
+        IssueService.IssueResult createIssueResult = issueService.create(callingUser(), validationResult);
 
         if (createIssueResult.isValid())
         {
@@ -275,7 +296,7 @@ public class CopyIssueResource
     @Path ("issueTypeInformation/{project}")
     public Response getIssueTypeInformation(@PathParam ("project") String projectKey)
     {
-        User user = authenticationContext.getLoggedInUser();
+        User user = callingUser();
         ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
         Project project;
         if (result.isValid())
@@ -316,7 +337,7 @@ public class CopyIssueResource
     {
         try
         {
-            ProjectService.GetProjectResult result = projectService.getProjectByKey(authenticationContext.getLoggedInUser(), copyIssueBean.getTargetProjectKey());
+            ProjectService.GetProjectResult result = projectService.getProjectByKey(callingUser(), copyIssueBean.getTargetProjectKey());
             Project project;
             if (result.isValid())
             {
@@ -385,4 +406,153 @@ public class CopyIssueResource
         }
     }
 
+    /**
+     * Converts any remote issue links to this JIRA instance into local issue links.
+     * 
+     * @param issueKey the issue key
+     * @return no content if successful
+     */
+    @GET
+    @Path ("convertIssueLinks/{issueKey}")
+    public Response checkFieldPermissions(@PathParam ("issueKey") String issueKey)
+    {
+        final User user = callingUser();
+
+        // Get issue
+        final IssueService.IssueResult result = issueService.getIssue(user, issueKey);
+        if (!result.isValid())
+        {
+            return Response.serverError().entity(ErrorBean.convertErrorCollection(result.getErrorCollection())).cacheControl(RESTException.never()).build();
+        }
+        final Issue issue = result.getIssue();
+
+        // Get remote issue links
+        final RemoteIssueLinkService.RemoteIssueLinkListResult linksResult = remoteIssueLinkService.getRemoteIssueLinksForIssue(user, issue);
+        if (!linksResult.isValid())
+        {
+            return Response.serverError().entity(ErrorBean.convertErrorCollection(linksResult.getErrorCollection())).cacheControl(RESTException.never()).build();
+        }
+
+        for (final RemoteIssueLink remoteIssueLink : linksResult.getRemoteIssueLinks())
+        {
+            // We are only interested in JIRA links
+            if (RemoteIssueLink.APPLICATION_TYPE_JIRA.equals(remoteIssueLink.getApplicationType()))
+            {
+                final Map<String, String> values = decode(remoteIssueLink.getGlobalId(), GLOBAL_ID_KEYS);
+                if (internalHostApplication.getId().get().equals(values.get("appId")))
+                {
+                    // It links to this JIRA instance, make it a local link
+                    final Issue issueToLinkTo = getIssue(user, Long.parseLong(values.get("issueId")));
+                    createIssueLink(user, issue, issueToLinkTo, remoteIssueLink.getRelationship());
+
+                    // Delete the remote issue link, it is no longer needed
+                    final RemoteIssueLinkService.DeleteValidationResult deleteValidationResult = remoteIssueLinkService.validateDelete(user, remoteIssueLink.getId());
+                    if (deleteValidationResult.isValid())
+                    {
+                        remoteIssueLinkService.delete(user, deleteValidationResult);
+                    }
+                }
+            }
+        }
+        
+        return Response.noContent().cacheControl(RESTException.never()).build();
+    }
+
+    private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship)
+    {
+        final IssueLinkService.AddIssueLinkValidationResult addIssueLinkValidationResult = issueLinkService.validateAddIssueLinks(
+                user, fromIssue, relationship, ImmutableList.<String>of(toIssue.getKey()));
+
+        if (addIssueLinkValidationResult.isValid())
+        {
+            issueLinkService.addIssueLinks(user, addIssueLinkValidationResult);
+        }
+        else
+        {
+            // TODO handle error
+            log.warn("Error creating local link from " + fromIssue.getKey() + " to " + toIssue.getKey() + ". " + addIssueLinkValidationResult.getErrorCollection());
+        }
+    }
+
+    private Issue getIssue(final User user, final Long issueId)
+    {
+        final IssueService.IssueResult result = issueService.getIssue(user, issueId);
+        if (!result.isValid())
+        {
+            return null;
+        }
+
+        return result.getIssue();
+    }
+
+    // TODO, once a newer version of 5.0 is released (e.g. beta3), change to use GlobalIdFactory in the view-issue-plugin
+    /**
+     * Decode the given String to a Map of values.
+     *
+     * @param globalId the String to decode
+     * @param keys the order in which the keys should appear. If the keys are not in this order an IllegalArgumentException is thrown.
+     * @return a Map of values
+     */
+    public static Map<String, String> decode(final String globalId, final List<String> keys)
+    {
+        final List<NameValuePair> params = new ArrayList<NameValuePair>();
+        final Scanner scanner = new Scanner(globalId);
+
+        try
+        {
+            URLEncodedUtils.parse(params, scanner, "UTF-8");
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId, e);
+        }
+
+        // Check that we have the right number of keys
+        if (params.size() != keys.size())
+        {
+            throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId);
+        }
+
+        // Get the values, and make sure the keys are in the correct order
+        final Map<String, String> result = new HashMap<String, String>(params.size());
+        for (int i = 0; i < params.size(); i++)
+        {
+            final NameValuePair param = params.get(i);
+            if (!param.getName().equals(keys.get(i)))
+            {
+                throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId);
+            }
+
+            result.put(param.getName(), param.getValue());
+        }
+
+        return result;
+    }
+
+    private static String getExpectedFormat(final List<String> keys)
+    {
+        final StringBuilder sb = new StringBuilder();
+        boolean first = true;
+
+        for (final String key : keys)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                sb.append("&");
+            }
+
+            sb.append(key).append("=<").append(key).append(">");
+        }
+
+        return sb.toString();
+    }
+
+    private User callingUser()
+    {
+        return authenticationContext.getLoggedInUser();
+    }
 }

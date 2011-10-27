@@ -73,6 +73,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
 {
     public static final String REST_URL_COPY_ISSUE = "/rest/copyissue/latest/";
     public static final String COPY_ISSUE_RESOURCE_PATH = "copyissue";
+    public static final String CONVERT_ISSUE_LINKS_RESOURCE_PATH = COPY_ISSUE_RESOURCE_PATH + "/convertIssueLinks";
     protected String targetEntityLink;
     protected final EntityLinkService entityLinkService;
     protected final FieldLayoutManager fieldLayoutManager;
