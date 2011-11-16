@@ -36,8 +36,8 @@
     </dependencies>
 
     <properties>
-        <jira.version>5.0-beta1</jira.version>
-        <jira.compile.version>5.0-beta1</jira.compile.version>
+        <jira.version>5.0-beta3</jira.version>
+        <jira.compile.version>5.0-beta3</jira.compile.version>
         <jira.data.version>4.1.1</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.5.0</rest.version>

@@ -6,7 +6,7 @@ import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.jira.bc.issue.issuelink.RemoteIssueLinkService;
+import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.security.JiraAuthenticationContext;
