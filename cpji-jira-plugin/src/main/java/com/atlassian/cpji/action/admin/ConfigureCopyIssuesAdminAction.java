@@ -1,7 +1,5 @@
 package com.atlassian.cpji.action.admin;
 
-import com.atlassian.cpji.config.CommentSecurityLevel;
-import com.atlassian.cpji.config.CommentSecurityType;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
@@ -39,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
 
 /**
  * @since v1.4
@@ -67,7 +64,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private MutableIssue issue;
     private Map fieldValuesHolder;
     private String group;
-    private CommentSecurityLevel selectedCommentSecurity;
+    private List<String> configChanges = new ArrayList<String>();
 
     public ConfigureCopyIssuesAdminAction(
             final IssueTypeSchemeManager issueTypeSchemeManager,
@@ -137,6 +134,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
                 orderableField.validateParams(this, simpleErrorCollection, getI18nHelper(), getIssue(), fieldScreenRenderer.getFieldScreenRenderLayoutItem(orderableField));
                 if (!simpleErrorCollection.hasAnyErrors())
                 {
+                    configChanges.add(getI18nHelper().getText("cpji.config.default.value", orderableField.getName()));
                     defaultFieldValuesManager.persistDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueType().getName(), fieldValue);
                 }
                 else
@@ -148,7 +146,11 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             }
             else
             {
-                defaultFieldValuesManager.clearDefaultValue(getProject().getKey(), orderableField.getId(), getIssueType().getName());
+                if (defaultFieldValuesManager.hasDefaultValue(getProject().getKey(), orderableField.getId(), getIssueType().getName()))
+                {
+                    configChanges.add(getI18nHelper().getText("cpji.config.default.empty.value", orderableField.getName()));
+                    defaultFieldValuesManager.clearDefaultValue(getProject().getKey(), orderableField.getId(), getIssueType().getName());
+                }
             }
         }
         return SUCCESS;
@@ -161,26 +163,24 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             return SECURITYBREACH;
         }
         saveGroupPermission();
-        saveCommentSecurityLevel();
         saveUserMapping();
+        configChanges.add(getI18nHelper().getText("cpji.config.user.mapping"));
         return SUCCESS;
+    }
+
+    public boolean hasConfigChanges()
+    {
+        return !configChanges.isEmpty();
+    }
+
+    public List<String> getConfigChanges()
+    {
+        return configChanges;
     }
 
     private void saveUserMapping()
     {
         copyIssueConfigurationManager.setUserMapping(userMappingType, getProject());
-    }
-
-    private void saveCommentSecurityLevel()
-    {
-        if (selectedCommentSecurity == null)
-        {
-            copyIssueConfigurationManager.clearCommentSecurityLevel(getProject());
-        }
-        else
-        {
-            copyIssueConfigurationManager.setSecurityLevel(selectedCommentSecurity, getProject());
-        }
     }
 
     private void saveGroupPermission()
@@ -362,16 +362,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return IssueOperations.EDIT_ISSUE_OPERATION;
     }
 
-    public List<CommentSecurityLevel> getSecurityLevels()
-    {
-        return copyIssueConfigurationManager.getSecurityLevels(getProject());
-    }
-
-    public CommentSecurityLevel getSelectedSecurityLevel()
-    {
-        return copyIssueConfigurationManager.getCommentSecurityLevel(getProject());
-    }
-
     public List<UserMappingType> getUserMappingTypes()
     {
         return Arrays.asList(UserMappingType.values());
@@ -380,21 +370,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     public UserMappingType getConfiguredUserMapping()
     {
         return copyIssueConfigurationManager.getUserMappingType(getProject());
-    }
-
-    public void setCommentSecurityLevel(String commentSecurityLevelId)
-    {
-        StringTokenizer stringTokenizer = new StringTokenizer(commentSecurityLevelId, "#");
-        if (stringTokenizer.countTokens() != 2)
-        {
-            selectedCommentSecurity = null;
-        }
-        else
-        {
-            String commentSecurityType = stringTokenizer.nextToken();
-            String commentSecurityId = stringTokenizer.nextToken();
-            selectedCommentSecurity = new CommentSecurityLevel(commentSecurityId, "", CommentSecurityType.valueOf(commentSecurityType));
-        }
     }
 
     public void setUserMapping(String userMapping)

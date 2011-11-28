@@ -48,6 +48,11 @@ public class DefaultFieldValuesManager
         settingsForProject.remove(createKey(fieldId, issueType));
     }
 
+    public boolean hasDefaultValue(final String projectKey, final String fieldId, final String issueType)
+    {
+        return getDefaultFieldValue(projectKey, fieldId, issueType) != null;
+    }
+
     public String[] getDefaultFieldValue(final String projectKey, final String fieldId, final String issueType)
     {
         PluginSettings settingsForProject = pluginSettingsFactory.createSettingsForKey(projectKey);

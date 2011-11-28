@@ -54,31 +54,6 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
         this.projectRoleManager = projectRoleManager;
     }
 
-    public void setSecurityLevel(final CommentSecurityLevel commentSecurityLevel, final Project project)
-    {
-        Assertions.notNull("commentSecurityLevel", commentSecurityLevel);
-        Assertions.notNull("project", project);
-
-        CommentSecurityLevel issueSecurityLevel = findCommentSecurityLevel(commentSecurityLevel, project);
-        if (issueSecurityLevel == null)
-        {
-            throw new RuntimeException("Issue Security Level with id '" + issueSecurityLevel.getId() + "' does not exist");
-        }
-        else
-        {
-            final PluginSettings settings = pluginSettingsFactory.createSettingsForKey(project.getKey());
-            settings.put(createKeyForSecurityLevel(project.getKey()), commentSecurityLevel.getId().toString());
-            settings.put(createKeyForSecurityLevel(project.getKey()) + TYPE, commentSecurityLevel.getType().toString());
-        }
-    }
-
-    public void clearCommentSecurityLevel(Project project)
-    {
-        final PluginSettings settings = pluginSettingsFactory.createSettingsForKey(project.getKey());
-        settings.remove(createKeyForSecurityLevel(project.getKey()));
-        settings.remove(createKeyForSecurityLevel(project.getKey()) + TYPE);
-    }
-
     private CommentSecurityLevel findCommentSecurityLevel(final CommentSecurityLevel commentSecurityLevel, Project project)
     {
         if (commentSecurityLevel.isGroupLevel() && visibilityValidator.isGroupVisiblityEnabled())
