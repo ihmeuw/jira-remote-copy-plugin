@@ -164,7 +164,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         }
         saveGroupPermission();
         saveUserMapping();
-        configChanges.add(getI18nHelper().getText("cpji.config.user.mapping"));
+
         return SUCCESS;
     }
 
@@ -180,11 +180,17 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
 
     private void saveUserMapping()
     {
-        copyIssueConfigurationManager.setUserMapping(userMappingType, getProject());
+        UserMappingType existingUserMapping = copyIssueConfigurationManager.getUserMappingType(getProject());
+        if (!existingUserMapping.equals(userMappingType))
+        {
+            copyIssueConfigurationManager.setUserMapping(userMappingType, getProject());
+            configChanges.add(getI18nHelper().getText("cpji.config.user.mapping"));
+        }
     }
 
     private void saveGroupPermission()
     {
+        String configuredGroup = copyIssuePermissionManager.getConfiguredGroup(projectKey);
         if (StringUtils.isNotEmpty(group))
         {
             Group selectedGroup = Iterables.find(groupManager.getAllGroups(), new Predicate<Group>()
@@ -194,11 +200,19 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
                     return group.equals(input.getName());
                 }
             });
-            copyIssuePermissionManager.restrictPermissionToGroup(projectKey, selectedGroup.getName());
+            if (configuredGroup == null || !configuredGroup.equals(selectedGroup.getName()))
+            {
+                copyIssuePermissionManager.restrictPermissionToGroup(projectKey, selectedGroup.getName());
+                configChanges.add(getI18nHelper().getText("cpji.config.user.group"));
+            }
         }
         else
         {
-            copyIssuePermissionManager.clearPermissionForProject(projectKey);
+            if (configuredGroup != null)
+            {
+                copyIssuePermissionManager.clearPermissionForProject(projectKey);
+                configChanges.add(getI18nHelper().getText("cpji.config.user.group.remove"));
+            }
         }
     }
 

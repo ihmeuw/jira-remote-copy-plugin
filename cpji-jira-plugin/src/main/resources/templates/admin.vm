@@ -7,7 +7,7 @@
  <form action="ConfigureCopyIssuesAdminAction!savePermission.jspa" method="post" class="aui">
      <div class="content-body">
         #if ($action.hasConfigChanges())
-        <div class="aui-message success"><span class="aui-icon icon-success"></span>
+        <div class="aui-message success">
            <ul>
                 #foreach( $change in $action.getConfigChanges() )
                   <li>$change</li>
@@ -16,7 +16,7 @@
        </div>
        #end
        #if ($action.invalidInput())
-       <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
+       <div class="aui-message warning">
              <p>There were some problems when saving the configuration.</p>
              <ul>
                 #foreach( $error in $action.getErrorMessages() )
@@ -27,6 +27,18 @@
        #end
      <h2>General Configuration</h2>
          <div class="field-group">
+             <label for"group">User group</label>
+             <select class="select" name="group" id="group">
+                <option value=""  #if($action.getSelectedGroup() == "") selected="" #end>everyone</option>
+                #foreach( $group in $action.getGroups() )
+                   <option value="$group.getName()"  #if($action.getSelectedGroup() == $group.getName()) selected="" #end>$group.getName()</option>
+                #end
+             </select>
+             <div class="description">
+                 Only users of this group can copy to another JIRA project.
+             </div>
+         </div>
+         <div class="field-group">
              <label for"userMapping">User Mapping</label>
              <select class="select" name="userMapping" id="userMapping">
                 #foreach( $userMapping in $action.getUserMappingTypes() )
@@ -34,7 +46,7 @@
                 #end
              </select>
              <div class="description">
-               Users from the remote JIRA instance are mapped by using the selected mapping type.
+               Users from the remote JIRA instance are mapped by using the selected mapping type. This user mapping is used when copying field values of the assignee, comment, reporter, voter and watcher field.
              </div>
          </div>
          <input type="hidden" name="projectKey" value="$action.getProjectKey()"/>

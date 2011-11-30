@@ -202,8 +202,11 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             }
             else if (orderableField instanceof TimeTrackingSystemField && isTimeTrackingEnabled())
             {
-                TimeTrackingBean timeTrackingBean = new TimeTrackingBean(issueToCopy.getOriginalEstimate(), issueToCopy.getTimeSpent(), issueToCopy.getEstimate());
-                copyIssueBean.setTimeTracking(timeTrackingBean);
+                if (issueToCopy.getOriginalEstimate() != null)
+                {
+                    TimeTrackingBean timeTrackingBean = new TimeTrackingBean(issueToCopy.getOriginalEstimate(), issueToCopy.getTimeSpent(), issueToCopy.getEstimate());
+                    copyIssueBean.setTimeTracking(timeTrackingBean);
+                }
             }
             else if (orderableField instanceof SecurityLevelSystemField)
             {

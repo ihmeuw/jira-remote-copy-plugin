@@ -19,12 +19,14 @@ import com.atlassian.cpji.fields.system.ReporterFieldMapper;
 import com.atlassian.cpji.fields.system.SummaryFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
+import com.atlassian.cpji.fields.system.TimeTrackingFieldMapper;
 import com.atlassian.cpji.fields.system.VoterFieldMapper;
 import com.atlassian.cpji.fields.system.WatcherFieldMapper;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.jira.bc.issue.comment.CommentService;
 import com.atlassian.jira.bc.issue.vote.VoteService;
 import com.atlassian.jira.bc.issue.watcher.WatcherService;
+import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
 import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
@@ -79,7 +81,8 @@ public class FieldMapperFactory
                     final VoteService voteService,
                     final DatePickerConverter datePickerConverter,
                     final DoubleConverter doubleConverter,
-                    final UserMappingManager userMappingManager)
+                    final UserMappingManager userMappingManager,
+                    final TimeTrackingConfiguration timeTrackingConfiguration)
     {
         SystemFieldIssueCreationFieldMapper priorityFieldMapper = new PriorityFieldMapper(constantsManager, getOrderableField(fieldManager, IssueFieldConstants.PRIORITY));
         addFieldMapper(priorityFieldMapper.getField(), priorityFieldMapper);
@@ -122,6 +125,9 @@ public class FieldMapperFactory
 
         SystemFieldIssueCreationFieldMapper labelSysFieldMapper = new LabelSystemFieldMapper(getOrderableField(fieldManager, IssueFieldConstants.LABELS));
         addFieldMapper(labelSysFieldMapper.getField(), labelSysFieldMapper);
+
+        SystemFieldIssueCreationFieldMapper timeTrackinFieldMapper = new TimeTrackingFieldMapper(getOrderableField(fieldManager, IssueFieldConstants.TIMETRACKING), timeTrackingConfiguration);
+        addFieldMapper(timeTrackinFieldMapper.getField(), timeTrackinFieldMapper);
 
         /**
          * SystemFieldPostIssueCreationFieldMapper
