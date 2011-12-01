@@ -24,6 +24,7 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -44,6 +45,7 @@ import java.util.NoSuchElementException;
 public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport implements OperationContext
 {
     public static final String SECURITYBREACH = "securitybreach";
+    public static final String PLUGIN_KEY = "com.atlassian.cpji.cpji-jira-plugin";
     private String projectKey;
     private List<IssueType> issueTypesForProject;
     private String selectedIssueTypeId;
@@ -57,6 +59,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
     private CopyIssueConfigurationManager copyIssueConfigurationManager;
+    private final WebResourceManager webResourceManager;
 
     private static final Logger log = Logger.getLogger(ConfigureCopyIssuesAdminAction.class);
 
@@ -74,7 +77,8 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final GroupManager groupManager,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager)
+            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager,
+            final WebResourceManager webResourceManager)
     {
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.issueFactory = issueFactory;
@@ -84,7 +88,9 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         this.groupManager = groupManager;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
+        this.webResourceManager = webResourceManager;
         fieldValuesHolder = new HashMap();
+        webResourceManager.requireResource(PLUGIN_KEY + ":admin-js");
     }
 
     public String doExecute() throws Exception
@@ -241,23 +247,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             }
         }
         return false;
-    }
-
-    public String getHtmlForField(FieldLayoutItem fieldLayoutItem)
-    {
-        OrderableField orderableField = fieldLayoutItem.getOrderableField();
-        Object defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueType().getName());
-        if (ActionContext.getParameters().get(orderableField.getId()) == null)
-        {
-            if (defaultFieldValue != null)
-            {
-                Map actionParams = new HashMap();
-                actionParams.put(orderableField.getId(), defaultFieldValue);
-                orderableField.populateFromParams(getFieldValuesHolder(), actionParams);
-            }
-        }
-
-        return orderableField.getEditHtml(fieldLayoutItem, this, this, getIssue(), getDisplayParameters());
     }
 
     private Map getDisplayParameters()

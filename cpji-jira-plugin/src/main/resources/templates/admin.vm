@@ -58,48 +58,30 @@
      </div>
  </form>
 
+ <form action="ConfigureCopyIssuesAdminAction!save.jspa" method="post" class="aui">
+     <div class="content-body" id="required-fields">
+     <h2>Default values for required fields</h2>
+     <p>
+       These default values will be applied if the remote issue does not contain a value.
+     </p>
+     <div class="field-group">
+         <label for"selectedIssueTypeId">Issue Type</label>
+         <select class="select" name="selectedIssueTypeId" id="select-issue-type">
+            #foreach( $issueType in $action.getIssueTypesForProject() )
+               <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId()) selected="" #end>$issueType.getName()</option>
+            #end
+         </select><span class="cpji-loading"></span>
+     </div>
+     <input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
+     <div id="fields">
 
- <h3>Default values Configuration</h3>
- <form action="ConfigureCopyIssuesAdminAction.jspa" method="post" class="aui">
-     <div class="content-body">
-     <h2>Issue Type</h2>
-         <p>
-             Default values are applied when another JIRA instance copies issues to this instance.
-             They can be configured per issue type.
-         </p>
-         <div class="field-group">
-             <label for"selectedIssueTypeId">Issue Type</label>
-             <select class="select" name="selectedIssueTypeId" id="selectedIssueTypeId">
-                #foreach( $issueType in $action.getIssueTypesForProject() )
-                   <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId()) selected="" #end>$issueType.getName()</option>
-                #end
-             </select>
-         </div>
-         <input type="hidden" name="projectKey" value="$action.getProjectKey()"/>
-         <div class="buttons-container">
-             <div class="buttons">
-                <input class="button" type="submit" value="select"/>
-             </div>
+     </div>
+     <div class="buttons-container">
+         <div class="buttons">
+            <input class="button" type="submit" value="Update"/>
          </div>
      </div>
+     </div>
  </form>
-
-<form action="ConfigureCopyIssuesAdminAction!save.jspa" method="post" class="aui">
-    <div class="content-body">
-        <h2>Required fields for Issue Type $action.getSelectedIssueTypeName()</h2>
-        <p>
-            Specify default values for these required fields.
-        </p>
-        #foreach( $item in $action.getFieldLayoutItems())
-          $action.getHtmlForField($item)
-        #end
-    <input type="hidden" name="projectKey" value="$action.getProjectKey()"/>
-    <input type="hidden" name="selectedIssueTypeId" value="$action.getSelectedIssueTypeId()"/>
-    <div class="buttons-container">
-         <div class="buttons">
-            <input type="submit" value="save" class="button"/>
-         </div>
-    </div>
-</form>
 </body>
 </html>

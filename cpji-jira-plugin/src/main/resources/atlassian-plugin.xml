@@ -76,6 +76,15 @@
         </actions>
     </webwork1>
 
+    <webwork1 key="admin-field-html-action" name="Returns HTML for fields" class="java.lang.Object">
+        <actions>
+            <action name="com.atlassian.cpji.action.admin.GetFieldsHtmlAction" alias="GetFieldsHtmlAction">
+                <view name="success">/templates/htmlfields.vm</view>
+                <view name="error">/templates/error.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+
    <component key="fieldMapperFactory" class="com.atlassian.cpji.fields.FieldMapperFactory"/>
    <component key="defaultFieldValuesManager" class="com.atlassian.cpji.fields.value.DefaultFieldValuesManager"/>
    <component key="copyIssueConfigurationManager" class="com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager"/>
@@ -102,5 +111,10 @@
     <component-import key="pluginSettingsFactory">
         <interface>com.atlassian.sal.api.pluginsettings.PluginSettingsFactory</interface>
     </component-import>
+
+    <web-resource key="admin-js">
+       <resource type="download" name="admin.js" location="js/admin.js"/>
+       <resource type="download" name="admin.css" location="css/admin.css"/>
+    </web-resource>
 
 </atlassian-plugin>

@@ -1,0 +1,3 @@
+ #foreach( $item in $action.getFieldLayoutItems())
+      $action.getHtmlForField($item)
+ #end
