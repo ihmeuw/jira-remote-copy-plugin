@@ -52,7 +52,7 @@
          <input type="hidden" name="projectKey" value="$action.getProjectKey()"/>
          <div class="buttons-container">
              <div class="buttons">
-                <input class="button" type="submit" value="save"/>
+                <input class="button" type="submit" value="Update"/>
              </div>
          </div>
      </div>
