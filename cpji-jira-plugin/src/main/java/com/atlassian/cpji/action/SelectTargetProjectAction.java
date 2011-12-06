@@ -114,7 +114,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
                         log.debug("Authentication failed to remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "'");
                         return ResponseStatus.AUTHENTICATION_FAILED;
                     }
-                    if ("installed".equals(response.getResponseBodyAsString().toLowerCase()))
+                    if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase()))
                     {
                         log.debug("Remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "' has the CPJI plugin installed.");
                         return ResponseStatus.OK;

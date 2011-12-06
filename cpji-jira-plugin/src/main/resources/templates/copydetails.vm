@@ -1,4 +1,7 @@
 <html>
+<head>
+    <title>Select a new issue type</title>
+</head>
 <body>
 <div id="stepped-process" class="content-container">
     <div class="content-related">
@@ -46,7 +49,7 @@
                     <label for="attachments">Attachments</label>
                  <span class="field-value">
                      #if ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
-                         Attachments will be moved.
+                         Attachments will be copied.
                          <input type="hidden" name="copyAttachments" value="true"/>
                      #elseif (!$action.remoteAttachmentsEnabled())
                          Attachments are disabled in the remote JIRA instance.

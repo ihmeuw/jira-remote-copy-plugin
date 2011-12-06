@@ -124,7 +124,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
                     }
                     if (!response.isSuccessful())
                     {
-                        throw new RuntimeException("Error from remote JIRA instance '" + entityLink.getApplicationLink().getRpcUrl() + "' Status code: '" + response.getStatusCode() + "' Response: '" + response.getResponseBodyAsString()+ "' ");
+                        throw new RuntimeException("Error from remote JIRA instance '" + entityLink.getApplicationLink().getRpcUrl() + "' Status code: '" + response.getStatusCode() + "' Response: '" + response.getResponseBodyAsString() + "' ");
                     }
                     return response.getEntity(FieldPermissionsBean.class);
                 }

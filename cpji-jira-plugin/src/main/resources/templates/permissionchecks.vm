@@ -1,5 +1,8 @@
 #* @vtlvariable name="action" type="com.atlassian.cpji.action.PermissionChecksAction" *#
 <html>
+<head>
+    <title>Confirm new values</title>
+</head>
 <body>
 <div id="stepped-process" class="content-container">
     <div class="content-related">

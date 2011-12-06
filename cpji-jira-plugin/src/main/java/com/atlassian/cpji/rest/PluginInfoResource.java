@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 public class PluginInfoResource
 {
     public static String RESOURCE_PATH = "plugininfo";
+    public static final String PLUGIN_INSTALLED = "installed";
 
     public PluginInfoResource()
     {
@@ -28,6 +29,6 @@ public class PluginInfoResource
     @AnonymousAllowed
     public Response pluginInfo()
     {
-        return Response.ok("installed").build();
+        return Response.ok(PLUGIN_INSTALLED).build();
     }
 }

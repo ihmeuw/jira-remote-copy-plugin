@@ -1,4 +1,7 @@
 <html>
+<head>
+    <title>Select a target remote project</title>
+</head>
 <body>
 <div id="stepped-process" class="content-container">
     <div class="content-related">

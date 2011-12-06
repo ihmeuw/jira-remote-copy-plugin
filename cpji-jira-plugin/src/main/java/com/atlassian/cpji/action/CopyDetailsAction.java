@@ -142,7 +142,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             issueLinkOptions = new ArrayList<Option>();
             I18nHelper i18nHelper = beanFactory.getInstance(getLoggedInUser());
             String remoteJiraVersion = copyInformationBean.getVersion();
-            if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5.0"))
+            if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5"))
             {
                 issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, i18nHelper.getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
                 issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, i18nHelper.getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
