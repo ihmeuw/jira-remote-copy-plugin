@@ -8,6 +8,7 @@ target_jira2/
 *.iml
 *.iws
 *.ipr
+.idea/
 
 # Mac OS X files
 .DS_Store
