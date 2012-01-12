@@ -209,13 +209,19 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         }
     }
 
-    private void convertIssueLinks(final String copiedIssueKey, final ApplicationLinkRequestFactory authenticatedRequestFactory) throws CredentialsRequiredException, ResponseException
+    private void convertIssueLinks(final String copiedIssueKey, final ApplicationLinkRequestFactory authenticatedRequestFactory) throws CredentialsRequiredException
     {
-        // TODO alert the user when it fails to convert the links
         ApplicationLinkRequest request = authenticatedRequestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + CONVERT_ISSUE_LINKS_RESOURCE_PATH + "/" + copiedIssueKey);
         request.setSoTimeout(CONNECTION_TIMEOUTS);
         request.setConnectionTimeout(CONNECTION_TIMEOUTS);
-        request.execute();
+        try
+        {
+            request.execute();
+        }
+        catch (final ResponseException e)
+        {
+            log.error("Failed to convert remote links into local links on the target server", e);
+        }
     }
 
     public String getLinkToNewIssue()
