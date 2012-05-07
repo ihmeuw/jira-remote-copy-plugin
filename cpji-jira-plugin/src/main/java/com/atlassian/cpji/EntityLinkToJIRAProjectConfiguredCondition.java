@@ -7,12 +7,15 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractIssueCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import org.apache.log4j.Logger;
 
 /**
  * @since v1.0
  */
 public class EntityLinkToJIRAProjectConfiguredCondition extends AbstractIssueCondition
 {
+    private static final Logger log = Logger.getLogger(EntityLinkToJIRAProjectConfiguredCondition.class);
+
     private final EntityLinkService entityLinkService;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
 
@@ -25,6 +28,9 @@ public class EntityLinkToJIRAProjectConfiguredCondition extends AbstractIssueCon
     @Override
     public boolean shouldDisplay(final User user, final Issue issue, final JiraHelper jiraHelper)
     {
-        return (entityLinkService.getPrimaryEntityLink(issue.getProjectObject(), JiraProjectEntityType.class) != null) && copyIssuePermissionManager.hasPermissionForProject(issue.getProjectObject().getKey());
+        final boolean hasProjectLink = (entityLinkService.getPrimaryEntityLink(issue.getProjectObject(), JiraProjectEntityType.class) != null);
+        final boolean hasPermissionForProject = copyIssuePermissionManager.hasPermissionForProject(issue.getProjectObject().getKey());
+        log.info("shouldDisplay for " + issue.getKey() + ": [hasProjectLink: " + hasProjectLink + ", hasPermissionForProject: " + hasPermissionForProject + "]");
+        return hasProjectLink && hasPermissionForProject;
     }
 }
