@@ -28,7 +28,7 @@ public class EntityLinkToJIRAProjectConfiguredCondition extends AbstractIssueCon
     @Override
     public boolean shouldDisplay(final User user, final Issue issue, final JiraHelper jiraHelper)
     {
-        final boolean hasProjectLink = (entityLinkService.getPrimaryEntityLink(issue.getProjectObject(), JiraProjectEntityType.class) != null);
+        final boolean hasProjectLink = (entityLinkService.getEntityLinks(issue.getProjectObject(), JiraProjectEntityType.class).iterator().hasNext());
         final boolean hasPermissionForProject = copyIssuePermissionManager.hasPermissionForProject(issue.getProjectObject().getKey());
         log.info("shouldDisplay for " + issue.getKey() + ": [hasProjectLink: " + hasProjectLink + ", hasPermissionForProject: " + hasPermissionForProject + "]");
         return hasProjectLink && hasPermissionForProject;
