@@ -47,9 +47,9 @@
     </properties>
 
     <scm>
-        <connection>scm:hg:ssh://hg@bitbucket.org/fschmitz/remotecopy</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org/fschmitz/remotecopy</developerConnection>
-        <url>scm:hg:ssh://hg@bitbucket.org/fschmitz/remotecopy</url>
+        <connection>scm:git:ssh://git@bitbucket.org/atlassian/jira-remote-copy-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/jira-remote-copy-plugin.git</developerConnection>
+        <url>https://bitbucket.org/atlassian/jira-remote-copy-plugin</url>
     </scm>
 
 </project>
