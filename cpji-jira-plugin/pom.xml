@@ -35,97 +35,53 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-core</artifactId>
-            <version>${jira.compile.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-selenium</artifactId>
-            <version>2.0</version>
-            <scope>test</scope>
         </dependency>
-
         <!-- REST dependencies-->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-common</artifactId>
-            <version>${rest.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-module</artifactId>
-            <version>${rest.version}</version>
-            <scope>provided</scope>
         </dependency>
-
-        <!-- Remote Issue Links dependencies -->
-        <!-- TODO, once a newer version of 5.0 is released (e.g. beta3), change this dependency to the jira-view-issue-plugin -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.0</version>
-            <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
         </dependency>
-
         <!-- UAL dependencies -->
         <dependency>
             <groupId>com.atlassian.applinks</groupId>
             <artifactId>applinks-api</artifactId>
-            <version>${applinks.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
-            <version>${my.sal.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.15</version>
-                <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.jms</groupId>
-                        <artifactId>jms</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.sun.jdmk</groupId>
-                        <artifactId>jmxtools</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>jmxri</artifactId>
-                        <groupId>com.sun.jmx</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
     </dependencies>
 
     <build>
