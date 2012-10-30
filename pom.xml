@@ -73,6 +73,12 @@
 				<version>2.0</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>com.atlassian.jira.tests</groupId>
+				<artifactId>jira-testkit-client</artifactId>
+				<version>${testkit.version}</version>
+				<scope>test</scope>
+			</dependency>
 
 			<!-- REST dependencies-->
 			<dependency>
@@ -167,6 +173,8 @@
         <applinks.version>3.5.6</applinks.version>
         <atlassian.selenium.version>2.0</atlassian.selenium.version>
         <cpji.build.directory>target</cpji.build.directory>
+		<testkit.version>5.0-m13</testkit.version>
+		<amps.version>4.0</amps.version>
     </properties>
 
     <scm>

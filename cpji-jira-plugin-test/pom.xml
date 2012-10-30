@@ -57,6 +57,11 @@
                                     <artifactId>cpji-jira-plugin</artifactId>
                                     <version>${project.version}</version>
                                 </pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira.tests</groupId>
+									<artifactId>jira-testkit-plugin</artifactId>
+									<version>${testkit.version}</version>
+								</pluginArtifact>
                             </pluginArtifacts>
                         </product>
                         <product>
@@ -71,6 +76,11 @@
                                     <artifactId>cpji-jira-plugin</artifactId>
                                     <version>${project.version}</version>
                                 </pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira.tests</groupId>
+									<artifactId>jira-testkit-plugin</artifactId>
+									<version>${testkit.version}</version>
+								</pluginArtifact>
                             </pluginArtifacts>
                         </product>
                     </products>
@@ -101,6 +111,5 @@
     <properties>
         <!-- Whether the tests should be run detached from the current screen -->
         <xvfb.enable>true</xvfb.enable>
-        <amps.version>4.0</amps.version>
     </properties>
 </project>
