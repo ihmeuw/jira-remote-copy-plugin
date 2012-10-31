@@ -57,7 +57,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-selenium-tests</artifactId>
+				<artifactId>jira-webdriver-tests</artifactId>
 				<version>${jira.version}</version>
 				<scope>test</scope>
 			</dependency>
@@ -164,6 +164,19 @@
 		</dependencies>
 	</dependencyManagement>
 
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<source>${jdkLevel}</source>
+					<target>${jdkLevel}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
     <properties>
         <jira.version>5.0</jira.version>
         <jira.compile.version>5.0</jira.compile.version>
@@ -175,6 +188,7 @@
         <cpji.build.directory>target</cpji.build.directory>
 		<testkit.version>5.0-m13</testkit.version>
 		<amps.version>4.0</amps.version>
+		<jdkLevel>1.6</jdkLevel>
     </properties>
 
     <scm>

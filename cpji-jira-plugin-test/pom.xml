@@ -18,20 +18,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.atlassian.selenium</groupId>
-            <artifactId>atlassian-pageobjects-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.selenium</groupId>
-            <artifactId>atlassian-webdriver-jira</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>atlassian-jira-pageobjects</artifactId>
         </dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-selenium-tests</artifactId>
+            <artifactId>jira-webdriver-tests</artifactId>
         </dependency>
     </dependencies>
     <build>

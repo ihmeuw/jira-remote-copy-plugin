@@ -1,8 +1,8 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.pageobjects.pages.DashboardPage;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
-import com.atlassian.webdriver.jira.JiraTestedProduct;
 import it.com.atlassian.cpji.pages.CopyDetailsPage;
 import it.com.atlassian.cpji.pages.CopyIssueToInstancePage;
 import it.com.atlassian.cpji.pages.PermissionChecksPage;

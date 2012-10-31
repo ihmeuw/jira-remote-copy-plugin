@@ -1,7 +1,7 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.pageobjects.TestedProductFactory;
-import com.atlassian.webdriver.jira.JiraTestedProduct;
 
 /**
  * @since v2.1
