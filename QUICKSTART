@@ -1,0 +1,9 @@
+To run JIRA instances in debug mode use:
+
+atlas-mvn amps:debug -DinstanceId=jira1 -Pjira1
+atlas-mvn amps:debug -DinstanceId=jira2 -Pjira2
+
+To run integration tests use:
+
+atlas-mvn amps:integration-test -DtestGroups=jira-tests
+

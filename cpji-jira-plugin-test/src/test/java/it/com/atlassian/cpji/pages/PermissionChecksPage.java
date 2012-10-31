@@ -23,7 +23,7 @@ public class PermissionChecksPage extends AbstractJiraPage
     @Override
     public TimedCondition isAt()
     {
-        return Conditions.forMatcher(elementFinder.find(By.className("current")).timed().getText(), Matchers.equalToIgnoringCase("Confirm new values"));
+        return Conditions.forMatcher(elementFinder.find(By.className("current")).timed().getText(), Matchers.equalToIgnoringCase("Confirmation"));
     }
 
     @Override

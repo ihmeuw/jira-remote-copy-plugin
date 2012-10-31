@@ -57,11 +57,11 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 
         // Custom fields
         assertEquals("2011-09-30", fields.getString(DATE_PICKER_CF));
-        assertEquals("jira-developers", fields.getString(GROUP_PICKER_CF));
+        assertEquals("jira-developers", fields.getJSONObject(GROUP_PICKER_CF).getString("name"));
 
         final JSONArray multiGroup = fields.getJSONArray(MULTI_GROUP_PICKER_CF);
-        assertEquals("jira-developers", multiGroup.getString(0));
-        assertEquals("jira-users", multiGroup.getString(1));
+        assertEquals("jira-developers", multiGroup.getJSONObject(0).getString("name"));
+        assertEquals("jira-users", multiGroup.getJSONObject(1).getString("name"));
 
         assertEquals("Free text field.", fields.getString(FREE_TEXT_FIELD_CF));
         assertEquals("beta", fields.getJSONObject(SELECT_LIST_CF).getString("value"));

@@ -44,12 +44,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>com.atlassian.selenium</groupId>
-				<artifactId>atlassian-webdriver-jira</artifactId>
-				<version>${atlassian.selenium.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<groupId>com.atlassian.jira</groupId>
 				<artifactId>atlassian-jira-pageobjects</artifactId>
 				<version>${jira.version}</version>
@@ -70,7 +64,7 @@
 			<dependency>
 				<groupId>com.atlassian.selenium</groupId>
 				<artifactId>atlassian-selenium</artifactId>
-				<version>2.0</version>
+				<version>${atlassian.selenium.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -178,17 +172,17 @@
 	</build>
 
     <properties>
-        <jira.version>5.0</jira.version>
-        <jira.compile.version>5.0</jira.compile.version>
+        <jira.version>6.0-SNAPSHOT</jira.version>
+        <jira.compile.version>6.0-SNAPSHOT</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.5.0</rest.version>
         <applinks.version>3.5.6</applinks.version>
-        <atlassian.selenium.version>2.0</atlassian.selenium.version>
         <cpji.build.directory>target</cpji.build.directory>
 		<testkit.version>5.0-m13</testkit.version>
 		<amps.version>4.0</amps.version>
 		<jdkLevel>1.6</jdkLevel>
+		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
     </properties>
 
     <scm>
