@@ -11,6 +11,12 @@
     <name>Remote copying of issues - Integration Tests</name>
     <description>Tests for copying issues between remote JIRA instances</description>
     <dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>cpji-jira-plugin</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>atlassian-jira-pageobjects</artifactId>
@@ -103,47 +109,5 @@
     <properties>
         <!-- Whether the tests should be run detached from the current screen -->
         <xvfb.enable>true</xvfb.enable>
-		<tested-plugin.jar>${basedir}/../cpji-jira-plugin/target/cpji-jira-plugin-${project.version}.jar</tested-plugin.jar>
     </properties>
-	<profiles>
-		<profile>
-			<id>artifact-passing</id>
-			<activation>
-				<file>
-					<exists>PassedArtifacts/cpji-jira-plugin-${project.version}.jar</exists>
-				</file>
-			</activation>
-			<properties>
-				<tested-plugin.jar>${basedir}/PassedArtifacts/cpji-jira-plugin-${project.version}.jar</tested-plugin.jar>
-			</properties>
-		</profile>
-		<profile>
-			<id>use-tested-plugin-from-local-file</id>
-			<activation>
-				<file>
-					<exists>${tested-plugin.jar}</exists>
-				</file>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>cpji-jira-plugin</artifactId>
-					<version>${project.version}</version>
-					<scope>system</scope>
-					<systemPath>${tested-plugin.jar}</systemPath>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>use-tested-plugin-from-repository</id>
-			<dependencies>
-				<dependency>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>cpji-jira-plugin</artifactId>
-					<version>${project.version}</version>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 </project>

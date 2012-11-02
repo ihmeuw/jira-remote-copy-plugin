@@ -168,6 +168,13 @@
 					<target>${jdkLevel}</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<preparationGoals>clean test</preparationGoals>
+					<releaseProfiles>releaseProfile</releaseProfiles>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -184,6 +191,16 @@
 		<jdkLevel>1.6</jdkLevel>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
     </properties>
+
+	<profiles>
+		<profile>
+			<id>releaseProfile</id>
+			<properties>
+				<maven.test.unit.skip>false</maven.test.unit.skip>
+				<maven.test.it.skip>false</maven.test.it.skip>
+			</properties>
+		</profile>
+	</profiles>
 
     <scm>
         <connection>scm:git:ssh://git@bitbucket.org/atlassian/jira-remote-copy-plugin.git</connection>
