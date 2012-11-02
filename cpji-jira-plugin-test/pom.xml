@@ -110,7 +110,7 @@
 			<id>artifact-passing</id>
 			<activation>
 				<file>
-					<exists>${basedir}/PassedArtifacts/cpji-jira-plugin-${project.version}.jar</exists>
+					<exists>PassedArtifacts/cpji-jira-plugin-${project.version}.jar</exists>
 				</file>
 			</activation>
 			<properties>
@@ -136,11 +136,6 @@
 		</profile>
 		<profile>
 			<id>use-tested-plugin-from-repository</id>
-			<activation>
-				<file>
-					<missing>${tested-plugin.jar}</missing>
-				</file>
-			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
