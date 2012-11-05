@@ -1,5 +1,6 @@
 package com.atlassian.cpji.action;
 
+import com.atlassian.applinks.api.ApplicationLink;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
@@ -26,13 +27,16 @@ import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.apache.log4j.Logger;
 
 import java.net.URI;
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @since v1.2
@@ -165,9 +169,26 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         return entityLinkService.getEntityLinks(getIssueObject().getProjectObject(), JiraProjectEntityType.class);
     }
 
-	public LinkedHashMap<String, String> getAvailableDestinationProjects() {
-		Iterable<Either<ResponseStatus, Iterable<BasicProject>>> projects = remoteProjectService.getProjects();
-		return Maps.newLinkedHashMap();
+	public ImmutableList<Map.Entry<String, String>> getAvailableDestinationProjects() {
+		final Map<String, String> result = Maps.newLinkedHashMap();
+		final Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> remoteProjects = remoteProjectService.getProjects();
+		for (Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> statusOrProjects : remoteProjects.entrySet()) {
+			if (statusOrProjects.getValue().isRight()) {
+				final Iterable<BasicProject> projects = (Iterable<BasicProject>) statusOrProjects.getValue().right().get();
+				for (BasicProject project : projects) {
+					result.put(statusOrProjects.getKey().getId() + "_" + project.getKey(),
+							String.format("(%s) %s (%s)", statusOrProjects.getKey().getName(), project.getName(),
+									project.getKey()));
+				}
+			}
+		}
+
+		return Ordering.from(new Comparator<Map.Entry<String,String>>() {
+			@Override
+			public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+				return o1.getValue().compareTo(o2.getValue());
+			}
+		}).immutableSortedCopy(result.entrySet());
 	}
 
     public String getAuthorizationUrl()

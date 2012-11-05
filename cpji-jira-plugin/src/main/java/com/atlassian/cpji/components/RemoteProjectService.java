@@ -12,14 +12,14 @@ import com.atlassian.jira.rest.client.internal.json.BasicProjectsJsonParser;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONTokener;
 
 import javax.annotation.Nonnull;
-import java.util.List;
+import java.util.Map;
 
 public class RemoteProjectService {
 
@@ -33,10 +33,10 @@ public class RemoteProjectService {
 
 	// @todo should be multi-threaded
 	@Nonnull
-	public Iterable<Either<ResponseStatus, Iterable<BasicProject>>> getProjects() {
-		List<Either<ResponseStatus, Iterable<BasicProject>>> result = Lists.newArrayList();
+	public Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> getProjects() {
+		Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> result = Maps.newHashMap();
 		for (ApplicationLink jira : applicationLinkService.getApplicationLinks(JiraApplicationType.class)) {
-			result.add(getProjects(jira));
+			result.put(jira, getProjects(jira));
 		}
 		return result;
 	}
