@@ -1,4 +1,4 @@
-package com.atlassian.cpji;
+package com.atlassian.cpji.conditions;
 
 import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
@@ -30,7 +30,7 @@ public class EntityLinkToJIRAProjectConfiguredCondition extends AbstractIssueCon
     {
         final boolean hasProjectLink = (entityLinkService.getEntityLinks(issue.getProjectObject(), JiraProjectEntityType.class).iterator().hasNext());
         final boolean hasPermissionForProject = copyIssuePermissionManager.hasPermissionForProject(issue.getProjectObject().getKey());
-        log.info("shouldDisplay for " + issue.getKey() + ": [hasProjectLink: " + hasProjectLink + ", hasPermissionForProject: " + hasPermissionForProject + "]");
+        log.debug("shouldDisplay for " + issue.getKey() + ": [hasProjectLink: " + hasProjectLink + ", hasPermissionForProject: " + hasPermissionForProject + "]");
         return hasProjectLink && hasPermissionForProject;
     }
 }

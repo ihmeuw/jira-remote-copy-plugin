@@ -13,7 +13,8 @@
             /secure/SelectTargetProjectAction!default.jspa?id=${issueId}
         </link>
         <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
-        <condition class="com.atlassian.cpji.EntityLinkToJIRAProjectConfiguredCondition"/>
+        <condition class="com.atlassian.cpji.conditions.JiraApplicationLinkIsConfiguredCondition"/>
+		<condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
     </web-item>
 
     <webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
@@ -106,6 +107,10 @@
     <component-import key="entityLinkService">
       <interface>com.atlassian.applinks.api.EntityLinkService</interface>
     </component-import>
+
+	<component-import key="applicationLinkService">
+		<interface>com.atlassian.applinks.api.ApplicationLinkService</interface>
+	</component-import>
 
     <component-import key="pluginSettingsFactory">
         <interface>com.atlassian.sal.api.pluginsettings.PluginSettingsFactory</interface>

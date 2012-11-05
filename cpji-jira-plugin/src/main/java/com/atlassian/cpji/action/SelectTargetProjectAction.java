@@ -3,6 +3,7 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
+import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.AuthorisationURIGenerator;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.api.EntityLink;
@@ -35,7 +36,8 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 {
 
     public static final String AUTHORIZE = "authorize";
-    private final InternalHostApplication hostApplication;
+	private final ApplicationLinkService applicationLinkService;
+	private final InternalHostApplication hostApplication;
 
     private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
     private String authorizationUrl;
@@ -51,6 +53,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     public SelectTargetProjectAction(
             final SubTaskManager subTaskManager,
             final EntityLinkService entityLinkService,
+			final ApplicationLinkService applicationLinkService,
             final InternalHostApplication hostApplication,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
@@ -61,7 +64,8 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final UserMappingManager userMappingManager)
     {
         super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
-        this.hostApplication = hostApplication;
+		this.applicationLinkService = applicationLinkService;
+		this.hostApplication = hostApplication;
     }
 
     @Override
