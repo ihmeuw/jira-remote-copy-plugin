@@ -21,13 +21,13 @@ import org.codehaus.jettison.json.JSONTokener;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class RemoteProjectService {
+public class RemoteJiraService {
 
-	private static final Logger log = Logger.getLogger(RemoteProjectService.class);
+	private static final Logger log = Logger.getLogger(RemoteJiraService.class);
 
 	private final ApplicationLinkService applicationLinkService;
 
-	public RemoteProjectService(final ApplicationLinkService applicationLinkService) {
+	public RemoteJiraService(final ApplicationLinkService applicationLinkService) {
 		this.applicationLinkService = applicationLinkService;
 	}
 

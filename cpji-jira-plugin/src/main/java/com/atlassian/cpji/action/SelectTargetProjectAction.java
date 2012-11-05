@@ -11,7 +11,7 @@ import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.RemoteProjectService;
+import com.atlassian.cpji.components.RemoteJiraService;
 import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
@@ -46,7 +46,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 
     public static final String AUTHORIZE = "authorize";
 	private final InternalHostApplication hostApplication;
-	private final RemoteProjectService remoteProjectService;
+	private final RemoteJiraService remoteJiraService;
 
 	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
     private String authorizationUrl;
@@ -62,11 +62,11 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final UserMappingManager userMappingManager,
-			final RemoteProjectService remoteProjectService)
+			final RemoteJiraService remoteJiraService)
     {
         super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
 		this.hostApplication = hostApplication;
-		this.remoteProjectService = remoteProjectService;
+		this.remoteJiraService = remoteJiraService;
 	}
 
     @Override
@@ -171,7 +171,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 
 	public ImmutableList<Map.Entry<String, String>> getAvailableDestinationProjects() {
 		final Map<String, String> result = Maps.newLinkedHashMap();
-		final Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> remoteProjects = remoteProjectService.getProjects();
+		final Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> remoteProjects = remoteJiraService.getProjects();
 		for (Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> statusOrProjects : remoteProjects.entrySet()) {
 			if (statusOrProjects.getValue().isRight()) {
 				final Iterable<BasicProject> projects = (Iterable<BasicProject>) statusOrProjects.getValue().right().get();
