@@ -1,9 +1,13 @@
 To run JIRA instances in debug mode use:
 
-atlas-mvn amps:debug -DinstanceId=jira1 -Pjira1
-atlas-mvn amps:debug -DinstanceId=jira2 -Pjira2
+cd cpji-jira-plugin && atlas-mvn amps:debug -DinstanceId=jira1 -Pjira1
+cd cpji-jira-plugin && atlas-mvn amps:debug -DinstanceId=jira2 -Pjira2
 
 To run integration tests use:
 
-atlas-mvn amps:integration-test -DtestGroups=jira-tests
+cd cpji-jira-plugin-test && atlas-mvn amps:integration-test -DtestGroups=jira-tests
 
+To run CLI for each:
+
+cd cpji-jira-plugin && atlas-mvn jira:cli -Pjira1
+cd cpji-jira-plugin && atlas-mvn jira:cli -Pjira2
