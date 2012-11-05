@@ -3,7 +3,6 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
-import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.AuthorisationURIGenerator;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.api.EntityLink;
@@ -11,22 +10,28 @@ import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.RemoteProjectService;
+import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.PluginInfoResource;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.log4j.Logger;
 
 import java.net.URI;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -36,24 +41,15 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 {
 
     public static final String AUTHORIZE = "authorize";
-	private final ApplicationLinkService applicationLinkService;
 	private final InternalHostApplication hostApplication;
+	private final RemoteProjectService remoteProjectService;
 
-    private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
+	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
     private String authorizationUrl;
 
-    public enum ResponseStatus
-    {
-        AUTHORIZATION_REQUIRED,
-        AUTHENTICATION_FAILED,
-        PLUGIN_NOT_INSTALLED,
-        OK
-    }
-
-    public SelectTargetProjectAction(
+	public SelectTargetProjectAction(
             final SubTaskManager subTaskManager,
             final EntityLinkService entityLinkService,
-			final ApplicationLinkService applicationLinkService,
             final InternalHostApplication hostApplication,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
@@ -61,12 +57,13 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final FieldMapperFactory fieldMapperFactory,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final UserMappingManager userMappingManager)
+            final UserMappingManager userMappingManager,
+			final RemoteProjectService remoteProjectService)
     {
         super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
-		this.applicationLinkService = applicationLinkService;
 		this.hostApplication = hostApplication;
-    }
+		this.remoteProjectService = remoteProjectService;
+	}
 
     @Override
     public String doDefault() throws Exception
@@ -167,6 +164,11 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     {
         return entityLinkService.getEntityLinks(getIssueObject().getProjectObject(), JiraProjectEntityType.class);
     }
+
+	public LinkedHashMap<String, String> getAvailableDestinationProjects() {
+		Iterable<Either<ResponseStatus, Iterable<BasicProject>>> projects = remoteProjectService.getProjects();
+		return Maps.newLinkedHashMap();
+	}
 
     public String getAuthorizationUrl()
     {

@@ -1,3 +1,4 @@
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.SelectTargetProjectAction" *#
 <html>
 <head>
     <title>Select a target remote project</title>
@@ -23,6 +24,15 @@
                         #end
                     </select>
                 </div>
+
+				<div class="field-group">
+					<label for="targetEntityLink">$i18n.getText('cpji.select.destination.project')</label>
+					<select name="targetEntityLink" id="destinationProject">
+						#foreach( $destinationProject in $action.getAvailableDestinationProjects() )
+							<option value="$destinationProject.key">$destinationProject.value</option>
+						#end
+					</select>
+				</div>
             </fieldset>
             <div class="button-container">
                 <div class="buttons">

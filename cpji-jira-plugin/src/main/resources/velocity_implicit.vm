@@ -1,0 +1,6 @@
+#* @implicitly included *#
+#* @vtlvariable name="i18n" type="com.atlassian.jira.util.I18nHelper" *#
+#* @vtlvariable name="textutils" type="com.opensymphony.util.TextUtils" *#
+#* @vtlvariable name="params" type="java.util.Map" *#
+#* @vtlvariable name="map" type="com.atlassian.core.util.map.EasyMap" *#
+#* @vtlvariable name="list" type="com.atlassian.core.util.collection.EasyList" *#
