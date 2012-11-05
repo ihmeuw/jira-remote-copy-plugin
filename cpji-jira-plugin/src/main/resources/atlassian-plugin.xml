@@ -96,7 +96,7 @@
 	<component key="fieldLayoutItemsRetriever" class="com.atlassian.cpji.fields.FieldLayoutItemsRetriever"/>
 	<component key="issueLinkClient" class="com.atlassian.cpji.util.IssueLinkClient"/>
 	<component key="userMappingManager" class="com.atlassian.cpji.fields.value.UserMappingManager"/>
-	<component key="remoteProjectService" class="com.atlassian.cpji.components.RemoteJiraService"/>
+	<component key="remoteJiraService" class="com.atlassian.cpji.components.RemoteJiraService"/>
 
 	<resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>
 
