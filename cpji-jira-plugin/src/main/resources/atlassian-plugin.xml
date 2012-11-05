@@ -20,9 +20,9 @@
     <webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
         <actions>
             <action name="com.atlassian.cpji.action.SelectTargetProjectAction" alias="SelectTargetProjectAction">
-                <view name="success">/templates/selectproject.vm</view>
-                <view name="error">/templates/error.vm</view>
-                <view name="authorize">/templates/authorize.vm</view>
+                <view name="success">/com/atlassian/cpji/templates/selectproject.vm</view>
+                <view name="error">/com/atlassian/cpji/templates/error.vm</view>
+                <view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
                 <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
                 <view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
             </action>
@@ -32,9 +32,9 @@
     <webwork1 key="copydetails-action" name="Copy Issue to another JIRA instance" class="java.lang.Object">
         <actions>
             <action name="com.atlassian.cpji.action.CopyDetailsAction" alias="CopyDetailsAction">
-                <view name="success">/templates/copydetails.vm</view>
-                <view name="error">/templates/error.vm</view>
-                <view name="authorize">/templates/authorize.vm</view>
+                <view name="success">/com/atlassian/cpji/templates/copydetails.vm</view>
+                <view name="error">/com/atlassian/cpji/templates/error.vm</view>
+                <view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
                 <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
                 <view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
             </action>
@@ -44,9 +44,9 @@
     <webwork1 key="check-project-permissions" name="check the permissions" class="java.lang.Object">
         <actions>
             <action name="com.atlassian.cpji.action.PermissionChecksAction" alias="PermissionChecksAction">
-                <view name="success">/templates/permissionchecks.vm</view>
-                <view name="error">/templates/error.vm</view>
-                <view name="authorize">/templates/authorize.vm</view>
+                <view name="success">/com/atlassian/cpji/templates/permissionchecks.vm</view>
+                <view name="error">/com/atlassian/cpji/templates/error.vm</view>
+                <view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
                 <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
                 <view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
             </action>
@@ -56,9 +56,9 @@
     <webwork1 key="copyissue-action" name="Copy Issue to another JIRA instance" class="java.lang.Object">
         <actions>
             <action name="com.atlassian.cpji.action.CopyIssueToInstanceAction" alias="CopyIssueToInstanceAction">
-                <view name="success">/templates/copied.vm</view>
-                <view name="error">/templates/error.vm</view>
-                <view name="authorize">/templates/authorize.vm</view>
+                <view name="success">/com/atlassian/cpji/templates/copied.vm</view>
+                <view name="error">/com/atlassian/cpji/templates/error.vm</view>
+                <view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
             </action>
         </actions>
     </webwork1>
@@ -71,8 +71,8 @@
     <webwork1 key="admin-default-values-action" name="Administration UI for default values" class="java.lang.Object">
         <actions>
             <action name="com.atlassian.cpji.action.admin.ConfigureCopyIssuesAdminAction" alias="ConfigureCopyIssuesAdminAction">
-                <view name="success">/templates/admin.vm</view>
-                <view name="error">/templates/error.vm</view>
+                <view name="success">/com/atlassian/cpji/templates/admin.vm</view>
+                <view name="error">/com/atlassian/cpji/templates/error.vm</view>
             </action>
         </actions>
     </webwork1>
@@ -80,8 +80,8 @@
     <webwork1 key="admin-field-html-action" name="Returns HTML for fields" class="java.lang.Object">
         <actions>
             <action name="com.atlassian.cpji.action.admin.GetFieldsHtmlAction" alias="GetFieldsHtmlAction">
-                <view name="success">/templates/htmlfields.vm</view>
-                <view name="error">/templates/error.vm</view>
+                <view name="success">/com/atlassian/cpji/templates/htmlfields.vm</view>
+                <view name="error">/com/atlassian/cpji/templates/error.vm</view>
             </action>
         </actions>
     </webwork1>
