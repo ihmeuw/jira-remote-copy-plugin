@@ -1,10 +1,11 @@
 package com.atlassian.cpji.action;
 
+import com.atlassian.applinks.api.ApplicationLink;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
+import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.applinks.api.EntityLink;
 import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -53,9 +54,11 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
             final FieldManager fieldManager,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final UserMappingManager userMappingManager)
+            final UserMappingManager userMappingManager,
+			final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
         this.fieldMapperFactory = fieldMapperFactory;
     }
 
@@ -97,16 +100,17 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        final EntityLink entityLink = getSelectedEntityLink();
+        final SelectedProject entityLink = getSelectedDestinationProject();
         if (entityLink == null)
         {
             addErrorMessage("Failed to find the entity link.");
             return ERROR;
         }
-        ApplicationLinkRequestFactory requestFactory = entityLink.getApplicationLink().createAuthenticatedRequestFactory();
+		final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(entityLink.getApplicationId());
+		final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
         try
         {
-            CopyIssueBean copyIssueBean = createCopyIssueBean(entityLink.getKey(), getIssueObject(), issueType);
+            CopyIssueBean copyIssueBean = createCopyIssueBean(entityLink.getProjectKey(), getIssueObject(), issueType);
             ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/fieldPermissions");
             request.setEntity(copyIssueBean);
             FieldPermissionsBean fieldValidationBean = request.execute(new ApplicationLinkResponseHandler<FieldPermissionsBean>()
@@ -124,7 +128,8 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
                     }
                     if (!response.isSuccessful())
                     {
-                        throw new RuntimeException("Error from remote JIRA instance '" + entityLink.getApplicationLink().getRpcUrl() + "' Status code: '" + response.getStatusCode() + "' Response: '" + response.getResponseBodyAsString() + "' ");
+                        throw new RuntimeException("Error from remote JIRA instance '" + applicationLink.getRpcUrl()
+								+ "' Status code: '" + response.getStatusCode() + "' Response: '" + response.getResponseBodyAsString() + "' ");
                     }
                     return response.getEntity(FieldPermissionsBean.class);
                 }

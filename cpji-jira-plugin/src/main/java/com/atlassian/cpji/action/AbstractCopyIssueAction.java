@@ -1,9 +1,8 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationId;
-import com.atlassian.applinks.api.EntityLink;
+import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.EntityLinkService;
-import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
@@ -52,7 +51,6 @@ import com.atlassian.jira.issue.label.Label;
 import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.web.action.issue.AbstractIssueSelectAction;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
@@ -74,10 +72,14 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
     public static final String REST_URL_COPY_ISSUE = "/rest/copyissue/latest/";
     public static final String COPY_ISSUE_RESOURCE_PATH = "copyissue";
     public static final String CONVERT_ISSUE_LINKS_RESOURCE_PATH = COPY_ISSUE_RESOURCE_PATH + "/convertIssueLinks";
-    protected String targetEntityLink;
-    protected final EntityLinkService entityLinkService;
+
+	protected String targetEntityLink;
+
+	protected final EntityLinkService entityLinkService;
     protected final FieldLayoutManager fieldLayoutManager;
     protected final CommentManager commentManager;
+	protected final ApplicationLinkService applicationLinkService;
+
     private final FieldManager fieldManager;
     private final FieldMapperFactory fieldMapperFactory;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
@@ -92,7 +94,8 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
             final FieldMapperFactory fieldMapperFactory,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final UserMappingManager userMappingManager)
+            final UserMappingManager userMappingManager,
+			final ApplicationLinkService applicationLinkService)
     {
         super(subTaskManager);
         this.entityLinkService = entityLinkService;
@@ -103,25 +106,15 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.userMappingManager = userMappingManager;
-    }
+		this.applicationLinkService = applicationLinkService;
+	}
 
-    @SuppressWarnings ("unused")
-    public EntityLink getSelectedEntityLink()
+    public SelectedProject getSelectedDestinationProject()
     {
         try
         {
             String[] strings = StringUtils.split(URLDecoder.decode(targetEntityLink, "UTF-8"), "|");
-            final ApplicationId applicationId = new ApplicationId(strings[0]);
-            final String entityKey = strings[1];
-
-            EntityLink linkToTargetEntity = Iterables.find(entityLinkService.getEntityLinks(getIssueObject().getProjectObject(), JiraProjectEntityType.class), new Predicate<EntityLink>()
-            {
-                public boolean apply(EntityLink input)
-                {
-                    return (input.getApplicationLink().getId().equals(applicationId) && input.getKey().equals(entityKey));
-                }
-            });
-            return linkToTargetEntity;
+            return new SelectedProject(new ApplicationId(strings[0]), strings[1]);
         }
         catch (UnsupportedEncodingException ex)
         {
@@ -338,4 +331,22 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
     {
         return getIssueObject().getKey();
     }
+
+	public static class SelectedProject {
+		private final ApplicationId applicationId;
+		private final String projectKey;
+
+		public SelectedProject(ApplicationId applicationId, String projectKey) {
+			this.applicationId = applicationId;
+			this.projectKey = projectKey;
+		}
+
+		public ApplicationId getApplicationId() {
+			return applicationId;
+		}
+
+		public String getProjectKey() {
+			return projectKey;
+		}
+	}
 }

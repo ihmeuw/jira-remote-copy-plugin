@@ -4,6 +4,7 @@ import com.atlassian.applinks.api.ApplicationLink;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
+import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.AuthorisationURIGenerator;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.api.EntityLink;
@@ -62,9 +63,11 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final UserMappingManager userMappingManager,
-			final RemoteJiraService remoteJiraService)
+			final RemoteJiraService remoteJiraService,
+			final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
 		this.hostApplication = hostApplication;
 		this.remoteJiraService = remoteJiraService;
 	}
@@ -84,10 +87,10 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        final EntityLink selectedEntityLink;
+        final SelectedProject selectedEntityLink;
         try
         {
-            selectedEntityLink = getSelectedEntityLink();
+            selectedEntityLink = getSelectedDestinationProject();
         }
         catch (Exception ex)
         {
@@ -96,7 +99,8 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-        final ApplicationLinkRequestFactory requestFactory = selectedEntityLink.getApplicationLink().createAuthenticatedRequestFactory();
+		final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(selectedEntityLink.getApplicationId());
+		final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
 
         try
         {
@@ -116,15 +120,15 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
                     }
                     if (response.getStatusCode() == 401)
                     {
-                        log.debug("Authentication failed to remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "'");
+                        log.debug("Authentication failed to remote JIRA instance '" + applicationLink.getName() + "'");
                         return ResponseStatus.AUTHENTICATION_FAILED;
                     }
                     if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase()))
                     {
-                        log.debug("Remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "' has the CPJI plugin installed.");
+                        log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
                         return ResponseStatus.OK;
                     }
-                    log.debug("Remote JIRA instance '" + selectedEntityLink.getApplicationLink().getName() + "' has the CPJI plugin NOT installed.");
+                    log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin NOT installed.");
                     return ResponseStatus.PLUGIN_NOT_INSTALLED;
                 }
             });
@@ -176,7 +180,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 			if (statusOrProjects.getValue().isRight()) {
 				final Iterable<BasicProject> projects = (Iterable<BasicProject>) statusOrProjects.getValue().right().get();
 				for (BasicProject project : projects) {
-					result.put(statusOrProjects.getKey().getId() + "_" + project.getKey(),
+					result.put(statusOrProjects.getKey().getId() + "|" + project.getKey(),
 							String.format("(%s) %s (%s)", statusOrProjects.getKey().getName(), project.getName(),
 									project.getKey()));
 				}

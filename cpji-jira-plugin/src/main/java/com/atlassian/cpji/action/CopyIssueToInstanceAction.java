@@ -76,9 +76,11 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
                     final IssueLinkClient issueLinkClient,
                     final UserMappingManager userMappingManager,
                     final IssueLinkManager issueLinkManager,
-                    final RemoteIssueLinkManager remoteIssueLinkManager)
+                    final RemoteIssueLinkManager remoteIssueLinkManager,
+					final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
         this.issueLinkClient = issueLinkClient;
         this.issueLinkManager = issueLinkManager;
         this.remoteIssueLinkManager = remoteIssueLinkManager;
@@ -94,8 +96,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
             return permissionCheck;
         }
         
-        final EntityLink linkToTargetEntity = getSelectedEntityLink();
-        final ApplicationLink appLink = linkToTargetEntity.getApplicationLink();
+        final SelectedProject linkToTargetEntity = getSelectedDestinationProject();
+        final ApplicationLink appLink = applicationLinkService.getApplicationLink(linkToTargetEntity.getApplicationId());
         final ApplicationLinkRequestFactory authenticatedRequestFactory = appLink.createAuthenticatedRequestFactory();
 
         ApplicationLinkRequest request = authenticatedRequestFactory.createRequest(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/copy");
@@ -103,7 +105,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         request.setConnectionTimeout(CONNECTION_TIMEOUTS);
         MutableIssue issueToCopy = getIssueObject();
 
-        CopyIssueBean copyIssueBean = createCopyIssueBean(linkToTargetEntity.getKey(), issueToCopy, issueType);
+        CopyIssueBean copyIssueBean = createCopyIssueBean(linkToTargetEntity.getProjectKey(), issueToCopy, issueType);
         request.setEntity(copyIssueBean);
 
         final Holder<IssueCreationResultBean> resultHolder = new Holder<IssueCreationResultBean>();
@@ -224,9 +226,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         }
     }
 
-    public String getLinkToNewIssue()
-    {
-        URI displayUrl = getSelectedEntityLink().getApplicationLink().getDisplayUrl();
+    public String getLinkToNewIssue() throws TypeNotInstalledException {
+        URI displayUrl = applicationLinkService.getApplicationLink(getSelectedDestinationProject().getApplicationId()).getDisplayUrl();
         return displayUrl + "/browse/" + copiedIssueKey;
     }
 

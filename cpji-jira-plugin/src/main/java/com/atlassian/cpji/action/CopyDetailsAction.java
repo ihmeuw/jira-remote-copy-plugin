@@ -3,8 +3,8 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
+import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.applinks.api.EntityLink;
 import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -90,9 +90,11 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final BeanFactory beanFactory,
-            final UserMappingManager userMappingManager)
+            final UserMappingManager userMappingManager,
+			final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager);
+        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
+				copyIssuePermissionManager, userMappingManager, applicationLinkService);
         this.beanFactory = beanFactory;
     }
 
@@ -104,16 +106,17 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        EntityLink entityLink = getSelectedEntityLink();
+        SelectedProject entityLink = getSelectedDestinationProject();
         if (entityLink == null)
         {
             addErrorMessage("Failed to find the entity link.");
             return ERROR;
         }
-        ApplicationLinkRequestFactory requestFactory = entityLink.getApplicationLink().createAuthenticatedRequestFactory();
+        ApplicationLinkRequestFactory requestFactory = applicationLinkService.getApplicationLink(entityLink.getApplicationId()).createAuthenticatedRequestFactory();
         try
         {
-            ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/issueTypeInformation/" + entityLink.getKey());
+            ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/issueTypeInformation/"
+					+ entityLink.getProjectKey());
             CopyInformationBean copyInformationBean = request.execute(new ApplicationLinkResponseHandler<CopyInformationBean>()
             {
                 public CopyInformationBean credentialsRequired(final Response response) throws ResponseException
