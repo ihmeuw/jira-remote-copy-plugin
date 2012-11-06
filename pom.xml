@@ -158,7 +158,17 @@
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
 				<artifactId>jira-rest-java-client</artifactId>
-				<version>0.6-m10</version>
+				<version>1.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>stax</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.fugue</groupId>
