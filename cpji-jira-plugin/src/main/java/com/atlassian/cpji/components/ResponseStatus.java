@@ -25,6 +25,14 @@ public class ResponseStatus
 		return new ResponseStatus(applicationLink, Status.AUTHENTICATION_FAILED);
 	}
 
+	public static ResponseStatus ok(ApplicationLink applicationLink) {
+		return new ResponseStatus(applicationLink, Status.OK);
+	}
+
+	public static ResponseStatus pluginNotInstalled(ApplicationLink applicationLink) {
+		return new ResponseStatus(applicationLink, Status.PLUGIN_NOT_INSTALLED);
+	}
+
 	public enum Status {
 			COMMUNICATION_FAILED,
 			AUTHORIZATION_REQUIRED,

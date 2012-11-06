@@ -114,7 +114,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             {
                 public ResponseStatus credentialsRequired(final Response response) throws ResponseException
                 {
-                    return ResponseStatus.AUTHORIZATION_REQUIRED;
+                    return ResponseStatus.authorizationRequired(applicationLink);
                 }
 
                 public ResponseStatus handle(final Response response) throws ResponseException
@@ -126,28 +126,28 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
                     if (response.getStatusCode() == 401)
                     {
                         log.debug("Authentication failed to remote JIRA instance '" + applicationLink.getName() + "'");
-                        return ResponseStatus.AUTHENTICATION_FAILED;
+                        return ResponseStatus.authenticationFailed(applicationLink);
                     }
                     if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase()))
                     {
                         log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
-                        return ResponseStatus.OK;
+                        return ResponseStatus.ok(applicationLink);
                     }
                     log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin NOT installed.");
-                    return ResponseStatus.PLUGIN_NOT_INSTALLED;
+                    return ResponseStatus.pluginNotInstalled(applicationLink);
                 }
             });
-            if (ResponseStatus.AUTHORIZATION_REQUIRED.equals(responseStatus))
+            if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getStatus()))
             {
                 return generateAuthorizationUrl(requestFactory);
             }
-            else if (ResponseStatus.PLUGIN_NOT_INSTALLED.equals(responseStatus))
+            else if (ResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getStatus()))
             {
                 log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
                 addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
                 return ERROR;
             }
-            else if (ResponseStatus.AUTHENTICATION_FAILED.equals(responseStatus))
+            else if (ResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getStatus()))
             {
                 addErrorMessage("Authentication failed. Check the authentication configuration.");
                 return ERROR;
