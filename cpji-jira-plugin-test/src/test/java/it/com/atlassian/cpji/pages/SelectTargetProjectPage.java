@@ -44,7 +44,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
     @Override
     public TimedCondition isAt()
     {
-        return Conditions.forMatcher(elementFinder.find(By.className("current")).timed().getText(), Matchers.equalToIgnoringCase("Select project"));
+        return elementFinder.find(By.id("targetEntityLink-field")).timed().isPresent();
     }
 
     @Override
