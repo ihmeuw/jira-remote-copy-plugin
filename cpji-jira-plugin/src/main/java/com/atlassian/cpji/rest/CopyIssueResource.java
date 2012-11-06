@@ -1,6 +1,9 @@
 package com.atlassian.cpji.rest;
 
+import com.atlassian.applinks.api.ApplicationLink;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
+import com.atlassian.cpji.components.RemoteJiraService;
+import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
@@ -15,17 +18,9 @@ import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.rest.model.CopyInformationBean;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
-import com.atlassian.cpji.rest.model.ErrorBean;
-import com.atlassian.cpji.rest.model.FieldPermissionsBean;
-import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.cpji.rest.model.IssueTypeBean;
-import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
-import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
@@ -46,6 +41,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutStorageException;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
@@ -55,18 +51,14 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.*;
+import javax.annotation.Nullable;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -102,6 +94,7 @@ public class CopyIssueResource
     private final InternalHostApplication internalHostApplication;
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
+    private final RemoteJiraService remoteProjectService;
 
     private static final Logger log = Logger.getLogger(CopyIssueResource.class);
 
@@ -121,7 +114,9 @@ public class CopyIssueResource
                     final BuildUtilsInfo buildUtilsInfo,
                     final InternalHostApplication internalHostApplication,
                     final IssueLinkService issueLinkService,
-                    final RemoteIssueLinkService remoteIssueLinkService)
+                    final RemoteIssueLinkService remoteIssueLinkService,
+                    final RemoteJiraService remoteProjectService
+                    )
     {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
@@ -138,6 +133,7 @@ public class CopyIssueResource
         this.internalHostApplication = internalHostApplication;
         this.issueLinkService = issueLinkService;
         this.remoteIssueLinkService = remoteIssueLinkService;
+        this.remoteProjectService = remoteProjectService;
     }
 
 
@@ -456,6 +452,40 @@ public class CopyIssueResource
         }
         
         return Response.noContent().cacheControl(RESTException.never()).build();
+    }
+
+    @GET
+    @Path("projects")
+    public Response getApplicableProjects(){
+
+        Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> whole = remoteProjectService.getProjects();
+        //TODO error handling unsuccesful responses?
+        Map<ApplicationLink,Either<ResponseStatus, Iterable<BasicProject>>> allProjects = Maps.filterEntries(whole, new Predicate<Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>>>() {
+            @Override
+            public boolean apply(@Nullable final Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> entry) {
+                return entry.getValue().isRight();
+            }
+        });
+
+        final Iterable<ProjectGroupBean>  projectsGroups = Iterables.transform(allProjects.entrySet(), new MapEntryToProjectGroupConverter());
+
+        return Response.ok(Lists.newArrayList(projectsGroups)).build();
+
+    }
+
+    private static class MapEntryToProjectGroupConverter implements Function<Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>>, ProjectGroupBean>{
+
+        @Override
+        public ProjectGroupBean apply(@Nullable final Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> entry) {
+            Iterable<BasicProject> basicProjectsIterable = (Iterable<BasicProject>) entry.getValue().right().get();
+            Iterable<ProjectBean> projectsInServer = Iterables.transform(basicProjectsIterable, new Function<Object, ProjectBean>() {
+                @Override
+                public ProjectBean apply(final Object o) {
+                    return new ProjectBean((BasicProject) o);
+                }
+            });
+            return new ProjectGroupBean(entry.getKey().getName(), entry.getKey().getId().get(), Lists.newArrayList(projectsInServer));
+        }
     }
 
     private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship)

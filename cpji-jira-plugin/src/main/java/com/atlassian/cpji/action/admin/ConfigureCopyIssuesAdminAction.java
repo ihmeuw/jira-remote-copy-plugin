@@ -1,5 +1,6 @@
 package com.atlassian.cpji.action.admin;
 
+import com.atlassian.cpji.action.AbstractCopyIssueAction;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
@@ -45,7 +46,6 @@ import java.util.NoSuchElementException;
 public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport implements OperationContext
 {
     public static final String SECURITYBREACH = "securitybreach";
-    public static final String PLUGIN_KEY = "com.atlassian.cpji.cpji-jira-plugin";
     private String projectKey;
     private List<IssueType> issueTypesForProject;
     private String selectedIssueTypeId;
@@ -90,7 +90,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
         this.webResourceManager = webResourceManager;
         fieldValuesHolder = new HashMap();
-        webResourceManager.requireResource(PLUGIN_KEY + ":admin-js");
+        webResourceManager.requireResource(AbstractCopyIssueAction.PLUGIN_KEY + ":admin-js");
     }
 
     public String doExecute() throws Exception

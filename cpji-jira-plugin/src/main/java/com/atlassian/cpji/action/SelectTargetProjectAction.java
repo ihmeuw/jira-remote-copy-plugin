@@ -25,6 +25,7 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
@@ -48,6 +49,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     public static final String AUTHORIZE = "authorize";
 	private final InternalHostApplication hostApplication;
 	private final RemoteJiraService remoteJiraService;
+    private final WebResourceManager webResourceManager;
 
 	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
     private String authorizationUrl;
@@ -64,12 +66,15 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final UserMappingManager userMappingManager,
 			final RemoteJiraService remoteJiraService,
-			final ApplicationLinkService applicationLinkService)
+			final ApplicationLinkService applicationLinkService,
+            final WebResourceManager webResourceManager)
     {
         super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
 		this.hostApplication = hostApplication;
 		this.remoteJiraService = remoteJiraService;
+        this.webResourceManager = webResourceManager;
+        webResourceManager.requireResource(PLUGIN_KEY + ":copyissue-js");
 	}
 
     @Override

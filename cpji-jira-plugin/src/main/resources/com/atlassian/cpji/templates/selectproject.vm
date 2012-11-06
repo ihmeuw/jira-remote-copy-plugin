@@ -19,10 +19,11 @@
 				<div class="field-group">
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
 					<select name="targetEntityLink" id="targetEntityLink">
-						#foreach( $destinationProject in $action.getAvailableDestinationProjects() )
-							<option value="$textutils.htmlEncode($destinationProject.key)">$destinationProject.value</option>
-						#end
+##						#foreach( $destinationProject in $action.getAvailableDestinationProjects() )
+##							<option value="$textutils.htmlEncode($destinationProject.key)">$destinationProject.value</option>
+##						#end
 					</select>
+                    <div id="targetEntityLinkLoader" style="display: hidden;">$i18n.getText('common.concepts.loading')</div>
 				</div>
             </fieldset>
             <div class="button-container">
