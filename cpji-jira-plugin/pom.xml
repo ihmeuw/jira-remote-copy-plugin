@@ -113,7 +113,7 @@
                             <httpPort>2990</httpPort>
                             <jvmDebugPort>5002</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250</jvmArgs>
                         </product>
                         <product>
                             <id>jira</id>
@@ -122,7 +122,7 @@
                             <httpPort>2991</httpPort>
                             <jvmDebugPort>5003</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500</jvmArgs>
                         </product>
                     </products>
                 </configuration>

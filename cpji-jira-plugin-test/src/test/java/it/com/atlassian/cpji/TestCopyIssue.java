@@ -129,4 +129,40 @@ public class TestCopyIssue extends AbstractCopyIssueTest
     {
         return jiraTestedProduct.getPageBinder().navigateToAndBind(ViewIssuePage.class, issueKey);
     }
+
+	@Test
+	public void testCopyForProjectWithoutProjectEntityLinks() throws IOException, JSONException {
+		viewIssue(jira1, "NEL-3");
+		SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, 10301L);
+
+		selectTargetProjectPage.setDestinationProject("(Your Company JIRA) Destination not entity links (DNEL)");
+
+		final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
+		final PermissionChecksPage permissionChecksPage = copyDetailsPage.next();
+
+		assertTrue(permissionChecksPage.isAllSystemFieldsRetained());
+		assertTrue(permissionChecksPage.isAllCustomFieldsRetained());
+
+		final CopyIssueToInstancePage copyIssueToInstancePage = permissionChecksPage.copyIssue();
+		assertTrue(copyIssueToInstancePage.isSuccessful());
+
+		final String remoteIssueKey = copyIssueToInstancePage.getRemoteIssueKey();
+
+		// Query the remotely copied issue via REST
+		final JSONObject json = getIssueJson(jira2, remoteIssueKey);
+		final JSONObject fields = json.getJSONObject("fields");
+
+		// System fields
+		assertEquals("Testing as admin", fields.getString("summary"));
+		assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
+		assertEquals(JSONObject.NULL, fields.opt("description"));
+
+		// Custom fields
+		assertEquals(JSONObject.NULL, fields.opt(DATE_PICKER_CF));
+		assertEquals(JSONObject.NULL, fields.opt(GROUP_PICKER_CF));
+		assertEquals(JSONObject.NULL, fields.opt(MULTI_GROUP_PICKER_CF));
+		assertEquals(JSONObject.NULL, fields.opt(FREE_TEXT_FIELD_CF));
+		assertEquals(JSONObject.NULL, fields.opt(SELECT_LIST_CF));
+		assertEquals(JSONObject.NULL, fields.opt(NUMBER_FIELD_CF));
+	}
 }
