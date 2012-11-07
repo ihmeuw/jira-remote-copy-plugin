@@ -21,6 +21,11 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>atlassian-jira-pageobjects</artifactId>
         </dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+			<scope>test</scope>
+		</dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-webdriver-tests</artifactId>
@@ -42,6 +47,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
+						<atlassian.test.target.dir>target</atlassian.test.target.dir>
                     </systemPropertyVariables>
                     <products>
                         <product>
@@ -49,6 +55,7 @@
                             <instanceId>jira1</instanceId>
                             <version>${jira.version}</version>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250</jvmArgs>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -68,6 +75,7 @@
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500</jvmArgs>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
