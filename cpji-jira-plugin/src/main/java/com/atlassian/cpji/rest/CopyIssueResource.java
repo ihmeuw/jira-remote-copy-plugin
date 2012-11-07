@@ -1,14 +1,7 @@
 package com.atlassian.cpji.rest;
 
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.cpji.components.Projects;
-import com.atlassian.cpji.components.RemoteJiraService;
-import com.atlassian.cpji.fields.CustomFieldMappingResult;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapper;
-import com.atlassian.cpji.fields.FieldMapperFactory;
-import com.atlassian.cpji.fields.IssueCreationFieldMapper;
-import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.*;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
@@ -17,26 +10,12 @@ import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.rest.model.CopyInformationBean;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
-import com.atlassian.cpji.rest.model.ErrorBean;
-import com.atlassian.cpji.rest.model.FieldPermissionsBean;
-import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.cpji.rest.model.IssueTypeBean;
-import com.atlassian.cpji.rest.model.ProjectBean;
-import com.atlassian.cpji.rest.model.ProjectGroupBean;
-import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
-import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.bc.project.ProjectService;
-import com.atlassian.jira.config.properties.APKeys;
-import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParametersImpl;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -51,11 +30,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutStorageException;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.util.BuildUtilsInfo;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -66,22 +41,10 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
-import javax.annotation.Nullable;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.*;
 
 
 /**
@@ -96,20 +59,16 @@ public class CopyIssueResource
 
     private final IssueService issueService;
     private final JiraAuthenticationContext authenticationContext;
-    private final PermissionManager permissionManager;
     private final ProjectService projectService;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final FieldLayoutManager fieldLayoutManager;
-    private final ApplicationProperties applicationProperties;
     private final FieldMapperFactory fieldMapperFactory;
     private final FieldManager fieldManager;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
-    private final BuildUtilsInfo buildUtilsInfo;
     private final InternalHostApplication internalHostApplication;
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
-    private final RemoteJiraService remoteProjectService;
 
     private static final Logger log = Logger.getLogger(CopyIssueResource.class);
 
@@ -117,38 +76,30 @@ public class CopyIssueResource
             (
                     final IssueService issueService,
                     final JiraAuthenticationContext authenticationContext,
-                    final PermissionManager permissionManager,
                     final ProjectService projectService,
                     final IssueTypeSchemeManager issueTypeSchemeManager,
                     final FieldLayoutManager fieldLayoutManager,
-                    final ApplicationProperties applicationProperties,
                     final FieldMapperFactory fieldMapperFactory,
                     final FieldManager fieldManager,
                     final DefaultFieldValuesManager defaultFieldValuesManager,
                     final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-                    final BuildUtilsInfo buildUtilsInfo,
                     final InternalHostApplication internalHostApplication,
                     final IssueLinkService issueLinkService,
-                    final RemoteIssueLinkService remoteIssueLinkService,
-                    final RemoteJiraService remoteProjectService
+                    final RemoteIssueLinkService remoteIssueLinkService
                     )
     {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
-        this.permissionManager = permissionManager;
         this.projectService = projectService;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.fieldLayoutManager = fieldLayoutManager;
-        this.applicationProperties = applicationProperties;
         this.fieldMapperFactory = fieldMapperFactory;
         this.fieldManager = fieldManager;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
-        this.buildUtilsInfo = buildUtilsInfo;
         this.internalHostApplication = internalHostApplication;
         this.issueLinkService = issueLinkService;
         this.remoteIssueLinkService = remoteIssueLinkService;
-        this.remoteProjectService = remoteProjectService;
     }
 
 
@@ -303,44 +254,7 @@ public class CopyIssueResource
     }
 
 
-    @GET
-    @Path ("issueTypeInformation/{project}")
-    public Response getIssueTypeInformation(@PathParam ("project") String projectKey)
-    {
-        User user = callingUser();
-        ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
-        Project project;
-        if (result.isValid())
-        {
-            project = result.getProject();
-        }
-        else
-        {
-            return Response.serverError().entity(ErrorBean.convertErrorCollection(result.getErrorCollection())).cacheControl(RESTException.never()).build();
-        }
-        UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
-        boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
-        boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 
-        if (hasCreateIssuePermission)
-        {
-            Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);
-            List<String> issueTypes = new ArrayList<String>();
-            for (IssueType issueType : issueTypesForProject)
-            {
-                issueTypes.add(issueType.getName());
-            }
-            IssueTypeBean issueTypesBean = new IssueTypeBean(issueTypes);
-            boolean attachmentsDisabled = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS);
-            CopyInformationBean copyInformationBean = new CopyInformationBean(issueTypesBean, attachmentsDisabled, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
-            return Response.ok(copyInformationBean).cacheControl(RESTException.never()).build();
-        }
-        else
-        {
-            CopyInformationBean copyInformationBean = new CopyInformationBean(null, true, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
-            return Response.ok(copyInformationBean).cacheControl(RESTException.never()).build();
-        }
-    }
 
     @PUT
     @Path ("fieldPermissions")
@@ -469,28 +383,7 @@ public class CopyIssueResource
         return Response.noContent().cacheControl(RESTException.never()).build();
     }
 
-    @GET
-    @Path("projects")
-    public Response getApplicableProjects(){
-        //TODO error handling unsuccesful responses?
 
-        return Response.ok(Lists.newArrayList(Iterables.transform(Either.allRight(remoteProjectService.getProjects()),
-				new ProjectsToProjectGroupBean()))).build();
-    }
-
-    private static class ProjectsToProjectGroupBean implements Function<Projects, ProjectGroupBean> {
-        @Override
-        public ProjectGroupBean apply(@Nullable final Projects entry) {
-            Iterable<BasicProject> basicProjectsIterable = entry.getResult();
-            Iterable<ProjectBean> projectsInServer = Iterables.transform(basicProjectsIterable, new Function<Object, ProjectBean>() {
-                @Override
-                public ProjectBean apply(final Object o) {
-                    return new ProjectBean((BasicProject) o);
-                }
-            });
-            return new ProjectGroupBean(entry.getApplicationLink().getName(), entry.getApplicationLink().getId().get(), Lists.newArrayList(projectsInServer));
-        }
-    }
 
     private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship)
     {

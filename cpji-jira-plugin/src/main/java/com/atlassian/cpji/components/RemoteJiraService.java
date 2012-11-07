@@ -114,7 +114,7 @@ public class RemoteJiraService {
 
 	@Nonnull
 	protected Either<ResponseStatus, Projects> getProjects(final ApplicationLink applicationLink, ApplicationLinkRequestFactory requestFactory) {
-		return callRestService(applicationLink, requestFactory, "/rest/api/latest/project", new AbstractJsonResponseHandler<Projects>(
+		return callRestService(applicationLink, requestFactory, "/rest/copyissue/1.0/project", new AbstractJsonResponseHandler<Projects>(
 				applicationLink) {
 			@Override
 			protected Projects parseResponse(Response response) throws ResponseException, JSONException {

@@ -23,7 +23,7 @@ AJS.$(function($){
 
 
         getProjects : function(){
-            $.getJSON(copyIssue.contextPath + "/rest/copyissue/1.0/copyissue/projects", copyIssue.getProjectsSuccess);
+            $.getJSON(copyIssue.contextPath + "/rest/copyissue/1.0/project/destination", copyIssue.getProjectsSuccess);
         },
 
         convertGroupToOptgroup : function(json){

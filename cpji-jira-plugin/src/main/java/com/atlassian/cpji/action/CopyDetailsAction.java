@@ -115,7 +115,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         ApplicationLinkRequestFactory requestFactory = applicationLinkService.getApplicationLink(entityLink.getApplicationId()).createAuthenticatedRequestFactory();
         try
         {
-            ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/issueTypeInformation/"
+            ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + PROJECT_RESOURCE_PATH + "/issueTypeInformation/"
 					+ entityLink.getProjectKey());
             CopyInformationBean copyInformationBean = request.execute(new ApplicationLinkResponseHandler<CopyInformationBean>()
             {
