@@ -2,7 +2,7 @@ AJS.$(function($){
 
     var copyIssue = {
 
-        context : contextPath,
+        contextPath : contextPath,
 
         loader : null,
         projectsSelect : null,
@@ -10,13 +10,20 @@ AJS.$(function($){
         initSelectProject : function(select, loader){
             copyIssue.projectsSelect = select;
             copyIssue.loader = loader;
-            loader.show();
-            select.hide();
+            copyIssue.toggleLoadingState(true);
             copyIssue.getProjects();
         },
 
+
+        toggleLoadingState : function(visible){
+            copyIssue.loader.toggleClass("hidden", !visible);
+            copyIssue.projectsSelect.toggleClass("hidden", visible);
+        },
+
+
+
         getProjects : function(){
-            $.getJSON(copyIssue.context + "/rest/copyissue/1.0/copyissue/projects", copyIssue.getProjectsSuccess);
+            $.getJSON(copyIssue.contextPath + "/rest/copyissue/1.0/copyissue/projects", copyIssue.getProjectsSuccess);
         },
 
         convertGroupToOptgroup : function(json){
@@ -39,8 +46,7 @@ AJS.$(function($){
                 var serverElem = copyIssue.convertGroupToOptgroup(data[server]);
                 copyIssue.projectsSelect.append(serverElem);
             }
-            copyIssue.projectsSelect.show();
-            copyIssue.loader.hide();
+            copyIssue.toggleLoadingState(false);
             copyIssue.prepareSelect();
 
 
