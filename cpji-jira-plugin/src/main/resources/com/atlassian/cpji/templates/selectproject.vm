@@ -18,11 +18,7 @@
             <fieldset>
 				<div class="field-group">
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
-					<select name="targetEntityLink" id="targetEntityLink">
-##						#foreach( $destinationProject in $action.getAvailableDestinationProjects() )
-##							<option value="$textutils.htmlEncode($destinationProject.key)">$destinationProject.value</option>
-##						#end
-					</select>
+					<div style="width: 250px;"><select name="targetEntityLink" id="targetEntityLink" class="hidden"></select></div>
                     <span id="targetEntityLinkLoader" class="icon loading hidden"></span>
 				</div>
             </fieldset>

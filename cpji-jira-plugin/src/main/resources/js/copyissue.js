@@ -54,6 +54,7 @@ AJS.$(function($){
         prepareSelect : function(){
             new AJS.SingleSelect({
                 element: copyIssue.projectsSelect,
+                showDropdownButton: true,
                 itemAttrDisplayed: "label",
                 getDisplayVal : function(){
                     return "aaa";
