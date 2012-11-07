@@ -8,7 +8,6 @@ import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
 import com.atlassian.fugue.Either;
-import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.rest.client.domain.ServerInfo;
 import com.atlassian.jira.rest.client.internal.json.BasicProjectsJsonParser;
 import com.atlassian.jira.rest.client.internal.json.ServerInfoJsonParser;
@@ -16,6 +15,7 @@ import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,11 +26,10 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
 import javax.annotation.Nonnull;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -67,21 +66,21 @@ public class RemoteJiraService {
 	}
 
 	@Nonnull
-	public Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> getProjects() {
+	public Iterable<Either<ResponseStatus, Projects>> getProjects() {
 		final ExecutorService es = Executors.newFixedThreadPool(THREADS);
 		final Iterable<ApplicationLink> applicationLinks = applicationLinkService.getApplicationLinks(
 				JiraApplicationType.class);
 
-		final List<Callable<Either<ResponseStatus, Iterable<BasicProject>>>> queries = Lists.newArrayList(
+		final List<Callable<Either<ResponseStatus, Projects>>> queries = Lists.newArrayList(
 				Iterables.transform(applicationLinks,
-						new Function<ApplicationLink, Callable<Either<ResponseStatus, Iterable<BasicProject>>>>() {
+						new Function<ApplicationLink, Callable<Either<ResponseStatus, Projects>>>() {
 							@Override
-							public Callable<Either<ResponseStatus, Iterable<BasicProject>>> apply(final ApplicationLink applicationLink) {
+							public Callable<Either<ResponseStatus,Projects>> apply(final ApplicationLink applicationLink) {
 								final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
 
-								return new Callable<Either<ResponseStatus, Iterable<BasicProject>>>() {
+								return new Callable<Either<ResponseStatus, Projects>>() {
 									@Override
-									public Either<ResponseStatus, Iterable<BasicProject>> call() {
+									public Either<ResponseStatus, Projects> call() {
 										return getProjects(applicationLink, requestFactory);
 									}
 								};
@@ -90,34 +89,37 @@ public class RemoteJiraService {
 		);
 
 		try {
-			final Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> result = Maps.newHashMap();
-			final Iterator<ApplicationLink> applicationLinksIterator = applicationLinks.iterator();
-			for(Future<Either<ResponseStatus, Iterable<BasicProject>>> queryResult : es.invokeAll(queries)) {
-				final ApplicationLink applicationLink = applicationLinksIterator.next();
-				final Either<ResponseStatus, Iterable<BasicProject>> projects = queryResult.get();
-				result.put(applicationLink, projects);
-			}
-			return result;
+			return ImmutableList.copyOf(Iterables.transform(es.invokeAll(queries),
+					new Function<Future<Either<ResponseStatus, Projects>>, Either<ResponseStatus, Projects>>() {
+						@Override
+						public Either<ResponseStatus, Projects> apply(Future<Either<ResponseStatus, Projects>> eitherFuture) {
+							try {
+								return eitherFuture.get();
+							} catch (Exception e) {
+								log.warn("Failed to execute Application Links request", e);
+								return Either.left(ResponseStatus.communicationFailed(null));
+							}
+						}
+					}));
 		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (ExecutionException e) {
-			throw new RuntimeException(e);
+			log.warn("Threads were interrupted during Application Links request", e);
+			return Collections.emptyList();
 		}
 	}
 
 	@Nonnull
-	public Either<ResponseStatus, Iterable<BasicProject>> getProjects(ApplicationLink jiraServer) {
+	public Either<ResponseStatus, Projects> getProjects(ApplicationLink jiraServer) {
 		return getProjects(jiraServer, jiraServer.createAuthenticatedRequestFactory());
 	}
 
 	@Nonnull
-	protected Either<ResponseStatus, Iterable<BasicProject>> getProjects(ApplicationLink applicationLink, ApplicationLinkRequestFactory requestFactory) {
-		return callRestService(applicationLink, requestFactory, "/rest/api/latest/project", new AbstractJsonResponseHandler<Iterable<BasicProject>>(
+	protected Either<ResponseStatus, Projects> getProjects(final ApplicationLink applicationLink, ApplicationLinkRequestFactory requestFactory) {
+		return callRestService(applicationLink, requestFactory, "/rest/api/latest/project", new AbstractJsonResponseHandler<Projects>(
 				applicationLink) {
 			@Override
-			protected Iterable<BasicProject> parseResponse(Response response) throws ResponseException, JSONException {
-				return new BasicProjectsJsonParser().parse(
-						new JSONArray(new JSONTokener(response.getResponseBodyAsString())));
+			protected Projects parseResponse(Response response) throws ResponseException, JSONException {
+				return new Projects(applicationLink, new BasicProjectsJsonParser().parse(
+						new JSONArray(new JSONTokener(response.getResponseBodyAsString()))));
 			}
 		});
 	}

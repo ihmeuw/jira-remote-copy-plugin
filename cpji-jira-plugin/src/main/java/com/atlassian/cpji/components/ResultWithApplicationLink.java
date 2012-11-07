@@ -1,8 +1,6 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.applinks.api.ApplicationLinkRequest;
-import com.atlassian.jira.rest.client.domain.BasicProject;
 
 /**
 *
@@ -25,21 +23,4 @@ public class ResultWithApplicationLink<T> {
 		return result;
 	}
 
-	public static class ResponseStatusResult extends ResultWithApplicationLink<ResponseStatus> {
-		public ResponseStatusResult(ApplicationLink applicationLink, ResponseStatus result) {
-			super(applicationLink, result);
-		}
-	}
-
-	public static class Projects extends ResultWithApplicationLink<Iterable<BasicProject>> {
-		public Projects(ApplicationLink applicationLink, Iterable<BasicProject> result) {
-			super(applicationLink, result);
-		}
-	}
-
-	public static class ApplicationLinkRequestResult extends ResultWithApplicationLink<ApplicationLinkRequest> {
-		public ApplicationLinkRequestResult(ApplicationLink applicationLink, ApplicationLinkRequest result) {
-			super(applicationLink, result);
-		}
-	}
 }

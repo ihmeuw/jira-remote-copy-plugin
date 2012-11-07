@@ -12,6 +12,7 @@ import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.Projects;
 import com.atlassian.cpji.components.RemoteJiraService;
 import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -29,12 +30,15 @@ import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Comparator;
 import java.util.List;
@@ -179,17 +183,19 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     }
 
 	public ImmutableList<Map.Entry<String, String>> getAvailableDestinationProjects() {
-		final Map<String, String> result = Maps.newLinkedHashMap();
-		final Map<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> remoteProjects = remoteJiraService.getProjects();
-		for (Map.Entry<ApplicationLink, Either<ResponseStatus, Iterable<BasicProject>>> statusOrProjects : remoteProjects.entrySet()) {
-			if (statusOrProjects.getValue().isRight()) {
-				final Iterable<BasicProject> projects = (Iterable<BasicProject>) statusOrProjects.getValue().right().get();
-				for (BasicProject project : projects) {
-					result.put(statusOrProjects.getKey().getId() + "|" + project.getKey(),
-							String.format("(%s) %s (%s)", statusOrProjects.getKey().getName(), project.getName(),
-									project.getKey()));
-				}
-			}
+		final Iterable<Map.Entry<String, String>> projects = ImmutableList.of();
+		for(final Projects remoteProjects : Either.allRight(remoteJiraService.getProjects())) {
+			Iterables.concat(projects, Iterables.transform(remoteProjects.getResult(),
+					new Function<BasicProject, Pair>() {
+						@Override
+						public Pair apply(@Nullable BasicProject basicProject) {
+							return Pair
+									.of(remoteProjects.getApplicationLink().getId().get() + "|" + basicProject.getKey(),
+											String.format("(%s) %s (%s)", remoteProjects.getApplicationLink().getName(),
+													basicProject.getName(),
+													basicProject.getKey()));
+						}
+					}));
 		}
 
 		return Ordering.from(new Comparator<Map.Entry<String,String>>() {
@@ -197,7 +203,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 			public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
 				return o1.getValue().compareTo(o2.getValue());
 			}
-		}).immutableSortedCopy(result.entrySet());
+		}).immutableSortedCopy(projects);
 	}
 
     public String getAuthorizationUrl()
