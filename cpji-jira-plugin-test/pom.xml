@@ -55,7 +55,7 @@
                             <instanceId>jira1</instanceId>
                             <version>${jira.version}</version>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250 -Dplugin.webresource.batching.off=false</jvmArgs>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -67,6 +67,11 @@
 									<artifactId>jira-testkit-plugin</artifactId>
 									<version>${testkit.version}</version>
 								</pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira</groupId>
+									<artifactId>jira-func-test-plugin</artifactId>
+									<version>${jira.version}</version>
+								</pluginArtifact>
                             </pluginArtifacts>
                         </product>
                         <product>
@@ -75,7 +80,7 @@
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500 -Dplugin.webresource.batching.off=false</jvmArgs>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -86,6 +91,11 @@
 									<groupId>com.atlassian.jira.tests</groupId>
 									<artifactId>jira-testkit-plugin</artifactId>
 									<version>${testkit.version}</version>
+								</pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira</groupId>
+									<artifactId>jira-func-test-plugin</artifactId>
+									<version>${jira.version}</version>
 								</pluginArtifact>
                             </pluginArtifacts>
                         </product>
@@ -116,6 +126,6 @@
     </build>
     <properties>
         <!-- Whether the tests should be run detached from the current screen -->
-        <xvfb.enable>true</xvfb.enable>
+        <xvfb.enable>false</xvfb.enable>
     </properties>
 </project>
