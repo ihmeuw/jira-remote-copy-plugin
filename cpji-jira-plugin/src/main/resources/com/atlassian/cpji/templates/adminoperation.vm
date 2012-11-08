@@ -1,0 +1,2 @@
+<span class="project-config-list-label">$i18n.getText('cpji.admin.general.name')</span>
+<a href="$req.contextPath/secure/ConfigureCopyIssuesAdminAction.jspa?projectKey=$projectKey" id="configure_cpji">$i18n.getText('common.words.configure')</a>

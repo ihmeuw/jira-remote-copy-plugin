@@ -66,7 +66,7 @@
 
 	<project-operation name="Project Operation for Copy Issues Default values " key="cpji-copy-issues-default-values"
 					   class="com.atlassian.cpji.action.admin.ConfigureDefaultValuesProjectOperation">
-		<resource name="view" type="velocity" location="templates/admin.vm"/>
+		<resource name="view" type="velocity" location="/com/atlassian/cpji/templates/adminoperation.vm"/>
 	</project-operation>
 
 	<webwork1 key="admin-default-values-action" name="Administration UI for default values" class="java.lang.Object">
