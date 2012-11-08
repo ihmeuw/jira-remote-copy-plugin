@@ -36,49 +36,49 @@
                 </div>
             </fieldset>
 
-            #if ($action.isSALUpgradeRequired() && $action.attachmentsEnabled())
-                <div class="field-group">
-                    <label for="attachments">Attachments</label>
+			<h2>Issue details</h2>
+			<fieldset>
+				#if ($action.isSALUpgradeRequired() && $action.attachmentsEnabled())
+					<div class="field-group">
+						<label for="attachments">Attachments</label>
                      <span class="field-value">
                          Attachments are not moved until we have upgraded JIRA's SAL version.
                      </span>
-                    <input type="hidden" name="copyAttachments" value="false"/>
-                </div>
-            #elseif ($action.attachmentsEnabled())
-                <div class="field-group">
-                    <label for="attachments">Attachments</label>
+						<input type="hidden" name="copyAttachments" value="false"/>
+					</div>
+				#elseif ($action.attachmentsEnabled())
+					<div class="field-group">
+						<label for="attachments">Attachments</label>
                  <span class="field-value">
-                     #if ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
-                         Attachments will be copied.
+					 #if ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
+						 Attachments will be copied.
                          <input type="hidden" name="copyAttachments" value="true"/>
-                     #elseif (!$action.remoteAttachmentsEnabled())
-                         Attachments are disabled in the remote JIRA instance.
+					 #elseif (!$action.remoteAttachmentsEnabled())
+						 Attachments are disabled in the remote JIRA instance.
                          <input type="hidden" name="copyAttachments" value="false"/>
-                     #elseif(!$action.hasCreateAttachmentsPermission())
-                         You don't have the create attachments permission in the remote JIRA instance.
+					 #elseif(!$action.hasCreateAttachmentsPermission())
+						 You don't have the create attachments permission in the remote JIRA instance.
                          <input type="hidden" name="copyAttachments" value="false"/>
-                     #end
-                 </span>
-                </div>
-            #end
+					 #end
+				 </span>
+					</div>
+				#end
 
-            <fieldset class="group">
-                <legend>
-                    <span>Copy Issue Links</span>
-                </legend>
-                <div class="checkbox">
-                    <input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
-                </div>
-            </fieldset>
+				<div class="field-group">
+					<label for="copy-issue-links">Copy Issue Links</label>
+					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
+				</fieldset>
 
-            <div class="field-group">
-                <label for="remoteIssueLink">Create Issue Link</label>
-                <select name="remoteIssueLink" id="remoteIssueLink">
-                    #foreach( $issueLink in $action.getIssueLinkOptions())
-                        <option value="${issueLink.value}">${issueLink.label}</option>
-                    #end
-                </select>
-            </div>
+				<div class="field-group">
+					<label for="remoteIssueLink">Create Issue Link</label>
+					<select name="remoteIssueLink" id="remoteIssueLink">
+						#foreach( $issueLink in $action.getIssueLinkOptions())
+							<option value="${issueLink.value}">${issueLink.label}</option>
+						#end
+					</select>
+				</div>
+			</fieldset>
+
             <div class="button-container">
                 <div class="buttons">
                     <input type="submit" value="Next" class="button submit"/>
