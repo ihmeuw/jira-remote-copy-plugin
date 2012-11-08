@@ -126,6 +126,6 @@
     </build>
     <properties>
         <!-- Whether the tests should be run detached from the current screen -->
-        <xvfb.enable>false</xvfb.enable>
+        <xvfb.enable>true</xvfb.enable>
     </properties>
 </project>
