@@ -29,6 +29,13 @@
                 <cli.port>5678</cli.port>
             </properties>
         </profile>
+		<profile>
+			<id>jira3</id>
+			<properties>
+				<http.port>2992</http.port>
+				<cli.port>5679</cli.port>
+			</properties>
+		</profile>
     </profiles>
 
     <dependencies>
@@ -113,7 +120,7 @@
                             <httpPort>2990</httpPort>
                             <jvmDebugPort>5002</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250 -Dplugin.webresource.batching.off=false</jvmArgs>
                         </product>
                         <product>
                             <id>jira</id>
@@ -122,8 +129,17 @@
                             <httpPort>2991</httpPort>
                             <jvmDebugPort>5003</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500 -Dplugin.webresource.batching.off=false</jvmArgs>
                         </product>
+						<product>
+							<id>jira</id>
+							<instanceId>jira3</instanceId>
+							<version>${jira.version}</version>
+							<httpPort>2992</httpPort>
+							<jvmDebugPort>5004</jvmDebugPort>
+							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=133 -Dplugin.webresource.batching.off=false</jvmArgs>
+						</product>
                     </products>
                 </configuration>
             </plugin>
