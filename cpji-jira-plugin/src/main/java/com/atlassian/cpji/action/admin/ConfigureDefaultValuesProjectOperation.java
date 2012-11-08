@@ -1,45 +1,31 @@
 package com.atlassian.cpji.action.admin;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.plugin.projectoperation.PluggableProjectOperation;
-import com.atlassian.jira.plugin.projectoperation.ProjectOperationModuleDescriptor;
+import com.atlassian.jira.plugin.projectoperation.AbstractPluggableProjectOperation;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.util.I18nHelper;
-import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
-
-import static java.lang.String.format;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @since v1.4
  */
-public class ConfigureDefaultValuesProjectOperation implements PluggableProjectOperation
+public class ConfigureDefaultValuesProjectOperation extends AbstractPluggableProjectOperation
 {
-    private ProjectOperationModuleDescriptor descriptor;
     private final PermissionManager permissionManager;
-    private final VelocityRequestContextFactory velocityRequestContext;
-    private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public ConfigureDefaultValuesProjectOperation(PermissionManager permissionManager, VelocityRequestContextFactory velocityRequestContext, final JiraAuthenticationContext jiraAuthenticationContext)
+    public ConfigureDefaultValuesProjectOperation(PermissionManager permissionManager)
     {
         this.permissionManager = permissionManager;
-        this.velocityRequestContext = velocityRequestContext;
-        this.jiraAuthenticationContext = jiraAuthenticationContext;
-
     }
-
-    public void init(ProjectOperationModuleDescriptor descriptor)
-    {
-        this.descriptor = descriptor;
-    }
-
-    private static final String TEMPLATE = "<span class=\"project-config-list-label\">%s</span><a href=\"%s/secure/ConfigureCopyIssuesAdminAction.jspa?projectKey=%s\" id=\"configure_cpji\">%s</a>";
 
     final public String getHtml(Project project, User user)
     {
-        return format(TEMPLATE, getLabelHtml(project, user), velocityRequestContext.getJiraVelocityRequestContext().getBaseUrl(), project.getKey(), getContentHtml(project, user));
+
+        ImmutableMap<String, ?> params = ImmutableMap.of(
+                "projectKey", project.getKey()
+        );
+        return descriptor.getHtml("view", params);
     }
 
     public boolean showOperation(final Project project, final User user)
@@ -47,13 +33,4 @@ public class ConfigureDefaultValuesProjectOperation implements PluggableProjectO
         return permissionManager.hasPermission(Permissions.PROJECT_ADMIN, project, user) || permissionManager.hasPermission(Permissions.ADMINISTER, user);
     }
 
-    public String getLabelHtml(Project project, User user)
-    {
-        return jiraAuthenticationContext.getI18nHelper().getText("cpji.admin.general.name") + ":";
-    }
-
-    public String getContentHtml(Project project, User user)
-    {
-        return jiraAuthenticationContext.getI18nHelper().getText("common.words.configure");
-    }
 }
