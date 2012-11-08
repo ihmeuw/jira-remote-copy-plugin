@@ -2,28 +2,44 @@ AJS.$(function($){
 
     var copyIssue = {
 
-        contextPath : contextPath,
+        settings : {
+            contextPath : contextPath,
+            loader : null,
+            projectsSelect : null,
+            form : null,
+            messagesBar : $("#aui-message-bar")
+        },
 
-        loader : null,
-        projectsSelect : null,
+        singleSelect : null,
 
-        initSelectProject : function(select, loader){
-            copyIssue.projectsSelect = select;
-            copyIssue.loader = loader;
+        initSelectProject : function(settings){
+            $.extend(copyIssue.settings, settings);
             copyIssue.toggleLoadingState(true);
             copyIssue.getProjects();
+            copyIssue.settings.form.submit(copyIssue.validateForm);
         },
 
+        validateForm : function(){
+            var isElementSelected = copyIssue.singleSelect.getSelectedDescriptor() != undefined;
+            if(!isElementSelected){
+                AJS.messages.error({
+                    title:AJS.I18n.getText("cpji.project.validation.not.selected"),
+                    body: "<p>" + AJS.I18n.getText("cpji.project.validation.invalid.value") +"</p>"
+                });
+                return false;
+            } else {
+                return true;
+            }
+            return isElementSelected;
+        },
 
         toggleLoadingState : function(visible){
-            copyIssue.loader.toggleClass("hidden", !visible);
-            copyIssue.projectsSelect.toggleClass("hidden", visible);
+            copyIssue.settings.loader.toggleClass("hidden", !visible);
+            copyIssue.settings.projectsSelect.toggleClass("hidden", visible);
         },
 
-
-
         getProjects : function(){
-            $.getJSON(copyIssue.contextPath + "/rest/copyissue/1.0/project/destination", copyIssue.getProjectsSuccess);
+            $.getJSON(copyIssue.settings.contextPath + "/rest/copyissue/1.0/project/destination", copyIssue.getProjectsSuccess);
         },
 
         convertGroupToOptgroup : function(json){
@@ -44,7 +60,7 @@ AJS.$(function($){
         getProjectsSuccess : function(data){
             for(var server in data){
                 var serverElem = copyIssue.convertGroupToOptgroup(data[server]);
-                copyIssue.projectsSelect.append(serverElem);
+                copyIssue.settings.projectsSelect.append(serverElem);
             }
             copyIssue.toggleLoadingState(false);
             copyIssue.prepareSelect();
@@ -52,17 +68,23 @@ AJS.$(function($){
 
         },
         prepareSelect : function(){
-            new AJS.SingleSelect({
-                element: copyIssue.projectsSelect,
+            copyIssue.singleSelect = new AJS.SingleSelect({
+                element: copyIssue.settings.projectsSelect,
                 showDropdownButton: true,
-                itemAttrDisplayed: "label",
-                getDisplayVal : function(){
-                    return "aaa";
-                }
+                itemAttrDisplayed: "label"
             });
+            copyIssue.settings.projectsSelect.bind("selected", copyIssue.onValueSelected);
+        },
+
+        onValueSelected : function () {
+            copyIssue.settings.messagesBar.empty();
         }
 
     }
 
-    copyIssue.initSelectProject($("#targetEntityLink"), $("#targetEntityLinkLoader"));
+    copyIssue.initSelectProject({
+        projectsSelect: $("#targetEntityLink"),
+        loader : $("#targetEntityLinkLoader"),
+        form : $("#stepped-process form.aui")
+    });
 });

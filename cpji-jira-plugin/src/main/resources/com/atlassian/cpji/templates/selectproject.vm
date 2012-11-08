@@ -15,6 +15,7 @@
     <div class="content-body aui-panel">
         <form action="SelectTargetProjectAction.jspa" class="aui" method="post">
             <h2>$i18n.getText('cpji.select.destination.project')</h2>
+            <div id="aui-message-bar"></div>
             <fieldset>
 				<div class="field-group">
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
