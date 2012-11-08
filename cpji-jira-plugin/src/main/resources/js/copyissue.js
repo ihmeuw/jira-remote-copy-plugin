@@ -6,8 +6,7 @@ AJS.$(function($){
             contextPath : contextPath,
             loader : null,
             projectsSelect : null,
-            form : null,
-            messagesBar : $("#aui-message-bar")
+            submitButton : null
         },
 
         singleSelect : null,
@@ -16,22 +15,8 @@ AJS.$(function($){
             $.extend(copyIssue.settings, settings);
             copyIssue.toggleLoadingState(true);
             copyIssue.getProjects();
-            copyIssue.settings.form.submit(copyIssue.validateForm);
         },
 
-        validateForm : function(){
-            var isElementSelected = copyIssue.singleSelect.getSelectedDescriptor() != undefined;
-            if(!isElementSelected){
-                AJS.messages.error({
-                    title:AJS.I18n.getText("cpji.project.validation.not.selected"),
-                    body: "<p>" + AJS.I18n.getText("cpji.project.validation.invalid.value") +"</p>"
-                });
-                return false;
-            } else {
-                return true;
-            }
-            return isElementSelected;
-        },
 
         toggleLoadingState : function(visible){
             copyIssue.settings.loader.toggleClass("hidden", !visible);
@@ -74,10 +59,17 @@ AJS.$(function($){
                 itemAttrDisplayed: "label"
             });
             copyIssue.settings.projectsSelect.bind("selected", copyIssue.onValueSelected);
+            copyIssue.settings.projectsSelect.bind("unselect", copyIssue.onValueUnselected);
         },
 
-        onValueSelected : function () {
-            copyIssue.settings.messagesBar.empty();
+        onValueSelected : function (item) {
+            copyIssue.settings.submitButton.prop("disabled", false);
+            copyIssue.settings.submitButton.attr("aria-disabled", false);
+        },
+
+        onValueUnselected : function (item) {
+            copyIssue.settings.submitButton.prop("disabled", true);
+            copyIssue.settings.submitButton.attr("aria-disabled", true);
         }
 
     }
@@ -85,6 +77,6 @@ AJS.$(function($){
     copyIssue.initSelectProject({
         projectsSelect: $("#targetEntityLink"),
         loader : $("#targetEntityLinkLoader"),
-        form : $("#stepped-process form.aui")
+        submitButton : $("#select-project-submit")
     });
 });

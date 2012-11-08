@@ -125,9 +125,6 @@
 	</web-resource>
 
     <web-resource key="copyissue-js">
-        <transformation extension="js">
-            <transformer key="jsI18n"/>
-        </transformation>
         <resource type="download" name="copyissue.js" location="js/copyissue.js"/>
     </web-resource>
 
