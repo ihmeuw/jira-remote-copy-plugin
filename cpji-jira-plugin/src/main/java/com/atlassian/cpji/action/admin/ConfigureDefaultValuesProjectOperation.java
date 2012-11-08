@@ -4,8 +4,10 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.plugin.projectoperation.PluggableProjectOperation;
 import com.atlassian.jira.plugin.projectoperation.ProjectOperationModuleDescriptor;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
 
 import static java.lang.String.format;
@@ -18,11 +20,14 @@ public class ConfigureDefaultValuesProjectOperation implements PluggableProjectO
     private ProjectOperationModuleDescriptor descriptor;
     private final PermissionManager permissionManager;
     private final VelocityRequestContextFactory velocityRequestContext;
+    private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public ConfigureDefaultValuesProjectOperation(PermissionManager permissionManager, VelocityRequestContextFactory velocityRequestContext)
+    public ConfigureDefaultValuesProjectOperation(PermissionManager permissionManager, VelocityRequestContextFactory velocityRequestContext, final JiraAuthenticationContext jiraAuthenticationContext)
     {
         this.permissionManager = permissionManager;
         this.velocityRequestContext = velocityRequestContext;
+        this.jiraAuthenticationContext = jiraAuthenticationContext;
+
     }
 
     public void init(ProjectOperationModuleDescriptor descriptor)
@@ -44,11 +49,11 @@ public class ConfigureDefaultValuesProjectOperation implements PluggableProjectO
 
     public String getLabelHtml(Project project, User user)
     {
-        return "Copy JIRA Issue(s)";
+        return jiraAuthenticationContext.getI18nHelper().getText("cpji.admin.general.name") + ":";
     }
 
     public String getContentHtml(Project project, User user)
     {
-        return "Configure permission and default field values";
+        return jiraAuthenticationContext.getI18nHelper().getText("common.words.configure");
     }
 }
