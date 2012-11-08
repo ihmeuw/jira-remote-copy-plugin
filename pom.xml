@@ -227,8 +227,8 @@
 		<jdkLevel>1.6</jdkLevel>
 		<cpji.build.directory>target</cpji.build.directory>
 
-        <jira.version>6.0-SNAPSHOT</jira.version>
-        <jira.compile.version>6.0-SNAPSHOT</jira.compile.version>
+        <jira.version>5.1.8</jira.version>
+        <jira.compile.version>5.1.8</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
