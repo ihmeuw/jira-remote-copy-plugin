@@ -1,6 +1,5 @@
 package com.atlassian.cpji.action.admin;
 
-import com.atlassian.cpji.action.AbstractCopyIssueAction;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
@@ -14,7 +13,6 @@ import com.atlassian.jira.issue.customfields.OperationContext;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
-import com.atlassian.jira.issue.fields.layout.field.FieldLayoutStorageException;
 import com.atlassian.jira.issue.fields.screen.FieldScreenRenderer;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.operation.IssueOperation;
@@ -25,7 +23,6 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
-import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -59,7 +56,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
     private CopyIssueConfigurationManager copyIssueConfigurationManager;
-    private final WebResourceManager webResourceManager;
 
     private static final Logger log = Logger.getLogger(ConfigureCopyIssuesAdminAction.class);
 
@@ -68,6 +64,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private Map fieldValuesHolder;
     private String group;
     private List<String> configChanges = new ArrayList<String>();
+    private Boolean executeFired = false;
 
     public ConfigureCopyIssuesAdminAction(
             final IssueTypeSchemeManager issueTypeSchemeManager,
@@ -77,8 +74,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final GroupManager groupManager,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager,
-            final WebResourceManager webResourceManager)
+            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager)
     {
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.issueFactory = issueFactory;
@@ -88,9 +84,16 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         this.groupManager = groupManager;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
-        this.webResourceManager = webResourceManager;
         fieldValuesHolder = new HashMap();
-        webResourceManager.requireResource(AbstractCopyIssueAction.PLUGIN_KEY + ":admin-js");
+    }
+
+    @Override
+    public String doDefault() throws Exception {
+        if (!getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser()) && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser()))
+        {
+            return SECURITYBREACH;
+        }
+        return INPUT;
     }
 
     public String doExecute() throws Exception
@@ -99,7 +102,13 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         {
             return SECURITYBREACH;
         }
-        return SUCCESS;
+
+        executeFired = true;
+        saveFieldValues();
+        saveGroupPermission();
+        saveUserMapping();
+
+        return INPUT;
     }
 
     public List<Group> getGroups()
@@ -122,15 +131,11 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return configuredGroup;
     }
 
-    public String doSave() throws Exception
+    private void saveFieldValues() throws Exception
     {
-        if (!getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser()) && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser()))
-        {
-            return SECURITYBREACH;
-        }
         for (FieldLayoutItem fieldLayoutItem : getFieldLayoutItems())
         {
-            FieldScreenRenderer fieldScreenRenderer = issueCreationHelperBean.createFieldScreenRenderer(getRemoteUser(), getIssue());
+            FieldScreenRenderer fieldScreenRenderer = issueCreationHelperBean.createFieldScreenRenderer(getLoggedInUser(), getIssue());
             SimpleErrorCollection simpleErrorCollection = new SimpleErrorCollection();
             OrderableField orderableField = fieldLayoutItem.getOrderableField();
             Object fieldValue = ActionContext.getParameters().get(orderableField.getId());
@@ -159,20 +164,8 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
                 }
             }
         }
-        return SUCCESS;
     }
 
-    public String doSavePermission() throws Exception
-    {
-        if (!getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser()) && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser()))
-        {
-            return SECURITYBREACH;
-        }
-        saveGroupPermission();
-        saveUserMapping();
-
-        return SUCCESS;
-    }
 
     public boolean hasConfigChanges()
     {
@@ -249,13 +242,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return false;
     }
 
-    private Map getDisplayParameters()
-    {
-        Map displayParameters = new HashMap();
-        displayParameters.put("theme", "aui");
-        return displayParameters;
-    }
-
     private MutableIssue getIssue()
     {
         if (issue == null)
@@ -268,7 +254,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     }
 
 
-    public List<FieldLayoutItem> getFieldLayoutItems() throws FieldLayoutStorageException
+    public List<FieldLayoutItem> getFieldLayoutItems()
     {
         Iterable<FieldLayoutItem> filter = Iterables.filter(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(getProject(), getIssueType()), new Predicate<FieldLayoutItem>()
         {
@@ -379,4 +365,9 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     {
         userMappingType = UserMappingType.valueOf(userMapping);
     }
+
+    public Boolean getExecuteFired() {
+        return executeFired;
+    }
+
 }

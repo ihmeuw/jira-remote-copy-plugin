@@ -73,7 +73,7 @@
 		<actions>
 			<action name="com.atlassian.cpji.action.admin.ConfigureCopyIssuesAdminAction"
 					alias="ConfigureCopyIssuesAdminAction">
-				<view name="success">/com/atlassian/cpji/templates/admin.vm</view>
+				<view name="input">/com/atlassian/cpji/templates/admin.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
 			</action>
 		</actions>
