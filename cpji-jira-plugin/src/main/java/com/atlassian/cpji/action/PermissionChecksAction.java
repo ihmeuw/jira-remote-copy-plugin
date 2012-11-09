@@ -47,7 +47,6 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
 
     public PermissionChecksAction(
             final SubTaskManager subTaskManager,
-            final EntityLinkService entityLinkService,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
             final FieldMapperFactory fieldMapperFactory,
@@ -57,7 +56,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
             final UserMappingManager userMappingManager,
 			final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
+        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
         this.fieldMapperFactory = fieldMapperFactory;
     }
@@ -103,7 +102,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         final SelectedProject entityLink = getSelectedDestinationProject();
         if (entityLink == null)
         {
-            addErrorMessage("Failed to find the entity link.");
+            addErrorMessage("Failed to find the destination project.");
             return ERROR;
         }
 		final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(entityLink.getApplicationId());

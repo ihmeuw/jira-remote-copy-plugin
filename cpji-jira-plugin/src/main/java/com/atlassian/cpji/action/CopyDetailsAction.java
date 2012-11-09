@@ -82,7 +82,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
     public CopyDetailsAction(
             final SubTaskManager subTaskManager,
-            final EntityLinkService entityLinkService,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
             final FieldManager fieldManager,
@@ -93,7 +92,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             final UserMappingManager userMappingManager,
 			final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
+        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
 				copyIssuePermissionManager, userMappingManager, applicationLinkService);
         this.beanFactory = beanFactory;
     }
