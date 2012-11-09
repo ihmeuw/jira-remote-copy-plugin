@@ -2,20 +2,13 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.value.UserMappingManager;
-import com.atlassian.cpji.rest.model.CommentBean;
-import com.atlassian.cpji.rest.model.ComponentBean;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.cpji.rest.model.TimeTrackingBean;
-import com.atlassian.cpji.rest.model.UserBean;
-import com.atlassian.cpji.rest.model.VersionBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.ServiceOutcome;
 import com.atlassian.jira.bc.issue.vote.VoteService;
@@ -29,24 +22,9 @@ import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.Comment;
 import com.atlassian.jira.issue.comments.CommentManager;
-import com.atlassian.jira.issue.fields.AffectedVersionsSystemField;
-import com.atlassian.jira.issue.fields.AssigneeSystemField;
-import com.atlassian.jira.issue.fields.ComponentsSystemField;
-import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.fields.DescriptionSystemField;
-import com.atlassian.jira.issue.fields.DueDateSystemField;
-import com.atlassian.jira.issue.fields.EnvironmentSystemField;
-import com.atlassian.jira.issue.fields.FieldManager;
-import com.atlassian.jira.issue.fields.FixVersionsSystemField;
-import com.atlassian.jira.issue.fields.LabelsSystemField;
-import com.atlassian.jira.issue.fields.OrderableField;
-import com.atlassian.jira.issue.fields.PrioritySystemField;
-import com.atlassian.jira.issue.fields.ReporterSystemField;
-import com.atlassian.jira.issue.fields.SecurityLevelSystemField;
-import com.atlassian.jira.issue.fields.TimeTrackingSystemField;
+import com.atlassian.jira.issue.fields.*;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.issue.fields.layout.field.FieldLayoutStorageException;
 import com.atlassian.jira.issue.label.Label;
 import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.web.action.issue.AbstractIssueSelectAction;
@@ -58,11 +36,7 @@ import org.ofbiz.core.entity.GenericValue;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @since v1.4
@@ -77,7 +51,6 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
 
     protected String targetEntityLink;
 
-	protected final EntityLinkService entityLinkService;
     protected final FieldLayoutManager fieldLayoutManager;
     protected final CommentManager commentManager;
 	protected final ApplicationLinkService applicationLinkService;
@@ -89,7 +62,6 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
     private final UserMappingManager userMappingManager;
 
     public AbstractCopyIssueAction(final SubTaskManager subTaskManager,
-            final EntityLinkService entityLinkService,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
             final FieldManager fieldManager,
@@ -100,7 +72,6 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
 			final ApplicationLinkService applicationLinkService)
     {
         super(subTaskManager);
-        this.entityLinkService = entityLinkService;
         this.fieldLayoutManager = fieldLayoutManager;
         this.commentManager = commentManager;
         this.fieldManager = fieldManager;
@@ -137,7 +108,6 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
     }
 
     protected CopyIssueBean createCopyIssueBean(final String targetProjectKey, final MutableIssue issueToCopy, final String targetIssueType)
-            throws FieldLayoutStorageException
     {
         CopyIssueBean copyIssueBean = new CopyIssueBean();
         copyIssueBean.setSummary(issueToCopy.getSummary());

@@ -107,10 +107,6 @@
 		<package>com.atlassian.cpji.rest</package>
 	</rest>
 
-	<component-import key="entityLinkService">
-		<interface>com.atlassian.applinks.api.EntityLinkService</interface>
-	</component-import>
-
 	<component-import key="applicationLinkService">
 		<interface>com.atlassian.applinks.api.ApplicationLinkService</interface>
 	</component-import>

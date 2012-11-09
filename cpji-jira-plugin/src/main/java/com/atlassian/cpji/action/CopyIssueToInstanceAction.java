@@ -66,7 +66,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     public CopyIssueToInstanceAction
             (
                     final SubTaskManager subTaskManager,
-                    final EntityLinkService entityLinkService,
                     final FieldLayoutManager fieldLayoutManager,
                     final CommentManager commentManager,
                     final FieldManager fieldManager,
@@ -79,7 +78,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
                     final RemoteIssueLinkManager remoteIssueLinkManager,
 					final ApplicationLinkService applicationLinkService)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
+        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
         this.issueLinkClient = issueLinkClient;
         this.issueLinkManager = issueLinkManager;

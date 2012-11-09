@@ -1,15 +1,6 @@
 package com.atlassian.cpji.action;
 
-import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.applinks.api.ApplicationLinkRequest;
-import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
-import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
-import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.applinks.api.AuthorisationURIGenerator;
-import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.applinks.api.EntityLink;
-import com.atlassian.applinks.api.EntityLinkService;
-import com.atlassian.applinks.api.application.jira.JiraProjectEntityType;
+import com.atlassian.applinks.api.*;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.Projects;
@@ -33,7 +24,6 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -41,7 +31,6 @@ import org.apache.log4j.Logger;
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,7 +49,6 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 
 	public SelectTargetProjectAction(
             final SubTaskManager subTaskManager,
-            final EntityLinkService entityLinkService,
             final InternalHostApplication hostApplication,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
@@ -73,7 +61,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 			final ApplicationLinkService applicationLinkService,
             final WebResourceManager webResourceManager)
     {
-        super(subTaskManager, entityLinkService, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
+        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
 		this.hostApplication = hostApplication;
 		this.remoteJiraService = remoteJiraService;
@@ -171,16 +159,6 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         return AUTHORIZE;
     }
 
-    @SuppressWarnings ("unused")
-    public List<EntityLink> getLinkedJiraProjects()
-    {
-        return Lists.newArrayList(getEntityLinks());
-    }
-
-    private Iterable<EntityLink> getEntityLinks()
-    {
-        return entityLinkService.getEntityLinks(getIssueObject().getProjectObject(), JiraProjectEntityType.class);
-    }
 
 	public ImmutableList<Map.Entry<String, String>> getAvailableDestinationProjects() {
 		final Iterable<Map.Entry<String, String>> projects = ImmutableList.of();
