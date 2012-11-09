@@ -14,30 +14,6 @@
     <description>Plugin that copies issues from one JIRA instance to another</description>
     <packaging>atlassian-plugin</packaging>
 
-    <profiles>
-        <profile>
-            <id>jira1</id>
-            <properties>
-                <http.port>2990</http.port>
-                <cli.port>1234</cli.port>
-            </properties>
-        </profile>
-        <profile>
-            <id>jira2</id>
-            <properties>
-                <http.port>2991</http.port>
-                <cli.port>5678</cli.port>
-            </properties>
-        </profile>
-		<profile>
-			<id>jira3</id>
-			<properties>
-				<http.port>2992</http.port>
-				<cli.port>5679</cli.port>
-			</properties>
-		</profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>

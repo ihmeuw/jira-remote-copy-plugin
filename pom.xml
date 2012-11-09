@@ -71,7 +71,6 @@
 				<groupId>com.atlassian.jira.tests</groupId>
 				<artifactId>jira-testkit-client</artifactId>
 				<version>${testkit.version}</version>
-				<scope>test</scope>
 			</dependency>
 
 			<!-- REST dependencies-->
@@ -245,6 +244,33 @@
 			<properties>
 				<maven.test.unit.skip>false</maven.test.unit.skip>
 				<maven.test.it.skip>false</maven.test.it.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>jira1</id>
+			<properties>
+				<http.port>2990</http.port>
+				<cli.port>1234</cli.port>
+			</properties>
+		</profile>
+		<profile>
+			<id>jira2</id>
+			<properties>
+				<http.port>2991</http.port>
+				<cli.port>5678</cli.port>
+			</properties>
+		</profile>
+		<profile>
+			<id>jira3</id>
+			<properties>
+				<http.port>2992</http.port>
+				<cli.port>5679</cli.port>
+			</properties>
+		</profile>
+		<profile>
+			<id>jira-6</id>
+			<properties>
+				<jira.version>6.0-SNAPSHOT</jira.version>
 			</properties>
 		</profile>
 	</profiles>
