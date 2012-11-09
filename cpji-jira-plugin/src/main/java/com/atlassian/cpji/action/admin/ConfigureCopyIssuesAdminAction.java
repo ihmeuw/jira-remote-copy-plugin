@@ -37,7 +37,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
 			IssueFieldConstants.PROJECT);
     private MutableIssue issue;
     private Map fieldValuesHolder;
-    private ImmutableList<String> groups;
     private List<String> configChanges = new ArrayList<String>();
     private Boolean executeFired = false;
 	private List<String> selectedGroups;
@@ -93,7 +91,6 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
         fieldValuesHolder = new HashMap();
-		this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(projectKey);
     }
 
     @Override
@@ -131,13 +128,12 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return Lists.newArrayList(groupManager.getAllGroups());
     }
 
-    public void setGroups(Collection<String> groups)
-    {
-        this.groups = ImmutableList.copyOf(groups);
-    }
-
     public boolean isGroupSelected(Group group)
     {
+		if (selectedGroups == null) {
+			this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(projectKey);
+		}
+
         if (selectedGroups.contains(group.getName()))
         {
             return true;
@@ -205,7 +201,9 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     {
         final ImmutableList<String> configuredGroups = ImmutableList.copyOf(
 				copyIssuePermissionManager.getConfiguredGroups(projectKey));
-        if (groups != null && !groups.isEmpty())
+		final Object rawGroups = ActionContext.getParameters().get("groups");
+		final ImmutableList<String> groups = rawGroups != null ? ImmutableList.copyOf((String[]) rawGroups) : ImmutableList.<String>of();
+        if (!groups.isEmpty())
         {
             ImmutableList<String> selectedGroups = ImmutableList.copyOf(Iterables.filter(
 					Iterables.transform(groupManager.getAllGroups(), getGroupName()),
