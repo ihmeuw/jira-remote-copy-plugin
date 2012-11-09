@@ -52,7 +52,7 @@
          <input type="hidden" name="projectKey" value="$action.getProjectKey()"/>
          <div class="buttons-container">
              <div class="buttons">
-                <input class="button" type="submit" value="Update"/>
+                <input id="update-general-configuration" class="button" type="submit" value="Update"/>
              </div>
          </div>
      </div>
@@ -78,7 +78,7 @@
      </div>
      <div class="buttons-container">
          <div class="buttons">
-            <input class="button" type="submit" value="Update"/>
+            <input id="update-field-defaults" class="button" type="submit" value="Update"/>
          </div>
      </div>
      </div>

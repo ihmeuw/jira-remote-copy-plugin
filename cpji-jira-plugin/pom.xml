@@ -121,6 +121,18 @@
                             <jvmDebugPort>5002</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250 -Dplugin.webresource.batching.off=false</jvmArgs>
+							<pluginArtifacts>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira.tests</groupId>
+									<artifactId>jira-testkit-plugin</artifactId>
+									<version>${testkit.version}</version>
+								</pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira</groupId>
+									<artifactId>jira-func-test-plugin</artifactId>
+									<version>${jira.version}</version>
+								</pluginArtifact>
+							</pluginArtifacts>
                         </product>
                         <product>
                             <id>jira</id>
@@ -130,6 +142,18 @@
                             <jvmDebugPort>5003</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500 -Dplugin.webresource.batching.off=false</jvmArgs>
+							<pluginArtifacts>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira.tests</groupId>
+									<artifactId>jira-testkit-plugin</artifactId>
+									<version>${testkit.version}</version>
+								</pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira</groupId>
+									<artifactId>jira-func-test-plugin</artifactId>
+									<version>${jira.version}</version>
+								</pluginArtifact>
+							</pluginArtifacts>
                         </product>
 						<product>
 							<id>jira</id>
@@ -139,6 +163,18 @@
 							<jvmDebugPort>5004</jvmDebugPort>
 							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=133 -Dplugin.webresource.batching.off=false</jvmArgs>
+							<pluginArtifacts>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira.tests</groupId>
+									<artifactId>jira-testkit-plugin</artifactId>
+									<version>${testkit.version}</version>
+								</pluginArtifact>
+								<pluginArtifact>
+									<groupId>com.atlassian.jira</groupId>
+									<artifactId>jira-func-test-plugin</artifactId>
+									<version>${jira.version}</version>
+								</pluginArtifact>
+							</pluginArtifacts>
 						</product>
                     </products>
                 </configuration>

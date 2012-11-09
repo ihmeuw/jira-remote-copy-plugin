@@ -1,8 +1,6 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
-import com.atlassian.jira.pageobjects.pages.DashboardPage;
-import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import it.com.atlassian.cpji.pages.CopyDetailsPage;
 import it.com.atlassian.cpji.pages.CopyIssueToInstancePage;
 import it.com.atlassian.cpji.pages.PermissionChecksPage;
@@ -118,16 +116,6 @@ public class TestCopyIssue extends AbstractCopyIssueTest
         assertEquals(200, response.getStatusLine().getStatusCode());
         final String entity = EntityUtils.toString(response.getEntity());
         return new JSONObject(entity);
-    }
-
-    private void login(final JiraTestedProduct jiraTestedProduct)
-    {
-        jiraTestedProduct.gotoLoginPage().loginAsSysAdmin(DashboardPage.class);
-    }
-
-    private ViewIssuePage viewIssue(final JiraTestedProduct jiraTestedProduct, final String issueKey)
-    {
-        return jiraTestedProduct.getPageBinder().navigateToAndBind(ViewIssuePage.class, issueKey);
     }
 
 	@Test

@@ -1,6 +1,8 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.pageobjects.pages.DashboardPage;
+import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.jira.webtest.webdriver.setup.JiraWebTestRules;
 import com.atlassian.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
@@ -19,4 +21,20 @@ public abstract class AbstractCopyIssueTest
 	public TestRule webTestRule1 = JiraWebTestRules.forJira(jira1);
 	@Rule
 	public TestRule webTestRule2 = JiraWebTestRules.forJira(jira2);
+
+	protected void login(final JiraTestedProduct jiraTestedProduct)
+	{
+		jiraTestedProduct.gotoLoginPage().loginAsSysAdmin(DashboardPage.class);
+	}
+
+	protected <M extends com.atlassian.pageobjects.Page> M login(final JiraTestedProduct jiraTestedProduct, final Class<M> clazz, Object ... args)
+	{
+		return jiraTestedProduct.gotoLoginPage().loginAsSysAdmin(clazz, args);
+	}
+
+	protected ViewIssuePage viewIssue(final JiraTestedProduct jiraTestedProduct, final String issueKey)
+	{
+		return jiraTestedProduct.getPageBinder().navigateToAndBind(ViewIssuePage.class, issueKey);
+	}
+
 }

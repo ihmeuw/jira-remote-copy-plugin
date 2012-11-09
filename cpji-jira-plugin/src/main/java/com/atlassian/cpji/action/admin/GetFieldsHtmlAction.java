@@ -36,7 +36,7 @@ public class GetFieldsHtmlAction extends JiraWebActionSupport implements Operati
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final IssueFactory issueFactory;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
-    private static final ArrayList<String> unmodifiableFields = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE, IssueFieldConstants.PROJECT);
+    private static final ArrayList<String> unmodifiableFields = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE, IssueFieldConstants.PROJECT, IssueFieldConstants.SUMMARY);
     private String projectKey;
     private String selectedIssueTypeId;
     private MutableIssue issue;
