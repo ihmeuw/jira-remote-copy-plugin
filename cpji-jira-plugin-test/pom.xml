@@ -30,7 +30,13 @@
 					<artifactId>hamcrest-library</artifactId>
 				</exclusion>
 			</exclusions>
+			<scope>compile</scope>
         </dependency>
+		<dependency>
+			<groupId>com.atlassian.selenium</groupId>
+			<artifactId>atlassian-pageobjects-api</artifactId>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
