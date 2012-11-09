@@ -16,7 +16,7 @@ import java.util.List;
  * @since v2.1
  */
 public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
-	private static final String URI_TEMPLATE = "/secure/ConfigureCopyIssuesAdminAction.jspa?projectKey=%s";
+	private static final String URI_TEMPLATE = "/secure/ConfigureCopyIssuesAdminAction!default.jspa?projectKey=%s";
 
 	private final String projectKey;
 
