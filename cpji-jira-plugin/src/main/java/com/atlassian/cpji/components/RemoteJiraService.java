@@ -134,7 +134,7 @@ public class RemoteJiraService {
 		{
 			return Either.left(ResponseStatus.authorizationRequired(applicationLink));
 		} catch (ResponseException e) {
-			log.error("Failed to transform response", e);
+			log.error(String.format("Failed to transform response from Application Link: %s (%s)", toString(applicationLink), e.getMessage()));
 			return Either.left(ResponseStatus.communicationFailed(applicationLink));
 		}
 	}
@@ -165,7 +165,7 @@ public class RemoteJiraService {
 			try {
 				return Either.right(parseResponse(response));
 			} catch (JSONException e) {
-				log.error("Failed to parse JSON", e);
+				log.error(String.format("Failed to parse JSON from Application Link: %s (%s)", RemoteJiraService.toString(applicationLink), e.getMessage()));
 				return Either.left(ResponseStatus.communicationFailed(applicationLink));
 			}
 		}
@@ -173,4 +173,7 @@ public class RemoteJiraService {
 		protected abstract T parseResponse(Response response) throws ResponseException, JSONException;
 	}
 
+	protected static String toString(ApplicationLink applicationLink) {
+		return applicationLink.getName() + " " + applicationLink.getId() + " " + applicationLink.getDisplayUrl();
+	}
 }
