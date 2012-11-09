@@ -23,15 +23,21 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import webwork.action.ActionContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,14 +65,16 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
 
     private static final Logger log = Logger.getLogger(ConfigureCopyIssuesAdminAction.class);
 
-    private static final ArrayList<String> unmodifiableFields = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE, IssueFieldConstants.PROJECT);
+    private static final ArrayList<String> unmodifiableFields = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE,
+			IssueFieldConstants.PROJECT);
     private MutableIssue issue;
     private Map fieldValuesHolder;
-    private String group;
+    private ImmutableList<String> groups;
     private List<String> configChanges = new ArrayList<String>();
     private Boolean executeFired = false;
+	private List<String> selectedGroups;
 
-    public ConfigureCopyIssuesAdminAction(
+	public ConfigureCopyIssuesAdminAction(
             final IssueTypeSchemeManager issueTypeSchemeManager,
             final IssueFactory issueFactory,
             final IssueCreationHelperBean issueCreationHelperBean,
@@ -85,20 +93,26 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
         fieldValuesHolder = new HashMap();
+		this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(projectKey);
     }
 
     @Override
     public String doDefault() throws Exception {
-        if (!getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser()) && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser()))
+        if (isPermissionDenied())
         {
             return SECURITYBREACH;
         }
         return INPUT;
     }
 
-    public String doExecute() throws Exception
+	protected boolean isPermissionDenied() {
+		return !getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser())
+				&& !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser());
+	}
+
+	public String doExecute() throws Exception
     {
-        if (!getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser()) && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser()))
+        if (isPermissionDenied())
         {
             return SECURITYBREACH;
         }
@@ -111,24 +125,24 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return INPUT;
     }
 
+	@Nonnull
     public List<Group> getGroups()
     {
         return Lists.newArrayList(groupManager.getAllGroups());
     }
 
-    public void setGroup(String group)
+    public void setGroups(Collection<String> groups)
     {
-        this.group = group;
+        this.groups = ImmutableList.copyOf(groups);
     }
 
-    public String getSelectedGroup()
+    public boolean isGroupSelected(Group group)
     {
-        String configuredGroup = copyIssuePermissionManager.getConfiguredGroup(projectKey);
-        if (StringUtils.isEmpty(configuredGroup))
+        if (selectedGroups.contains(group.getName()))
         {
-            return "";
+            return true;
         }
-        return configuredGroup;
+        return false;
     }
 
     private void saveFieldValues() throws Exception
@@ -189,25 +203,23 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
 
     private void saveGroupPermission()
     {
-        String configuredGroup = copyIssuePermissionManager.getConfiguredGroup(projectKey);
-        if (StringUtils.isNotEmpty(group))
+        final ImmutableList<String> configuredGroups = ImmutableList.copyOf(
+				copyIssuePermissionManager.getConfiguredGroups(projectKey));
+        if (groups != null && !groups.isEmpty())
         {
-            Group selectedGroup = Iterables.find(groupManager.getAllGroups(), new Predicate<Group>()
+            ImmutableList<String> selectedGroups = ImmutableList.copyOf(Iterables.filter(
+					Iterables.transform(groupManager.getAllGroups(), getGroupName()),
+					Predicates.in(groups)));
+
+            if (configuredGroups.isEmpty() || !configuredGroups.equals(selectedGroups))
             {
-                public boolean apply(final Group input)
-                {
-                    return group.equals(input.getName());
-                }
-            });
-            if (configuredGroup == null || !configuredGroup.equals(selectedGroup.getName()))
-            {
-                copyIssuePermissionManager.restrictPermissionToGroup(projectKey, selectedGroup.getName());
+                copyIssuePermissionManager.restrictPermissionToGroups(projectKey, selectedGroups);
                 configChanges.add(getI18nHelper().getText("cpji.config.user.group"));
             }
         }
         else
         {
-            if (configuredGroup != null)
+            if (!configuredGroups.isEmpty())
             {
                 copyIssuePermissionManager.clearPermissionForProject(projectKey);
                 configChanges.add(getI18nHelper().getText("cpji.config.user.group.remove"));
@@ -370,4 +382,14 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return executeFired;
     }
 
+	public static class GroupName implements Function<Group, String> {
+		@Override
+		public String apply(@Nullable Group group) {
+			return group.getName();
+		}
+	}
+
+	public static GroupName getGroupName() {
+		return new GroupName();
+	}
 }

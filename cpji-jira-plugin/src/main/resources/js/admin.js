@@ -17,6 +17,12 @@ AJS.toInit(function () {
 
                 $('#select-issue-type').change(copyAdmin.onIssueTypeChange);
                 $('#select-issue-type').trigger('change');
+
+				new AJS.MultiSelect({
+					element: AJS.$("#groups"),
+					stallEventBind: false,
+					itemAttrDisplayed: "label"
+				});
             },
 
 
