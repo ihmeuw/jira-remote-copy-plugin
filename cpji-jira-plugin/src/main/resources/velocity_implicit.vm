@@ -1,4 +1,5 @@
 #* @implicitly included *#
+#* @vtlvariable name="req" type="com.atlassian.plugin.servlet.PluginHttpRequestWrapper" *#
 #* @vtlvariable name="i18n" type="com.atlassian.jira.util.I18nHelper" *#
 #* @vtlvariable name="textutils" type="com.opensymphony.util.TextUtils" *#
 #* @vtlvariable name="params" type="java.util.Map" *#
