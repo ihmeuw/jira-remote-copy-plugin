@@ -1,5 +1,6 @@
 package com.atlassian.cpji.action.admin;
 
+import com.atlassian.cpji.action.AbstractCopyIssueAction;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
@@ -23,6 +24,7 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -60,7 +62,8 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
-    private CopyIssueConfigurationManager copyIssueConfigurationManager;
+    private final CopyIssueConfigurationManager copyIssueConfigurationManager;
+    private final WebResourceManager webResourceManager;
 
     private static final Logger log = Logger.getLogger(ConfigureCopyIssuesAdminAction.class);
 
@@ -80,7 +83,8 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final GroupManager groupManager,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager)
+            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager,
+            final WebResourceManager webResourceManager)
     {
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.issueFactory = issueFactory;
@@ -90,6 +94,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         this.groupManager = groupManager;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
+        this.webResourceManager = webResourceManager;
         fieldValuesHolder = new HashMap();
     }
 
@@ -99,6 +104,9 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         {
             return SECURITYBREACH;
         }
+
+        requireResources();
+
         return INPUT;
     }
 
@@ -114,12 +122,24 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             return SECURITYBREACH;
         }
 
+        if(!"POST".equals(ActionContext.getRequest().getMethod())){
+            return returnComplete("ConfigureCopyIssuesAdminAction!default.jspa?projectKey=TST");
+        }
+
         executeFired = true;
         saveFieldValues();
         saveGroupPermission();
         saveUserMapping();
 
+        requireResources();
+
         return INPUT;
+
+
+    }
+
+    private void requireResources(){
+        webResourceManager.requireResource(AbstractCopyIssueAction.RESOURCES_ADMIN_JS);
     }
 
 	@Nonnull

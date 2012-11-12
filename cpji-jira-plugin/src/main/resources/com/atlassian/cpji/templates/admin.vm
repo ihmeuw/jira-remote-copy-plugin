@@ -1,70 +1,80 @@
 #* @vtlvariable name="action" type="com.atlassian.cpji.action.admin.ConfigureCopyIssuesAdminAction" *#
-<form action="ConfigureCopyIssuesAdminAction.jspa" method="post" class="aui">
-    <h2>$i18n.getText("cpji.admin.title")</h2>
-    <div class="form-body">
-        #if ($action.getExecuteFired() && !$action.invalidInput())
-            <div class="aui-message success">
-                <p>$i18n.getText("cpji.admin.successful.saved")</p>
-                #if ($action.hasConfigChanges())
-                <ul>
-                    #foreach( $change in $action.getConfigChanges() )
-                        <li>$change</li>
+
+<html>
+<head>
+    <meta name='decorator' content='atl.admin'>
+    <title>$i18n.getText("cpji.admin.title")</title>
+</head>
+<body>
+<div class="content-body aui-panel">
+    <form action="ConfigureCopyIssuesAdminAction.jspa?projectKey=$projectKey" method="post" class="aui">
+        <h2>$i18n.getText("cpji.admin.title")</h2>
+        <div class="form-body">
+            #if ($action.getExecuteFired() && !$action.invalidInput())
+                <div class="aui-message success">
+                    <p>$i18n.getText("cpji.admin.successful.saved")</p>
+                    #if ($action.hasConfigChanges())
+                    <ul>
+                        #foreach( $change in $action.getConfigChanges() )
+                            <li>$change</li>
+                        #end
+                    </ul>
                     #end
-                </ul>
-                #end
-            </div>
-        #end
-        #if ($action.invalidInput())
-            <div class="aui-message warning">
-                <p>$i18n.getText("cpji.admin.there.were.problems")</p>
-                <ul>
-                    #foreach( $error in $action.getErrorMessages() )
-                        <li>$error</li>
+                </div>
+            #end
+            #if ($action.invalidInput())
+                <div class="aui-message warning">
+                    <p>$i18n.getText("cpji.admin.there.were.problems")</p>
+                    <ul>
+                        #foreach( $error in $action.getErrorMessages() )
+                            <li>$error</li>
+                        #end
+                    </ul>
+                </div>
+            #end
+
+            <div class="field-group">
+                <label for="groups">$i18n.getText("cpji.admin.fields.group.name")</label>
+                <select class="hidden" name="groups" id="groups" multiple="multiple">
+                    #foreach( $group in $action.groups )
+                        <option value="$group.getName()"  #if($action.isGroupSelected($group)) selected="" #end>$group.getName()</option>
                     #end
-                </ul>
+                </select>
+                <div class="description">$i18n.getText("cpji.admin.fields.group.description")</div>
+
+                <label for="userMapping">$i18n.getText("cpji.admin.fields.usermapping.name")</label>
+                <select class="select" name="userMapping" id="userMapping">
+                    #foreach( $userMapping in $action.getUserMappingTypes() )
+                        <option value="$userMapping"  #if($action.getConfiguredUserMapping() == $userMapping)
+                                selected="" #end>$i18n.getText($userMapping.getI18nKey())</option>
+                    #end
+                </select>
+                <div class="description">$i18n.getText("cpji.admin.fields.usermapping.description")</div>
             </div>
-        #end
 
-        <div class="field-group">
-            <label for="groups">$i18n.getText("cpji.admin.fields.group.name")</label>
-            <select class="hidden" name="groups" id="groups" multiple="multiple">
-                #foreach( $group in $action.groups )
-                    <option value="$group.getName()"  #if($action.isGroupSelected($group)) selected="" #end>$group.getName()</option>
-                #end
-            </select>
-            <div class="description">$i18n.getText("cpji.admin.fields.group.description")</div>
+            <p>$i18n.getText("cpji.admin.default.values")</p>
+            <div class="field-group">
 
-            <label for"userMapping">$i18n.getText("cpji.admin.fields.usermapping.name")</label>
-            <select class="select" name="userMapping" id="userMapping">
-                #foreach( $userMapping in $action.getUserMappingTypes() )
-                    <option value="$userMapping"  #if($action.getConfiguredUserMapping() == $userMapping)
-                            selected="" #end>$i18n.getText($userMapping.getI18nKey())</option>
-                #end
-            </select>
-            <div class="description">$i18n.getText("cpji.admin.fields.usermapping.description")</div>
+                <label for="select-issue-type">$i18n.getText("issue.field.issuetype")</label>
+                <select class="select" name="selectedIssueTypeId" id="select-issue-type">
+                    #foreach( $issueType in $action.getIssueTypesForProject() )
+                        <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId())
+                                selected="" #end>$issueType.getName()</option>
+                    #end
+                </select><span class="cpji-loading"></span>
+            </div>
+            <div id="fields"></div>
+            <input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
+
         </div>
 
-        <p>$i18n.getText("cpji.admin.default.values")</p>
-        <div class="field-group">
-
-            <label for"selectedIssueTypeId">$i18n.getText("issue.field.issuetype")</label>
-            <select class="select" name="selectedIssueTypeId" id="select-issue-type">
-                #foreach( $issueType in $action.getIssueTypesForProject() )
-                    <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId())
-                            selected="" #end>$issueType.getName()</option>
-                #end
-            </select><span class="cpji-loading"></span>
+        <div class="buttons-container form-footer">
+            <div class="buttons">
+                <input class="button submit" type="submit" value="$i18n.getText("common.words.update")"/>
+                <a href="$req.contextPath/plugins/servlet/project-config/${projectKey}/summary" class="cancel">$i18n.getText("admin.common.words.close")</a>
+            </div>
         </div>
-        <div id="fields"></div>
-
-        <input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
-
-    </div>
-
-    <div class="buttons-container form-footer">
-        <div class="buttons">
-            <input class="button submit" type="submit" value="$i18n.getText("common.words.update")"/>
-            <a href="#" class="cancel">$i18n.getText("admin.common.words.close")</a>
-        </div>
-    </div>
-</form>
+    </form>
+</div>
+</body>
+</html>

@@ -25,7 +25,7 @@ public class ConfigureDefaultValuesProjectOperation extends AbstractPluggablePro
 
     final public String getHtml(Project project, User user)
     {
-        webResourceManager.requireResource(AbstractCopyIssueAction.PLUGIN_KEY + ":admin-js");
+        webResourceManager.requireResource(AbstractCopyIssueAction.RESOURCES_ADMIN_JS);
         ImmutableMap<String, ?> params = ImmutableMap.of(
                 "projectKey", project.getKey()
         );

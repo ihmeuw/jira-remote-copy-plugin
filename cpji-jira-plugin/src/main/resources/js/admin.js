@@ -12,17 +12,27 @@ AJS.toInit(function () {
             }),
 
             prepareDialog : function(e, dialog){
-                if(dialog != copyAdmin.dialog)
-                    return;
+                if(dialog == copyAdmin.dialog)
+                    copyAdmin.initComponents();
 
+
+            },
+
+            initComponents : function(){
+                console.log("test1");
+
+                if(!$('#select-issue-type').length){
+                    return;
+                }
+                console.log("test1");
                 $('#select-issue-type').change(copyAdmin.onIssueTypeChange);
                 $('#select-issue-type').trigger('change');
 
-				new AJS.MultiSelect({
-					element: AJS.$("#groups"),
-					stallEventBind: false,
-					itemAttrDisplayed: "label"
-				});
+                new AJS.MultiSelect({
+                    element: AJS.$("#groups"),
+                    stallEventBind: false,
+                    itemAttrDisplayed: "label"
+                });
             },
 
 
@@ -39,6 +49,8 @@ AJS.toInit(function () {
 
         }
 
+        console.log("test1");
+        copyAdmin.initComponents();
         $(document).bind("dialogContentReady", copyAdmin.prepareDialog);
     })(AJS.$);
 });
