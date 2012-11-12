@@ -1,6 +1,7 @@
 package it.com.atlassian.cpji;
 
 import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
+import org.hamcrest.Matcher;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +23,17 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 	@Test
 	public void testProjectConfigurationDoesntIncludeSummary() {
 		ConfigureCopyIssuesAdminActionPage adminPage = jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "NEL");
-
-		assertThat(adminPage.getRequiredFields(),
-				IsIterableContainingInAnyOrder.<String>containsInAnyOrder(startsWith("Issue Type"), startsWith("Reporter")));
+		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
 	}
+    @Test
+    public void testProjectConfigurationAsDialogDoesntIncludeSummary() {
+		ConfigureCopyIssuesAdminActionPage adminPage = jira1.visit(ConfigureCopyIssuesAdminActionPage.AsDialog.class, "NEL");
+		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
+	}
+
+
+    private Matcher<Iterable<String>> expectedRequiredFields() {
+        return IsIterableContainingInAnyOrder.<String>containsInAnyOrder(startsWith("Issue Type"), startsWith("Reporter"));
+    }
+
 }

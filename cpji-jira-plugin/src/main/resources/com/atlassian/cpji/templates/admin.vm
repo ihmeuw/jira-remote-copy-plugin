@@ -53,24 +53,26 @@
             </div>
 
             <p>$i18n.getText("cpji.admin.default.values")</p>
-            <div class="field-group">
+            <div id="cpji-required-fields">
+                <div class="field-group">
 
-                <label for="select-issue-type">$i18n.getText("issue.field.issuetype")</label>
-                <select class="select" name="selectedIssueTypeId" id="select-issue-type">
-                    #foreach( $issueType in $action.getIssueTypesForProject() )
-                        <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId())
-                                selected="" #end>$issueType.getName()</option>
-                    #end
-                </select><span class="cpji-loading"></span>
+                    <label for="select-issue-type">$i18n.getText("issue.field.issuetype")</label>
+                    <select class="select" name="selectedIssueTypeId" id="select-issue-type">
+                        #foreach( $issueType in $action.getIssueTypesForProject() )
+                            <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId())
+                                    selected="" #end>$issueType.getName()</option>
+                        #end
+                    </select><span class="cpji-loading"></span>
+                </div>
+                <div id="cpji-fields"></div>
+                <input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
             </div>
-            <div id="fields"></div>
-            <input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
 
         </div>
 
         <div class="buttons-container form-footer">
             <div class="buttons">
-                <input class="button submit" type="submit" value="$i18n.getText("common.words.update")"/>
+                <input class="button submit" type="submit" id="cpji-update-button" value="$i18n.getText("common.words.update")"/>
                 <a href="$req.contextPath/plugins/servlet/project-config/${projectKey}/summary" class="cancel">$i18n.getText("admin.common.words.close")</a>
             </div>
         </div>
