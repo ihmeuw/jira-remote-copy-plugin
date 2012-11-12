@@ -25,12 +25,12 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 		ConfigureCopyIssuesAdminActionPage adminPage = jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "NEL");
 		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
 	}
+
     @Test
     public void testProjectConfigurationAsDialogDoesntIncludeSummary() {
-		ConfigureCopyIssuesAdminActionPage adminPage = jira1.visit(ConfigureCopyIssuesAdminActionPage.AsDialog.class, "NEL");
+        ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1, "NEL");
 		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
-	}
-
+    }
 
     private Matcher<Iterable<String>> expectedRequiredFields() {
         return IsIterableContainingInAnyOrder.<String>containsInAnyOrder(startsWith("Issue Type"), startsWith("Reporter"));
