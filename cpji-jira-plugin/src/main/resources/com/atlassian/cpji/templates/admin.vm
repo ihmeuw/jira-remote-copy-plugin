@@ -26,7 +26,7 @@
         #end
 
         <div class="field-group">
-            <label for="groups">$i18n.getText("cpji.admin.fields.group.name")</label>
+            <label for="groups">$i18n.getText("cpji.admin.fields.groups.name")</label>
             <select class="hidden" name="groups" id="groups" multiple="multiple">
                 #foreach( $group in $action.groups )
                     <option value="$group.getName()"  #if($action.isGroupSelected($group)) selected="" #end>$group.getName()</option>
