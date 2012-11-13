@@ -72,6 +72,12 @@
 				<artifactId>jira-testkit-client</artifactId>
 				<version>${testkit.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>rhino</groupId>
+				<artifactId>js</artifactId>
+				<version>1.7R2.0</version>
+				<scope>compile</scope>
+			</dependency>
 
 			<!-- REST dependencies-->
 			<dependency>
@@ -232,7 +238,7 @@
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
         <applinks.version>3.5.6</applinks.version>
-		<testkit.version>5.0-m13</testkit.version>
+		<testkit.version>5.0-m15</testkit.version>
 		<amps.version>4.0</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
 		<jersey.version>1.8-atlassian-6</jersey.version>

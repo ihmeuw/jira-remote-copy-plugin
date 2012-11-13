@@ -280,7 +280,6 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
     {
         try
         {
-            final GenericValue issue = getIssue();
             if (!copyIssuePermissionManager.hasPermissionForProject(getIssueObject().getProjectObject().getKey()))
             {
                 addErrorMessage(getText("cpji.error.no.permission"));

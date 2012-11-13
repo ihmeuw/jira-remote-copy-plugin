@@ -49,7 +49,6 @@ import java.util.NoSuchElementException;
  */
 public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport implements OperationContext
 {
-    public static final String SECURITYBREACH = "securitybreach";
     private String projectKey;
     private List<IssueType> issueTypesForProject;
     private String selectedIssueTypeId;
@@ -102,7 +101,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     public String doDefault() throws Exception {
         if (isPermissionDenied())
         {
-            return SECURITYBREACH;
+            return PERMISSION_VIOLATION_RESULT;
         }
 
         requireResources();
@@ -119,7 +118,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     {
         if (isPermissionDenied())
         {
-            return SECURITYBREACH;
+            return PERMISSION_VIOLATION_RESULT;
         }
 
         if(!"POST".equals(ActionContext.getRequest().getMethod())){

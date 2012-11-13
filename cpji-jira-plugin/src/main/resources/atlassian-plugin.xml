@@ -60,6 +60,8 @@
 				<view name="success">/com/atlassian/cpji/templates/copied.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
 				<view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
+				<view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
+				<view name="issuenotfound">/secure/views/issuenotfound.jsp</view>
 			</action>
 		</actions>
 	</webwork1>
@@ -75,6 +77,7 @@
 					alias="ConfigureCopyIssuesAdminAction">
 				<view name="input">/com/atlassian/cpji/templates/admin.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
+				<view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
 			</action>
 		</actions>
 	</webwork1>

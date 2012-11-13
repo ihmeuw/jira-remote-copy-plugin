@@ -1,10 +1,14 @@
 package com.atlassian.cpji.tests.rules;
 
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.testkit.client.Backdoor;
+import com.atlassian.jira.testkit.client.util.TestKitLocalEnvironmentData;
 import com.google.common.collect.ImmutableList;
 import org.junit.rules.ExternalResource;
 
 import javax.annotation.Nonnull;
+import java.net.URI;
+import java.util.Properties;
 
 public class EnableDarkFeatureRule extends ExternalResource {
 	private final ImmutableList<JiraTestedProduct> jiras;
@@ -25,7 +29,7 @@ public class EnableDarkFeatureRule extends ExternalResource {
 	protected void before() throws Throwable {
 		super.before();
 		for(JiraTestedProduct jira : jiras) {
-			jira.backdoor().darkFeatures().enableForSite(feature);
+			getBackdoor(jira).darkFeatures().enableForSite(feature);
 		}
 	}
 
@@ -33,9 +37,18 @@ public class EnableDarkFeatureRule extends ExternalResource {
 	protected void after() {
 		if (this.disableAfter) {
 			for(JiraTestedProduct jira : jiras) {
-				jira.backdoor().darkFeatures().disableForSite(feature);
+				getBackdoor(jira).darkFeatures().disableForSite(feature);
 			}
 		}
 		super.after();
+	}
+
+	public static Backdoor getBackdoor(JiraTestedProduct jira) {
+		Properties props = new Properties();
+		props.put("jira.port", Integer.toString(jira.getProductInstance().getHttpPort()));
+		props.put("jira.context", jira.getProductInstance().getContextPath());
+		props.put("jira.host", URI.create(jira.getProductInstance().getBaseUrl()).getHost());
+		props.put("jira.xml.data.location", ".");
+		return new Backdoor(new TestKitLocalEnvironmentData(props, null));
 	}
 }

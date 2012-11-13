@@ -45,6 +45,7 @@
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-webdriver-tests</artifactId>
+			<scope>compile</scope>
         </dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -57,6 +58,14 @@
 			<artifactId>hamcrest-all</artifactId>
 			<version>1.2</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.jira.tests</groupId>
+			<artifactId>jira-testkit-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>rhino</groupId>
+			<artifactId>js</artifactId>
 		</dependency>
 	</dependencies>
     <build>

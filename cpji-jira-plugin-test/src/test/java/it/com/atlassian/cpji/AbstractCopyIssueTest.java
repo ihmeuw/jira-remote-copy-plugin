@@ -1,10 +1,10 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.cpji.tests.rules.EnableDarkFeatureRule;
+import com.atlassian.cpji.tests.rules.JiraWebTestRules;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.pageobjects.pages.DashboardPage;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
-import com.atlassian.jira.webtest.webdriver.setup.JiraWebTestRules;
 import com.atlassian.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
 import org.junit.ClassRule;
