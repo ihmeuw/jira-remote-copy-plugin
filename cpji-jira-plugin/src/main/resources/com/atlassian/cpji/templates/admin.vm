@@ -51,7 +51,7 @@
                 </select>
                 <div class="description">$i18n.getText("cpji.admin.fields.usermapping.description")</div>
             </div>
-
+            <h3>$i18n.getText("cpji.admin.default.values.header")</h3>
             <p>$i18n.getText("cpji.admin.default.values")</p>
             <div id="cpji-required-fields">
                 <div class="field-group">

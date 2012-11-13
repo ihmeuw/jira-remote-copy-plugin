@@ -19,12 +19,9 @@ AJS.toInit(function () {
             },
 
             initComponents : function(){
-                console.log("test1");
-
                 if(!$('#select-issue-type').length){
                     return;
                 }
-                console.log("test1");
                 $('#select-issue-type').change(copyAdmin.onIssueTypeChange);
                 $('#select-issue-type').trigger('change');
 
@@ -38,18 +35,19 @@ AJS.toInit(function () {
 
             onIssueTypeChange : function(){
                 $('.cpji-loading').show();
-                $('#cpji-fields').empty();
+                var fields = $('#cpji-fields');
+                fields.empty();
                 var projectKey = $('#project-key').val();
                 var issueType = $('#select-issue-type :selected').val();
                 $.get(contextPath + '/GetFieldsHtmlAction.jspa?projectKey=' + projectKey + '&selectedIssueTypeId=' + issueType, function (data) {
-                    $('#cpji-fields').append($(data));
+                    fields.append($(data));
                     $('.cpji-loading').hide();
+                    JIRA.trigger(JIRA.Events.NEW_CONTENT_ADDED, [fields]);
                 });
             }
 
         }
 
-        console.log("test1");
         copyAdmin.initComponents();
         $(document).bind("dialogContentReady", copyAdmin.prepareDialog);
     })(AJS.$);
