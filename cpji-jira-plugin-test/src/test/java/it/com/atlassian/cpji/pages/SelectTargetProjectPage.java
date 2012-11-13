@@ -5,9 +5,8 @@ import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.Options;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.SelectElement;
-import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
-import org.hamcrest.Matchers;
+import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import org.openqa.selenium.By;
 
 import javax.annotation.Nonnull;
@@ -44,7 +43,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
     @Override
     public TimedCondition isAt()
     {
-        return elementFinder.find(By.id("targetEntityLink-field")).timed().isPresent();
+        return elementFinder.find(By.id("targetEntityLink-field"), TimeoutType.SLOW_PAGE_LOAD).timed().isPresent();
     }
 
     @Override
