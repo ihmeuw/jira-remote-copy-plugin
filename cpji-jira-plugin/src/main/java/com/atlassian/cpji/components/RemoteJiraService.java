@@ -104,6 +104,8 @@ public class RemoteJiraService {
 		} catch (InterruptedException e) {
 			log.warn("Threads were interrupted during Application Links request", e);
 			return Collections.emptyList();
+		} finally {
+			es.shutdown();
 		}
 	}
 
