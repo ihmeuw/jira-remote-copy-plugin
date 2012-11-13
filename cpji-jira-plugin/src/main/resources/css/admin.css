@@ -1,1 +1,5 @@
 .cpji-loading {background:url("../../../images/icons/wait.gif") 0 center no-repeat; padding-left: 16px;}
+
+.aui-dialog-content form.aui .multi-select {
+	max-width: 100% !important;
+}

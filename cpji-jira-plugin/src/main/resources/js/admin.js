@@ -7,8 +7,6 @@ AJS.toInit(function () {
                 trigger: "#configure_cpji",
                 ajaxOptions: JIRA.Dialogs.getDefaultAjaxOptions,
                 autoClose : false
-
-
             }),
 
             prepareDialog : function(e, dialog){
