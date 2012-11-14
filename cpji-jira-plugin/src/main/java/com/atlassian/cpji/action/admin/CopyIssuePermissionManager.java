@@ -1,18 +1,17 @@
 package com.atlassian.cpji.action.admin;
 
-import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @since v1.5
@@ -24,7 +23,7 @@ public class CopyIssuePermissionManager {
 
 	public static final String CPJI_OLD_KEY = "cpji.permission.%s";
 
-	public static final String ALLOWED_GROUPS_KEY = "cpji.allowed.groups.%s";
+	public static final String ALLOWED_GROUPS_KEY = "cpji.allowed.groups";
 
 	public CopyIssuePermissionManager(final PluginSettingsFactory pluginSettingsFactory, final JiraAuthenticationContext jiraAuthenticationContext, final GroupManager groupManager) {
 		this.pluginSettingsFactory = pluginSettingsFactory;
@@ -34,7 +33,7 @@ public class CopyIssuePermissionManager {
 
 	public void restrictPermissionToGroups(@Nonnull String projectKey, @Nonnull Iterable<String> groups) {
 		PluginSettings settingsForProject = pluginSettingsFactory.createSettingsForKey(projectKey);
-		settingsForProject.put(createKey(projectKey), ImmutableList.copyOf(groups));
+		settingsForProject.put(ALLOWED_GROUPS_KEY, ImmutableList.copyOf(groups));
 	}
 
 	public boolean hasPermissionForProject(String projectKey) {
@@ -44,12 +43,10 @@ public class CopyIssuePermissionManager {
 		}
 
 		final User loggedInUser = jiraAuthenticationContext.getLoggedInUser();
+		final Set<String> loggedInGroups = Sets.newHashSet(groupManager.getGroupNamesForUser(loggedInUser));
 		for(String group : groups) {
-			final Group groupObject = groupManager.getGroupObject(group);
-			if (groupObject != null) {
-				if(groupManager.isUserInGroup(loggedInUser, groupObject)) {
-					return true;
-				}
+			if(loggedInGroups.contains(group)) {
+				return true;
 			}
 		}
 		return false;
@@ -63,7 +60,7 @@ public class CopyIssuePermissionManager {
 	@Nonnull
 	public List<String> getConfiguredGroups(String projectKey) {
 		PluginSettings settingsForProject = pluginSettingsFactory.createSettingsForKey(projectKey);
-		List<String> groups = (List<String>) settingsForProject.get(createKey(projectKey));
+		List<String> groups = (List<String>) settingsForProject.get(ALLOWED_GROUPS_KEY);
 		if (groups != null) {
 			return groups;
 		}
@@ -81,7 +78,7 @@ public class CopyIssuePermissionManager {
 
 	public void clearPermissionForProject(@Nonnull String projectKey) {
 		PluginSettings settingsForProject = pluginSettingsFactory.createSettingsForKey(projectKey);
-		settingsForProject.remove(createKey(projectKey));
+		settingsForProject.remove(ALLOWED_GROUPS_KEY);
 		settingsForProject.remove(createOldKey(projectKey));
 	}
 
@@ -93,10 +90,4 @@ public class CopyIssuePermissionManager {
 	private String createOldKey(@Nonnull final String projectKey) {
 		return String.format(CPJI_OLD_KEY, projectKey);
 	}
-
-	@Nonnull
-	private String createKey(@Nonnull final String projectKey) {
-		return String.format(ALLOWED_GROUPS_KEY, projectKey);
-	}
-
 }
