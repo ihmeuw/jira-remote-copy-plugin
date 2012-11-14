@@ -6,6 +6,7 @@ import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
 import it.com.atlassian.cpji.pages.PermissionViolationPage;
 import it.com.atlassian.cpji.pages.SelectTargetProjectPage;
 import org.apache.log4j.Logger;
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.hamcrest.collection.IsIterableWithSize;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,18 @@ public class TestAllowedGroups extends AbstractCopyIssueTest {
 	@Before
 	public void setup() {
 		login(jira1);
+	}
+
+	@Test
+	public void allowedGroupsAreRemembered() {
+		jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "TST").setAllowedGroups(ImmutableList.of("jira-administrators")).submit();
+		try {
+			assertThat(jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "TST").getAllowedGroups(),
+				IsIterableContainingInAnyOrder.containsInAnyOrder("jira-administrators"));
+		} finally {
+			try { jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "TST").setAllowedGroups(
+					null).submit(); } catch(Exception e) { log.error(e.getMessage()); }
+		}
 	}
 
 	@Test
