@@ -4,6 +4,7 @@ import com.atlassian.pageobjects.elements.PageElement;
 import com.google.common.collect.Iterables;
 import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
 import it.com.atlassian.cpji.pages.JiraLoginPageWithWarnings;
+import it.com.atlassian.cpji.pages.PermissionViolationPage;
 import org.hamcrest.Matcher;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
@@ -53,5 +54,11 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 		final PageElement warning = Iterables.getFirst(jiraPage.getWarnings(), null);
 		assertNotNull(warning);
 		assertEquals("You must log in to access this page.", warning.find(By.tagName("p")).getText());
+	}
+
+	@Test
+	public void permissionDeniedWhenRegularUser() {
+		jira1.logout();
+		jira1.gotoLoginPage().login("fred", "fred", PermissionViolationPage.class, "/secure/ConfigureCopyIssuesAdminAction!default.jspa?projectKey=TST");
 	}
 }
