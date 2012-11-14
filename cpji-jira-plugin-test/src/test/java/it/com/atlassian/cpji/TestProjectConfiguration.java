@@ -1,13 +1,20 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.pageobjects.elements.PageElement;
+import com.google.common.collect.Iterables;
 import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
+import it.com.atlassian.cpji.pages.JiraLoginPageWithWarnings;
 import org.hamcrest.Matcher;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.By;
 
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @since v2.1
@@ -28,7 +35,8 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 
     @Test
     public void testProjectConfigurationAsDialogDoesntIncludeSummary() {
-        ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1, "NEL");
+        ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1,
+				"NEL");
 		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
     }
 
@@ -36,4 +44,14 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
         return IsIterableContainingInAnyOrder.<String>containsInAnyOrder(startsWith("Issue Type"), startsWith("Reporter"));
     }
 
+	@Test
+	public void permissionDeniedShouldBePresentedWhenAnonymous() {
+		jira1.logout();
+		jira1.getTester().getDriver().navigate().to(jira1.getProductInstance().getBaseUrl() + "/secure/ConfigureCopyIssuesAdminAction!default.jspa?projectKey=TST");
+		final JiraLoginPageWithWarnings jiraPage = jira1.getPageBinder().bind(JiraLoginPageWithWarnings.class);
+		assertTrue(jiraPage.hasWarnings());
+		final PageElement warning = Iterables.getFirst(jiraPage.getWarnings(), null);
+		assertNotNull(warning);
+		assertEquals("You must log in to access this page.", warning.find(By.tagName("p")).getText());
+	}
 }
