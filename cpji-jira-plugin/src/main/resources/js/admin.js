@@ -24,7 +24,7 @@ AJS.toInit(function () {
                 $('#select-issue-type').trigger('change');
 
                 new AJS.MultiSelect({
-                    element: AJS.$("#groups"),
+                    element: $("#groups"),
                     stallEventBind: false,
                     itemAttrDisplayed: "label"
                 });
@@ -43,10 +43,21 @@ AJS.toInit(function () {
                     JIRA.trigger(JIRA.Events.NEW_CONTENT_ADDED, [fields]);
                 });
             }
+    
+        };
 
+        if(!JIRA.plugins){
+            JIRA.plugins = {
+                cpjiPlugin : {}
+            };
+        } else {
+            JIRA.plugins.cpjiPlugin = {};
         }
 
-        copyAdmin.initComponents();
-        $(document).bind("dialogContentReady", copyAdmin.prepareDialog);
+
+
+        JIRA.plugins.cpjiPlugin.admin = copyAdmin;
+        JIRA.plugins.cpjiPlugin.admin.initComponents();
+        $(document).bind("dialogContentReady", JIRA.plugins.cpjiPlugin.admin.prepareDialog);
     })(AJS.$);
 });
