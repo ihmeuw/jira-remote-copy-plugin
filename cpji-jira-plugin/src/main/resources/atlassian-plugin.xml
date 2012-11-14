@@ -119,6 +119,7 @@
 	</component-import>
 
 	<web-resource key="admin-js">
+        <dependency>jira.webresources:jira-global</dependency>
 		<resource type="download" name="admin.js" location="js/admin.js"/>
 		<resource type="download" name="admin.css" location="css/admin.css"/>
 	</web-resource>
@@ -126,5 +127,8 @@
     <web-resource key="copyissue-js">
         <resource type="download" name="copyissue.js" location="js/copyissue.js"/>
     </web-resource>
+
+    <resource type="qunit" name="js/admin-tests.js" location="js/admin-tests.js"/>
+
 
 </atlassian-plugin>

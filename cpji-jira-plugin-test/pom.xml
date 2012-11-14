@@ -67,6 +67,12 @@
 			<groupId>rhino</groupId>
 			<artifactId>js</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.atlassian.aui</groupId>
+            <artifactId>aui-qunit-util</artifactId>
+            <version>0.20</version>
+            <scope>test</scope>
+        </dependency>
 	</dependencies>
     <build>
         <plugins>
@@ -103,6 +109,11 @@
 									<artifactId>jira-func-test-plugin</artifactId>
 									<version>${jira.version}</version>
 								</pluginArtifact>
+                                <pluginArtifact>
+                                    <groupId>com.atlassian.aui</groupId>
+                                    <artifactId>aui-qunit-plugin</artifactId>
+                                    <version>${aui.qunit.version}</version>
+                                </pluginArtifact>
                             </pluginArtifacts>
                         </product>
                         <product>
@@ -128,6 +139,11 @@
 									<artifactId>jira-func-test-plugin</artifactId>
 									<version>${jira.version}</version>
 								</pluginArtifact>
+                                <pluginArtifact>
+                                    <groupId>com.atlassian.aui</groupId>
+                                    <artifactId>aui-qunit-plugin</artifactId>
+                                    <version>${aui.qunit.version}</version>
+                                </pluginArtifact>
                             </pluginArtifacts>
                         </product>
                     </products>

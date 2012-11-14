@@ -231,7 +231,7 @@
     <properties>
 		<jdkLevel>1.6</jdkLevel>
 		<cpji.build.directory>target</cpji.build.directory>
-
+        <aui.qunit.version>0.20</aui.qunit.version>
         <jira.version>5.1.8</jira.version>
         <jira.compile.version>5.1.8</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
