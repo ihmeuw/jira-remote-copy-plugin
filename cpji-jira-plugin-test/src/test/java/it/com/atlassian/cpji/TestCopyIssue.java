@@ -18,7 +18,9 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -123,7 +125,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 		viewIssue(jira1, "NEL-3");
 		SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, 10301L);
 
-		selectTargetProjectPage.setDestinationProject("(Your Company JIRA) Destination not entity links (DNEL)");
+		selectTargetProjectPage.setDestinationProject("Destination not entity links");
 
 		final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
 		final PermissionChecksPage permissionChecksPage = copyDetailsPage.next();
@@ -135,6 +137,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 		assertTrue(copyIssueToInstancePage.isSuccessful());
 
 		final String remoteIssueKey = copyIssueToInstancePage.getRemoteIssueKey();
+		assertThat(remoteIssueKey, startsWith("DNEL"));
 
 		// Query the remotely copied issue via REST
 		final JSONObject json = getIssueJson(jira2, remoteIssueKey);

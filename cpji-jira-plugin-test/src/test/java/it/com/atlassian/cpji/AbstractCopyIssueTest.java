@@ -1,6 +1,6 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.cpji.tests.rules.JiraWebTestRules;
+import com.atlassian.cpji.tests.com.atlassian.cpji.tests.rules.JiraWebTestRules;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.pageobjects.pages.DashboardPage;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
@@ -13,7 +13,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 
-import static com.atlassian.cpji.tests.rules.JiraWebTestRules.getBackdoor;
+import static com.atlassian.cpji.tests.com.atlassian.cpji.tests.rules.JiraWebTestRules.getBackdoor;
 
 /**
  * @since v2.1
