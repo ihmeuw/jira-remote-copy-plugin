@@ -5,6 +5,8 @@ import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.jira.pageobjects.project.summary.ProjectSummaryPageTab;
 import com.atlassian.jira.pageobjects.project.summary.SettingsPanel;
+import com.atlassian.jira.pageobjects.util.TraceContext;
+import com.atlassian.jira.pageobjects.util.Tracer;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
@@ -17,6 +19,7 @@ import org.openqa.selenium.By;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * @since v2.1
@@ -29,8 +32,19 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
     @ElementBy(id = "cpji-update-button")
 	protected PageElement updateButton;
 
-    @ElementBy(className="cpji-loading")
-    protected PageElement loadingMarker;
+    @ElementBy(id="reporter-field")
+    protected PageElement reportedField;
+
+    @ElementBy(id="cpji-general-errors")
+    protected PageElement generalErrors;
+
+    @ElementBy(id="cpji-general-success")
+    protected PageElement generalSuccess;
+
+    @Inject
+    private TraceContext traceContext;
+
+
 
 	public ConfigureCopyIssuesAdminActionPage(@Nonnull String projectKey) {
 		this.projectKey = projectKey;
@@ -47,9 +61,33 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 	}
 
 	public ConfigureCopyIssuesAdminActionPage submit() {
+        Tracer checkpoint = traceContext.checkpoint();
 		updateButton.click();
+        traceContext.waitFor(checkpoint, "cpji.load.completed");
 		return pageBinder.bind(ConfigureCopyIssuesAdminActionPage.class, projectKey);
 	}
+
+    public ConfigureCopyIssuesAdminActionPage setReporter(String reporter){
+        if(!reportedField.isPresent()){
+            throw new RuntimeException("Reporter field is not available");
+        }
+
+        reportedField.clear();
+        reportedField.type(reporter);
+        return this;
+
+    }
+
+    public String getReporterText()
+    {
+        return reportedField.getValue();
+    }
+
+
+
+    public boolean hasGeneralErrorsMessage(){
+        return generalErrors.isPresent();
+    }
 
 	@Override
 	public TimedCondition isAt() {
@@ -67,6 +105,22 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 				Iterables.transform(driver.findElements(By.cssSelector("#cpji-required-fields div.field-group label")),
 						WebDriverQueryFunctions.getText()));
 	}
+
+
+    public List<String> getErrors(){
+        return ImmutableList.copyOf(Iterables.transform(driver.findElements(By.className("error")), WebDriverQueryFunctions.getText()));
+    }
+
+    public List<String> getSuccessMessages(){
+        return ImmutableList.copyOf(Iterables.transform(generalSuccess.findAll(By.tagName("li")), new Function<PageElement, String>()
+        {
+            @Override
+            public String apply(@Nullable final PageElement input)
+            {
+                return input.getText();
+            }
+        }));
+    }
 
     public static class AsDialog extends ConfigureCopyIssuesAdminActionPage{
 
