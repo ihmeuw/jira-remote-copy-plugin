@@ -28,7 +28,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
     @ElementBy(className = "submit")
     private PageElement nextButton;
 
-	@ElementBy(id = "targetEntityLink-single-select")
+	@ElementBy(id = "targetEntityLink-container")
 	private PageElement targetEntityLinkContainer;
     
     private SingleSelect entitySelection;
@@ -46,7 +46,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	}
 
 	public SelectTargetProjectPage setDestinationProject(@Nonnull String name) {
-		elementFinder.find(By.id("targetEntityLink-field"), TimeoutType.SLOW_PAGE_LOAD).timed().isPresent().byDefaultTimeout();
+		elementFinder.find(By.id("targetEntityLink-single-select"), TimeoutType.SLOW_PAGE_LOAD).timed().isPresent().byDefaultTimeout();
 		if(entitySelection.type(name).isSuggestionsOpen().by(5)) {
 			entitySelection.clickSuggestion();
 		}

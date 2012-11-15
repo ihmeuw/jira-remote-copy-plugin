@@ -16,7 +16,7 @@
         <form action="SelectTargetProjectAction.jspa" class="aui" method="post">
             <h2>$i18n.getText('cpji.select.destination.project')</h2>
             <fieldset>
-				<div class="field-group">
+				<div class="field-group" id="targetEntityLink-container">
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
 					<div style="width: 250px;"><select name="targetEntityLink" id="targetEntityLink" class="hidden"></select></div>
                     <span id="targetEntityLinkLoader" class="icon loading hidden"></span>
