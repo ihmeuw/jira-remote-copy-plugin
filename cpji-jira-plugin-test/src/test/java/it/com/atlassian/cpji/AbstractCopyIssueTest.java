@@ -1,6 +1,6 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.cpji.tests.com.atlassian.cpji.tests.rules.JiraWebTestRules;
+import com.atlassian.cpji.tests.rules.JiraWebTestRules;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.pageobjects.pages.DashboardPage;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
@@ -13,8 +13,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
 
-import static com.atlassian.cpji.tests.com.atlassian.cpji.tests.rules.JiraWebTestRules.getBackdoor;
-
 /**
  * @since v2.1
  */
@@ -23,8 +21,8 @@ public abstract class AbstractCopyIssueTest
     static JiraTestedProduct jira1 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2990/jira", "jira1", 2990, "/jira"), null);
     static JiraTestedProduct jira2 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2991/jira", "jira2", 2991, "/jira"), null);
 
-	static Backdoor testkit1 = getBackdoor(jira1);
-	static Backdoor testkit2 = getBackdoor(jira2);
+	static Backdoor testkit1 = JiraWebTestRules.getBackdoor(jira1);
+	static Backdoor testkit2 = JiraWebTestRules.getBackdoor(jira2);
 
 	@ClassRule
 	public static EnableDarkFeatureRule pldRule = new EnableDarkFeatureRule("com.atlassian.jira.config.PDL", testkit1, testkit2);
