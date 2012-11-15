@@ -13,10 +13,7 @@ AJS.toInit(function () {
                 if(dialog == copyAdmin.dialog)
                     copyAdmin.initComponents();
 
-                JIRA.trace("cpji.load.completed");
-
-
-            },
+                },
 
             initComponents : function(){
                 if(!$('#select-issue-type').length){
@@ -29,6 +26,8 @@ AJS.toInit(function () {
                     stallEventBind: false,
                     itemAttrDisplayed: "label"
                 });
+
+                JIRA.trace("cpji.load.completed");
             },
 
 

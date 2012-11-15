@@ -11,11 +11,11 @@ import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.webdriver.WebDriverQueryFunctions;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -35,12 +35,6 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 
     @ElementBy(id="reporter-field")
     protected PageElement reportedField;
-
-    @ElementBy(id="cpji-general-errors")
-    protected PageElement generalErrors;
-
-    @ElementBy(id="cpji-general-success")
-    protected PageElement generalSuccess;
 
     @Inject
     private TraceContext traceContext;
@@ -87,7 +81,7 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 
 
     public boolean hasGeneralErrorsMessage(){
-        return generalErrors.isPresent();
+        return driver.findElement(By.id("cpji-general-errors")).isDisplayed();
     }
 
 	@Override
@@ -113,14 +107,8 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
     }
 
     public List<String> getSuccessMessages(){
-        return ImmutableList.copyOf(Iterables.transform(generalSuccess.findAll(By.tagName("li")), new Function<PageElement, String>()
-        {
-            @Override
-            public String apply(@Nullable final PageElement input)
-            {
-                return input.getText();
-            }
-        }));
+        final List<WebElement> messages = driver.findElements(By.cssSelector("#cpji-general-success li"));
+        return ImmutableList.copyOf(Iterables.transform(messages, WebDriverQueryFunctions.getText()));
     }
 
     public static class AsDialog extends ConfigureCopyIssuesAdminActionPage{
