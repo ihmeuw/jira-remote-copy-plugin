@@ -11,6 +11,7 @@ import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.webdriver.WebDriverQueryFunctions;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -63,10 +64,7 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 	}
 
     public ConfigureCopyIssuesAdminActionPage setReporter(String reporter){
-        if(!reportedField.isPresent()){
-            throw new RuntimeException("Reporter field is not available");
-        }
-
+        Preconditions.checkArgument(reportedField.isPresent(), "Reporter field is not available");
         reportedField.clear();
         reportedField.type(reporter);
         return this;
