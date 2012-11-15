@@ -2,31 +2,22 @@ package com.atlassian.cpji.action.admin;
 
 import com.atlassian.cpji.action.AbstractCopyIssueAction;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
-import com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.issue.IssueFactory;
-import com.atlassian.jira.issue.IssueFieldConstants;
-import com.atlassian.jira.issue.MutableIssue;
-import com.atlassian.jira.issue.customfields.OperationContext;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.screen.FieldScreenRenderer;
 import com.atlassian.jira.issue.issuetype.IssueType;
-import com.atlassian.jira.issue.operation.IssueOperation;
-import com.atlassian.jira.issue.operation.IssueOperations;
-import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
-import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -35,30 +26,23 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import webwork.action.ActionContext;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @since v1.4
  */
-public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport implements OperationContext
+public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
 {
-    private String projectKey;
     private List<IssueType> issueTypesForProject;
-    private String selectedIssueTypeId;
     private UserMappingType userMappingType;
 
     private final IssueTypeSchemeManager issueTypeSchemeManager;
-    private final IssueFactory issueFactory;
     private final IssueCreationHelperBean issueCreationHelperBean;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
-    private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
     private final CopyIssueConfigurationManager copyIssueConfigurationManager;
@@ -66,36 +50,22 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
 
     private static final Logger log = Logger.getLogger(ConfigureCopyIssuesAdminAction.class);
 
-    private static final ArrayList<String> unmodifiableFields = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE,
-			IssueFieldConstants.PROJECT);
-    private MutableIssue issue;
-    private Map fieldValuesHolder;
     private List<String> configChanges = new ArrayList<String>();
     private Boolean executeFired = false;
 	private List<String> selectedGroups;
 
-	public ConfigureCopyIssuesAdminAction(
-            final IssueTypeSchemeManager issueTypeSchemeManager,
-            final IssueFactory issueFactory,
-            final IssueCreationHelperBean issueCreationHelperBean,
-            final DefaultFieldValuesManager defaultFieldValuesManager,
-            final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final GroupManager groupManager,
-            final CopyIssuePermissionManager copyIssuePermissionManager,
-            final DefaultCopyIssueConfigurationManager copyIssueConfigurationManager,
-            final WebResourceManager webResourceManager)
+    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManager defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager)
     {
+        super(fieldLayoutItemsRetriever, issueTypeSchemeManager, issueFactory, defaultFieldValuesManager);
         this.issueTypeSchemeManager = issueTypeSchemeManager;
-        this.issueFactory = issueFactory;
-        this.issueCreationHelperBean = issueCreationHelperBean;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
-        this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
+        this.issueCreationHelperBean = issueCreationHelperBean;
         this.groupManager = groupManager;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
         this.copyIssueConfigurationManager = copyIssueConfigurationManager;
         this.webResourceManager = webResourceManager;
-        fieldValuesHolder = new HashMap();
     }
+
 
     @Override
     public String doDefault() throws Exception {
@@ -150,7 +120,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     public boolean isGroupSelected(Group group)
     {
 		if (selectedGroups == null) {
-			this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(projectKey);
+			this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(getProjectKey());
 		}
 
         if (selectedGroups.contains(group.getName()))
@@ -170,7 +140,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
             Object fieldValue = ActionContext.getParameters().get(orderableField.getId());
             if (containsValues(fieldValue))
             {
-                orderableField.populateFromParams(fieldValuesHolder, ActionContext.getParameters());
+                orderableField.populateFromParams(getFieldValuesHolder(), ActionContext.getParameters());
                 orderableField.validateParams(this, simpleErrorCollection, getI18nHelper(), getIssue(), fieldScreenRenderer.getFieldScreenRenderLayoutItem(orderableField));
                 if (!simpleErrorCollection.hasAnyErrors())
                 {
@@ -219,7 +189,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
     private void saveGroupPermission()
     {
         final ImmutableList<String> configuredGroups = ImmutableList.copyOf(
-				copyIssuePermissionManager.getConfiguredGroups(projectKey));
+				copyIssuePermissionManager.getConfiguredGroups(getProjectKey()));
 		final Object rawGroups = ActionContext.getParameters().get("groups");
 		final ImmutableList<String> groups = rawGroups != null ? ImmutableList.copyOf((String[]) rawGroups) : ImmutableList.<String>of();
         if (!groups.isEmpty())
@@ -230,7 +200,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
 
             if (configuredGroups.isEmpty() || !configuredGroups.equals(selectedGroups))
             {
-                copyIssuePermissionManager.restrictPermissionToGroups(projectKey, selectedGroups);
+                copyIssuePermissionManager.restrictPermissionToGroups(getProjectKey(), selectedGroups);
                 configChanges.add(getI18nHelper().getText("cpji.config.user.group"));
             }
         }
@@ -238,7 +208,7 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         {
             if (!configuredGroups.isEmpty())
             {
-                copyIssuePermissionManager.clearPermissionForProject(projectKey);
+                copyIssuePermissionManager.clearPermissionForProject(getProjectKey());
                 configChanges.add(getI18nHelper().getText("cpji.config.user.group.remove"));
             }
         }
@@ -271,113 +241,15 @@ public class ConfigureCopyIssuesAdminAction extends JiraWebActionSupport impleme
         return false;
     }
 
-    private MutableIssue getIssue()
-    {
-        if (issue == null)
-        {
-            issue = issueFactory.getIssue();
-        }
-        issue.setProjectId(getProject().getId());
-        issue.setIssueTypeId(getIssueType().getId());
-        return issue;
-    }
-
-
-    public List<FieldLayoutItem> getFieldLayoutItems()
-    {
-        Iterable<FieldLayoutItem> filter = Iterables.filter(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(getProject(), getIssueType()), new Predicate<FieldLayoutItem>()
-        {
-            public boolean apply(final FieldLayoutItem input)
-            {
-                return !unmodifiableFields.contains(input.getOrderableField().getId()) && input.isRequired();
-            }
-        });
-        return Lists.newArrayList(filter);
-    }
-
-    private Project getProject()
-    {
-        if (StringUtils.isEmpty(projectKey))
-        {
-            throw new RuntimeException("Project key cannot be null!");
-        }
-        Project project = getProjectManager().getProjectObjByKey(projectKey);
-        if (project == null)
-        {
-            throw new RuntimeException("Project cannot be null!");
-        }
-        return project;
-    }
 
     public List<IssueType> getIssueTypesForProject()
     {
         issueTypesForProject = Lists.newArrayList(issueTypeSchemeManager.getIssueTypesForProject(getProject()));
-        if (selectedIssueTypeId == null)
+        if (getSelectedIssueTypeId() == null)
         {
-            selectedIssueTypeId = issueTypesForProject.get(0).getId();
+            setSelectedIssueTypeId(issueTypesForProject.get(0).getId());
         }
         return issueTypesForProject;
-    }
-
-    public void setProjectKey(String projectKey)
-    {
-        this.projectKey = projectKey;
-    }
-
-    public String getProjectKey()
-    {
-        return projectKey;
-    }
-
-    public String getSelectedIssueTypeId()
-    {
-        return selectedIssueTypeId;
-    }
-
-    public String getSelectedIssueTypeName()
-    {
-        List<IssueType> issueTypesForProject1 = getIssueTypesForProject();
-        for (IssueType issueType : issueTypesForProject1)
-        {
-            if (issueType.getId().equals(selectedIssueTypeId))
-            {
-                return issueType.getName();
-            }
-        }
-        return "none";
-    }
-
-    public void setSelectedIssueTypeId(final String selectedIssueTypeId)
-    {
-        this.selectedIssueTypeId = selectedIssueTypeId;
-    }
-
-    private IssueType getIssueType()
-    {
-        try
-        {
-            return Iterables.find(issueTypeSchemeManager.getIssueTypesForProject(getProject()), new Predicate<IssueType>()
-            {
-                public boolean apply(final IssueType input)
-                {
-                    return input.getId().equals(selectedIssueTypeId);
-                }
-            });
-        }
-        catch (NoSuchElementException ex)
-        {
-            throw new RuntimeException("Failed to find issue type with id '" + selectedIssueTypeId + "'");
-        }
-    }
-
-    public Map getFieldValuesHolder()
-    {
-        return fieldValuesHolder;
-    }
-
-    public IssueOperation getIssueOperation()
-    {
-        return IssueOperations.EDIT_ISSUE_OPERATION;
     }
 
     public List<UserMappingType> getUserMappingTypes()

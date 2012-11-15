@@ -21,7 +21,6 @@ AJS.toInit(function () {
                     return;
                 }
                 $('#select-issue-type').change(copyAdmin.onIssueTypeChange);
-                $('#select-issue-type').trigger('change');
 
                 new AJS.MultiSelect({
                     element: $("#groups"),

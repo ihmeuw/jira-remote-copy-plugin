@@ -25,11 +25,13 @@
             #if ($action.invalidInput())
                 <div class="aui-message warning">
                     <p>$i18n.getText("cpji.admin.there.were.problems")</p>
-                    <ul>
-                        #foreach( $error in $action.getErrorMessages() )
-                            <li>$error</li>
-                        #end
-                    </ul>
+                    #if ($action.hasErrorMessages)
+                        <ul>
+                            #foreach( $error in $action.errorMessages )
+                                <li>$error</li>
+                            #end
+                        </ul>
+                    #end
                 </div>
             #end
 
@@ -62,9 +64,11 @@
                             <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId())
                                     selected="" #end>$issueType.getName()</option>
                         #end
-                    </select><span class="cpji-loading"></span>
+                    </select><span class="cpji-loading hidden"></span>
                 </div>
-                <div id="cpji-fields"></div>
+                <div id="cpji-fields">
+                    #parse("/com/atlassian/cpji/templates/htmlfields.vm")
+                </div>
                 <input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
             </div>
 

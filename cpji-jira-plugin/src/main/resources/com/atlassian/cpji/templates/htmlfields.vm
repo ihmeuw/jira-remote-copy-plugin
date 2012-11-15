@@ -1,3 +1,4 @@
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.admin.GetFieldsHtmlAction" *#
  #foreach( $item in $action.getFieldLayoutItems())
       $action.getHtmlForField($item)
  #end
