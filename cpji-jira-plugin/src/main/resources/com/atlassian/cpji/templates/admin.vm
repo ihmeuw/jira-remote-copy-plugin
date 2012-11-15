@@ -11,7 +11,7 @@
         <h2>$i18n.getText("cpji.admin.title")</h2>
         <div class="form-body">
             #if ($action.getExecuteFired() && !$action.invalidInput())
-                <div class="aui-message success">
+                <div class="aui-message success" id="cpji-general-success">
                     <p>$i18n.getText("cpji.admin.successful.saved")</p>
                     #if ($action.hasConfigChanges())
                     <ul>
@@ -23,7 +23,7 @@
                 </div>
             #end
             #if ($action.invalidInput())
-                <div class="aui-message warning">
+                <div class="aui-message warning" id="cpji-general-errors">
                     <p>$i18n.getText("cpji.admin.there.were.problems")</p>
                     #if ($action.hasErrorMessages)
                         <ul>

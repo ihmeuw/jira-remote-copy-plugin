@@ -13,6 +13,8 @@ AJS.toInit(function () {
                 if(dialog == copyAdmin.dialog)
                     copyAdmin.initComponents();
 
+                JIRA.trace("cpji.load.completed");
+
 
             },
 

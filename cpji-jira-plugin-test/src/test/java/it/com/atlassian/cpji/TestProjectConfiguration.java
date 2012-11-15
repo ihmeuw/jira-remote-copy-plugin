@@ -35,10 +35,19 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 	}
 
     @Test
-    public void testProjectConfigurationAsDialogDoesntIncludeSummary() {
+    public void defaultReporterShouldReturnErrorOnInvalidUserAndSaveValidOne() {
         ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1,
 				"NEL");
-		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
+
+        adminPage.setReporter("FAKE USER").submit();
+
+        assertTrue(adminPage.hasGeneralErrorsMessage());
+        assertThat(adminPage.getErrors(), IsIterableContainingInAnyOrder.containsInAnyOrder("The reporter specified is not a user."));
+
+        adminPage.setReporter("fred").submit();
+
+        assertThat(adminPage.getSuccessMessages(), IsIterableContainingInAnyOrder.containsInAnyOrder("Saved default value for field 'Reporter'"));
+        assertEquals("Fred Flinstone", adminPage.getReporterText());
     }
 
     private Matcher<Iterable<String>> expectedRequiredFields() {
