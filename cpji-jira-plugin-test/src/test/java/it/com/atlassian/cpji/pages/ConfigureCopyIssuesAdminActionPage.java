@@ -6,7 +6,6 @@ import com.atlassian.jira.pageobjects.project.summary.ProjectSummaryPageTab;
 import com.atlassian.jira.pageobjects.project.summary.SettingsPanel;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
-import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.webdriver.WebDriverQueryFunctions;
 import com.google.common.base.Predicate;
@@ -17,9 +16,9 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.openqa.selenium.By;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
  * @since v2.1
@@ -96,7 +95,7 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 
 	@Override
 	public TimedCondition isAt() {
-        return Conditions.and(updateButton.timed().isVisible(), Conditions.not(loadingMarker.timed().isVisible()));
+        return updateButton.timed().isVisible();
 	}
 
 	@Override

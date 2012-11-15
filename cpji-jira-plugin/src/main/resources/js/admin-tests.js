@@ -58,7 +58,6 @@ test("initialization", function ()
 {
     this.put.initComponents();
 
-    ok(this.put.onIssueTypeChange.calledOnce, "issue type field onChange was on beginning");
     ok(AJS.MultiSelect.calledOnce, "MutliSelect is initialized")
     var selectArgs = AJS.MultiSelect.firstCall.args[0];
     equal(selectArgs.element.get(0), jQuery("#groups", this.fixture).get(0), "MultiSelect uses group field");
@@ -72,7 +71,7 @@ test("Reacting for issue type change", function()
 
     var obj = jQuery("#select-issue-type", this.fixture);
     obj.change();
-    ok(this.put.onIssueTypeChange.calledTwice, "issue type field onChange was called twice (first at bootstrap, second after event)");
+    ok(this.put.onIssueTypeChange.calledOnce, "issue type field onChange was called");
 });
 
 
