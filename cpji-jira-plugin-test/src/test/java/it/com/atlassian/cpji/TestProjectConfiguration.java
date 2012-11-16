@@ -46,15 +46,35 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
         ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1,
 				"NEL");
 
-        adminPage.setReporter("FAKE USER").submit();
+        adminPage.getDefaultValues().typeIntoReporterField("FAKE USER");
+        adminPage.submit();
 
         assertTrue(adminPage.hasGeneralErrorsMessage());
         assertThat(adminPage.getErrors(), IsIterableContainingInAnyOrder.containsInAnyOrder("The reporter specified is not a user."));
 
-        adminPage.setReporter("fred").submit();
+        adminPage.getDefaultValues().setReporter("fred");
+        adminPage.submit();
 
         assertThat(adminPage.getSuccessMessages(), IsIterableContainingInAnyOrder.containsInAnyOrder("Saved default value for field 'Reporter'"));
-        assertEquals("Fred Flinstone", adminPage.getReporterText());
+        assertEquals("Fred Flinstone", adminPage.getDefaultValues().getReporterText());
+    }
+
+    @Test
+    public void projectConfigurationShouldRememberReportersForDifferentIssueTypes(){
+        ConfigureCopyIssuesAdminActionPage adminPage = jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "NEL");
+
+        adminPage.getDefaultValues().changeIssueType("ta").setReporter("fred");
+        adminPage.submit();
+
+        adminPage.getDefaultValues().changeIssueType("bug").setReporter("admin");
+        adminPage.submit();
+
+        String reporter = adminPage.getDefaultValues().changeIssueType("ta").getReporterText();
+        assertEquals("Fred Flinstone", reporter);
+
+        reporter = adminPage.getDefaultValues().changeIssueType("bug").getReporterText();
+        assertEquals("admin", reporter);
+
     }
 
     private Matcher<Iterable<String>> expectedRequiredFields() {

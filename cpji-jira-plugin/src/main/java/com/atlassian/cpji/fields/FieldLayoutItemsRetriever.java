@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields;
 
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
@@ -48,4 +49,10 @@ public class FieldLayoutItemsRetriever
             }
         });
     }
+
+    public FieldLayoutItem getIssueTypeField(final Project project){
+        FieldLayout fieldLayout = fieldLayoutManager.getFieldLayout(project, null);
+        return fieldLayout.getFieldLayoutItem(IssueFieldConstants.ISSUE_TYPE);
+    }
+
 }

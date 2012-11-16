@@ -56,15 +56,8 @@
             <h3>$i18n.getText("cpji.admin.default.values.header")</h3>
             <p>$i18n.getText("cpji.admin.default.values")</p>
             <div id="cpji-required-fields">
-                <div class="field-group">
-
-                    <label for="select-issue-type">$i18n.getText("issue.field.issuetype")</label>
-                    <select class="select" name="selectedIssueTypeId" id="select-issue-type">
-                        #foreach( $issueType in $action.getIssueTypesForProject() )
-                            <option value="$issueType.getId()"  #if($action.getSelectedIssueTypeId() == $issueType.getId())
-                                    selected="" #end>$issueType.getName()</option>
-                        #end
-                    </select><span class="cpji-loading hidden"></span>
+                <div id="cpji-issuetype-field">
+                    $action.issueFieldHtml
                 </div>
                 <div id="cpji-fields">
                     #parse("/com/atlassian/cpji/templates/htmlfields.vm")
