@@ -1,6 +1,12 @@
 package com.atlassian.cpji.action;
 
-import com.atlassian.applinks.api.*;
+import com.atlassian.applinks.api.ApplicationLink;
+import com.atlassian.applinks.api.ApplicationLinkRequest;
+import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
+import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
+import com.atlassian.applinks.api.ApplicationLinkService;
+import com.atlassian.applinks.api.AuthorisationURIGenerator;
+import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.Projects;
@@ -17,6 +23,7 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
+import com.atlassian.jira.util.lang.Pair;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
@@ -25,7 +32,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
