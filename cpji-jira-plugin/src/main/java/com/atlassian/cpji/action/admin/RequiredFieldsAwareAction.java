@@ -113,14 +113,9 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
     {
         if (StringUtils.isEmpty(projectKey))
         {
-            throw new RuntimeException("Project key cannot be null!");
+            return null;
         }
-        Project project = getProjectManager().getProjectObjByKey(projectKey);
-        if (project == null)
-        {
-            throw new RuntimeException("Project cannot be null!");
-        }
-        return project;
+        return getProjectManager().getProjectObjByKey(projectKey);
     }
 
 
@@ -139,7 +134,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
         }
         catch (NoSuchElementException ex)
         {
-            throw new NoSuchElementException("Failed to find issue type with id '" + selectedIssueTypeId + "'");
+            return null;
         }
     }
 
