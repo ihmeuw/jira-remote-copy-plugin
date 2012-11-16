@@ -1,5 +1,6 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.jira.tests.annotations.JiraBuildNumberDependent;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.google.common.collect.Iterables;
 import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
@@ -34,6 +35,7 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
 	}
 
+	@JiraBuildNumberDependent(value = 788)
     @Test
     public void defaultReporterShouldReturnErrorOnInvalidUserAndSaveValidOne() {
         ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1,
