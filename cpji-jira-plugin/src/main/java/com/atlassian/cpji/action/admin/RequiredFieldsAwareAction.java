@@ -37,7 +37,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
 
 
     private String projectKey;
-    private String selectedIssueTypeId;
+    private String issuetype;
     private MutableIssue issue;
     private Map fieldValuesHolder;
 
@@ -53,7 +53,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
     public String getHtmlForField(FieldLayoutItem fieldLayoutItem)
     {
         OrderableField orderableField = fieldLayoutItem.getOrderableField();
-        Object defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueType().getName());
+        Object defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName());
         if (ActionContext.getParameters().get(orderableField.getId()) == null)
         {
             if (defaultFieldValue != null)
@@ -70,7 +70,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
 
     public List<FieldLayoutItem> getFieldLayoutItems()
     {
-        Iterable<FieldLayoutItem> filter = Iterables.filter(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(getProject(), getIssueType()), new Predicate<FieldLayoutItem>()
+        Iterable<FieldLayoutItem> filter = Iterables.filter(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(getProject(), getIssueTypeObject()), new Predicate<FieldLayoutItem>()
         {
             public boolean apply(final FieldLayoutItem input)
             {
@@ -105,7 +105,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
             issue = issueFactory.getIssue();
         }
         issue.setProjectId(getProject().getId());
-        issue.setIssueTypeId(getIssueType().getId());
+        issue.setIssueTypeId(getIssueTypeObject().getId());
         return issue;
     }
 
@@ -119,7 +119,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
     }
 
 
-    protected IssueType getIssueType()
+    protected IssueType getIssueTypeObject()
     {
         try
         {
@@ -128,7 +128,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
 
                 public boolean apply(final IssueType input)
                 {
-                    return input.getId().equals(selectedIssueTypeId);
+                    return input.getId().equals(getIssuetype());
                 }
             });
         }
@@ -136,26 +136,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
         {
             return null;
         }
-    }
 
-    public void setSelectedIssueTypeId(final String selectedIssueTypeId)
-    {
-        this.selectedIssueTypeId = selectedIssueTypeId;
-    }
-
-    public String getSelectedIssueTypeId()
-    {
-        return selectedIssueTypeId;
-    }
-
-
-    public String getSelectedIssueTypeName()
-    {
-        try{
-            return getIssueType().getName();
-        } catch(NoSuchElementException e){
-            return "none";
-        }
     }
 
     public void setProjectKey(final String projectKey)
@@ -168,4 +149,16 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
         return projectKey;
     }
 
+    public String getIssuetype()
+    {
+        if(issuetype == null){
+            issuetype = Iterables.get(issueTypeSchemeManager.getIssueTypesForProject(getProject()), 0).getId();
+        }
+        return issuetype;
+    }
+
+    public void setIssuetype(final String issuetype)
+    {
+        this.issuetype = issuetype;
+    }
 }

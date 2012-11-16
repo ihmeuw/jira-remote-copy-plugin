@@ -16,10 +16,10 @@ AJS.toInit(function () {
                 },
 
             initComponents : function(){
-                if(!$('#select-issue-type').length){
+                if(!$('#issuetype').length){
                     return;
                 }
-                $('#select-issue-type').change(copyAdmin.onIssueTypeChange);
+                $('#issuetype').change(copyAdmin.onIssueTypeChange);
 
                 new AJS.MultiSelect({
                     element: $("#groups"),
@@ -36,8 +36,8 @@ AJS.toInit(function () {
                 var fields = $('#cpji-fields');
                 fields.empty();
                 var projectKey = $('#project-key').val();
-                var issueType = $('#select-issue-type :selected').val();
-                $.get(contextPath + '/GetFieldsHtmlAction.jspa?projectKey=' + projectKey + '&selectedIssueTypeId=' + issueType, function (data) {
+                var issueType = $('#issuetype').val();
+                $.get(contextPath + '/GetFieldsHtmlAction.jspa?projectKey=' + projectKey + '&issuetype=' + issueType, function (data) {
                     fields.append($(data));
                     $('.cpji-loading').hide();
                     JIRA.trigger(JIRA.Events.NEW_CONTENT_ADDED, [fields]);

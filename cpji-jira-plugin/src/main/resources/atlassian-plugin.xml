@@ -119,7 +119,7 @@
 	</component-import>
 
 	<web-resource key="admin-js">
-        <dependency>jira.webresources:jira-global</dependency>
+        <dependency>jira.webresources:jira-fields</dependency>
 		<resource type="download" name="admin.js" location="js/admin.js"/>
 		<resource type="download" name="admin.css" location="css/admin.css"/>
 	</web-resource>

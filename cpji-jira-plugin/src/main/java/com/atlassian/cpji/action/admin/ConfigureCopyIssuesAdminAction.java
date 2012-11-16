@@ -11,7 +11,6 @@ import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.screen.FieldScreenRenderer;
-import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.SimpleErrorCollection;
@@ -37,11 +36,10 @@ import javax.annotation.Nullable;
  */
 public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
 {
-    private List<IssueType> issueTypesForProject;
     private UserMappingType userMappingType;
 
-    private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final IssueCreationHelperBean issueCreationHelperBean;
+    private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
@@ -57,7 +55,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
     public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManager defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager)
     {
         super(fieldLayoutItemsRetriever, issueTypeSchemeManager, issueFactory, defaultFieldValuesManager);
-        this.issueTypeSchemeManager = issueTypeSchemeManager;
+        this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.issueCreationHelperBean = issueCreationHelperBean;
         this.groupManager = groupManager;
@@ -130,6 +128,15 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
         return false;
     }
 
+    public String getIssueFieldHtml(){
+
+        FieldLayoutItem layout = fieldLayoutItemsRetriever.getIssueTypeField(getProject());
+        OrderableField field = layout.getOrderableField();
+        field.populateFromParams(getFieldValuesHolder(), ActionContext.getParameters());
+        return field.getEditHtml(layout, this, this, getIssue(), getDisplayParameters());
+
+    }
+
     private void saveFieldValues() throws Exception
     {
         for (FieldLayoutItem fieldLayoutItem : getFieldLayoutItems())
@@ -145,7 +152,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
                 if (!simpleErrorCollection.hasAnyErrors())
                 {
                     configChanges.add(getI18nHelper().getText("cpji.config.default.value", orderableField.getName()));
-                    defaultFieldValuesManager.persistDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueType().getName(), fieldValue);
+                    defaultFieldValuesManager.persistDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName(), fieldValue);
                 }
                 else
                 {
@@ -156,10 +163,10 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
             }
             else
             {
-                if (defaultFieldValuesManager.hasDefaultValue(getProject().getKey(), orderableField.getId(), getIssueType().getName()))
+                if (defaultFieldValuesManager.hasDefaultValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName()))
                 {
                     configChanges.add(getI18nHelper().getText("cpji.config.default.empty.value", orderableField.getName()));
-                    defaultFieldValuesManager.clearDefaultValue(getProject().getKey(), orderableField.getId(), getIssueType().getName());
+                    defaultFieldValuesManager.clearDefaultValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName());
                 }
             }
         }
@@ -241,16 +248,6 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
         return false;
     }
 
-
-    public List<IssueType> getIssueTypesForProject()
-    {
-        issueTypesForProject = Lists.newArrayList(issueTypeSchemeManager.getIssueTypesForProject(getProject()));
-        if (getSelectedIssueTypeId() == null)
-        {
-            setSelectedIssueTypeId(issueTypesForProject.get(0).getId());
-        }
-        return issueTypesForProject;
-    }
 
     public List<UserMappingType> getUserMappingTypes()
     {
