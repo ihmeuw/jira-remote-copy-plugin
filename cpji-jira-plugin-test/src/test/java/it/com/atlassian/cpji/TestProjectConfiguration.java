@@ -1,7 +1,5 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.jira.tests.annotations.JiraBuildNumberDependent;
-import com.atlassian.jira.tests.rules.JiraBuildNumberRule;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.google.common.collect.Iterables;
 import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
@@ -10,7 +8,6 @@ import it.com.atlassian.cpji.pages.PermissionViolationPage;
 import org.hamcrest.Matcher;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
 
@@ -25,9 +22,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestProjectConfiguration extends AbstractCopyIssueTest
 {
-	@Rule
-	public JiraBuildNumberRule jiraBuildNumberRule = new JiraBuildNumberRule(jira1);
-
     @Before
     public void setUp()
     {
@@ -40,7 +34,6 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 		assertThat(adminPage.getRequiredFields(), expectedRequiredFields());
 	}
 
-	@JiraBuildNumberDependent(value = 788)
     @Test
     public void defaultReporterShouldReturnErrorOnInvalidUserAndSaveValidOne() {
         ConfigureCopyIssuesAdminActionPage.AsDialog adminPage = ConfigureCopyIssuesAdminActionPage.AsDialog.open(jira1,

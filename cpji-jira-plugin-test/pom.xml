@@ -50,7 +50,6 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.1.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -76,6 +75,29 @@
 		<dependency>
 			<groupId>com.atlassian.jira.tests</groupId>
 			<artifactId>jira-func-test-basics</artifactId>
+		</dependency>
+		<!-- REST dependencies -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.plugins.rest</groupId>
+			<artifactId>atlassian-rest-common</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.plugins.rest</groupId>
+			<artifactId>atlassian-rest-module</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-rest-java-client</artifactId>
 		</dependency>
 	</dependencies>
     <build>

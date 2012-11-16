@@ -19,10 +19,10 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-core</artifactId>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>com.atlassian.selenium</groupId>
             <artifactId>atlassian-selenium</artifactId>
-        </dependency>
+        </dependency-->
         <!-- REST dependencies-->
         <dependency>
             <groupId>javax.xml.bind</groupId>

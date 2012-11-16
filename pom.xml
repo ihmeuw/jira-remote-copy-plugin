@@ -109,6 +109,21 @@
 				<version>${rest.version}</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+				<groupId>com.atlassian.jira</groupId>
+				<artifactId>jira-rest-java-client</artifactId>
+				<version>1.1-m01</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>stax</groupId>
+						<artifactId>stax-api</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 
 			<!-- Remote Issue Links dependencies -->
 			<!-- TODO, once a newer version of 5.0 is released (e.g. beta3), change this dependency to the jira-view-issue-plugin -->
@@ -164,21 +179,6 @@
 						<groupId>com.sun.jmx</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-rest-java-client</artifactId>
-				<version>1.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>stax</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.fugue</groupId>
@@ -238,13 +238,13 @@
 		<cpji.build.directory>target</cpji.build.directory>
         <aui.qunit.version>0.20</aui.qunit.version>
         <jira.version>5.0.7</jira.version>
-        <jira.compile.version>5.1.8</jira.compile.version>
+        <jira.compile.version>5.0.7</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
         <applinks.version>3.5.6</applinks.version>
 		<testkit.version>5.16</testkit.version>
-		<test-basics.version>1.9.4</test-basics.version>
+		<test-basics.version>1.9.5-SNAPSHOT</test-basics.version>
 		<amps.version>4.0</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
 		<jersey.version>1.8-atlassian-6</jersey.version>
