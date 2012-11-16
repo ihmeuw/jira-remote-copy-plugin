@@ -11,6 +11,9 @@ import com.google.common.collect.Iterables;
  * @since v2.1
  */
 public class JiraLoginPageWithWarnings extends JiraLoginPage {
+	@ElementBy(id = "login-form")
+	protected PageElement loginForm;
+
 	@ElementBy(className = "aui-message", within = "loginForm")
 	protected Iterable<PageElement> messages;
 
