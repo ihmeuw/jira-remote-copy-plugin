@@ -41,6 +41,7 @@ AJS.toInit(function () {
                     fields.append($(data));
                     $('.cpji-loading').hide();
                     JIRA.trigger(JIRA.Events.NEW_CONTENT_ADDED, [fields]);
+                    JIRA.trace("cpji.fields.load.completed");
                 });
             }
     

@@ -11,7 +11,6 @@ import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.webdriver.WebDriverQueryFunctions;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -34,12 +33,8 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
     @ElementBy(id = "cpji-update-button")
 	protected PageElement updateButton;
 
-    @ElementBy(id="reporter-field")
-    protected PageElement reportedField;
-
     @Inject
     private TraceContext traceContext;
-
 
 
 	public ConfigureCopyIssuesAdminActionPage(@Nonnull String projectKey) {
@@ -63,17 +58,8 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 		return pageBinder.bind(ConfigureCopyIssuesAdminActionPage.class, projectKey);
 	}
 
-    public ConfigureCopyIssuesAdminActionPage setReporter(String reporter){
-        Preconditions.checkArgument(reportedField.isPresent(), "Reporter field is not available");
-        reportedField.clear();
-        reportedField.type(reporter);
-        return this;
-
-    }
-
-    public String getReporterText()
-    {
-        return reportedField.getValue();
+    public DefaultValuesFragment getDefaultValues(){
+        return pageBinder.bind(DefaultValuesFragment.class);
     }
 
 

@@ -56,7 +56,9 @@
             <h3>$i18n.getText("cpji.admin.default.values.header")</h3>
             <p>$i18n.getText("cpji.admin.default.values")</p>
             <div id="cpji-required-fields">
-                $action.issueFieldHtml
+                <div id="cpji-issuetype-field">
+                    $action.issueFieldHtml
+                </div>
                 <div id="cpji-fields">
                     #parse("/com/atlassian/cpji/templates/htmlfields.vm")
                 </div>
