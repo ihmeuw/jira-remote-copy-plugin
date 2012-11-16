@@ -100,7 +100,7 @@ public class SingleSelect
 
     public TimedCondition isSuggestionsOpen()
     {
-        return Conditions.and(getActiveLayer().timed().isPresent(), Conditions.forSupplier(timeouts, new Supplier<Boolean>()
+        return Conditions.and(getActiveLayer().timed().isPresent(), Conditions.forSupplier(timeouts.timeoutFor(TimeoutType.AJAX_ACTION), new Supplier<Boolean>()
         {
             @Override
             public Boolean get()

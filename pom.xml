@@ -73,6 +73,11 @@
 				<version>${testkit.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.atlassian.jira.tests</groupId>
+				<artifactId>jira-func-test-basics</artifactId>
+				<version>${test-basics.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>rhino</groupId>
 				<artifactId>js</artifactId>
 				<version>1.7R2.0</version>
@@ -232,13 +237,14 @@
 		<jdkLevel>1.6</jdkLevel>
 		<cpji.build.directory>target</cpji.build.directory>
         <aui.qunit.version>0.20</aui.qunit.version>
-        <jira.version>5.1.8</jira.version>
+        <jira.version>5.0.7</jira.version>
         <jira.compile.version>5.1.8</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
         <applinks.version>3.5.6</applinks.version>
 		<testkit.version>5.16</testkit.version>
+		<test-basics.version>1.9.3</test-basics.version>
 		<amps.version>4.0</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
 		<jersey.version>1.8-atlassian-6</jersey.version>
@@ -277,6 +283,12 @@
 			<id>jira-6</id>
 			<properties>
 				<jira.version>6.0-SNAPSHOT</jira.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>jira-5.0.x</id>
+			<properties>
+				<atlassian.selenium.version>2.1-m14</atlassian.selenium.version>
 			</properties>
 		</profile>
 	</profiles>
