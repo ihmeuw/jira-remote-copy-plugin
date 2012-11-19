@@ -43,7 +43,8 @@
                     #end
                 </select>
                 <div class="description">$i18n.getText("cpji.admin.fields.group.description")</div>
-
+            </div>
+            <div class="field-group">
                 <label for="userMapping">$i18n.getText("cpji.admin.fields.usermapping.name")</label>
                 <select class="select" name="userMapping" id="userMapping">
                     #foreach( $userMapping in $action.getUserMappingTypes() )
