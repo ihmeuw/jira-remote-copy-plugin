@@ -26,15 +26,6 @@
         <url>http://www.atlassian.com</url>
     </organization>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.6</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -322,9 +313,17 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>jira-5.2.x</id>
+			<properties>
+				<jira.version>5.2</jira.version>
+				<testkit.version>5.2-m23</testkit.version>
+			</properties>
+		</profile>
+		<profile>
 			<id>jira-6</id>
 			<properties>
 				<jira.version>6.0-SNAPSHOT</jira.version>
+				<testkit.version>5.2-m23</testkit.version>
 			</properties>
 		</profile>
 		<profile>
