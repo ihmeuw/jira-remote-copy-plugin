@@ -15,12 +15,11 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
-import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.List;
 
 /**
  * @since v2.1
@@ -52,20 +51,18 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 	}
 
 	public ConfigureCopyIssuesAdminActionPage submit() {
-        Tracer checkpoint = traceContext.checkpoint();
+        Tracer checkpoint = TraceContext.checkpoint();
 		updateButton.click();
         traceContext.waitFor(checkpoint, "cpji.load.completed");
 		return pageBinder.bind(ConfigureCopyIssuesAdminActionPage.class, projectKey);
 	}
 
-    public DefaultValuesFragment getDefaultValues(){
+    public DefaultValuesFragment getDefaultValues() {
         return pageBinder.bind(DefaultValuesFragment.class);
     }
 
-
-
-    public boolean hasGeneralErrorsMessage(){
-        return driver.findElement(By.id("cpji-general-errors")).isDisplayed();
+    public boolean hasGeneralErrorsMessage() {
+        return elementFinder.find(By.id("cpji-general-errors")).timed().isVisible().byDefaultTimeout();
     }
 
 	@Override
@@ -86,22 +83,23 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 	}
 
 
-    public List<String> getErrors(){
+    public List<String> getErrors() {
         return ImmutableList.copyOf(Iterables.transform(driver.findElements(By.className("error")), WebDriverQueryFunctions.getText()));
     }
 
-    public List<String> getSuccessMessages(){
-        final List<WebElement> messages = driver.findElements(By.cssSelector("#cpji-general-success li"));
-        return ImmutableList.copyOf(Iterables.transform(messages, WebDriverQueryFunctions.getText()));
+    public List<String> getConfigChanges() {
+		assert elementFinder.find(By.cssSelector("#cpji-general-success #configChanges li")).timed().isVisible().byDefaultTimeout();
+        final List<PageElement> messages = elementFinder.findAll(By.cssSelector("#cpji-general-success #configChanges li"));
+        return ImmutableList.copyOf(Iterables.transform(messages, PageElements.getText()));
     }
 
-    public static class AsDialog extends ConfigureCopyIssuesAdminActionPage{
+    public static class AsDialog extends ConfigureCopyIssuesAdminActionPage {
 
-        public AsDialog(@Nonnull String projectKey){
+        public AsDialog(@Nonnull String projectKey) {
             super(projectKey);
         }
 
-        public static AsDialog open(JiraTestedProduct jira, String projectKey){
+        public static AsDialog open(JiraTestedProduct jira, String projectKey) {
             ProjectSummaryPageTab summary = jira.visit(ProjectSummaryPageTab.class, projectKey);
             final List<PageElement> plugins = summary.openPanel(SettingsPanel.class).getPluginElements();
             PageElement configureLink = Iterables.find(plugins, new Predicate<PageElement>() {
@@ -113,8 +111,7 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
             configureLink.find(By.id("configure_cpji")).click();
             return jira.getPageBinder().bind(AsDialog.class, projectKey);
         }
-
-    }
+	}
 
 
 }

@@ -48,6 +48,10 @@
 			<scope>compile</scope>
         </dependency>
 		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-apache-client</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.1.2</version>

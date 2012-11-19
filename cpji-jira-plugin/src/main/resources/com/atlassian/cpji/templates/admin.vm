@@ -14,7 +14,7 @@
                 <div class="aui-message success" id="cpji-general-success">
                     <p>$i18n.getText("cpji.admin.successful.saved")</p>
                     #if ($action.hasConfigChanges())
-                    <ul>
+                    <ul id="configChanges">
                         #foreach( $change in $action.getConfigChanges() )
                             <li>$change</li>
                         #end

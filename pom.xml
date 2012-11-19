@@ -48,6 +48,18 @@
 				<artifactId>atlassian-jira-pageobjects</artifactId>
 				<version>${jira.version}</version>
 				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey.contribs</groupId>
+						<artifactId>jersey-apache-client</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey.contribs</groupId>
+				<artifactId>jersey-apache-client</artifactId>
+				<version>1.8-atlassian-1</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
@@ -71,6 +83,12 @@
 				<groupId>com.atlassian.jira.tests</groupId>
 				<artifactId>jira-testkit-client</artifactId>
 				<version>${testkit.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey.contribs</groupId>
+						<artifactId>jersey-apache-client</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira.tests</groupId>
@@ -119,8 +137,32 @@
 						<artifactId>jersey-core</artifactId>
 					</exclusion>
 					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-client</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey.contribs</groupId>
+						<artifactId>jersey-multipart</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey.oauth</groupId>
+						<artifactId>oauth-client</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey.oauth</groupId>
+						<artifactId>oauth-signature</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey.contribs</groupId>
+						<artifactId>jersey-apache-client</artifactId>
+					</exclusion>
+					<exclusion>
 						<groupId>stax</groupId>
 						<artifactId>stax-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.guava</groupId>
+						<artifactId>guava</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
