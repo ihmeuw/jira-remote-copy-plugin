@@ -15,6 +15,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.openqa.selenium.By;
 
@@ -57,7 +58,7 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 		try {
 			final Scriptable scope = cx.initStandardObjects();
 			scope.put("traceContext", scope, new TraceContext());
-			Tracer checkpoint = (Tracer) cx.evaluateString(scope, "traceContext.checkpoint();", "js", 1, null);
+			Tracer checkpoint = (Tracer) ((NativeJavaObject) cx.evaluateString(scope, "traceContext.checkpoint();", "js", 1, null)).unwrap();
 			updateButton.click();
 			traceContext.waitFor(checkpoint, "cpji.load.completed");
 		} finally {

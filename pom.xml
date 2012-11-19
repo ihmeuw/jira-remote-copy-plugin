@@ -145,11 +145,11 @@
 						<artifactId>jersey-multipart</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>com.sun.jersey.oauth</groupId>
+						<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
 						<artifactId>oauth-client</artifactId>
 					</exclusion>
 					<exclusion>
-						<groupId>com.sun.jersey.oauth</groupId>
+						<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
 						<artifactId>oauth-signature</artifactId>
 					</exclusion>
 					<exclusion>
