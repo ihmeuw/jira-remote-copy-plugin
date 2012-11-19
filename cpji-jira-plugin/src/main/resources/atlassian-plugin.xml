@@ -87,6 +87,7 @@
 			<action name="com.atlassian.cpji.action.admin.GetFieldsHtmlAction" alias="GetFieldsHtmlAction">
 				<view name="success">/com/atlassian/cpji/templates/htmlfields.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
+                <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
 			</action>
 		</actions>
 	</webwork1>
