@@ -14,14 +14,14 @@ import com.atlassian.pageobjects.elements.query.webdriver.WebDriverQueryFunction
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.NativeJavaObject;
-import org.mozilla.javascript.Scriptable;
 import org.openqa.selenium.By;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -54,16 +54,24 @@ public class ConfigureCopyIssuesAdminActionPage extends AbstractJiraPage {
 	}
 
 	public ConfigureCopyIssuesAdminActionPage submit() {
-		final Context cx = Context.enter();
+		Tracer checkpoint;
 		try {
-			final Scriptable scope = cx.initStandardObjects();
-			scope.put("traceContext", scope, new TraceContext());
-			Tracer checkpoint = (Tracer) ((NativeJavaObject) cx.evaluateString(scope, "traceContext.checkpoint();", "js", 1, null)).unwrap();
-			updateButton.click();
-			traceContext.waitFor(checkpoint, "cpji.load.completed");
-		} finally {
-			cx.exit();
+			Method getCheckpoint = TraceContext.class.getMethod("checkpoint");
+			if (Modifier.isStatic(getCheckpoint.getModifiers())) {
+				checkpoint = (Tracer) getCheckpoint.invoke(null);
+			} else {
+				checkpoint = (Tracer) getCheckpoint.invoke(traceContext);
+			}
+		} catch (NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
 		}
+
+		updateButton.click();
+		traceContext.waitFor(checkpoint, "cpji.load.completed");
 		return pageBinder.bind(ConfigureCopyIssuesAdminActionPage.class, projectKey);
 	}
 

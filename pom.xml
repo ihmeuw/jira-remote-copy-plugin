@@ -333,6 +333,12 @@
 				<atlassian.selenium.version>2.1-m14</atlassian.selenium.version>
 			</properties>
 		</profile>
+		<profile>
+			<id>jira-5.1.x</id>
+			<properties>
+				<jira.version>5.1.8</jira.version>
+			</properties>
+		</profile>
 	</profiles>
 
     <scm>
