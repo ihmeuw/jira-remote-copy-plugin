@@ -2,7 +2,7 @@
     <p>An error occurred.</p>
     <ul>
     #foreach( $error in $action.getErrorMessages() )
-        <li>$error</li>
+        <li>$textutils.htmlEncode($error)</li>
     #end
     </ul>
 </div>

@@ -16,7 +16,7 @@
                     #if ($action.hasConfigChanges())
                     <ul id="configChanges">
                         #foreach( $change in $action.getConfigChanges() )
-                            <li>$change</li>
+                            <li>$textutils.htmlEncode($change)</li>
                         #end
                     </ul>
                     #end
@@ -28,7 +28,7 @@
                     #if ($action.hasErrorMessages)
                         <ul>
                             #foreach( $error in $action.errorMessages )
-                                <li>$error</li>
+                                <li>$textutils.htmlEncode($error)</li>
                             #end
                         </ul>
                     #end
@@ -39,7 +39,7 @@
                 <label for="groups">$i18n.getText("cpji.admin.fields.groups.name")</label>
                 <select class="hidden" name="groups" id="groups" multiple="multiple">
                     #foreach( $group in $action.groups )
-                        <option value="$group.getName()"  #if($action.isGroupSelected($group)) selected="" #end>$group.getName()</option>
+                        <option value="$textutils.htmlEncode($group.getName())"  #if($action.isGroupSelected($group)) selected="" #end>$textutils.htmlEncode($group.getName())</option>
                     #end
                 </select>
                 <div class="description">$i18n.getText("cpji.admin.fields.group.description")</div>

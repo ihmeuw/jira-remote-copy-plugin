@@ -20,7 +20,7 @@
                     <label for="issueType">Issue Type</label>
                     <select name="issueType" id="issueType">
                         #foreach( $issueType in $action.getAvailableIssueTypes())
-                            <option #if(${issueType.isSelected()}) selected #end  value="${issueType.value}">${issueType.value}</option>
+                            <option #if(${issueType.isSelected()}) selected #end  value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
                         #end
                     </select>
                 </div>
@@ -29,11 +29,11 @@
             <fieldset>
                 <div class="field-group">
                     <label>User name</label>
-                    <span class="field-value">$action.getRemoteUserName()</span>
+                    <span class="field-value">$textutils.htmlEncode($action.getRemoteUserName())</span>
                 </div>
                 <div class="field-group">
                     <label>User Full Name</label>
-                    <span class="field-value">$action.getRemoteFullUserName()</span>
+                    <span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName())</span>
                 </div>
             </fieldset>
 
@@ -74,7 +74,7 @@
 					<label for="remoteIssueLink">Create Issue Link</label>
 					<select name="remoteIssueLink" id="remoteIssueLink">
 						#foreach( $issueLink in $action.getIssueLinkOptions())
-							<option value="${issueLink.value}">${issueLink.label}</option>
+							<option value="$textutils.htmlEncode(${issueLink.value})">$textutils.htmlEncode(${issueLink.label})</option>
 						#end
 					</select>
 				</div>
@@ -87,7 +87,7 @@
             </div>
             <input type="hidden" name="id" value="$action.id"/>
             <input type="hidden" name="atl_token" value="$action.xsrfToken"/>
-            <input type="hidden" name="targetEntityLink" value="$action.targetEntityLink"/>
+            <input type="hidden" name="targetEntityLink" value="$textutils.htmlEncode($action.targetEntityLink)"/>
         </form>
     </div>
 </div>

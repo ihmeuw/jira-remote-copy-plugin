@@ -19,10 +19,10 @@
             <div class="aui-message error"><span class="aui-icon icon-error"></span><p>Can't copy the issue, because of the following fields.</p>
                <ul>
                  #foreach( $permission in $action.getSystemFieldPermissions() )
-                   #if (!$permission.canCopyIssue())<li>$permission.fieldName</li>#end
+                   #if (!$permission.canCopyIssue())<li>$textutils.htmlEncode($permission.fieldName)</li>#end
                 #end
                 #foreach( $permission in $action.getCustomFieldPermissions() )
-                    #if (!$permission.canCopyIssue())<li>$permission.fieldName</li>#end
+                    #if (!$permission.canCopyIssue())<li>$textutils.htmlEncode($permission.fieldName)</li>#end
                 #end
                </ul>
             </div>
@@ -30,10 +30,10 @@
             <div class="aui-message warning"><span class="aui-icon icon-warning"></span><p>The issue can be copied, but there are warnings related to the values of the following fields.</p>
                 <ul>
                 #foreach( $permission in $action.getSystemFieldPermissions() )
-                   <li>$permission.fieldName</li>
+                   <li>$textutils.htmlEncode($permission.fieldName)</li>
                 #end
                 #foreach( $permission in $action.getCustomFieldPermissions() )
-                   <li>$permission.fieldName</li>
+                   <li>$textutils.htmlEncode($permission.fieldName)</li>
                 #end
                 </ul>
             </div>
@@ -52,8 +52,8 @@
                 <tbody>
                     #foreach( $permission in $action.getSystemFieldPermissions() )
                         <tr>
-                            <td headers="system-field-id" #if (!$permission.canCopyIssue()) class="status-inactive" #end>$permission.fieldName</td>
-                            <td headers="system-field-permission"> $permission.getValidationMessage() </td>
+                            <td headers="system-field-id" #if (!$permission.canCopyIssue()) class="status-inactive" #end>$textutils.htmlEncode($permission.fieldName)</td>
+                            <td headers="system-field-permission"> $textutils.htmlEncode($permission.getValidationMessage()) </td>
                         </tr>
                     #end
                 </tbody>
@@ -73,8 +73,8 @@
                 <tbody>
                     #foreach( $permission in $action.getCustomFieldPermissions() )
                         <tr>
-                            <td headers="custom-field-id" #if (!$permission.canCopyIssue()) class="status-inactive" #end>$permission.fieldName</td>
-                            <td headers="custom-field-permission"> $permission.getValidationMessage()</td>
+                            <td headers="custom-field-id" #if (!$permission.canCopyIssue()) class="status-inactive" #end>$textutils.htmlEncode($permission.fieldName)</td>
+                            <td headers="custom-field-permission">$textutils.htmlEncode($permission.getValidationMessage())</td>
                         </tr>
                     #end
                 </tbody>
@@ -91,11 +91,11 @@
             </div>
             <input type="hidden" name="atl_token" value="$action.getXsrfToken()"/>
             <input type="hidden" name="id" value="$action.getId()"/>
-            <input type="hidden" name="targetEntityLink" value="$action.targetEntityLink"/>
-            <input type="hidden" name="issueType" value="$action.getIssueType()"/>
+            <input type="hidden" name="targetEntityLink" value="$textutils.htmlEncode($action.targetEntityLink)"/>
+            <input type="hidden" name="issueType" value="$textutils.htmlEncode($action.getIssueType())"/>
             <input type="hidden" name="copyAttachments" value="$action.copyAttachments()"/>
             <input type="hidden" name="copyIssueLinks" value="$action.copyIssueLinks()"/>
-            <input type="hidden" name="remoteIssueLink" value="$action.remoteIssueLink()"/>
+            <input type="hidden" name="remoteIssueLink" value="$textutils.htmlEncode($action.remoteIssueLink())"/>
         </form>
     </div>
 </div>

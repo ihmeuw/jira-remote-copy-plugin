@@ -1,3 +1,4 @@
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.CopyIssueToInstanceAction" *#
 <html>
 <body>
 
@@ -19,7 +20,7 @@
              <p>There were some problems during issue creation.</p>
              <ul>
                 #foreach( $error in $action.getErrorMessages() )
-                  <li>$error</li>
+                  <li>$textutils.htmlEncode($error)</li>
                 #end
              </ul>
             </div>
