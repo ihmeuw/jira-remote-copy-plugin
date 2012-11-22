@@ -46,12 +46,17 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	}
 
 	public SelectTargetProjectPage setDestinationProject(@Nonnull String name) {
-		elementFinder.find(By.id("targetEntityLink-single-select"), TimeoutType.SLOW_PAGE_LOAD).timed().isPresent().byDefaultTimeout();
-		if(entitySelection.type(name).isSuggestionsOpen().by(5)) {
+        waitForDestinationProjectField();
+        if(entitySelection.type(name).isSuggestionsOpen().by(5)) {
 			entitySelection.clickSuggestion();
 		}
 		return this;
 	}
+
+    public void waitForDestinationProjectField()
+    {
+        elementFinder.find(By.id("targetEntityLink-single-select"), TimeoutType.SLOW_PAGE_LOAD).timed().isPresent().byDefaultTimeout();
+    }
 
     @Override
     public TimedCondition isAt()
@@ -68,6 +73,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 
     public CopyDetailsPage next()
     {
+        waitForDestinationProjectField();
         final String targetEntityLink = entitySelection.getValue();
         nextButton.click();
         return pageBinder.bind(CopyDetailsPage.class, issueId, targetEntityLink);
