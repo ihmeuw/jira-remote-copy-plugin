@@ -129,11 +129,5 @@
         <resource type="download" name="copyissue.js" location="js/copyissue.js"/>
     </web-resource>
 
-    <resource type="qunit" name="js/admin-tests.js" location="js/admin-tests.js"/>
-
-    <web-resource key="ajs-test-walkaround">
-        <resource type="download" name="ajstest.js" location="js/qunit-result-collector.js"/>
-    </web-resource>
-
 
 </atlassian-plugin>

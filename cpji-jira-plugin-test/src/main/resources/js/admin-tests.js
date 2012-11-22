@@ -1,4 +1,4 @@
-AJS.test.require("com.atlassian.cpji.cpji-jira-plugin:ajs-test-walkaround");
+AJS.test.require("com.atlassian.cpji.cpji-jira-plugin-test:ajs-test-walkaround");
 AJS.test.require("com.atlassian.cpji.cpji-jira-plugin:admin-js");
 
 var generalTools = {

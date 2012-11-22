@@ -10,6 +10,8 @@
     <artifactId>cpji-jira-plugin-test</artifactId>
     <name>Remote copying of issues - Integration Tests</name>
     <description>Tests for copying issues between remote JIRA instances</description>
+    <packaging>atlassian-plugin</packaging>
+
     <dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

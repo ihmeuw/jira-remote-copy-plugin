@@ -1,0 +1,16 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
+	</plugin-info>
+
+
+    <resource type="qunit" name="js/admin-tests.js" location="js/admin-tests.js"/>
+
+    <web-resource key="ajs-test-walkaround">
+        <resource type="download" name="ajstest.js" location="js/qunit-result-collector.js"/>
+    </web-resource>
+
+
+</atlassian-plugin>
