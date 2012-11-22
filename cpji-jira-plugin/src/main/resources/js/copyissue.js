@@ -63,12 +63,12 @@ AJS.$(function($){
         },
 
         onValueSelected : function (item) {
-            copyIssue.settings.submitButton.prop("disabled", false);
+            copyIssue.settings.submitButton.attr("disabled", false);
             copyIssue.settings.submitButton.attr("aria-disabled", false);
         },
 
         onValueUnselected : function (item) {
-            copyIssue.settings.submitButton.prop("disabled", true);
+            copyIssue.settings.submitButton.attr("disabled", true);
             copyIssue.settings.submitButton.attr("aria-disabled", true);
         }
 

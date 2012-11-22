@@ -1,3 +1,4 @@
+AJS.test.require("com.atlassian.cpji.cpji-jira-plugin:ajs-test-walkaround");
 AJS.test.require("com.atlassian.cpji.cpji-jira-plugin:admin-js");
 
 var generalTools = {
@@ -41,7 +42,7 @@ module("initComponents", {
     setup:function ()
     {
         generalTools.init.call(this);
-        this.fixture.append("<select id='select-issue-type'><option>a</option><option>b</option></select>");
+        this.fixture.append("<select id='issuetype'><option>a</option><option>b</option></select>");
         this.fixture.append("<select id='groups'><option>a</option><option>b</option></select>");
         sinon.stub(this.put, "onIssueTypeChange");
         sinon.stub(AJS, "MultiSelect");
@@ -60,7 +61,7 @@ test("initialization", function ()
 
     ok(AJS.MultiSelect.calledOnce, "MutliSelect is initialized")
     var selectArgs = AJS.MultiSelect.firstCall.args[0];
-    equal(selectArgs.element.get(0), jQuery("#groups", this.fixture).get(0), "MultiSelect uses group field");
+    equal(selectArgs.element.html(), jQuery("#groups", this.fixture).html(), "MultiSelect uses group field");
     equal(selectArgs.itemAttrDisplayed, "label", "MultiSelect displays labels");
 });
 
@@ -69,7 +70,7 @@ test("Reacting for issue type change", function()
 {
     this.put.initComponents();
 
-    var obj = jQuery("#select-issue-type", this.fixture);
+    var obj = jQuery("#issuetype", this.fixture);
     obj.change();
     ok(this.put.onIssueTypeChange.calledOnce, "issue type field onChange was called");
 });
@@ -80,7 +81,7 @@ module("onIssueTypeChange", {
         generalTools.init.call(this);
         var markup = '<div class="cpji-loading" style="display: none;">loader</div>'
                 + '<div id="cpji-fields">fields</div>'
-                + '<select id="select-issue-type"><option selected="selected" value="MY_SELECTED_KEY">a</option><option value="NOTSEL">b</option></select>'
+                + '<select id="issuetype"><option selected="selected" value="MY_SELECTED_KEY">a</option><option value="NOTSEL">b</option></select>'
                 + '<input type="hidden" id="project-key" value="PROJECT_KEY"/>';
         this.fixture.append(markup);
         sinon.stub(jQuery, "get");
@@ -100,7 +101,7 @@ test("General", function(){
 
     var args = jQuery.get.firstCall.args;
     var key = "projectKey=PROJECT_KEY";
-    var issueType = "selectedIssueTypeId=MY_SELECTED_KEY"
+    var issueType = "issuetype=MY_SELECTED_KEY"
     notEqual(args[0].indexOf(key), -1, "Query string contains project key");
     notEqual(args[0].indexOf(issueType), -1, "Query string contains issue type");
 });
@@ -119,7 +120,7 @@ test("AJAX Result", function(){
     ok(JIRA.trigger.firstCall.calledWith(JIRA.Events.NEW_CONTENT_ADDED), "NEW_CONTENT_ADDED event was triggered");
 
     var eventArgs = JIRA.trigger.firstCall.args[1];
-    equal(eventArgs[0].get(0), fields.get(0), "... with our fields elemenet as context");
+    equal(eventArgs[0].html(), fields.html(), "... with our fields elemenet as context");
 
     JIRA.trigger.restore();
 });
