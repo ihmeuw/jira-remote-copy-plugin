@@ -96,9 +96,7 @@ public class ProjectResource {
 
     @GET
     @Path("destination")
-    public Response getApplicableProjects(){
-        //TODO error handling unsuccesful responses?
-
+    public Response getApplicableProjects() {
         return Response.ok(Lists.newArrayList(Iterables.transform(Either.allRight(remoteJiraService.getProjects()),
                 new ProjectsToProjectGroupBean()))).build();
     }

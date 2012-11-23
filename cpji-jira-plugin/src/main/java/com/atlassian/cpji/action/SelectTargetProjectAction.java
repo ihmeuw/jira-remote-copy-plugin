@@ -9,35 +9,24 @@ import com.atlassian.applinks.api.AuthorisationURIGenerator;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.Projects;
 import com.atlassian.cpji.components.RemoteJiraService;
 import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.PluginInfoResource;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
-import com.atlassian.jira.util.lang.Pair;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 import org.apache.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.Comparator;
-import java.util.Map;
 
 /**
  * @since v1.2
@@ -48,7 +37,6 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     public static final String AUTHORIZE = "authorize";
 	private final InternalHostApplication hostApplication;
 	private final RemoteJiraService remoteJiraService;
-    private final WebResourceManager webResourceManager;
 
 	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
     private String authorizationUrl;
@@ -71,7 +59,6 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
 		this.hostApplication = hostApplication;
 		this.remoteJiraService = remoteJiraService;
-        this.webResourceManager = webResourceManager;
         webResourceManager.requireResource(PLUGIN_KEY + ":copyissue-js");
 	}
 
@@ -164,31 +151,6 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         authorizationUrl = uriGenerator.getAuthorisationURI(URI.create(url)).toString();
         return AUTHORIZE;
     }
-
-
-	public ImmutableList<Map.Entry<String, String>> getAvailableDestinationProjects() {
-		final Iterable<Map.Entry<String, String>> projects = ImmutableList.of();
-		for(final Projects remoteProjects : Either.allRight(remoteJiraService.getProjects())) {
-			Iterables.concat(projects, Iterables.transform(remoteProjects.getResult(),
-					new Function<BasicProject, Pair>() {
-						@Override
-						public Pair apply(@Nullable BasicProject basicProject) {
-							return Pair
-									.of(remoteProjects.getApplicationLink().getId().get() + "|" + basicProject.getKey(),
-											String.format("(%s) %s (%s)", remoteProjects.getApplicationLink().getName(),
-													basicProject.getName(),
-													basicProject.getKey()));
-						}
-					}));
-		}
-
-		return Ordering.from(new Comparator<Map.Entry<String,String>>() {
-			@Override
-			public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
-				return o1.getValue().compareTo(o2.getValue());
-			}
-		}).immutableSortedCopy(projects);
-	}
 
     public String getAuthorizationUrl()
     {

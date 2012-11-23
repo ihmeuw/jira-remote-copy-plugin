@@ -1,6 +1,10 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.applinks.api.ApplicationLink;
+import com.google.common.base.Predicate;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
 * TODO: Document this class / interface here
@@ -51,5 +55,15 @@ public class ResponseStatus
 
 	public static ResponseStatus authorizationRequired(ApplicationLink applicationLink) {
 		return new ResponseStatus(applicationLink, Status.AUTHORIZATION_REQUIRED);
+	}
+
+	@Nonnull
+	public static Predicate<ResponseStatus> hasApplicationLink() {
+		return new Predicate<ResponseStatus>() {
+			@Override
+			public boolean apply(@Nullable ResponseStatus input) {
+				return input.getApplicationLink() != null;
+			}
+		};
 	}
 }
