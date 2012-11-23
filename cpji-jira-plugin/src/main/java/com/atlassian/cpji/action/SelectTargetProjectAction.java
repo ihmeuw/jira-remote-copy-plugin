@@ -15,6 +15,7 @@ import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.PluginInfoResource;
+import com.atlassian.cpji.rest.RemotesResource;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -25,8 +26,6 @@ import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 import org.apache.log4j.Logger;
-
-import java.net.URI;
 
 /**
  * @since v1.2
@@ -147,8 +146,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 
     private String generateAuthorizationUrl(AuthorisationURIGenerator uriGenerator) throws Exception
     {
-        String url = hostApplication.getBaseUrl() + "/secure/SelectTargetProjectAction!default.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink;
-        authorizationUrl = uriGenerator.getAuthorisationURI(URI.create(url)).toString();
+        authorizationUrl = RemotesResource.generateAuthorizationUrl(hostApplication, uriGenerator, Long.toString(id));
         return AUTHORIZE;
     }
 

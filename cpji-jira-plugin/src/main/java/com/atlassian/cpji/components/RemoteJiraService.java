@@ -202,6 +202,12 @@ public class RemoteJiraService {
 			ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, path);
 			return (Either<ResponseStatus, T>) request.execute(handler);
 		}
+		catch (NullPointerException e) {
+			if (StringUtils.contains(e.getMessage(), "You have to be logged in to use oauth authentication.")) {
+				return Either.left(ResponseStatus.authorizationRequired(applicationLink));
+			}
+			throw e;
+		}
 		catch (CredentialsRequiredException ex)
 		{
 			return Either.left(ResponseStatus.authorizationRequired(applicationLink));
@@ -237,6 +243,10 @@ public class RemoteJiraService {
 			if (response.getStatusCode() == 401)
 			{
 				return Either.left(ResponseStatus.authenticationFailed(applicationLink));
+			}
+			if (response.getStatusCode() == 404)
+			{
+				return Either.left(ResponseStatus.pluginNotInstalled(applicationLink));
 			}
 			try {
 				return Either.right(parseResponse(response));

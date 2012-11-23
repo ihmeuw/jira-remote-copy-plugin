@@ -24,7 +24,7 @@ AJS.$(function($){
         },
 
         getProjects : function(){
-            $.getJSON(copyIssue.settings.contextPath + "/rest/copyissue/1.0/project/destination", copyIssue.getProjectsSuccess);
+            $.getJSON(copyIssue.settings.contextPath + "/rest/copyissue/1.0/remotes/availableDestinations", copyIssue.getProjectsSuccess);
         },
 
         convertGroupToOptgroup : function(json){
@@ -43,10 +43,12 @@ AJS.$(function($){
 
 
         getProjectsSuccess : function(data){
-            for(var server in data){
-                var serverElem = copyIssue.convertGroupToOptgroup(data[server]);
-                copyIssue.settings.projectsSelect.append(serverElem);
-            }
+			if (data.projects) {
+				for(var server in data.projects) {
+					var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
+					copyIssue.settings.projectsSelect.append(serverElem);
+				}
+			}
             copyIssue.toggleLoadingState(false);
             copyIssue.prepareSelect();
 
