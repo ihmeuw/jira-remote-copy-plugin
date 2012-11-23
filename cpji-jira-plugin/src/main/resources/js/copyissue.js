@@ -24,43 +24,47 @@ AJS.$(function($){
         },
 
         getProjects : function(){
-            $.getJSON(copyIssue.settings.contextPath + "/rest/copyissue/1.0/remotes/availableDestinations", copyIssue.getProjectsSuccess);
+            JIRA.SmartAjax.makeRequest({
+				url: (copyIssue.settings.contextPath + "/rest/copyissue/1.0/remotes/availableDestinations"),
+				success: copyIssue.getProjectsSuccess
+			});
         },
 
-        convertGroupToOptgroup : function(json){
+        convertGroupToOptgroup : function(json) {
             var elem = $("<optgroup></optgroup>");
             elem.attr('label', json.name);
 
-            for(var i in json.projects){
+            for(var i in json.projects) {
                 var project = json.projects[i];
                 var projElem = $("<option></option>");
-                projElem.attr('value', json.id + "|" + project.key);
+                projElem.attr('value', AJS.escapeHtml(json.id + "|" + project.key));
                 projElem.text(project.name + " (" + project.key + ")");
                 elem.append(projElem);
             }
             return elem;
         },
 
-
-        getProjectsSuccess : function(data){
+        getProjectsSuccess : function(data) {
 			if (data.projects) {
 				for(var server in data.projects) {
 					var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
 					copyIssue.settings.projectsSelect.append(serverElem);
 				}
 			}
+			if (data.failures) {
+
+			}
             copyIssue.toggleLoadingState(false);
             copyIssue.prepareSelect();
-
-
         },
-        prepareSelect : function(){
+
+        prepareSelect : function() {
             copyIssue.singleSelect = new AJS.SingleSelect({
                 element: copyIssue.settings.projectsSelect,
                 showDropdownButton: true,
                 itemAttrDisplayed: "label"
             });
-            copyIssue.settings.projectsSelect.bind("selected", copyIssue.onValueSelected);
+            copyIssue.settings.projectsSelect.bind("selected", copywwIssue.onValueSelected);
             copyIssue.settings.projectsSelect.bind("unselect", copyIssue.onValueUnselected);
         },
 
