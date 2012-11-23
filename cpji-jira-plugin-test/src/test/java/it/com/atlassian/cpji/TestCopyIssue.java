@@ -69,6 +69,28 @@ public class TestCopyIssue extends AbstractCopyIssueTest
     }
 
     @Test
+    public void testAttachmentsCopying() throws Exception{
+        final String remoteIssueKey = remoteCopy(jira1, "NEL-4", 10400L);
+
+        final JSONObject json = getIssueJson(jira2, remoteIssueKey);
+        final JSONObject fields = json.getJSONObject("fields");
+        final JSONArray attachments = fields.getJSONArray("attachment");
+
+        final JSONObject document = attachments.getJSONObject(0);
+        checkAttachment(document, "document.doc", 9216, "application/msword; charset=ISO-8859-1");
+
+        final JSONObject screenshot = attachments.getJSONObject(1);
+        checkAttachment(screenshot, "screenshot.png", 36743, "image/png; charset=ISO-8859-1");
+
+    }
+
+    private void checkAttachment(JSONObject attachment, String filename, int size, String mimeType) throws Exception{
+        assertEquals(filename, attachment.getString("filename"));
+        assertEquals(size, attachment.getInt("size"));
+        assertEquals(mimeType, attachment.getString("mimeType"));
+    }
+
+    @Test
     public void testWithoutCustomFields() throws Exception
     {
         final String remoteIssueKey = remoteCopy(jira1, "TST-2", 10100L);

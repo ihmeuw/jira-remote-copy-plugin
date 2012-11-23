@@ -207,5 +207,6 @@
     <properties>
         <!-- Whether the tests should be run detached from the current screen -->
         <xvfb.enable>true</xvfb.enable>
+        <jira.qunit.testoutput.location>${project.basedir}/target/test-results</jira.qunit.testoutput.location>
     </properties>
 </project>
