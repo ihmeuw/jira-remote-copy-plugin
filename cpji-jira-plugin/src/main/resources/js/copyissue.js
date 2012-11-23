@@ -64,7 +64,7 @@ AJS.$(function($){
                 showDropdownButton: true,
                 itemAttrDisplayed: "label"
             });
-            copyIssue.settings.projectsSelect.bind("selected", copywwIssue.onValueSelected);
+            copyIssue.settings.projectsSelect.bind("selected", copyIssue.onValueSelected);
             copyIssue.settings.projectsSelect.bind("unselect", copyIssue.onValueUnselected);
         },
 
