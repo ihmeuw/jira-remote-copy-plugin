@@ -37,7 +37,7 @@ AJS.$(function($){
             for(var i in json.projects) {
                 var project = json.projects[i];
                 var projElem = $("<option></option>");
-                projElem.attr('value', AJS.escapeHtml(json.id + "|" + project.key));
+                projElem.attr('value', json.id + "|" + project.key);
                 projElem.text(project.name + " (" + project.key + ")");
                 elem.append(projElem);
             }
