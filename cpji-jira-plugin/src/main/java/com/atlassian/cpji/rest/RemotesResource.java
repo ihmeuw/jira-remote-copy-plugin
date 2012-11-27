@@ -9,6 +9,7 @@ import com.atlassian.cpji.rest.model.RemotePluginBean;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -50,7 +51,7 @@ public class RemotesResource {
 	}
 
 	@Nullable
-	public static String generateAuthorizationUrl(InternalHostApplication hostApplication, AuthorisationURIGenerator uriGenerator, String issueId)
+	public static String generateAuthorizationUrl(@Nonnull InternalHostApplication hostApplication, @Nonnull AuthorisationURIGenerator uriGenerator, @Nonnull String issueId)
 	{
 		final String url = hostApplication.getBaseUrl() + "/secure/SelectTargetProjectAction!default.jspa?id=" + issueId;
 		final URI authorisationUri = uriGenerator.getAuthorisationURI(URI.create(url));
@@ -60,7 +61,8 @@ public class RemotesResource {
 	@GET
 	@Path("availableDestinations")
 	public Response getAvailableDestinationProjects(@QueryParam("issueId") final String issueId) {
-		return Response.ok(AvailableProjectsBean.create(hostApplication, issueId, remoteJiraService.getProjects())).build();
+		return Response.ok(AvailableProjectsBean.create(hostApplication, issueId,
+				remoteJiraService.getProjects())).build();
 	}
 
 }

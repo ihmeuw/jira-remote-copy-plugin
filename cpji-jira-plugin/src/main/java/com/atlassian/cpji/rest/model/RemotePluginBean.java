@@ -23,7 +23,7 @@ public class RemotePluginBean {
 	@XmlElement
 	private final String authorisationUrl;
 
-	public static RemotePluginBean create(ResponseStatus input, InternalHostApplication hostApplication, String issueId) {
+	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull InternalHostApplication hostApplication, @Nonnull String issueId) {
 		return new RemotePluginBean(input.getApplicationLink().getName(), input.getStatus().toString(),
 				RemotesResource.generateAuthorizationUrl(hostApplication,
 						input.getApplicationLink().createAuthenticatedRequestFactory(), issueId));

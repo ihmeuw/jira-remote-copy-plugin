@@ -25,7 +25,7 @@ AJS.$(function($){
 
         getProjects : function(){
             JIRA.SmartAjax.makeRequest({
-				url: (copyIssue.settings.contextPath + "/rest/copyissue/1.0/remotes/availableDestinations"),
+				url: (copyIssue.settings.contextPath + "/rest/copyissue/1.0/remotes/availableDestinations?issueId=" + AJS.$("input[name=id]").val()),
 				success: copyIssue.getProjectsSuccess
 			});
         },
