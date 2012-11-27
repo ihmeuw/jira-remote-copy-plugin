@@ -45,14 +45,16 @@ AJS.$(function($){
         },
 
         getProjectsSuccess : function(data) {
+			copyIssue.settings.container.find(".description").remove();
 			if (data.projects) {
 				for(var server in data.projects) {
 					var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
 					copyIssue.settings.projectsSelect.append(serverElem);
 				}
 			}
-			if (data.failures) {
-
+			if (data.failures && Object.keys(data.failures).length > 0) {
+				copyIssue.settings.container.append(AJS.$("<div class='description'></div>")
+						.append(RIC.Templates.remoteDestinationsNotAvailable(data.failures)));
 			}
             copyIssue.toggleLoadingState(false);
             copyIssue.prepareSelect();
@@ -81,6 +83,7 @@ AJS.$(function($){
     }
 
     copyIssue.initSelectProject({
+		container: $("#targetEntityLink-container"),
         projectsSelect: $("#targetEntityLink"),
         loader : $("#targetEntityLinkLoader"),
         submitButton : $("#select-project-submit")

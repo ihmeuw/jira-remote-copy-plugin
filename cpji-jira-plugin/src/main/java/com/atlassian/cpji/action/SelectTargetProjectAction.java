@@ -58,7 +58,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
 		this.hostApplication = hostApplication;
 		this.remoteJiraService = remoteJiraService;
-        webResourceManager.requireResource(PLUGIN_KEY + ":copyissue-js");
+        webResourceManager.requireResource(PLUGIN_KEY + ":selectTargetProjectAction");
 	}
 
     @Override

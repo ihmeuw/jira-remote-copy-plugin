@@ -1,0 +1,87 @@
+{namespace RIC.Templates}
+
+/**
+ * @param? authorization
+ * @param? authentication
+ * @param? communication
+ * @param? notInstalled
+ */
+{template .remoteDestinationsNotAvailable}
+		{if $authorization and length($authorization) > 0}
+			{getText('cpji.you.need.to.log.in')}
+			&nbsp;
+			{foreach $server in $authorization}
+				<a href="{$server.authorisationUrl}" title="{$server.name}">{$server.name}</a>
+				{if not isLast($server)}
+				,&nbsp;
+				{/if}
+			{/foreach}
+		{/if}
+		{if ($authentication and length($authentication))
+			or ($communication and length($communication))
+			or ($notInstalled and length($notInstalled))}
+			{call .warningMsg}
+				{param title}
+					{getText('cpji.please.contact.admin')}
+				{/param}
+				{param msg}
+					{if $authentication and length($authentication)}
+						<div>
+						{getText('cpji.authentication.failed')}
+						{call .listServers}
+							{param servers: $authentication /}
+						{/call}
+						</div>
+					{/if}
+					{if $communication and length($communication)}
+						<div>
+						{getText('cpji.communication.failed')}
+						{call .listServers}
+							{param servers: $communication /}
+						{/call}
+						</div>
+					{/if}
+					{if $notInstalled and length($notInstalled)}
+						<div>
+						{getText('cpji.remote.copying.not.installed')}
+						{call .listServers}
+							{param servers: $notInstalled /}
+						{/call}
+						</div>
+					{/if}
+				{/param}
+			{/call}
+		{/if}
+{/template}
+
+/**
+ * @param servers
+ */
+{template .listServers}
+	{foreach $server in $servers}
+		{$server.name}
+		{if not isLast($server)}
+		,&nbsp;
+		{/if}
+	{/foreach}
+{/template}
+
+/**
+* Warning message
+* @param msg
+* @param? closeable
+* @param? title
+*/
+{template .warningMsg}
+<div class="aui-message warning {if $closeable}closeable{/if}">
+	{if $title}
+	<p class="title"><span class="aui-icon icon-warning"></span><strong>{$title}</strong></p>
+	{else}
+    <span class="aui-icon icon-warning"></span>
+    {/if}
+    {$msg|noAutoescape}
+    {if $closeable}
+        <span class="aui-icon icon-close"></span>
+    {/if}
+</div>
+{/template}

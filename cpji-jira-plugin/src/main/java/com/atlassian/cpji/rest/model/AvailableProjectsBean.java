@@ -24,24 +24,17 @@ public class AvailableProjectsBean {
 	@XmlElement
 	private List<ProjectGroupBean> projects;
 	@XmlElement
-	private List<RemotePluginBean> failures;
+	private RemoteFailuresBean failures;
 
-	public AvailableProjectsBean(@Nonnull Iterable<ProjectGroupBean> projects, @Nonnull Iterable<RemotePluginBean> failures) {
+	public AvailableProjectsBean(@Nonnull Iterable<ProjectGroupBean> projects, @Nonnull RemoteFailuresBean failures) {
 		this.projects = ImmutableList.copyOf(projects);
-		this.failures = ImmutableList.copyOf(failures);
+		this.failures = failures;
 	}
 
 	public static AvailableProjectsBean create(@Nonnull final InternalHostApplication hostApplication, @Nonnull final String issueId, @Nonnull Iterable<Either<ResponseStatus, Projects>> projects) {
 		return new AvailableProjectsBean(Iterables.transform(Either.allRight(projects),
 				new ProjectsToProjectGroupBean()),
-				Iterables.transform(Either.allLeft(projects),
-						new Function<ResponseStatus, RemotePluginBean>() {
-							@Override
-							public RemotePluginBean apply(ResponseStatus input) {
-								return RemotePluginBean.create(input, hostApplication, issueId);
-							}
-						}
-				));
+				RemoteFailuresBean.create(hostApplication, issueId, Either.allLeft(projects)));
 	}
 
 	private static class ProjectsToProjectGroupBean implements Function<Projects, ProjectGroupBean> {
@@ -66,7 +59,7 @@ public class AvailableProjectsBean {
 	}
 
 	@Nonnull
-	public Iterable<RemotePluginBean> getFailures() {
+	public RemoteFailuresBean getFailures() {
 		return failures;
 	}
 }
