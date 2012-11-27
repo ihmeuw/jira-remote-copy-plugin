@@ -9,8 +9,11 @@ import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
 import com.atlassian.cpji.action.CopyIssueToInstanceAction;
 import com.atlassian.cpji.rest.PluginInfoResource;
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Either;
+import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.rest.client.internal.json.BasicProjectsJsonParser;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
@@ -39,9 +42,11 @@ public class RemoteJiraService {
 	private static final int THREADS = 5;
 
 	private final ApplicationLinkService applicationLinkService;
+	private final JiraAuthenticationContext authenticationContext;
 
-	public RemoteJiraService(final ApplicationLinkService applicationLinkService) {
+	public RemoteJiraService(final ApplicationLinkService applicationLinkService, final JiraAuthenticationContext authenticationContext) {
 		this.applicationLinkService = applicationLinkService;
+		this.authenticationContext = authenticationContext;
 	}
 
 	/**
@@ -58,10 +63,12 @@ public class RemoteJiraService {
 					@Override
 					public Callable<ResponseStatus> apply(final ApplicationLink applicationLink) {
 						final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
+						final User user = authenticationContext.getLoggedInUser();
 
 						return new Callable<ResponseStatus>() {
 							@Override
 							public ResponseStatus call() throws Exception {
+								ComponentManager.getInstance().getJiraAuthenticationContext().setLoggedInUser(user);
 								return getPluginInfo(applicationLink,  requestFactory);
 							}
 						};
@@ -70,17 +77,18 @@ public class RemoteJiraService {
 		);
 
 		try {
-			return ImmutableList.copyOf(Iterables.transform(es.invokeAll(queries), new Function<Future<ResponseStatus>, ResponseStatus>() {
-				@Override
-				public ResponseStatus apply(@Nullable Future<ResponseStatus> input) {
-					try {
-						return input.get();
-					} catch (Exception e) {
-						log.warn("Failed to execute Application Links request", e);
-						return ResponseStatus.communicationFailed(null);
-					}
-				}
-			}));
+			return ImmutableList.copyOf(
+					Iterables.transform(es.invokeAll(queries), new Function<Future<ResponseStatus>, ResponseStatus>() {
+						@Override
+						public ResponseStatus apply(@Nullable Future<ResponseStatus> input) {
+							try {
+								return input.get();
+							} catch (Exception e) {
+								log.warn("Failed to execute Application Links request", e);
+								return ResponseStatus.communicationFailed(null);
+							}
+						}
+					}));
 		} catch (InterruptedException e) {
 			log.warn("Threads were interrupted during Application Links request", e);
 			return Collections.emptyList();
@@ -147,10 +155,12 @@ public class RemoteJiraService {
 							@Override
 							public Callable<Either<ResponseStatus,Projects>> apply(final ApplicationLink applicationLink) {
 								final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
+								final User user = authenticationContext.getLoggedInUser();
 
 								return new Callable<Either<ResponseStatus, Projects>>() {
 									@Override
 									public Either<ResponseStatus, Projects> call() {
+										ComponentManager.getInstance().getJiraAuthenticationContext().setLoggedInUser(user);
 										return getProjects(applicationLink, requestFactory);
 									}
 								};
@@ -201,12 +211,6 @@ public class RemoteJiraService {
 		try {
 			ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, path);
 			return (Either<ResponseStatus, T>) request.execute(handler);
-		}
-		catch (NullPointerException e) {
-			if (StringUtils.contains(e.getMessage(), "You have to be logged in to use oauth authentication.")) {
-				return Either.left(ResponseStatus.authorizationRequired(applicationLink));
-			}
-			throw e;
 		}
 		catch (CredentialsRequiredException ex)
 		{
