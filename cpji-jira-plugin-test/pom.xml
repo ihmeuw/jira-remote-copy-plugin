@@ -5,7 +5,7 @@
     <parent>
         <artifactId>cpji-jira</artifactId>
         <groupId>com.atlassian.cpji</groupId>
-        <version>2.1-SNAPSHOT</version>
+        <version>3.0-SNAPSHOT</version>
     </parent>
     <artifactId>cpji-jira-plugin-test</artifactId>
     <name>Remote copying of issues - Integration Tests</name>
