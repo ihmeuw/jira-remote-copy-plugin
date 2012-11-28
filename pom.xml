@@ -346,4 +346,18 @@
         <url>https://bitbucket.org/atlassian/jira-remote-copy-plugin</url>
     </scm>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala</id>
+			<name>Scala Tools</name>
+			<url>http://scala-tools.org/repo-releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
 </project>

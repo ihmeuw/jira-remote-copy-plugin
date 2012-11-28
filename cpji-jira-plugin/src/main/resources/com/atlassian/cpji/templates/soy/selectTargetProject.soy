@@ -11,7 +11,7 @@
 			{getText('cpji.you.need.to.log.in')}
 			&nbsp;
 			{foreach $server in $authorization}
-				<a href="{$server.authorisationUrl}" title="{$server.name}">{$server.name}</a>
+				<a href="{$server.authorisationUrl}" title="{$server.applicationName}" data-application-id="{$server.applicationId}">{$server.applicationName}</a>
 				{if not isLast($server)}
 				,&nbsp;
 				{/if}
@@ -59,7 +59,7 @@
  */
 {template .listServers}
 	{foreach $server in $servers}
-		{$server.name}
+		{$server.applicationName}
 		{if not isLast($server)}
 		,&nbsp;
 		{/if}

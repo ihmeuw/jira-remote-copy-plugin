@@ -17,27 +17,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class RemotePluginBean {
 
 	@XmlElement
-	private final String name;
+	private final String applicationName;
+	@XmlElement
+	private final String applicationId;
 	@XmlElement
 	private final String status;
 	@XmlElement
 	private final String authorisationUrl;
 
 	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull InternalHostApplication hostApplication, @Nonnull String issueId) {
-		return new RemotePluginBean(input.getApplicationLink().getName(), input.getStatus().toString(),
+		return new RemotePluginBean(input.getApplicationLink().getName(),
+				input.getApplicationLink().getId().get(),
+				input.getStatus().toString(),
 				RemotesResource.generateAuthorizationUrl(hostApplication,
 						input.getApplicationLink().createAuthenticatedRequestFactory(), issueId));
 	}
 
-	public RemotePluginBean(@Nonnull String name, @Nonnull String status, @Nullable String authorisationUrl) {
-		this.name = name;
+	public RemotePluginBean(@Nonnull String name, @Nonnull String id, @Nonnull String status, @Nullable String authorisationUrl) {
+		this.applicationName = name;
+		this.applicationId = id;
 		this.status = status;
 		this.authorisationUrl = authorisationUrl;
 	}
 
 	@Nonnull
-	public String getName() {
-		return name;
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	@Nonnull
+	public String getApplicationName() {
+		return applicationName;
 	}
 
 	@Nonnull
