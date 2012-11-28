@@ -2,12 +2,14 @@ package it.com.atlassian.cpji.pages;
 
 import com.atlassian.cpji.tests.pageobjects.SingleSelect;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
+import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
+import com.google.common.base.Preconditions;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
 
@@ -71,6 +73,14 @@ public class SelectTargetProjectPage extends AbstractJiraPage
         return url;
     }
 
+	public JiraLoginPage clickOAuthApproval(String applicationId) {
+		Preconditions.checkNotNull(applicationId);
+		By link = By.cssSelector(String.format("a[data-application-id=%s]", applicationId));
+		elementFinder.find(link).timed().isVisible().byDefaultTimeout();
+		elementFinder.find(link).click();
+		return pageBinder.bind(JiraLoginPage.class);
+	}
+
     public CopyDetailsPage next()
     {
         waitForDestinationProjectField();
@@ -78,4 +88,9 @@ public class SelectTargetProjectPage extends AbstractJiraPage
         nextButton.click();
         return pageBinder.bind(CopyDetailsPage.class, issueId, targetEntityLink);
     }
+
+	@Nonnull
+	public Long getIssueId() {
+		return issueId;
+	}
 }
