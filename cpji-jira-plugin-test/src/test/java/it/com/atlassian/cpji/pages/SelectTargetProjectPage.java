@@ -73,6 +73,12 @@ public class SelectTargetProjectPage extends AbstractJiraPage
         return url;
     }
 
+	public boolean hasOAuthApproval(String applicationId) {
+		Preconditions.checkNotNull(applicationId);
+		waitForDestinationProjectField();
+		return !elementFinder.findAll(By.cssSelector(String.format("a[data-application-id=%s]", applicationId))).isEmpty();
+	}
+
 	public JiraLoginPage clickOAuthApproval(String applicationId) {
 		Preconditions.checkNotNull(applicationId);
 		By link = By.cssSelector(String.format("a[data-application-id=%s]", applicationId));

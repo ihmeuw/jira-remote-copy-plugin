@@ -1,5 +1,6 @@
 package it.com.atlassian.cpji.pages;
 
+import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.Page;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.pageobjects.elements.ElementBy;
@@ -19,14 +20,8 @@ public class OAuthAuthorizePage implements Page {
 	@javax.inject.Inject
 	protected com.atlassian.webdriver.AtlassianWebDriver driver;
 
-	private final Long issueId;
-
 	@ElementBy(id = "approve")
 	private PageElement approve;
-
-	public OAuthAuthorizePage(Long issueId) {
-		this.issueId = issueId;
-	}
 
 	@Override
 	public String getUrl() {
@@ -38,8 +33,8 @@ public class OAuthAuthorizePage implements Page {
 		return approve.timed().isVisible();
 	}
 
-	public SelectTargetProjectPage approve() {
+	public JiraLoginPage approve() {
 		approve.click();
-		return pageBinder.bind(SelectTargetProjectPage.class, issueId);
+		return pageBinder.bind(JiraLoginPage.class);
 	}
 }
