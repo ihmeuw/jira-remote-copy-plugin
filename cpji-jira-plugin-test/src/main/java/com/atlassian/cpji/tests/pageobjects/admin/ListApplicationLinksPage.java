@@ -1,6 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects.admin;
 
-import com.atlassian.jira.pageobjects.framework.elements.PageElements;
+import com.atlassian.cpji.tests.pageobjects.PageElements;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
@@ -9,8 +9,6 @@ import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @since v3.0
@@ -48,7 +46,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 			final PageElement deleteButton = Iterables.get(Iterables
 					.filter(dialog.findAll(By.cssSelector(".button-panel-button.wizard-submit")),
 							PageElements.isVisible()), 0);
-			Preconditions.checkState(deleteButton.timed().isEnabled().by(10, TimeUnit.SECONDS)); // wait until it's enabled
+//			Preconditions.checkState(deleteButton.timed().isEnabled().by(20, TimeUnit.SECONDS)); // wait until it's enabled
 			deleteButton.click();
 			return this;
 		}

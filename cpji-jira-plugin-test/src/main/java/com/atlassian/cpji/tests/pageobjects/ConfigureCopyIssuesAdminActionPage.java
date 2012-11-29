@@ -1,4 +1,4 @@
-package it.com.atlassian.cpji.pages;
+package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.cpji.tests.pageobjects.MultiSelectUtil;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;

@@ -2,9 +2,9 @@ package it.com.atlassian.cpji;
 
 import com.atlassian.pageobjects.elements.PageElement;
 import com.google.common.collect.Iterables;
-import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
-import it.com.atlassian.cpji.pages.JiraLoginPageWithWarnings;
-import it.com.atlassian.cpji.pages.PermissionViolationPage;
+import com.atlassian.cpji.tests.pageobjects.ConfigureCopyIssuesAdminActionPage;
+import com.atlassian.cpji.tests.pageobjects.JiraLoginPageWithWarnings;
+import com.atlassian.cpji.tests.pageobjects.PermissionViolationPage;
 import org.hamcrest.Matcher;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;

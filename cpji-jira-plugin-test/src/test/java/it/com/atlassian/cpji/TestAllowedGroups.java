@@ -2,9 +2,9 @@ package it.com.atlassian.cpji;
 
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.google.common.collect.ImmutableList;
-import it.com.atlassian.cpji.pages.ConfigureCopyIssuesAdminActionPage;
-import it.com.atlassian.cpji.pages.PermissionViolationPage;
-import it.com.atlassian.cpji.pages.SelectTargetProjectPage;
+import com.atlassian.cpji.tests.pageobjects.ConfigureCopyIssuesAdminActionPage;
+import com.atlassian.cpji.tests.pageobjects.PermissionViolationPage;
+import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import org.apache.log4j.Logger;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.hamcrest.collection.IsIterableWithSize;

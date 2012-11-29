@@ -1,4 +1,4 @@
-package it.com.atlassian.cpji.pages;
+package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.PageElementFinder;

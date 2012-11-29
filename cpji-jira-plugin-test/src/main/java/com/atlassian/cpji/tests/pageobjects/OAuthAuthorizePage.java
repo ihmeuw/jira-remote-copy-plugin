@@ -1,4 +1,4 @@
-package it.com.atlassian.cpji.pages;
+package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.Page;

@@ -1,7 +1,8 @@
-package it.com.atlassian.cpji.pages;
+package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.pageobjects.elements.PageElement;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -17,6 +18,18 @@ public class PageElements {
 			@Override
 			public String apply(@Nullable PageElement input) {
 				return input.getText();
+			}
+		};
+	}
+
+	public static Predicate<PageElement> isVisible()
+	{
+		return new Predicate<PageElement>()
+		{
+			@Override
+			public boolean apply(PageElement input)
+			{
+				return input.isVisible();
 			}
 		};
 	}

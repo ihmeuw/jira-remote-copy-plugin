@@ -1,10 +1,10 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
-import it.com.atlassian.cpji.pages.CopyDetailsPage;
-import it.com.atlassian.cpji.pages.CopyIssueToInstancePage;
-import it.com.atlassian.cpji.pages.PermissionChecksPage;
-import it.com.atlassian.cpji.pages.SelectTargetProjectPage;
+import com.atlassian.cpji.tests.pageobjects.CopyDetailsPage;
+import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstancePage;
+import com.atlassian.cpji.tests.pageobjects.PermissionChecksPage;
+import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;

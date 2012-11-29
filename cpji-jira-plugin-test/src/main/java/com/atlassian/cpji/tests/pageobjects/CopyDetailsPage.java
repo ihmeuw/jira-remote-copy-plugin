@@ -1,4 +1,4 @@
-package it.com.atlassian.cpji.pages;
+package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.elements.ElementBy;

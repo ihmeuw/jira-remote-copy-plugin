@@ -2,8 +2,8 @@ package it.com.atlassian.cpji;
 
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
-import it.com.atlassian.cpji.pages.OAuthAuthorizePage;
-import it.com.atlassian.cpji.pages.SelectTargetProjectPage;
+import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
+import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 					selectTargetProjectPage.getIssueId());
 			assertFalse(selectTargetProjectPage.hasOAuthApproval(applicationId));
 		} finally {
-//			jira1.visit(ListApplicationLinksPage.class).clickDelete("http://localhost:2992/jira").delete().deleteAndReturn();
+			jira1.visit(ListApplicationLinksPage.class).clickDelete("http://localhost:2992/jira").delete().deleteAndReturn();
 		}
 	}
 }
