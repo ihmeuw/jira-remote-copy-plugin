@@ -48,7 +48,7 @@ public class AvailableProjectsBean {
 							return new ProjectBean((BasicProject) o);
 						}
 					});
-			return new ProjectGroupBean(entry.getApplicationLink().getName(), entry.getApplicationLink().getId().get(), Lists
+			return new ProjectGroupBean(entry.getJiraLocation().getName(), entry.getJiraLocation().getId(), Lists
 					.newArrayList(projectsInServer));
 		}
 	}

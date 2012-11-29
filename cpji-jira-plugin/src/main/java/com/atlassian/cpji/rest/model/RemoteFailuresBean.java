@@ -31,7 +31,7 @@ public class RemoteFailuresBean {
 		final List<RemotePluginBean> authentication = Lists.newArrayList();
 
 		for(ResponseStatus status : responseStatuses) {
-			switch (status.getStatus()) {
+			switch (status.getResult()) {
 				case PLUGIN_NOT_INSTALLED:
 					notInstalled.add(RemotePluginBean.create(status, hostApplication, issueId));
 					break;

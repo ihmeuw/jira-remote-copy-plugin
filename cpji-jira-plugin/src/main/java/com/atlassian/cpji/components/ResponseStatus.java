@@ -1,6 +1,6 @@
 package com.atlassian.cpji.components;
 
-import com.atlassian.applinks.api.ApplicationLink;
+import com.atlassian.cpji.components.remote.LocalJiraProxy;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nonnull;
@@ -11,30 +11,28 @@ import javax.annotation.Nullable;
 *
 * @since v5.2
 */
-public class ResponseStatus
+public class ResponseStatus extends ResultWithJiraLocation<ResponseStatus.Status>
 {
-	private final ApplicationLink applicationLink;
-	private final Status status;
+    public ResponseStatus(final JiraLocation jiraLocation, final Status result)
+    {
+        super(jiraLocation, result);
+    }
 
-	public ResponseStatus(ApplicationLink applicationLink, Status status) {
-		this.applicationLink = applicationLink;
-		this.status = status;
+
+    public static ResponseStatus communicationFailed(JiraLocation jiraLocation) {
+		return new ResponseStatus(jiraLocation, Status.COMMUNICATION_FAILED);
 	}
 
-	public static ResponseStatus communicationFailed(ApplicationLink applicationLink) {
-		return new ResponseStatus(applicationLink, Status.COMMUNICATION_FAILED);
+	public static ResponseStatus authenticationFailed(JiraLocation jiraLocation) {
+		return new ResponseStatus(jiraLocation, Status.AUTHENTICATION_FAILED);
 	}
 
-	public static ResponseStatus authenticationFailed(ApplicationLink applicationLink) {
-		return new ResponseStatus(applicationLink, Status.AUTHENTICATION_FAILED);
+	public static ResponseStatus ok(JiraLocation jiraLocation) {
+		return new ResponseStatus(jiraLocation, Status.OK);
 	}
 
-	public static ResponseStatus ok(ApplicationLink applicationLink) {
-		return new ResponseStatus(applicationLink, Status.OK);
-	}
-
-	public static ResponseStatus pluginNotInstalled(ApplicationLink applicationLink) {
-		return new ResponseStatus(applicationLink, Status.PLUGIN_NOT_INSTALLED);
+	public static ResponseStatus pluginNotInstalled(JiraLocation jiraLocation) {
+		return new ResponseStatus(jiraLocation, Status.PLUGIN_NOT_INSTALLED);
 	}
 
 	public enum Status {
@@ -45,24 +43,16 @@ public class ResponseStatus
 			OK
 	}
 
-	public ApplicationLink getApplicationLink() {
-		return applicationLink;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public static ResponseStatus authorizationRequired(ApplicationLink applicationLink) {
-		return new ResponseStatus(applicationLink, Status.AUTHORIZATION_REQUIRED);
+	public static ResponseStatus authorizationRequired(JiraLocation jiraLocation) {
+		return new ResponseStatus(jiraLocation, Status.AUTHORIZATION_REQUIRED);
 	}
 
 	@Nonnull
-	public static Predicate<ResponseStatus> hasApplicationLink() {
+	public static Predicate<ResponseStatus> onlyRemoteJiras() {
 		return new Predicate<ResponseStatus>() {
 			@Override
 			public boolean apply(@Nullable ResponseStatus input) {
-				return input.getApplicationLink() != null;
+				return input.getJiraLocation() != null && !input.getJiraLocation().equals(LocalJiraProxy.LOCAL_JIRA_LOCATION);
 			}
 		};
 	}

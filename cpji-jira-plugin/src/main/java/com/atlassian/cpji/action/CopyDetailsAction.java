@@ -1,18 +1,16 @@
 package com.atlassian.cpji.action;
 
-import com.atlassian.applinks.api.ApplicationLinkRequest;
-import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
-import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.remote.JiraProxy;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
-import com.atlassian.cpji.rest.UnauthorizedResponseException;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.issue.MutableIssue;
@@ -20,9 +18,6 @@ import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.util.I18nHelper;
-import com.atlassian.sal.api.net.Request;
-import com.atlassian.sal.api.net.Response;
-import com.atlassian.sal.api.net.ResponseException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,10 +85,12 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final BeanFactory beanFactory,
             final UserMappingManager userMappingManager,
-			final ApplicationLinkService applicationLinkService)
+			final ApplicationLinkService applicationLinkService,
+            final JiraProxyFactory jiraProxyFactory
+    )
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
-				copyIssuePermissionManager, userMappingManager, applicationLinkService);
+				copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
         this.beanFactory = beanFactory;
     }
 
@@ -111,72 +108,47 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             addErrorMessage("Failed to find the entity link.");
             return ERROR;
         }
-        ApplicationLinkRequestFactory requestFactory = applicationLinkService.getApplicationLink(entityLink.getApplicationId()).createAuthenticatedRequestFactory();
-        try
-        {
-            ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + PROJECT_RESOURCE_PATH + "/issueTypeInformation/"
-					+ entityLink.getProjectKey());
-            CopyInformationBean copyInformationBean = request.execute(new ApplicationLinkResponseHandler<CopyInformationBean>()
-            {
-                public CopyInformationBean credentialsRequired(final Response response) throws ResponseException
-                {
-                    return response.getEntity(CopyInformationBean.class);
-                }
 
-                public CopyInformationBean handle(final Response response) throws ResponseException
-                {
-                    if (!response.isSuccessful() && (response.getStatusCode() == 401))
-                    {
-                        throw new UnauthorizedResponseException();
-                    }
-                    else if (!response.isSuccessful())
-                    {
-                       throw new ResponseException(response.getResponseBodyAsString());
-                    }
-                    return response.getEntity(CopyInformationBean.class);
-                }
-            });
-            if (!copyInformationBean.getHasCreateIssuePermission())
-            {
-                addErrorMessage("You don't have the create issue permission for this JIRA project!");
-                return ERROR;
+        JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getApplicationId());
+        Either<ResponseStatus, CopyInformationBean> result = proxy.getCopyInformation(entityLink.getProjectKey());
+        if(result.isLeft()){
+            ResponseStatus status = (ResponseStatus) result.left().get();
+            if(ResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
+                log.error("Authentication failed.");
+                addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
+            } else if(ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
+                log.error("OAuth token invalid.");
+            } else if(ResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
+                log.error("Failed to retrieve the list of issue fields from the remote JIRA instance.");
+                addErrorMessage("Failed to retrieve the list of issue fields from the remote JIRA instance.");
             }
-            issueLinkOptions = new ArrayList<Option>();
-            I18nHelper i18nHelper = beanFactory.getInstance(getLoggedInUser());
-            String remoteJiraVersion = copyInformationBean.getVersion();
-            if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5"))
-            {
-                issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, i18nHelper.getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
-                issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, i18nHelper.getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
-            }
-            issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, i18nHelper.getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
-            issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, i18nHelper.getText(RemoteIssueLinkType.NONE.getI18nKey())));
-            checkIssueTypes(copyInformationBean.getIssueTypes().getGetTypes());
-            remoteAttachmentsEnabled = copyInformationBean.getAttachmentsEnabled();
-            hasCreateAttachmentsPermission = copyInformationBean.getHasCreateAttachmentPermission();
-            UserBean user = copyInformationBean.getRemoteUser();
-            remoteUserName = user.getUserName();
-            remoteFullUserName = copyInformationBean.getRemoteUser().getFullName();
-        }
-        catch (CredentialsRequiredException e)
-        {
-            log.error("OAuth token invalid.", e);
-            addErrorMessage("OAuth token invalid. Reason:" + e.getMessage());
+
             return ERROR;
         }
-        catch (UnauthorizedResponseException e)
+
+        CopyInformationBean copyInformationBean = (CopyInformationBean) result.right().get();
+        if (!copyInformationBean.getHasCreateIssuePermission())
         {
-            log.error("Authentication failed.", e);
-            addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
+            addErrorMessage("You don't have the create issue permission for this JIRA project!");
             return ERROR;
         }
-        catch (ResponseException e)
+        issueLinkOptions = new ArrayList<Option>();
+        I18nHelper i18nHelper = beanFactory.getInstance(getLoggedInUser());
+        String remoteJiraVersion = copyInformationBean.getVersion();
+        if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5"))
         {
-            log.error("Failed to retrieve the list of issue fields from the remote JIRA instance.", e);
-            addErrorMessage("Failed to retrieve the list of issue fields from the remote JIRA instance.");
-            addErrorMessage(e.getMessage());
-            return ERROR;
+            issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, i18nHelper.getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
+            issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, i18nHelper.getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
         }
+        issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, i18nHelper.getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
+        issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, i18nHelper.getText(RemoteIssueLinkType.NONE.getI18nKey())));
+        checkIssueTypes(copyInformationBean.getIssueTypes().getGetTypes());
+        remoteAttachmentsEnabled = copyInformationBean.getAttachmentsEnabled();
+        hasCreateAttachmentsPermission = copyInformationBean.getHasCreateAttachmentPermission();
+        UserBean user = copyInformationBean.getRemoteUser();
+        remoteUserName = user.getUserName();
+        remoteFullUserName = copyInformationBean.getRemoteUser().getFullName();
+
         return SUCCESS;
     }
 

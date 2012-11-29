@@ -6,8 +6,8 @@ import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.applinks.api.EntityLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
@@ -54,10 +54,11 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final UserMappingManager userMappingManager,
-			final ApplicationLinkService applicationLinkService)
+			final ApplicationLinkService applicationLinkService,
+            final JiraProxyFactory jiraProxyFactory)
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
         this.fieldMapperFactory = fieldMapperFactory;
     }
 

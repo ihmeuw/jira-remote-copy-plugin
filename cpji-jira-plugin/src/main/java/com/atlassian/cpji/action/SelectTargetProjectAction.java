@@ -1,30 +1,19 @@
 package com.atlassian.cpji.action;
 
-import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.applinks.api.ApplicationLinkRequest;
-import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
-import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.applinks.api.AuthorisationURIGenerator;
-import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.RemoteJiraService;
 import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.remote.JiraProxy;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
-import com.atlassian.cpji.rest.PluginInfoResource;
-import com.atlassian.cpji.rest.RemotesResource;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.plugin.webresource.WebResourceManager;
-import com.atlassian.sal.api.net.Request;
-import com.atlassian.sal.api.net.Response;
-import com.atlassian.sal.api.net.ResponseException;
 import org.apache.log4j.Logger;
 
 /**
@@ -34,15 +23,12 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
 {
 
     public static final String AUTHORIZE = "authorize";
-	private final InternalHostApplication hostApplication;
-	private final RemoteJiraService remoteJiraService;
 
 	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
     private String authorizationUrl;
 
 	public SelectTargetProjectAction(
             final SubTaskManager subTaskManager,
-            final InternalHostApplication hostApplication,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
             final FieldManager fieldManager,
@@ -50,14 +36,13 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final UserMappingManager userMappingManager,
-			final RemoteJiraService remoteJiraService,
 			final ApplicationLinkService applicationLinkService,
-            final WebResourceManager webResourceManager)
+            final WebResourceManager webResourceManager,
+            final JiraProxyFactory jiraProxyFactory
+            )
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService);
-		this.hostApplication = hostApplication;
-		this.remoteJiraService = remoteJiraService;
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
         webResourceManager.requireResource(PLUGIN_KEY + ":selectTargetProjectAction");
 	}
 
@@ -88,67 +73,28 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-		final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(selectedEntityLink.getApplicationId());
-		final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
+        JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getApplicationId());
+        ResponseStatus responseStatus = jira.isPluginInstalled();
 
-        try
+        if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))
         {
-            ApplicationLinkRequest request = requestFactory.createRequest(Request.MethodType.GET, CopyIssueToInstanceAction.REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH);
-            ResponseStatus responseStatus = request.execute(new ApplicationLinkResponseHandler<ResponseStatus>()
-            {
-                public ResponseStatus credentialsRequired(final Response response) throws ResponseException
-                {
-                    return ResponseStatus.authorizationRequired(applicationLink);
-                }
-
-                public ResponseStatus handle(final Response response) throws ResponseException
-                {
-                    if (log.isDebugEnabled())
-                    {
-                        log.debug("Response is: " + response.getResponseBodyAsString());
-                    }
-                    if (response.getStatusCode() == 401)
-                    {
-                        log.debug("Authentication failed to remote JIRA instance '" + applicationLink.getName() + "'");
-                        return ResponseStatus.authenticationFailed(applicationLink);
-                    }
-                    if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase()))
-                    {
-                        log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
-                        return ResponseStatus.ok(applicationLink);
-                    }
-                    log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin NOT installed.");
-                    return ResponseStatus.pluginNotInstalled(applicationLink);
-                }
-            });
-            if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getStatus()))
-            {
-                return generateAuthorizationUrl(requestFactory);
-            }
-            else if (ResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getStatus()))
-            {
-                log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
-                addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
-                return ERROR;
-            }
-            else if (ResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getStatus()))
-            {
-                addErrorMessage("Authentication failed. Check the authentication configuration.");
-                return ERROR;
-            }
+            authorizationUrl = jira.generateAuthenticationUrl(Long.toString(id));
+            return AUTHORIZE;
         }
-        catch (CredentialsRequiredException ex)
+        else if (ResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getResult()))
         {
-            return generateAuthorizationUrl(requestFactory);
+            log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
+            addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
+            return ERROR;
+        }
+        else if (ResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getResult()))
+        {
+            addErrorMessage("Authentication failed. Check the authentication configuration.");
+            return ERROR;
         }
         return getRedirect("/secure/CopyDetailsAction.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);
     }
 
-    private String generateAuthorizationUrl(AuthorisationURIGenerator uriGenerator) throws Exception
-    {
-        authorizationUrl = RemotesResource.generateAuthorizationUrl(hostApplication, uriGenerator, Long.toString(id));
-        return AUTHORIZE;
-    }
 
     public String getAuthorizationUrl()
     {

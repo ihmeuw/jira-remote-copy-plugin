@@ -41,7 +41,7 @@ public class RemotesResource {
 	@Path("plugins")
 	public Response getRemotePlugins(@QueryParam("issueId") final String issueId) {
 		return Response.ok(Iterables
-				.transform(Iterables.filter(remoteJiraService.getPluginInfo(), ResponseStatus.hasApplicationLink()),
+				.transform(Iterables.filter(remoteJiraService.getPluginInfo(), ResponseStatus.onlyRemoteJiras()),
 						new Function<ResponseStatus, RemotePluginBean>() {
 							@Override
 							public RemotePluginBean apply(@Nullable ResponseStatus input) {

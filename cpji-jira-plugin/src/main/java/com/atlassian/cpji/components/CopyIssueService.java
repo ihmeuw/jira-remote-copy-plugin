@@ -68,7 +68,6 @@ import java.util.Scanner;
 import javax.ws.rs.core.Response;
 
 /**
- *
  * @since v3.0
  */
 public class CopyIssueService
@@ -89,7 +88,8 @@ public class CopyIssueService
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService)
+    {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -215,7 +215,8 @@ public class CopyIssueService
 
             IssueCreationResultBean resultBean = new IssueCreationResultBean(createIssueResult.getIssue().getKey(), createIssueResult.getIssue().getProjectObject().getKey(), createIssueResult.getIssue().getId());
 
-            if(errors.hasAnyErrors()){
+            if (errors.hasAnyErrors())
+            {
                 errors.addErrorMessage("Created issue '" + createIssueResult.getIssue().getKey() + "'. But there were some errors.'");
                 throw new IssueCreatedWithErrorsException(resultBean, errors);
             }
@@ -229,7 +230,6 @@ public class CopyIssueService
         }
 
     }
-
 
 
     public FieldPermissionsBean checkFieldPermissions(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException
@@ -361,11 +361,13 @@ public class CopyIssueService
     }
 
     // TODO, once a newer version of 5.0 is released (e.g. beta3), change to use GlobalIdFactory in the view-issue-plugin
+
     /**
      * Decode the given String to a Map of values.
      *
      * @param globalId the String to decode
-     * @param keys the order in which the keys should appear. If the keys are not in this order an IllegalArgumentException is thrown.
+     * @param keys the order in which the keys should appear. If the keys are not in this order an
+     * IllegalArgumentException is thrown.
      * @return a Map of values
      */
     public static Map<String, String> decode(final String globalId, final List<String> keys)
@@ -430,7 +432,8 @@ public class CopyIssueService
     private Project getProjectFromIssueBean(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException
     {
         ProjectService.GetProjectResult result = projectService.getProjectByKey(callingUser(), copyIssueBean.getTargetProjectKey());
-        if(!result.isValid()){
+        if (!result.isValid())
+        {
             throw new ProjectNotFoundException(result.getErrorCollection());
         }
         return result.getProject();

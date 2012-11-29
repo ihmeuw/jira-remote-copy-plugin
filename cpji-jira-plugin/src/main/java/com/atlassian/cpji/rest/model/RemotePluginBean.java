@@ -1,5 +1,6 @@
 package com.atlassian.cpji.rest.model;
 
+import com.atlassian.applinks.api.ApplicationLink;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.rest.RemotesResource;
@@ -25,12 +26,12 @@ public class RemotePluginBean {
 	@XmlElement
 	private final String authorisationUrl;
 
-	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull InternalHostApplication hostApplication, @Nonnull String issueId) {
-		return new RemotePluginBean(input.getApplicationLink().getName(),
-				input.getApplicationLink().getId().get(),
-				input.getStatus().toString(),
+	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull ApplicationLink inputApplicationLink, @Nonnull InternalHostApplication hostApplication, @Nonnull String issueId) {
+		return new RemotePluginBean(input.getJiraLocation().getName(),
+				input.getJiraLocation().getId(),
+				input.getResult().toString(),
 				RemotesResource.generateAuthorizationUrl(hostApplication,
-						input.getApplicationLink().createAuthenticatedRequestFactory(), issueId));
+						inputApplicationLink.createAuthenticatedRequestFactory(), issueId));
 	}
 
 	public RemotePluginBean(@Nonnull String name, @Nonnull String id, @Nonnull String status, @Nullable String authorisationUrl) {
