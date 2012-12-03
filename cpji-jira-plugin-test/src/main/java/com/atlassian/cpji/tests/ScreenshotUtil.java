@@ -3,6 +3,7 @@ package com.atlassian.cpji.tests;
 import com.atlassian.jira.pageobjects.config.TestEnvironment;
 import com.atlassian.jira.tests.rules.WebDriverScreenshot;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hamcrest.StringDescription;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -36,15 +37,19 @@ public class ScreenshotUtil {
 		{
 			TakesScreenshot takingScreenshot = (TakesScreenshot) driver;
 			File screenshot = takingScreenshot.getScreenshotAs(OutputType.FILE);
-			File target = new File(testEnvironment.artifactDirectory(), name);
+			File target = new File(testEnvironment.artifactDirectory(), fileName(name));
 			FileUtils.copyFile(screenshot, target);
 			logger.info("A screenshot of the page has been stored under " + target.getAbsolutePath());
 		}
 		catch(Exception e)
 		{
 			logger.error(new StringDescription().appendText("Unable to take screenshot for failed test ")
-					.appendValue(name).toString(), e);
+					.appendValue(fileName(name)).toString(), e);
 		}
+	}
+
+	protected static String fileName(String file) {
+		return StringUtils.endsWith(file, ".png") ? file : file + ".png";
 	}
 
 	private static boolean isScreenshotCapable(WebDriver driver)
