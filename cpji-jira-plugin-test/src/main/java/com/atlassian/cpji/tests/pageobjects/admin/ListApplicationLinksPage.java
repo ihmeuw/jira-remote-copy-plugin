@@ -9,11 +9,15 @@ import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @since v3.0
  */
 public class ListApplicationLinksPage extends AbstractJiraPage {
+	private static final Logger logger = LoggerFactory.getLogger(ListApplicationLinksPage.class);
+
 	@ElementBy (id = "application-links-table")
 	private PageElement appLinksTable;
 
@@ -34,10 +38,17 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 	public DeleteDialog clickDelete(String url) {
 		Preconditions.checkNotNull(url);
+		dumpApplicationLinks();
 		final By by = By.cssSelector(String.format("tr[id='ual-row-%s'] .app-delete-link", url));
 		driver.waitUntilElementIsVisible(by);
 		elementFinder.find(by).click();
 		return pageBinder.bind(DeleteDialog.class);
+	}
+
+	private void dumpApplicationLinks() {
+		for(PageElement row : appLinksTable.findAll(By.tagName("tr"))) {
+			logger.info(row.find(By.className("application-name")).getText() + " " + row.find(By.className("application-url")).getText());
+		}
 	}
 
 	public static class DeleteDialog extends AbstractJiraPage {
