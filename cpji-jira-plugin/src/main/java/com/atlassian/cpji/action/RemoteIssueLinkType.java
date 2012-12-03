@@ -21,4 +21,13 @@ public enum RemoteIssueLinkType
     {
         return i18nKey;
     }
+
+    public boolean remoteHasLink(){
+        return equals(RECIPROCAL) || equals(OUTGOING);
+    }
+
+
+    public boolean localHasLink(){
+        return equals(RECIPROCAL) || equals(INCOMING);
+    }
 }

@@ -3,12 +3,20 @@ package com.atlassian.cpji.components.remote;
 import com.atlassian.cpji.components.JiraLocation;
 import com.atlassian.cpji.components.Projects;
 import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.rest.model.CopyInformationBean;
+import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.FieldPermissionsBean;
+import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.fugue.Either;
+import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.attachment.Attachment;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.util.ErrorCollection;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
@@ -63,6 +71,41 @@ public class LocalJiraProxy implements JiraProxy
     @Override
     public String generateAuthenticationUrl(String issueId) {
         throw new UnsupportedOperationException("Cannot generate authentication URL for local project");
+    }
+
+    @Override
+    public Either<ResponseStatus, CopyInformationBean> getCopyInformation(String projectKey) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Either<ResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public ErrorCollection copyAttachments(String issueKey, Collection<Attachment> attachments) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Either<ResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, String localRelationship, String remoteRelationship) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
 

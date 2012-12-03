@@ -347,7 +347,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction
 			this.projectKey = projectKey;
 		}
 
-		public JiraLocation getApplicationId() {
+		public JiraLocation getJiraLocation() {
 			return jiraLocation;
 		}
 

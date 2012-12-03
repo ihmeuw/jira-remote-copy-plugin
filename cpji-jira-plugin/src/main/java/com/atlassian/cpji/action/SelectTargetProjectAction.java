@@ -73,7 +73,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-        JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getApplicationId());
+        JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getJiraLocation());
         ResponseStatus responseStatus = jira.isPluginInstalled();
 
         if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))

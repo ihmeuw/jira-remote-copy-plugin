@@ -1,8 +1,8 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.Projects;
 import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.google.common.base.Function;
@@ -31,10 +31,10 @@ public class AvailableProjectsBean {
 		this.failures = failures;
 	}
 
-	public static AvailableProjectsBean create(@Nonnull final InternalHostApplication hostApplication, @Nonnull final String issueId, @Nonnull Iterable<Either<ResponseStatus, Projects>> projects) {
+	public static AvailableProjectsBean create(@Nonnull final JiraProxyFactory proxyFactory, @Nonnull final String issueId, @Nonnull Iterable<Either<ResponseStatus, Projects>> projects) {
 		return new AvailableProjectsBean(Iterables.transform(Either.allRight(projects),
 				new ProjectsToProjectGroupBean()),
-				RemoteFailuresBean.create(hostApplication, issueId, Either.allLeft(projects)));
+				RemoteFailuresBean.create(proxyFactory, issueId, Either.allLeft(projects)));
 	}
 
 	private static class ProjectsToProjectGroupBean implements Function<Projects, ProjectGroupBean> {

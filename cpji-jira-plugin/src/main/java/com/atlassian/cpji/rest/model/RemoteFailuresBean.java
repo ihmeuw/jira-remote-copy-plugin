@@ -1,7 +1,7 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -24,7 +24,7 @@ public class RemoteFailuresBean {
 	@XmlElement
 	private final List<RemotePluginBean> authentication;
 
-	public static RemoteFailuresBean create(@Nonnull final InternalHostApplication hostApplication, @Nonnull final String issueId, @Nonnull Iterable<ResponseStatus> responseStatuses) {
+	public static RemoteFailuresBean create(@Nonnull final JiraProxyFactory jiraProxyFactory, @Nonnull final String issueId, @Nonnull Iterable<ResponseStatus> responseStatuses) {
 		final List<RemotePluginBean> notInstalled = Lists.newArrayList();
 		final List<RemotePluginBean> communication = Lists.newArrayList();
 		final List<RemotePluginBean> authorization = Lists.newArrayList();
@@ -33,16 +33,16 @@ public class RemoteFailuresBean {
 		for(ResponseStatus status : responseStatuses) {
 			switch (status.getResult()) {
 				case PLUGIN_NOT_INSTALLED:
-					notInstalled.add(RemotePluginBean.create(status, hostApplication, issueId));
+					notInstalled.add(RemotePluginBean.create(status, jiraProxyFactory, issueId));
 					break;
 				case AUTHENTICATION_FAILED:
-					authentication.add(RemotePluginBean.create(status, hostApplication, issueId));
+					authentication.add(RemotePluginBean.create(status, jiraProxyFactory, issueId));
 					break;
 				case AUTHORIZATION_REQUIRED:
-					authorization.add(RemotePluginBean.create(status, hostApplication, issueId));
+					authorization.add(RemotePluginBean.create(status, jiraProxyFactory, issueId));
 					break;
 				case COMMUNICATION_FAILED:
-					communication.add(RemotePluginBean.create(status, hostApplication, issueId));
+					communication.add(RemotePluginBean.create(status, jiraProxyFactory, issueId));
 					break;
 			}
 		}

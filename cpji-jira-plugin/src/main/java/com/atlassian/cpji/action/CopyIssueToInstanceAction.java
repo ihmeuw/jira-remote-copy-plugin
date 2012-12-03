@@ -1,7 +1,8 @@
 package com.atlassian.cpji.action;
 
-import com.atlassian.applinks.api.*;
-import com.atlassian.cpji.IssueAttachmentsClient;
+import com.atlassian.applinks.api.ApplicationLinkService;
+import com.atlassian.applinks.api.CredentialsRequiredException;
+import com.atlassian.applinks.api.TypeNotInstalledException;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.ResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
@@ -9,14 +10,8 @@ import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
-import com.atlassian.cpji.rest.ResponseHolder;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CreationResult;
-import com.atlassian.cpji.rest.model.ErrorBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.cpji.rest.util.Holder;
-import com.atlassian.cpji.util.IssueLinkClient;
-import com.atlassian.cpji.util.RestResponse;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.Issue;
@@ -27,10 +22,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.link.*;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.jira.util.ErrorCollection;
-import com.atlassian.sal.api.net.Request;
-import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
-import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
 import java.net.URI;
@@ -47,7 +39,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     private String remoteIssueLink;
 
     private static final Logger log = Logger.getLogger(CopyIssueToInstanceAction.class);
-    private final IssueLinkClient issueLinkClient;
     private final IssueLinkManager issueLinkManager;
     private final RemoteIssueLinkManager remoteIssueLinkManager;
 
@@ -60,7 +51,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
                     final FieldMapperFactory fieldMapperFactory,
                     final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
                     final CopyIssuePermissionManager copyIssuePermissionManager,
-                    final IssueLinkClient issueLinkClient,
                     final UserMappingManager userMappingManager,
                     final IssueLinkManager issueLinkManager,
                     final RemoteIssueLinkManager remoteIssueLinkManager,
@@ -69,7 +59,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
 				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
-        this.issueLinkClient = issueLinkClient;
         this.issueLinkManager = issueLinkManager;
         this.remoteIssueLinkManager = remoteIssueLinkManager;
     }
@@ -85,7 +74,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         }
         
         final SelectedProject linkToTargetEntity = getSelectedDestinationProject();
-        final JiraProxy proxy = jiraProxyFactory.createJiraProxy(linkToTargetEntity.getApplicationId());
+        final JiraProxy proxy = jiraProxyFactory.createJiraProxy(linkToTargetEntity.getJiraLocation());
 
         MutableIssue issueToCopy = getIssueObject();
         CopyIssueBean copyIssueBean = createCopyIssueBean(linkToTargetEntity.getProjectKey(), issueToCopy, issueType);
@@ -119,31 +108,47 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
 
         if (copyIssueLinks() && issueLinkManager.isLinkingEnabled())
         {
-            proxy.copyIssueLinks(issueToCopy.getId(), copiedIssue.getIssueId(), copiedIssueKey);
-
+            copyLocalIssueLinks(proxy, issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
+            copyRemoteIssueLinks(proxy, issueToCopy, copiedIssue.getIssueKey());
+            proxy.convertRemoteIssueLinksIntoLocal(copiedIssueKey);
         }
 
         RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
-        if (remoteIssueLinkType.equals(RemoteIssueLinkType.INCOMING) || remoteIssueLinkType.equals(RemoteIssueLinkType.RECIPROCAL))
-        {
-             RestResponse remoteIssueLinkResponse = issueLinkClient.createLinkFromRemoteIssue(issueToCopy, appLink, copiedIssueKey, "copied from");
-             if (!remoteIssueLinkResponse.isSuccessful())
-             {
-                 log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + issueToCopy.getKey() + "'");
-             }
-        }
-        if (remoteIssueLinkType.equals(RemoteIssueLinkType.OUTGOING) || remoteIssueLinkType.equals(RemoteIssueLinkType.RECIPROCAL))
-        {
-            issueLinkClient.createLinkToRemoteIssue(issueToCopy, appLink, resultHolder.value.getIssueKey(), resultHolder.value.getIssueId(), "copied to");
-        }
+        proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
+                remoteIssueLinkType.localHasLink()?"copied to":null,
+                remoteIssueLinkType.remoteHasLink()?"copied from":null);
+
         return SUCCESS;
 
     }
 
 
+    private void copyLocalIssueLinks(JiraProxy remoteJira, final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId) throws ResponseException, CredentialsRequiredException
+    {
+        for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(localIssue.getId()))
+        {
+            final IssueLinkType type = inwardLink.getIssueLinkType();
+            remoteJira.copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId, type.getOutward(), type.getInward());
+        }
+        for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(localIssue.getId()))
+        {
+
+            final IssueLinkType type = outwardLink.getIssueLinkType();
+            remoteJira.copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type.getInward(), type.getOutward());
+        }
+    }
+
+    private void copyRemoteIssueLinks(JiraProxy remoteJira, final Issue localIssue, final String copiedIssueKey) throws ResponseException, CredentialsRequiredException
+    {
+        for (final RemoteIssueLink remoteIssueLink : remoteIssueLinkManager.getRemoteIssueLinksForIssue(localIssue))
+        {
+            remoteJira.copyRemoteIssueLink(remoteIssueLink, copiedIssueKey);
+        }
+    }
+
 
     public String getLinkToNewIssue() throws TypeNotInstalledException {
-        URI displayUrl = applicationLinkService.getApplicationLink(getSelectedDestinationProject().getApplicationId()).getDisplayUrl();
+        URI displayUrl = applicationLinkService.getApplicationLink(getSelectedDestinationProject().getJiraLocation().toApplicationId()).getDisplayUrl();
         return displayUrl + "/browse/" + copiedIssueKey;
     }
 

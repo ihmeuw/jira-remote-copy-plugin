@@ -109,7 +109,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-        JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getApplicationId());
+        JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
         Either<ResponseStatus, CopyInformationBean> result = proxy.getCopyInformation(entityLink.getProjectKey());
         if(result.isLeft()){
             ResponseStatus status = (ResponseStatus) result.left().get();

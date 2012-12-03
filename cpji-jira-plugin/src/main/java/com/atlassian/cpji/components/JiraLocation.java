@@ -1,5 +1,6 @@
 package com.atlassian.cpji.components;
 
+import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLink;
 
 /**
@@ -23,6 +24,10 @@ public class JiraLocation {
 
     public String getName() {
         return name;
+    }
+
+    public ApplicationId toApplicationId(){
+        return new ApplicationId(id);
     }
 
     public static JiraLocation fromAppLink(ApplicationLink appLink) {

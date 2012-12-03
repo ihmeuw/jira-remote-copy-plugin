@@ -1,10 +1,11 @@
 package com.atlassian.cpji.components.remote;
 
-import com.atlassian.applinks.api.*;
+import com.atlassian.applinks.api.ApplicationLink;
+import com.atlassian.applinks.api.ApplicationLinkRequest;
+import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
+import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.IssueAttachmentsClient;
-import com.atlassian.cpji.action.CopyDetailsAction;
-import com.atlassian.cpji.action.CopyIssueToInstanceAction;
 import com.atlassian.cpji.components.JiraLocation;
 import com.atlassian.cpji.components.Projects;
 import com.atlassian.cpji.components.ResponseStatus;
@@ -13,13 +14,13 @@ import com.atlassian.cpji.rest.RemotesResource;
 import com.atlassian.cpji.rest.ResponseHolder;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
+import com.atlassian.cpji.util.IssueLinkClient;
 import com.atlassian.cpji.util.RestResponse;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.attachment.Attachment;
-import com.atlassian.jira.issue.link.IssueLink;
-import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.rest.client.internal.json.BasicProjectsJsonParser;
 import com.atlassian.jira.util.ErrorCollection;
@@ -40,16 +41,23 @@ import java.util.Collection;
  */
 public class RemoteJiraProxy implements JiraProxy
 {
+    public static final String REST_URL_COPY_ISSUE = "/rest/copyissue/1.0/";
+    public static final String PROJECT_RESOURCE_PATH = "project";
+    public static final String COPY_ISSUE_RESOURCE_PATH = "copyissue";
+    public static final String CONVERT_ISSUE_LINKS_RESOURCE_PATH = COPY_ISSUE_RESOURCE_PATH + "/convertIssueLinks";
+
     public static final int CONNECTION_TIMEOUTS = 100000;
     private static final Logger log = Logger.getLogger(RemoteJiraProxy.class);
     private final InternalHostApplication hostApplication;
     private final ApplicationLink applicationLink;
     private final JiraLocation jiraLocation;
+    private final IssueLinkClient issueLinkClient;
 
-    public RemoteJiraProxy(InternalHostApplication hostApplication, final ApplicationLink applicationLink, JiraLocation jiraLocation) {
+    public RemoteJiraProxy(InternalHostApplication hostApplication, final ApplicationLink applicationLink, JiraLocation jiraLocation, IssueLinkClient issueLinkClient) {
         this.hostApplication = hostApplication;
         this.applicationLink = applicationLink;
         this.jiraLocation = jiraLocation;
+        this.issueLinkClient = issueLinkClient;
     }
 
     @Override
@@ -88,54 +96,9 @@ public class RemoteJiraProxy implements JiraProxy
     }
 
 
-    protected static abstract class AbstractJsonResponseHandler<T> implements ApplicationLinkResponseHandler<Either<ResponseStatus, T>>
-    {
-        private final JiraLocation jiraLocation;
-
-        protected AbstractJsonResponseHandler(JiraLocation jiraLocation) {
-            this.jiraLocation = jiraLocation;
-        }
-
-        public Either<ResponseStatus, T> credentialsRequired(final Response response) throws ResponseException
-        {
-            return Either.left(ResponseStatus.authorizationRequired(jiraLocation));
-        }
-
-        public Either<ResponseStatus, T> handle(final Response response) throws ResponseException
-        {
-            if (log.isDebugEnabled())
-            {
-                log.debug("Response is: " + response.getResponseBodyAsString());
-            }
-            if (response.getStatusCode() == 401)
-            {
-                return Either.left(ResponseStatus.authenticationFailed(jiraLocation));
-            }
-            if (response.getStatusCode() == 404)
-            {
-                return Either.left(ResponseStatus.pluginNotInstalled(jiraLocation));
-            }
-            if(!response.isSuccessful()){
-                return Either.left(ResponseStatus.communicationFailed(jiraLocation));
-            }
-            try {
-                return Either.right(parseResponse(response));
-            } catch (JSONException e) {
-                log.error(String.format("Failed to parse JSON from Application Link: %s (%s)", jiraLocation.getId(), e.getMessage()));
-                return Either.left(ResponseStatus.communicationFailed(jiraLocation));
-            }
-        }
-
-        protected abstract T parseResponse(Response response) throws ResponseException, JSONException;
-        protected void modifyRequest(ApplicationLinkRequest request){
-
-        }
-    }
-
-
     @Override
     public ResponseStatus isPluginInstalled() {
-        Either<ResponseStatus, Object> result = callRestService(Request.MethodType.GET, CopyIssueToInstanceAction.REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<ResponseStatus>(jiraLocation) {
+        Either<ResponseStatus, Object> result = callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<ResponseStatus>(jiraLocation) {
             @Override
             protected ResponseStatus parseResponse(Response response) throws ResponseException, JSONException {
                 if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase())) {
@@ -163,8 +126,7 @@ public class RemoteJiraProxy implements JiraProxy
 
     @Override
     public Either<ResponseStatus, CopyInformationBean> getCopyInformation(String projectKey) {
-        return callRestService(Request.MethodType.GET,
-                CopyDetailsAction.REST_URL_COPY_ISSUE + CopyDetailsAction.PROJECT_RESOURCE_PATH + "/issueTypeInformation/"+projectKey,
+        return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PROJECT_RESOURCE_PATH + "/issueTypeInformation/"+projectKey,
                 new AbstractJsonResponseHandler<CopyInformationBean>(jiraLocation){
 
             @Override
@@ -179,7 +141,7 @@ public class RemoteJiraProxy implements JiraProxy
 
         //TODO: retrieving errors on unsuccessful run
         //ErrorBean errorBean = response.getEntity(ErrorBean.class);
-        return callRestService(Request.MethodType.PUT, CopyDetailsAction.REST_URL_COPY_ISSUE + CopyDetailsAction.COPY_ISSUE_RESOURCE_PATH + "/copy", new AbstractJsonResponseHandler<IssueCreationResultBean>(jiraLocation) {
+        return callRestService(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/copy", new AbstractJsonResponseHandler<IssueCreationResultBean>(jiraLocation) {
 
             @Override
             protected void modifyRequest(ApplicationLinkRequest request) {
@@ -208,67 +170,77 @@ public class RemoteJiraProxy implements JiraProxy
     }
 
     @Override
-    public void copyIssueLinks(Long localIssueId, Long remoteIssueId, String remoteIssueKey) {
-        copyLocalIssueLinks(issueToCopy, copiedIssueKey, copiedIssue.getIssueId());
-        copyRemoteIssueLinks(issueToCopy, copiedIssueKey, appLink);
-        convertIssueLinks(copiedIssueKey, authenticatedRequestFactory);
+    public Either<ResponseStatus, FieldPermissionsBean> checkPermissions(final CopyIssueBean copyIssueBean) {
+        return callRestService(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/fieldPermissions", new AbstractJsonResponseHandler<FieldPermissionsBean>(jiraLocation) {
+            @Override
+            protected void modifyRequest(ApplicationLinkRequest request) {
+                request.setEntity(copyIssueBean);
+            }
+
+            @Override
+            protected FieldPermissionsBean parseResponse(Response response) throws ResponseException, JSONException {
+                return response.getEntity(FieldPermissionsBean.class);
+            }
+        });
     }
 
-    private void copyLocalIssueLinks(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId) throws ResponseException, CredentialsRequiredException
-    {
-        for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(localIssue.getId()))
-        {
-            final IssueLinkType type = inwardLink.getIssueLinkType();
-            copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId, type.getOutward(), type.getInward());
+    @Override
+    public void copyLocalIssueLink(Issue localIssue, String copiedIssueKey, Long copiedIssueId, String localRelationship, String remoteRelationship) {
+        try{
+            // Create link from the copied issue
+            if(remoteRelationship != null){
+                final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(localIssue, applicationLink, copiedIssueKey, remoteRelationship);
+
+                if (!response.isSuccessful())
+                {
+                    log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
+                }
+            }
+
+            // Create link from the local source issue
+            if(localRelationship != null){
+                issueLinkClient.createLinkToRemoteIssue(localIssue, applicationLink, copiedIssueKey, copiedIssueId, localRelationship);
+            }
+        } catch(Exception e){
+            return;
         }
 
-        for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(localIssue.getId()))
-        {
-            final IssueLinkType type = outwardLink.getIssueLinkType();
-            copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type.getInward(), type.getOutward());
-        }
     }
 
-    private void copyLocalIssueLink(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId, final String localRelationship, final String remoteRelationship) throws ResponseException, CredentialsRequiredException
-    {
-        // Create link from the copied issue
-        final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(
-                localIssue, applicationLink, copiedIssueKey, remoteRelationship);
-
-        if (!response.isSuccessful())
-        {
-            log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
-        }
-
-        // Create link from the local source issue
-        issueLinkClient.createLinkToRemoteIssue(localIssue, applicationLink, copiedIssueKey, copiedIssueId, localRelationship);
-    }
-
-    private void copyRemoteIssueLinks(final Issue localIssue, final String copiedIssueKey, final ApplicationLink appLink) throws ResponseException, CredentialsRequiredException
-    {
-        for (final RemoteIssueLink remoteIssueLink : remoteIssueLinkManager.getRemoteIssueLinksForIssue(localIssue))
-        {
-            final RestResponse response = issueLinkClient.createRemoteIssueLink(remoteIssueLink, copiedIssueKey, appLink);
+    @Override
+    public void copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String copiedIssueKey) {
+        try{
+            //todo - inline converting remote links into local?
+            final RestResponse response = issueLinkClient.createRemoteIssueLink(remoteIssueLink, copiedIssueKey, applicationLink);
             if (!response.isSuccessful())
             {
                 log.error("Failed to copy remote issue link. Error: Status " + response.getStatusCode() + ", Message: " + response.getStatusText());
             }
+        } catch(Exception e){
+            return;
         }
     }
 
-    private void convertIssueLinks(final String copiedIssueKey, final ApplicationLinkRequestFactory authenticatedRequestFactory) throws CredentialsRequiredException
-    {
-        ApplicationLinkRequest request = authenticatedRequestFactory.createRequest(Request.MethodType.GET, REST_URL_COPY_ISSUE + CONVERT_ISSUE_LINKS_RESOURCE_PATH + "/" + copiedIssueKey);
-        request.setSoTimeout(CONNECTION_TIMEOUTS);
-        request.setConnectionTimeout(CONNECTION_TIMEOUTS);
-        try
-        {
-            request.execute();
-        }
-        catch (final ResponseException e)
-        {
-            log.error("Failed to convert remote links into local links on the target server", e);
-        }
+    @Override
+    public void convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
+
+        AbstractJsonResponseHandler<Object> handler = new AbstractJsonResponseHandler<Object>(jiraLocation) {
+            @Override
+            protected void modifyRequest(ApplicationLinkRequest request) {
+                request.setSoTimeout(CONNECTION_TIMEOUTS);
+                request.setConnectionTimeout(CONNECTION_TIMEOUTS);
+            }
+
+            @Override
+            protected Object parseResponse(Response response) throws ResponseException, JSONException {
+                return new Object();
+            }
+        };
+
+        callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + CONVERT_ISSUE_LINKS_RESOURCE_PATH + "/" + remoteIssueKey, handler);
+
+
     }
+
 
 }

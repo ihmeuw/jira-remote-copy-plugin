@@ -1,9 +1,7 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.ResponseStatus;
-import com.atlassian.cpji.rest.RemotesResource;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,12 +24,12 @@ public class RemotePluginBean {
 	@XmlElement
 	private final String authorisationUrl;
 
-	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull ApplicationLink inputApplicationLink, @Nonnull InternalHostApplication hostApplication, @Nonnull String issueId) {
+	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull JiraProxyFactory proxyFactory, @Nonnull String issueId) {
 		return new RemotePluginBean(input.getJiraLocation().getName(),
 				input.getJiraLocation().getId(),
 				input.getResult().toString(),
-				RemotesResource.generateAuthorizationUrl(hostApplication,
-						inputApplicationLink.createAuthenticatedRequestFactory(), issueId));
+                proxyFactory.createJiraProxy(input.getJiraLocation()).generateAuthenticationUrl(issueId)
+				);
 	}
 
 	public RemotePluginBean(@Nonnull String name, @Nonnull String id, @Nonnull String status, @Nullable String authorisationUrl) {

@@ -102,6 +102,7 @@
 	<component key="userMappingManager" class="com.atlassian.cpji.fields.value.UserMappingManager"/>
 	<component key="remoteJiraService" class="com.atlassian.cpji.components.RemoteJiraService"/>
 	<component key="copyIssueService" class="com.atlassian.cpji.components.CopyIssueService"/>
+	<component key="jiraProxyFactory" class="com.atlassian.cpji.components.remote.JiraProxyFactory"/>
 
 	<resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>
 

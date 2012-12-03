@@ -7,6 +7,7 @@ import com.atlassian.applinks.api.TypeNotInstalledException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.JiraLocation;
+import com.atlassian.cpji.util.IssueLinkClient;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.google.common.base.Function;
@@ -24,12 +25,14 @@ public class JiraProxyFactory {
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final InternalHostApplication hostApplication;
+    private final IssueLinkClient issueLinkClient;
 
-    public JiraProxyFactory(ApplicationLinkService applicationLinkService, PermissionManager permissionManager, JiraAuthenticationContext jiraAuthenticationContext, InternalHostApplication hostApplication) {
+    public JiraProxyFactory(ApplicationLinkService applicationLinkService, PermissionManager permissionManager, JiraAuthenticationContext jiraAuthenticationContext, InternalHostApplication hostApplication, IssueLinkClient issueLinkClient) {
         this.applicationLinkService = applicationLinkService;
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.hostApplication = hostApplication;
+        this.issueLinkClient = issueLinkClient;
     }
 
     public JiraProxy createJiraProxy(JiraLocation jira) {
@@ -38,7 +41,7 @@ public class JiraProxyFactory {
         else {
             try {
                 final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(new ApplicationId(jira.getId()));
-                return new RemoteJiraProxy(hostApplication, applicationLink, jira);
+                return new RemoteJiraProxy(hostApplication, applicationLink, jira, issueLinkClient);
             } catch (TypeNotInstalledException e) {
                 return null;
             }
