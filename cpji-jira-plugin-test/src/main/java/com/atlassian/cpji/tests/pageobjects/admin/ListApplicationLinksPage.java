@@ -1,5 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects.admin;
 
+import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.PageElements;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.elements.CheckboxElement;
@@ -38,7 +39,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 	public DeleteDialog clickDelete(String url) {
 		Preconditions.checkNotNull(url);
-		dumpApplicationLinks();
+		ScreenshotUtil.attemptScreenshot(driver.getDriver(), "before click delete");
 		final By by = By.cssSelector(String.format("tr[id='ual-row-%s'] .app-delete-link", url));
 		driver.waitUntilElementIsVisible(by);
 		elementFinder.find(by).click();

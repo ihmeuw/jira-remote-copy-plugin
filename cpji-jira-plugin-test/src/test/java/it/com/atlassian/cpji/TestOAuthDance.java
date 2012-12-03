@@ -1,5 +1,6 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
@@ -27,9 +28,11 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 
 		try {
 			ListApplicationLinksPage appLinks = jira1.visit(ListApplicationLinksPage.class);
+			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "list application links");
 			appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
 					.setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
 					.setUseDifferentUsers().next();
+			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application link added");
 
 			viewIssue(jira1, issueKey);
 			SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, issueId);
