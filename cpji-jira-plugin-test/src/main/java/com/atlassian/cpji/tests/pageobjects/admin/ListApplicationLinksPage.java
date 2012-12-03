@@ -34,7 +34,9 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 	public DeleteDialog clickDelete(String url) {
 		Preconditions.checkNotNull(url);
-		elementFinder.find(By.cssSelector(String.format("tr[id='ual-row-%s'] .app-delete-link", url))).click();
+		final By by = By.cssSelector(String.format("tr[id='ual-row-%s'] .app-delete-link", url));
+		elementFinder.find(by).timed().isVisible().byDefaultTimeout();
+		elementFinder.find(by).click();
 		return pageBinder.bind(DeleteDialog.class);
 	}
 
