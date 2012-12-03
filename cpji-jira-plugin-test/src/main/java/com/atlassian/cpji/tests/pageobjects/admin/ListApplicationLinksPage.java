@@ -45,10 +45,11 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 		private PageElement dialog;
 
 		public DeleteDialog delete() {
+			final By locator = By.cssSelector(".button-panel-button.wizard-submit");
 			final PageElement deleteButton = Iterables.get(Iterables
-					.filter(dialog.findAll(By.cssSelector(".button-panel-button.wizard-submit")),
+					.filter(dialog.findAll(locator),
 							PageElements.isVisible()), 0);
-//			Preconditions.checkState(deleteButton.timed().isEnabled().by(20, TimeUnit.SECONDS)); // wait until it's enabled
+			driver.waitUntil(PageElements.isEnabled(locator));
 			deleteButton.click();
 			return this;
 		}
