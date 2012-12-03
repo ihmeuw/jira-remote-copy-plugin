@@ -7,11 +7,16 @@ import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * @since v3.0
@@ -46,10 +51,23 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 		return pageBinder.bind(DeleteDialog.class);
 	}
 
-	private void dumpApplicationLinks() {
-		for(PageElement row : appLinksTable.findAll(By.tagName("tr"))) {
-			logger.info(row.find(By.className("application-name")).getText() + " " + row.find(By.className("application-url")).getText());
-		}
+	public List<ApplicationLinkBean> getApplicationLinks() {
+		driver.waitUntilElementIsNotVisible(By.className("links-loading"));
+		return ImmutableList.copyOf(Iterables.transform(appLinksTable.findAll(By.tagName("tr")), new Function<PageElement, ApplicationLinkBean>() {
+			@Override
+			public ApplicationLinkBean apply(@Nullable PageElement input) {
+				return new ApplicationLinkBean(input.find(By.className("application-name")).getText(), input.find(By.className("application-url")).getText());
+			}
+		}));
+	}
+
+	public List<String> getNamesOfApplicationLinks() {
+		return ImmutableList.copyOf(Iterables.transform(getApplicationLinks(), new Function<ApplicationLinkBean, String>() {
+			@Override
+			public String apply(ApplicationLinkBean input) {
+				return input.getName();
+			}
+		}));
 	}
 
 	public static class DeleteDialog extends AbstractJiraPage {
@@ -179,6 +197,24 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 		@Override
 		public TimedCondition isAt() {
 			return differenUserRadio.timed().isVisible();
+		}
+	}
+
+	private class ApplicationLinkBean {
+		private final String name;
+		private final String url;
+
+		private ApplicationLinkBean(String name, String url) {
+			this.name = name;
+			this.url = url;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getUrl() {
+			return url;
 		}
 	}
 }

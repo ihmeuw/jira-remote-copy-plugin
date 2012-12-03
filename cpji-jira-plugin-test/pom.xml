@@ -222,6 +222,7 @@
                             <productIds>
                                 <productId>jira1</productId>
                                 <productId>jira2</productId>
+                                <productId>jira3</productId>
                             </productIds>
                             <includes>
                                 <include>it/**</include>

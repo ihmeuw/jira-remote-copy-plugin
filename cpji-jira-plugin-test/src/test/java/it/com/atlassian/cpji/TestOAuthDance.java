@@ -1,10 +1,10 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.cpji.tests.ScreenshotUtil;
-import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
-import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
+import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
+import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,9 +29,13 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 		try {
 			ListApplicationLinksPage appLinks = jira1.visit(ListApplicationLinksPage.class);
 			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "list application links");
-			appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
+
+			appLinks = appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
 					.setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
 					.setUseDifferentUsers().next();
+
+//			assertThat(appLinks.getNamesOfApplicationLinks(), IsCollectionContaining.hasItems("JIRA3", "Your Company JIRA"));
+
 			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application link added");
 
 			viewIssue(jira1, issueKey);
@@ -45,7 +49,13 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 					selectTargetProjectPage.getIssueId());
 			assertFalse(selectTargetProjectPage.hasOAuthApproval(applicationId));
 		} finally {
-			jira1.visit(ListApplicationLinksPage.class).clickDelete("http://localhost:2992/jira").delete().deleteAndReturn();
+			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application links list before delete");
+
+			try {
+				jira1.visit(ListApplicationLinksPage.class).clickDelete("http://localhost:2992/jira").delete().deleteAndReturn();
+			} catch (Exception e) {
+//				ignore it here, don't want hide the original exception
+			}
 		}
 	}
 }

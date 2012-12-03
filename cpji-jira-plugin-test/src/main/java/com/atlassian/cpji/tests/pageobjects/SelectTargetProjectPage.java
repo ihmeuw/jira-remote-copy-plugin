@@ -1,6 +1,5 @@
 package com.atlassian.cpji.tests.pageobjects;
 
-import com.atlassian.cpji.tests.pageobjects.SingleSelect;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.binder.Init;
@@ -82,7 +81,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	public JiraLoginPage clickOAuthApproval(String applicationId) {
 		Preconditions.checkNotNull(applicationId);
 		By link = By.cssSelector(String.format("a[data-application-id=%s]", applicationId));
-		elementFinder.find(link).timed().isVisible().byDefaultTimeout();
+		driver.waitUntilElementIsVisible(link);
 		elementFinder.find(link).click();
 		return pageBinder.bind(JiraLoginPage.class);
 	}
