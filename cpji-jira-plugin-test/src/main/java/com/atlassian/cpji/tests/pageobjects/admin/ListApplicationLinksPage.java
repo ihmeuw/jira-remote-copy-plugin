@@ -7,6 +7,7 @@ import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
+import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -24,12 +25,12 @@ import java.util.List;
 public class ListApplicationLinksPage extends AbstractJiraPage {
 	private static final Logger logger = LoggerFactory.getLogger(ListApplicationLinksPage.class);
 
-	@ElementBy (id = "application-links-table")
-	private PageElement appLinksTable;
+    @ElementBy (className = "links-loading")
+    private PageElement linksLoading;
 
 	@Override
 	public TimedCondition isAt() {
-		return appLinksTable.timed().isVisible();
+		return linksLoading.timed().isVisible();
 	}
 
 	@Override
@@ -51,9 +52,13 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 		return pageBinder.bind(DeleteDialog.class);
 	}
 
+    protected PageElement getApplicationLinksTable() {
+        driver.waitUntilElementIsNotVisible(By.className("links-loading"));
+        return elementFinder.find(By.id("application-links-table"), TimeoutType.SLOW_PAGE_LOAD);
+    }
+
 	public List<ApplicationLinkBean> getApplicationLinks() {
-		driver.waitUntilElementIsNotVisible(By.className("links-loading"));
-		return ImmutableList.copyOf(Iterables.transform(appLinksTable.findAll(By.tagName("tr")), new Function<PageElement, ApplicationLinkBean>() {
+		return ImmutableList.copyOf(Iterables.transform(getApplicationLinksTable().findAll(By.tagName("tr")), new Function<PageElement, ApplicationLinkBean>() {
 			@Override
 			public ApplicationLinkBean apply(@Nullable PageElement input) {
 				return new ApplicationLinkBean(input.find(By.className("application-name")).getText(), input.find(By.className("application-url")).getText());
