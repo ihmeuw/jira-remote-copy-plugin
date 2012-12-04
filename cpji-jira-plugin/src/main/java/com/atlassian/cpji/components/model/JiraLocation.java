@@ -26,7 +26,7 @@ public class JiraLocation {
         return name;
     }
 
-    public ApplicationId toApplicationId(){
+    public ApplicationId toApplicationId() {
         return new ApplicationId(id);
     }
 

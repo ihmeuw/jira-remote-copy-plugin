@@ -49,8 +49,7 @@ import java.util.*;
 /**
  * @since v3.0
  */
-public class CopyIssueService
-{
+public class CopyIssueService {
     private static final List<String> GLOBAL_ID_KEYS = ImmutableList.of("appId", "issueId");
     private static final Logger log = Logger.getLogger(CopyIssueService.class);
 
@@ -67,8 +66,7 @@ public class CopyIssueService
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService)
-    {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -85,8 +83,7 @@ public class CopyIssueService
 
 
     public IssueCreationResultBean copyIssue(final CopyIssueBean copyIssueBean)
-            throws ValidationException, IssueCreatedWithErrorsException, CreationException, ProjectNotFoundException
-    {
+            throws ValidationException, IssueCreatedWithErrorsException, CreationException, ProjectNotFoundException {
         Project project = getProjectFromIssueBean(copyIssueBean);
 
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
@@ -97,70 +94,47 @@ public class CopyIssueService
         IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
         projectFieldMapper.populateInputParameters(inputParameters, copyIssueBean, null, project);
         Map<String, FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
-        for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems)
-        {
+        for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems) {
             OrderableField orderableField = fieldLayoutItem.getOrderableField();
-            if (!fieldManager.isCustomField(orderableField))
-            {
+            if (!fieldManager.isCustomField(orderableField)) {
                 IssueCreationFieldMapper fieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(orderableField.getClass());
-                if (fieldMapper != null)
-                {
+                if (fieldMapper != null) {
                     MappingResult mappingResult = fieldMapper.getMappingResult(copyIssueBean, project);
-                    if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired())
-                    {
+                    if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
                         String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                        if (defaultFieldValue != null)
-                        {
+                        if (defaultFieldValue != null) {
                             inputParameters.getActionParameters().put(orderableField.getId(), defaultFieldValue);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         fieldMapper.populateInputParameters(inputParameters, copyIssueBean, fieldLayoutItem, project);
                     }
-                }
-                else
-                {
-                    if (!allSystemFieldMappers.containsKey(orderableField.getId()))
-                    {
+                } else {
+                    if (!allSystemFieldMappers.containsKey(orderableField.getId())) {
                         log.warn("No support for field '" + orderableField.getName() + "'");
                     }
                 }
-            }
-            else
-            {
+            } else {
                 CustomField customField = fieldManager.getCustomField(orderableField.getId());
                 CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper().get(customField.getCustomFieldType().getClass().getCanonicalName());
-                if (customFieldMapper != null)
-                {
+                if (customFieldMapper != null) {
                     CustomFieldBean matchingRemoteCustomField = CustomFieldMapperUtil.findMatchingRemoteCustomField(customField, copyIssueBean.getCustomFields());
-                    if (matchingRemoteCustomField != null)
-                    {
+                    if (matchingRemoteCustomField != null) {
                         CustomFieldMappingResult customFieldMappingResult = customFieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, issueType);
-                        if (!customFieldMappingResult.hasOneValidValue() && fieldLayoutItem.isRequired())
-                        {
+                        if (!customFieldMappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
                             String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                            if (defaultFieldValue != null)
-                            {
+                            if (defaultFieldValue != null) {
                                 inputParameters.addCustomFieldValue(orderableField.getId(), defaultFieldValue);
                             }
-                        }
-                        else
-                        {
+                        } else {
                             customFieldMapper.populateInputParameters(inputParameters, customFieldMappingResult, customField, project, issueType);
                         }
-                    }
-                    else if (fieldLayoutItem.isRequired())
-                    {
+                    } else if (fieldLayoutItem.isRequired()) {
                         String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                        if (defaultFieldValue != null)
-                        {
+                        if (defaultFieldValue != null) {
                             inputParameters.addCustomFieldValue(orderableField.getId(), defaultFieldValue);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     log.warn("No support yet for custom field type '" + customField.getCustomFieldType().getClass().getCanonicalName() + "'");
                 }
             }
@@ -168,25 +142,19 @@ public class CopyIssueService
 
         IssueService.CreateValidationResult validationResult = issueService.validateCreate(callingUser(), inputParameters);
 
-        if (!validationResult.isValid())
-        {
+        if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrorCollection());
         }
 
         IssueService.IssueResult createIssueResult = issueService.create(callingUser(), validationResult);
 
-        if (createIssueResult.isValid())
-        {
+        if (createIssueResult.isValid()) {
             final List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = fieldMapperFactory.getPostIssueCreationFieldMapper();
             final ErrorCollection errors = new SimpleErrorCollection();
-            for (SystemFieldPostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper)
-            {
-                try
-                {
+            for (SystemFieldPostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper) {
+                try {
                     issueCreationFieldMapper.process(createIssueResult.getIssue(), copyIssueBean);
-                }
-                catch (FieldCreationException e)
-                {
+                } catch (FieldCreationException e) {
                     log.warn("Exception when creating field '" + e.getFieldId() + "'", e);
                     errors.addError(issueCreationFieldMapper.getFieldId(), e.getMessage());
                 }
@@ -194,16 +162,13 @@ public class CopyIssueService
 
             IssueCreationResultBean resultBean = new IssueCreationResultBean(createIssueResult.getIssue().getKey(), createIssueResult.getIssue().getProjectObject().getKey(), createIssueResult.getIssue().getId());
 
-            if (errors.hasAnyErrors())
-            {
+            if (errors.hasAnyErrors()) {
                 errors.addErrorMessage("Created issue '" + createIssueResult.getIssue().getKey() + "'. But there were some errors.'");
                 throw new IssueCreatedWithErrorsException(resultBean, errors);
             }
 
             return resultBean;
-        }
-        else
-        {
+        } else {
             log.error("Failed to create issue. Reason: " + createIssueResult.getErrorCollection());
             throw new CreationException(createIssueResult.getErrorCollection());
         }
@@ -211,8 +176,7 @@ public class CopyIssueService
     }
 
 
-    public FieldPermissionsBean checkFieldPermissions(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException
-    {
+    public FieldPermissionsBean checkFieldPermissions(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException {
         Project project = getProjectFromIssueBean(copyIssueBean);
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
 
@@ -228,38 +192,28 @@ public class CopyIssueService
         systemFieldPermissionBeans.addAll(systemFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
         customFieldPermissionBeans.addAll(customFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
 
-        Iterable<String> orderableFieldIds = Iterables.transform(fieldLayoutItems, new Function<FieldLayoutItem, String>()
-        {
-            public String apply(final FieldLayoutItem from)
-            {
+        Iterable<String> orderableFieldIds = Iterables.transform(fieldLayoutItems, new Function<FieldLayoutItem, String>() {
+            public String apply(final FieldLayoutItem from) {
                 return from.getOrderableField().getId();
             }
         });
         ArrayList<String> fieldIds = Lists.newArrayList(orderableFieldIds);
         Map<String, NonOrderableSystemFieldMapper> nonOrderableSystemFieldMappers = fieldMapperFactory.getNonOrderableSystemFieldMappers();
-        for (NonOrderableSystemFieldMapper nonOrderableSystemFieldMapper : nonOrderableSystemFieldMappers.values())
-        {
-            if (nonOrderableSystemFieldMapper.isVisible())
-            {
+        for (NonOrderableSystemFieldMapper nonOrderableSystemFieldMapper : nonOrderableSystemFieldMappers.values()) {
+            if (nonOrderableSystemFieldMapper.isVisible()) {
                 fieldIds.add(nonOrderableSystemFieldMapper.getFieldId());
             }
         }
 
-        for (String fieldId : fieldIds)
-        {
-            if (fieldManager.isCustomField(fieldId))
-            {
+        for (String fieldId : fieldIds) {
+            if (fieldManager.isCustomField(fieldId)) {
                 CustomFieldPermissionBean customFieldPermissionBean = customFieldMappingChecker.getFieldPermission(fieldId);
-                if (customFieldPermissionBean != null)
-                {
+                if (customFieldPermissionBean != null) {
                     customFieldPermissionBeans.add(customFieldPermissionBean);
                 }
-            }
-            else
-            {
+            } else {
                 SystemFieldPermissionBean fieldPermission = systemFieldMappingChecker.getFieldPermission(fieldId);
-                if (fieldPermission != null)
-                {
+                if (fieldPermission != null) {
                     systemFieldPermissionBeans.add(fieldPermission);
                 }
             }
@@ -268,42 +222,35 @@ public class CopyIssueService
         return new FieldPermissionsBean(systemFieldPermissionBeans, customFieldPermissionBeans);
     }
 
-    public void convertRemoteLinksToLocal(String issueKey) throws IssueNotFoundException, RemoteLinksNotFoundException
-    {
+    public void convertRemoteLinksToLocal(String issueKey) throws IssueNotFoundException, RemoteLinksNotFoundException {
         final User user = callingUser();
 
         // Get issue
         final IssueService.IssueResult result = issueService.getIssue(user, issueKey);
 
-        if (!result.isValid())
-        {
+        if (!result.isValid()) {
             throw new IssueNotFoundException(result.getErrorCollection());
         }
         final Issue issue = result.getIssue();
 
         // Get remote issue links
         final RemoteIssueLinkService.RemoteIssueLinkListResult linksResult = remoteIssueLinkService.getRemoteIssueLinksForIssue(user, issue);
-        if (!linksResult.isValid())
-        {
+        if (!linksResult.isValid()) {
             throw new RemoteLinksNotFoundException(linksResult.getErrorCollection());
         }
 
-        for (final RemoteIssueLink remoteIssueLink : linksResult.getRemoteIssueLinks())
-        {
+        for (final RemoteIssueLink remoteIssueLink : linksResult.getRemoteIssueLinks()) {
             // We are only interested in JIRA links
-            if (RemoteIssueLink.APPLICATION_TYPE_JIRA.equals(remoteIssueLink.getApplicationType()))
-            {
+            if (RemoteIssueLink.APPLICATION_TYPE_JIRA.equals(remoteIssueLink.getApplicationType())) {
                 final Map<String, String> values = decode(remoteIssueLink.getGlobalId(), GLOBAL_ID_KEYS);
-                if (internalHostApplication.getId().get().equals(values.get("appId")))
-                {
+                if (internalHostApplication.getId().get().equals(values.get("appId"))) {
                     // It links to this JIRA instance, make it a local link
                     final Issue issueToLinkTo = getIssue(user, Long.parseLong(values.get("issueId")));
                     createIssueLink(user, issue, issueToLinkTo, remoteIssueLink.getRelationship());
 
                     // Delete the remote issue link, it is no longer needed
                     final RemoteIssueLinkService.DeleteValidationResult deleteValidationResult = remoteIssueLinkService.validateDelete(user, remoteIssueLink.getId());
-                    if (deleteValidationResult.isValid())
-                    {
+                    if (deleteValidationResult.isValid()) {
                         remoteIssueLinkService.delete(user, deleteValidationResult);
                     }
                 }
@@ -312,27 +259,21 @@ public class CopyIssueService
     }
 
 
-    private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship)
-    {
+    private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship) {
         final IssueLinkService.AddIssueLinkValidationResult addIssueLinkValidationResult = issueLinkService.validateAddIssueLinks(
                 user, fromIssue, relationship, ImmutableList.<String>of(toIssue.getKey()));
 
-        if (addIssueLinkValidationResult.isValid())
-        {
+        if (addIssueLinkValidationResult.isValid()) {
             issueLinkService.addIssueLinks(user, addIssueLinkValidationResult);
-        }
-        else
-        {
+        } else {
             // TODO handle error
             log.warn("Error creating local link from " + fromIssue.getKey() + " to " + toIssue.getKey() + ". " + addIssueLinkValidationResult.getErrorCollection());
         }
     }
 
-    private Issue getIssue(final User user, final Long issueId)
-    {
+    private Issue getIssue(final User user, final Long issueId) {
         final IssueService.IssueResult result = issueService.getIssue(user, issueId);
-        if (!result.isValid())
-        {
+        if (!result.isValid()) {
             return null;
         }
 
@@ -345,37 +286,30 @@ public class CopyIssueService
      * Decode the given String to a Map of values.
      *
      * @param globalId the String to decode
-     * @param keys the order in which the keys should appear. If the keys are not in this order an
-     * IllegalArgumentException is thrown.
+     * @param keys     the order in which the keys should appear. If the keys are not in this order an
+     *                 IllegalArgumentException is thrown.
      * @return a Map of values
      */
-    public static Map<String, String> decode(final String globalId, final List<String> keys)
-    {
+    public static Map<String, String> decode(final String globalId, final List<String> keys) {
         final List<NameValuePair> params = new ArrayList<NameValuePair>();
         final Scanner scanner = new Scanner(globalId);
 
-        try
-        {
+        try {
             URLEncodedUtils.parse(params, scanner, "UTF-8");
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId, e);
         }
 
         // Check that we have the right number of keys
-        if (params.size() != keys.size())
-        {
+        if (params.size() != keys.size()) {
             throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId);
         }
 
         // Get the values, and make sure the keys are in the correct order
         final Map<String, String> result = new HashMap<String, String>(params.size());
-        for (int i = 0; i < params.size(); i++)
-        {
+        for (int i = 0; i < params.size(); i++) {
             final NameValuePair param = params.get(i);
-            if (!param.getName().equals(keys.get(i)))
-            {
+            if (!param.getName().equals(keys.get(i))) {
                 throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId);
             }
 
@@ -385,19 +319,14 @@ public class CopyIssueService
         return result;
     }
 
-    private static String getExpectedFormat(final List<String> keys)
-    {
+    private static String getExpectedFormat(final List<String> keys) {
         final StringBuilder sb = new StringBuilder();
         boolean first = true;
 
-        for (final String key : keys)
-        {
-            if (first)
-            {
+        for (final String key : keys) {
+            if (first) {
                 first = false;
-            }
-            else
-            {
+            } else {
                 sb.append("&");
             }
 
@@ -408,41 +337,30 @@ public class CopyIssueService
     }
 
 
-    private Project getProjectFromIssueBean(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException
-    {
+    private Project getProjectFromIssueBean(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException {
         ProjectService.GetProjectResult result = projectService.getProjectByKey(callingUser(), copyIssueBean.getTargetProjectKey());
-        if (!result.isValid())
-        {
+        if (!result.isValid()) {
             throw new ProjectNotFoundException(result.getErrorCollection());
         }
         return result.getProject();
     }
 
 
-    private IssueType findIssueType(final String issueType, final Project project)
-    {
+    private IssueType findIssueType(final String issueType, final Project project) {
         Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);
-        try
-        {
-            return Iterables.find(issueTypesForProject, new Predicate<IssueType>()
-            {
-                public boolean apply(final IssueType input)
-                {
+        try {
+            return Iterables.find(issueTypesForProject, new Predicate<IssueType>() {
+                public boolean apply(final IssueType input) {
                     return input.getName().equals(issueType);
                 }
             });
-        }
-        catch (NoSuchElementException ex)
-        {
+        } catch (NoSuchElementException ex) {
             throw new RESTException(Response.Status.NOT_FOUND, "No issue type with name '" + issueType + "' found!");
         }
     }
 
 
-
-
-    private User callingUser()
-    {
+    private User callingUser() {
         return authenticationContext.getLoggedInUser();
     }
 

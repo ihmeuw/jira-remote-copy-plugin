@@ -26,25 +26,26 @@ import java.util.concurrent.Future;
 
 public class RemoteJiraService {
 
-	private static final Logger log = Logger.getLogger(RemoteJiraService.class);
-	private static final int THREADS = 5;
+    private static final Logger log = Logger.getLogger(RemoteJiraService.class);
+    private static final int THREADS = 5;
 
-	private final JiraAuthenticationContext authenticationContext;
+    private final JiraAuthenticationContext authenticationContext;
     private final JiraProxyFactory jiraProxyFactory;
 
-	public RemoteJiraService(final JiraAuthenticationContext authenticationContext, JiraProxyFactory jiraProxyFactory) {
-		this.authenticationContext = authenticationContext;
+    public RemoteJiraService(final JiraAuthenticationContext authenticationContext, JiraProxyFactory jiraProxyFactory) {
+        this.authenticationContext = authenticationContext;
         this.jiraProxyFactory = jiraProxyFactory;
     }
 
-	/**
-	 * Asks each JIRA to see what RIC plugin version do they have installed.
-	 * @return
-	 */
-	@Nonnull
-	public Iterable<Either<ResponseStatus, SuccessfulResponse>> getPluginInfo() {
+    /**
+     * Asks each JIRA to see what RIC plugin version do they have installed.
+     *
+     * @return
+     */
+    @Nonnull
+    public Iterable<Either<ResponseStatus, SuccessfulResponse>> getPluginInfo() {
 
-        return executeForEveryJira(new FunctionWithFallback<Either<ResponseStatus, SuccessfulResponse>>(){
+        return executeForEveryJira(new FunctionWithFallback<Either<ResponseStatus, SuccessfulResponse>>() {
 
             @Override
             public Either<ResponseStatus, SuccessfulResponse> onInvocationException(Exception e) {
@@ -58,29 +59,25 @@ public class RemoteJiraService {
             }
         });
 
-	}
+    }
 
 
-    private interface FunctionWithFallback<T> extends Function<JiraProxy, T>{
+    private interface FunctionWithFallback<T> extends Function<JiraProxy, T> {
         T onInvocationException(Exception e);
     }
 
-    private <T>Iterable<T> executeForEveryJira(final FunctionWithFallback<T> function){
+    private <T> Iterable<T> executeForEveryJira(final FunctionWithFallback<T> function) {
         final ExecutorService es = Executors.newFixedThreadPool(THREADS);
         final Iterable<JiraProxy> applicationLinks = jiraProxyFactory.getAllJiraProxies();
         final User user = authenticationContext.getLoggedInUser();
         final List<Callable<T>> queries = Lists.newArrayList(
                 Iterables.transform(applicationLinks,
-                        new Function<JiraProxy, Callable<T>>()
-                        {
+                        new Function<JiraProxy, Callable<T>>() {
                             @Override
-                            public Callable<T> apply(final JiraProxy applicationLink)
-                            {
-                                return new Callable<T>()
-                                {
+                            public Callable<T> apply(final JiraProxy applicationLink) {
+                                return new Callable<T>() {
                                     @Override
-                                    public T call()
-                                    {
+                                    public T call() {
                                         ComponentManager.getInstance().getJiraAuthenticationContext().setLoggedInUser(user);
                                         return function.apply(applicationLink);
                                     }
@@ -109,8 +106,8 @@ public class RemoteJiraService {
     }
 
 
-	@Nonnull
-	public Iterable<Either<ResponseStatus, Projects>> getProjects() {
+    @Nonnull
+    public Iterable<Either<ResponseStatus, Projects>> getProjects() {
 
         return executeForEveryJira(new FunctionWithFallback<Either<ResponseStatus, Projects>>() {
             @Override
@@ -123,6 +120,6 @@ public class RemoteJiraService {
                 return input.getProjects();
             }
         });
- 	}
+    }
 
 }

@@ -7,8 +7,8 @@ import com.atlassian.applinks.api.TypeNotInstalledException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.CopyIssueService;
-import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.ProjectInfoService;
+import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.util.IssueLinkClient;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.AttachmentManager;
@@ -75,7 +75,7 @@ public class JiraProxyFactory {
     }
 
     public JiraLocation getLocationById(String id) {
-        if(LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(id)){
+        if (LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(id)) {
             return LocalJiraProxy.LOCAL_JIRA_LOCATION;
         } else {
             try {
@@ -89,7 +89,7 @@ public class JiraProxyFactory {
     }
 
 
-    public Iterable<JiraProxy> getAllJiraProxies(){
+    public Iterable<JiraProxy> getAllJiraProxies() {
         return Iterables.concat(getRemoteProxies(), ImmutableList.of(createJiraProxy(LocalJiraProxy.LOCAL_JIRA_LOCATION)));
     }
 
@@ -104,17 +104,16 @@ public class JiraProxyFactory {
     }
 
 
-    public static Predicate<JiraLocation> isLocalLocation(){
+    public static Predicate<JiraLocation> isLocalLocation() {
         return new Predicate<JiraLocation>() {
             @Override
             public boolean apply(@Nullable JiraLocation input) {
-                if(input == null)
+                if (input == null)
                     return false;
                 return LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(input.getId());
             }
         };
     }
-
 
 
 }

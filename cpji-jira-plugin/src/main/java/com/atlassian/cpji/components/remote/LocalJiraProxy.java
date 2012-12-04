@@ -1,6 +1,7 @@
 package com.atlassian.cpji.components.remote;
 
-import com.atlassian.cpji.components.*;
+import com.atlassian.cpji.components.CopyIssueService;
+import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
 import com.atlassian.cpji.components.model.JiraLocation;
@@ -34,11 +35,9 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- *
  * @since v3.0
  */
-public class LocalJiraProxy implements JiraProxy
-{
+public class LocalJiraProxy implements JiraProxy {
 
     static final JiraLocation LOCAL_JIRA_LOCATION = new JiraLocation("LOCAL", "LOCAL");
 
@@ -52,7 +51,6 @@ public class LocalJiraProxy implements JiraProxy
     private final RemoteIssueLinkManager remoteIssueLinkManager;
     private final ProjectInfoService projectInfoService;
     private final JiraBaseUrls jiraBaseUrls;
-
 
 
     public LocalJiraProxy(final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, CopyIssueService copyIssueService, AttachmentManager attachmentManager, IssueManager issueManager, IssueLinkManager issueLinkManager, RemoteIssueLinkManager remoteIssueLinkManager, ProjectInfoService projectInfoService, JiraBaseUrls jiraBaseUrls, ApplicationProperties applicationProperties) {
@@ -75,15 +73,12 @@ public class LocalJiraProxy implements JiraProxy
     }
 
     @Override
-    public Either<ResponseStatus, Projects> getProjects()
-    {
+    public Either<ResponseStatus, Projects> getProjects() {
         Collection<Project> projects = permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, jiraAuthenticationContext.getLoggedInUser());
 
-        Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>()
-        {
+        Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>() {
             @Override
-            public BasicProject apply(@Nullable final Project input)
-            {
+            public BasicProject apply(@Nullable final Project input) {
                 return new BasicProject(null, input.getKey(), input.getName());
             }
         });
@@ -143,36 +138,38 @@ public class LocalJiraProxy implements JiraProxy
     }
 
     @Override
-    public void copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
+    public Either<ResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
         try {
 
-            if(localDirection == LinkCreationDirection.OUTWARD){
+            if (localDirection == LinkCreationDirection.OUTWARD) {
                 issueLinkManager.createIssueLink(localIssue.getId(), remoteIssueId, issueLinkType.getId(), null, jiraAuthenticationContext.getLoggedInUser());
-            } else if(localDirection == LinkCreationDirection.INWARD) {
+            } else if (localDirection == LinkCreationDirection.INWARD) {
                 issueLinkManager.createIssueLink(remoteIssueId, localIssue.getId(), issueLinkType.getId(), null, jiraAuthenticationContext.getLoggedInUser());
             }
-
+            return SuccessfulResponse.buildEither(jiraLocation);
         } catch (CreateException e) {
-            throw new RuntimeException(e);
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
     @Override
-    public void copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey) {
+    public Either<ResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey) {
         Issue issue = issueManager.getIssueObject(remoteIssueKey);
         try {
             RemoteIssueLinkBuilder builder = new RemoteIssueLinkBuilder(remoteIssueLink).issueId(issue.getId()).id(null);
             remoteIssueLinkManager.createRemoteIssueLink(builder.build(), jiraAuthenticationContext.getLoggedInUser());
+            return SuccessfulResponse.buildEither(jiraLocation);
         } catch (CreateException e) {
-            throw new RuntimeException(e);
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
     @Override
-    public void convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
+    public Either<ResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
         //all local links are also local
         //all remote links are still remote
         //so it is dry run
+        return SuccessfulResponse.buildEither(jiraLocation);
     }
 
     @Override
