@@ -79,7 +79,7 @@ public class LocalJiraProxy implements JiraProxy {
         Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>() {
             @Override
             public BasicProject apply(@Nullable final Project input) {
-                return new BasicProject(null, input.getKey(), input.getName());
+                return new BasicProject(null, input.getKey(), input.getName(), null);
             }
         });
 

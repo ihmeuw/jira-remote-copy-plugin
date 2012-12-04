@@ -1,23 +1,33 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.cpji.tests.pageobjects.CopyDetailsPage;
 import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstancePage;
 import com.atlassian.cpji.tests.pageobjects.PermissionChecksPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
+import com.atlassian.cpji.tests.rules.CreateIssues;
+import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.rest.client.domain.Comment;
+import com.atlassian.jira.rest.client.domain.Issue;
+import com.atlassian.jira.rest.client.domain.IssueFieldId;
+import com.atlassian.jira.rest.client.domain.input.ComplexIssueInputFieldValue;
+import com.atlassian.jira.rest.client.domain.input.FieldInput;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.atlassian.jira.rest.client.domain.IssueFieldId.PROJECT_FIELD;
+import static com.atlassian.jira.rest.client.domain.IssueFieldId.SUMMARY_FIELD;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -34,6 +44,9 @@ public class TestCopyIssue extends AbstractCopyIssueTest
     private static final String FREE_TEXT_FIELD_CF = "customfield_10000";
     private static final String SELECT_LIST_CF = "customfield_10006";
     private static final String NUMBER_FIELD_CF = "customfield_10005";
+
+	@Rule
+	public CreateIssues createIssues = new CreateIssues(restClient1);
 
     @Before
     public void setUp()
@@ -177,5 +190,15 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 		assertEquals(JSONObject.NULL, fields.opt(FREE_TEXT_FIELD_CF));
 		assertEquals(JSONObject.NULL, fields.opt(SELECT_LIST_CF));
 		assertEquals(JSONObject.NULL, fields.opt(NUMBER_FIELD_CF));
+	}
+
+	@Test
+	public void testIssueWithComments() {
+		Issue issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
+				new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.with("key", "TST")),
+				new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.with("id", "3")));
+
+		restClient1.getIssueClient().addComment(NPM, issue.getCommentsUri(), new Comment(null,
+				"This is a comment", null, null, new DateTime(), new DateTime(), null, null));
 	}
 }

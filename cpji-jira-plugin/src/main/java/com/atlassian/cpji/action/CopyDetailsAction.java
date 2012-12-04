@@ -94,6 +94,14 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         this.beanFactory = beanFactory;
     }
 
+	public boolean isIssueWithComments() {
+		final MutableIssue issue = getIssueObject();
+		if (issue != null) {
+			return !commentManager.getComments(issue).isEmpty();
+		}
+		return false;
+	}
+
     @Override
     protected String doExecute() throws Exception
     {
@@ -111,7 +119,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
         JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
         Either<ResponseStatus, CopyInformationBean> result = proxy.getCopyInformation(entityLink.getProjectKey());
-        if(result.isLeft()){
+        if(result.isLeft()) {
             ResponseStatus status = (ResponseStatus) result.left().get();
             if(ResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
                 log.error("Authentication failed.");
@@ -133,19 +141,21 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             return ERROR;
         }
         issueLinkOptions = new ArrayList<Option>();
-        I18nHelper i18nHelper = beanFactory.getInstance(getLoggedInUser());
-        String remoteJiraVersion = copyInformationBean.getVersion();
+
+		final String remoteJiraVersion = copyInformationBean.getVersion();
         if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5"))
         {
-            issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, i18nHelper.getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
-            issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, i18nHelper.getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
+            issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
+            issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
         }
-        issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, i18nHelper.getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
-        issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, i18nHelper.getText(RemoteIssueLinkType.NONE.getI18nKey())));
+        issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
+        issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, getText(RemoteIssueLinkType.NONE.getI18nKey())));
+
         checkIssueTypes(copyInformationBean.getIssueTypes().getGetTypes());
         remoteAttachmentsEnabled = copyInformationBean.getAttachmentsEnabled();
         hasCreateAttachmentsPermission = copyInformationBean.getHasCreateAttachmentPermission();
-        UserBean user = copyInformationBean.getRemoteUser();
+
+		UserBean user = copyInformationBean.getRemoteUser();
         remoteUserName = user.getUserName();
         remoteFullUserName = copyInformationBean.getRemoteUser().getFullName();
 

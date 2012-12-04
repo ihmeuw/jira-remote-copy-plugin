@@ -44,6 +44,10 @@
 						<groupId>com.sun.jersey.contribs</groupId>
 						<artifactId>jersey-apache-client</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -79,6 +83,10 @@
 						<groupId>com.sun.jersey.contribs</groupId>
 						<artifactId>jersey-apache-client</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -111,17 +119,33 @@
 				<artifactId>atlassian-rest-common</artifactId>
 				<version>${rest.version}</version>
 				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.ws.rs</groupId>
+						<artifactId>jsr311-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.plugins.rest</groupId>
 				<artifactId>atlassian-rest-module</artifactId>
 				<version>${rest.version}</version>
 				<scope>provided</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.jersey</groupId>
+						<artifactId>jersey-core</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
 				<artifactId>jira-rest-java-client</artifactId>
-				<version>1.1-m01</version>
+				<version>1.1-m02</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.sun.jersey</groupId>
@@ -223,11 +247,28 @@
 				<artifactId>jsr305</artifactId>
 				<version>2.0.0</version>
 			</dependency>
-			<dependency>
+			<!--dependency>
 				<groupId>com.sun.jersey</groupId>
 				<artifactId>jersey-core</artifactId>
 				<version>${jersey.version}</version>
+			</dependency-->
+			<!--dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-json</artifactId>
+				<version>1.8</version>
+				<scope>runtime</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>com.sun.xml.bind</groupId>
+						<artifactId>jaxb-impl</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jettison</groupId>
+				<artifactId>jettison</artifactId>
+				<version>1.1</version>
+			</dependency-->
 		</dependencies>
 	</dependencyManagement>
 
