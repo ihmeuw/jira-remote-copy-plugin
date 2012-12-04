@@ -17,7 +17,7 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.util.I18nHelper;
+import com.atlassian.plugin.webresource.WebResourceManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +37,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
     private Collection<Option> availableIssueTypes;
     private List<Option> issueLinkOptions;
-    private final I18nHelper.BeanFactory beanFactory;
 
     public class Option
     {
@@ -83,15 +82,14 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             final FieldMapperFactory fieldMapperFactory,
             final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final BeanFactory beanFactory,
             final UserMappingManager userMappingManager,
 			final ApplicationLinkService applicationLinkService,
-            final JiraProxyFactory jiraProxyFactory
+            final JiraProxyFactory jiraProxyFactory,
+			final WebResourceManager webResourceManager
     )
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
-				copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
-        this.beanFactory = beanFactory;
+				copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory, webResourceManager);
     }
 
 	public boolean isIssueWithComments() {

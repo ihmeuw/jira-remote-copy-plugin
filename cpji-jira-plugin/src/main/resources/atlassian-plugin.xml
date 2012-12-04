@@ -127,6 +127,8 @@
 			<transformer key="lessTransformer"/>
 		</transformation>
 
+		<context>remote-issue-copy</context>
+
 		<dependency>jira.webresources:jira-fields</dependency>
 		<resource type="download" name="global.css" location="com/atlassian/cpji/css/global.less"/>
 	</web-resource>

@@ -43,19 +43,22 @@
 			<fieldset>
 				#if ($action.issueWithComments)
 				<div class="field-group">
-					<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
-					<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" checked="checked"/>
+
+					<span class="field-value">
+						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" checked="checked"/>
+						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
+					</span>
 				</div>
 				#end
 
 				#if ($action.attachmentsEnabled())
 					<div class="field-group">
-						<label for="attachments">$i18n.getText('cpji.attachments')</label>
 						 <span class="field-value">
 							 #if ($action.isSALUpgradeRequired())
 								 $i18n.getText('cpji.attachments.not.moved.sal')
 							 #elseif ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
 								 <input type="checkbox" class="checkbox" id="attachments" name="copyAttachments" value="true" checked="checked"/>
+								 <label for="attachments">$i18n.getText('cpji.attachments')</label>
 							 #elseif (!$action.remoteAttachmentsEnabled())
 								 $i18n.getText('cpji.attachments.are.disabled')
 							 #elseif(!$action.hasCreateAttachmentsPermission())
@@ -66,9 +69,10 @@
 				#end
 
 				<div class="field-group">
-					<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
-					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true"
-						   checked="checked"/>
+					<span class="field-value">
+						<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
+						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
+					</span>
 				</div>
 
 				<div class="field-group">

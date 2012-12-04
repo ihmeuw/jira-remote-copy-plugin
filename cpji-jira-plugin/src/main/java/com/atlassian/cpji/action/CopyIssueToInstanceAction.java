@@ -24,6 +24,7 @@ import com.atlassian.jira.issue.link.*;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
+import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
@@ -61,10 +62,12 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
                     final IssueLinkManager issueLinkManager,
                     final RemoteIssueLinkManager remoteIssueLinkManager,
                     final ApplicationLinkService applicationLinkService,
-                    final JiraProxyFactory jiraProxyFactory, IssueLinkTypeManager issueLinkTypeManager)
+                    final JiraProxyFactory jiraProxyFactory, IssueLinkTypeManager issueLinkTypeManager,
+					final WebResourceManager webResourceManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory,
+				webResourceManager);
         this.issueLinkManager = issueLinkManager;
         this.remoteIssueLinkManager = remoteIssueLinkManager;
         this.issueLinkTypeManager = issueLinkTypeManager;

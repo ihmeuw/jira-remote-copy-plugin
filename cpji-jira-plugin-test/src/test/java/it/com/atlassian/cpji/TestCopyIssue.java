@@ -200,5 +200,8 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 
 		restClient1.getIssueClient().addComment(NPM, issue.getCommentsUri(), new Comment(null,
 				"This is a comment", null, null, new DateTime(), new DateTime(), null, null));
+
+		viewIssue(jira1, issue.getKey());
+
 	}
 }

@@ -44,7 +44,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             )
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory, webResourceManager);
         webResourceManager.requireResource(PLUGIN_KEY + ":selectTargetProjectAction");
 	}
 

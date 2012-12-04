@@ -20,6 +20,7 @@ import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
+import com.atlassian.plugin.webresource.WebResourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +50,12 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
             final CopyIssuePermissionManager copyIssuePermissionManager,
             final UserMappingManager userMappingManager,
 			final ApplicationLinkService applicationLinkService,
-            final JiraProxyFactory jiraProxyFactory)
+            final JiraProxyFactory jiraProxyFactory,
+			final WebResourceManager webResourceManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory);
+				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory,
+				webResourceManager);
         this.fieldMapperFactory = fieldMapperFactory;
     }
 
