@@ -1,77 +1,78 @@
 #* @vtlvariable name="action" type="com.atlassian.cpji.action.CopyDetailsAction" *#
 <html>
 <head>
-    <title>Select a new issue type</title>
+	<title>$i18n.getText('cpji.select.new.issue.type')</title>
 </head>
 <body>
 <div id="stepped-process" class="content-container">
-    <div class="content-related">
-    <ol class="steps">
-            <li class="done">Select project</li>
-            <li class="current">Select Issue Type</li>
-            <li class="todo">Confirmation</li>
-        </ol>
-    </div>
-    <div class="content-body aui-panel">
-        <form action="PermissionChecksAction.jspa" class="aui" method="post">
-            <h2>Issue type</h2>
-            <fieldset>
-                <div class="field-group">
-                    <label for="issueType">Issue Type</label>
-                    <select name="issueType" id="issueType">
-                        #foreach( $issueType in $action.getAvailableIssueTypes())
-                            <option #if(${issueType.isSelected()}) selected #end  value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
-                        #end
-                    </select>
-                </div>
-            </fieldset>
-            <h2>Remote user</h2>
-            <fieldset>
-                <div class="field-group">
-                    <label>User name</label>
-                    <span class="field-value">$textutils.htmlEncode($action.getRemoteUserName())</span>
-                </div>
-                <div class="field-group">
-                    <label>User Full Name</label>
-                    <span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName())</span>
-                </div>
-            </fieldset>
-
-			<h2>Issue details</h2>
+	<div class="content-related">
+		<ol class="steps">
+			<li class="done">$i18n.getText('cpji.select.project')</li>
+			<li class="current">$i18n.getText('cpji.select.issue.type')</li>
+			<li class="todo">$i18n.getText('cpji.confirmation')</li>
+		</ol>
+	</div>
+	<div class="content-body aui-panel">
+		<form action="PermissionChecksAction.jspa" class="aui" method="post">
+			<h2>$i18n.getText('cpji.issue.type')</h2>
 			<fieldset>
-				#if ($action.isSALUpgradeRequired() && $action.attachmentsEnabled())
+				<div class="field-group">
+					<label for="issueType">$i18n.getText('cpji.issue.type')</label>
+					<select name="issueType" id="issueType">
+						#foreach( $issueType in $action.getAvailableIssueTypes())
+							<option #if(${issueType.isSelected()}) selected #end
+																   value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
+						#end
+					</select>
+				</div>
+			</fieldset>
+
+			<h2>$i18n.getText('cpji.remote.user')</h2>
+			<fieldset>
+				<div class="field-group">
+					<label>$i18n.getText('cpji.user.name')</label>
+					<span class="field-value">$textutils.htmlEncode($action.getRemoteUserName())</span>
+				</div>
+				<div class="field-group">
+					<label>$i18n.getText('cpji.user.full.name')</label>
+					<span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName())</span>
+				</div>
+			</fieldset>
+
+			<h2>$i18n.getText('cpji.optional.copy.items')</h2>
+			<fieldset>
+				#if ($action.issueWithComments)
+				<div class="field-group">
+					<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
+					<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" checked="checked"/>
+				</div>
+				#end
+
+				#if ($action.attachmentsEnabled())
 					<div class="field-group">
-						<label for="attachments">Attachments</label>
-                     <span class="field-value">
-                         Attachments are not moved until we have upgraded JIRA's SAL version.
-                     </span>
-						<input type="hidden" name="copyAttachments" value="false"/>
-					</div>
-				#elseif ($action.attachmentsEnabled())
-					<div class="field-group">
-						<label for="attachments">Attachments</label>
-                 <span class="field-value">
-					 #if ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
-						 Attachments will be copied.
-                         <input type="hidden" name="copyAttachments" value="true"/>
-					 #elseif (!$action.remoteAttachmentsEnabled())
-						 Attachments are disabled in the remote JIRA instance.
-                         <input type="hidden" name="copyAttachments" value="false"/>
-					 #elseif(!$action.hasCreateAttachmentsPermission())
-						 You don't have the create attachments permission in the remote JIRA instance.
-                         <input type="hidden" name="copyAttachments" value="false"/>
-					 #end
-				 </span>
+						<label for="attachments">$i18n.getText('cpji.attachments')</label>
+						 <span class="field-value">
+							 #if ($action.isSALUpgradeRequired())
+								 $i18n.getText('cpji.attachments.not.moved.sal')
+							 #elseif ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
+								 <input type="checkbox" class="checkbox" id="attachments" name="copyAttachments" value="true" checked="checked"/>
+							 #elseif (!$action.remoteAttachmentsEnabled())
+								 $i18n.getText('cpji.attachments.are.disabled')
+							 #elseif(!$action.hasCreateAttachmentsPermission())
+								 $i18n.getText('cpji.not.permitted.to.create.attachments')
+							 #end
+						 </span>
 					</div>
 				#end
 
 				<div class="field-group">
-					<label for="copy-issue-links">Copy Issue Links</label>
-					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
-				</fieldset>
+					<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
+					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true"
+						   checked="checked"/>
+				</div>
 
 				<div class="field-group">
-					<label for="remoteIssueLink">Create Issue Link</label>
+					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
 					<select name="remoteIssueLink" id="remoteIssueLink">
 						#foreach( $issueLink in $action.getIssueLinkOptions())
 							<option value="$textutils.htmlEncode(${issueLink.value})">$textutils.htmlEncode(${issueLink.label})</option>
@@ -80,16 +81,16 @@
 				</div>
 			</fieldset>
 
-            <div class="button-container">
-                <div class="buttons">
-                    <input type="submit" value="Next" class="button submit"/>
-                </div>
-            </div>
-            <input type="hidden" name="id" value="$action.id"/>
-            <input type="hidden" name="atl_token" value="$action.xsrfToken"/>
-            <input type="hidden" name="targetEntityLink" value="$textutils.htmlEncode($action.targetEntityLink)"/>
-        </form>
-    </div>
+			<div class="button-container">
+				<div class="buttons">
+					<input type="submit" value="$i18n.getText('common.forms.next')" class="button submit"/>
+				</div>
+			</div>
+			<input type="hidden" name="id" value="$action.id"/>
+			<input type="hidden" name="atl_token" value="$action.xsrfToken"/>
+			<input type="hidden" name="targetEntityLink" value="$textutils.htmlEncode($action.targetEntityLink)"/>
+		</form>
+	</div>
 </div>
 </body>
 </html>
