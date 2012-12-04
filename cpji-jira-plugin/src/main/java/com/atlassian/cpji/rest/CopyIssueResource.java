@@ -71,7 +71,7 @@ public class CopyIssueResource
 
     /**
      * Converts any remote issue links to this JIRA instance into local issue links.
-     * 
+     *
      * @param issueKey the issue key
      * @return no content if successful
      */

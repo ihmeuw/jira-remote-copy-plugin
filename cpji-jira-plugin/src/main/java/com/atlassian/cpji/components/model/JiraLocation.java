@@ -1,4 +1,4 @@
-package com.atlassian.cpji.components;
+package com.atlassian.cpji.components.model;
 
 import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLink;
@@ -34,20 +34,4 @@ public class JiraLocation {
         return new JiraLocation(appLink.getId().get(), appLink.getName());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        JiraLocation that = (JiraLocation) o;
-
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
 }

@@ -1,7 +1,7 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.cpji.components.Projects;
-import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.ResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.rest.client.domain.BasicProject;

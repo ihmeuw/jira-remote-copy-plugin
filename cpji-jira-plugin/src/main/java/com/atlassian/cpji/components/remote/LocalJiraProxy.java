@@ -3,11 +3,17 @@ package com.atlassian.cpji.components.remote;
 import com.atlassian.cpji.components.*;
 import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
+import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.fugue.Either;
+import com.atlassian.jira.config.properties.APKeys;
+import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.Issue;
@@ -34,7 +40,9 @@ import java.util.Collection;
 public class LocalJiraProxy implements JiraProxy
 {
 
-    public static final JiraLocation LOCAL_JIRA_LOCATION = new JiraLocation("LOCAL", "");
+    static final JiraLocation LOCAL_JIRA_LOCATION = new JiraLocation("LOCAL", "LOCAL");
+
+    private final JiraLocation jiraLocation;
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final CopyIssueService copyIssueService;
@@ -45,7 +53,9 @@ public class LocalJiraProxy implements JiraProxy
     private final ProjectInfoService projectInfoService;
     private final JiraBaseUrls jiraBaseUrls;
 
-    public LocalJiraProxy(final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, CopyIssueService copyIssueService, AttachmentManager attachmentManager, IssueManager issueManager, IssueLinkManager issueLinkManager, RemoteIssueLinkManager remoteIssueLinkManager, ProjectInfoService projectInfoService, JiraBaseUrls jiraBaseUrls) {
+
+
+    public LocalJiraProxy(final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, CopyIssueService copyIssueService, AttachmentManager attachmentManager, IssueManager issueManager, IssueLinkManager issueLinkManager, RemoteIssueLinkManager remoteIssueLinkManager, ProjectInfoService projectInfoService, JiraBaseUrls jiraBaseUrls, ApplicationProperties applicationProperties) {
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.copyIssueService = copyIssueService;
@@ -55,11 +65,13 @@ public class LocalJiraProxy implements JiraProxy
         this.remoteIssueLinkManager = remoteIssueLinkManager;
         this.projectInfoService = projectInfoService;
         this.jiraBaseUrls = jiraBaseUrls;
+        jiraLocation = new JiraLocation(LOCAL_JIRA_LOCATION.getId(), applicationProperties.getString(APKeys.JIRA_TITLE));
+
     }
 
     @Override
     public JiraLocation getJiraLocation() {
-        return LOCAL_JIRA_LOCATION;
+        return jiraLocation;
     }
 
     @Override
@@ -76,13 +88,14 @@ public class LocalJiraProxy implements JiraProxy
             }
         });
 
-        return Either.right(new Projects(LOCAL_JIRA_LOCATION, basicProjects));
+        return Either.right(new Projects(jiraLocation, basicProjects));
 
     }
 
     @Override
-    public ResponseStatus isPluginInstalled() {
-        return ResponseStatus.ok(LOCAL_JIRA_LOCATION);
+    public Either<ResponseStatus, SuccessfulResponse> isPluginInstalled() {
+
+        return Either.right(SuccessfulResponse.build(jiraLocation));
     }
 
     @Override
@@ -95,7 +108,7 @@ public class LocalJiraProxy implements JiraProxy
         try {
             return Either.right(projectInfoService.getIssueTypeInformation(projectKey));
         } catch (ProjectNotFoundException e) {
-            return Either.left(ResponseStatus.errorOccured(LOCAL_JIRA_LOCATION, e.getErrorCollection()));
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
         }
     }
 
@@ -104,7 +117,7 @@ public class LocalJiraProxy implements JiraProxy
         try {
             return Either.right(copyIssueService.copyIssue(copyIssueBean));
         } catch (CopyIssueException e) {
-            return Either.left(ResponseStatus.errorOccured(LOCAL_JIRA_LOCATION, e.getErrorCollection()));
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
         }
     }
 
@@ -113,9 +126,9 @@ public class LocalJiraProxy implements JiraProxy
         Issue issue = issueManager.getIssueObject(issueKey);
         try {
             attachmentManager.createAttachment(attachmentFile, filename, contentType, jiraAuthenticationContext.getLoggedInUser(), issue);
-            return Either.right(new SuccessfulResponse(LOCAL_JIRA_LOCATION));
+            return Either.right(SuccessfulResponse.build(jiraLocation));
         } catch (AttachmentException e) {
-            return Either.left(ResponseStatus.errorOccured(LOCAL_JIRA_LOCATION, e.getMessage()));
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
@@ -125,7 +138,7 @@ public class LocalJiraProxy implements JiraProxy
         try {
             return Either.right(copyIssueService.checkFieldPermissions(copyIssueBean));
         } catch (ProjectNotFoundException e) {
-            return Either.left(ResponseStatus.errorOccured(LOCAL_JIRA_LOCATION, e.getMessage()));
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
@@ -167,6 +180,5 @@ public class LocalJiraProxy implements JiraProxy
         String baseUrl = jiraBaseUrls.baseUrl();
         return baseUrl + "/browse/" + issueKey;
     }
-
 
 }

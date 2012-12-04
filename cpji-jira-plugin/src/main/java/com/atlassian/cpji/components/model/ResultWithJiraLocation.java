@@ -1,4 +1,6 @@
-package com.atlassian.cpji.components;
+package com.atlassian.cpji.components.model;
+
+import com.atlassian.fugue.Either;
 
 /**
 *
@@ -25,4 +27,11 @@ public class ResultWithJiraLocation<T> {
         return result;
     }
 
+    public static ResultWithJiraLocation<?> extract(Either<? extends  ResultWithJiraLocation<?>, ? extends ResultWithJiraLocation<?>> either){
+        if(either.isLeft()){
+            return (ResultWithJiraLocation<?>) either.left().get();
+        } else {
+            return (ResultWithJiraLocation<?>) either.right().get();
+        }
+    }
 }

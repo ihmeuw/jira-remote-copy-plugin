@@ -10,7 +10,7 @@ import java.util.Date;
 public class DateUtil
 {
     private DateUtil() {}
-    
+
     public static final String TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     public static Date parseString(final String s)

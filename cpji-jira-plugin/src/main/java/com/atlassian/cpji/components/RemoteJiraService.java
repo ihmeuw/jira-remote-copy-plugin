@@ -1,5 +1,8 @@
 package com.atlassian.cpji.components;
 
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.crowd.embedded.api.User;
@@ -39,18 +42,18 @@ public class RemoteJiraService {
 	 * @return
 	 */
 	@Nonnull
-	public Iterable<ResponseStatus> getPluginInfo() {
+	public Iterable<Either<ResponseStatus, SuccessfulResponse>> getPluginInfo() {
 
-        return executeForEveryJira(new FunctionWithFallback<ResponseStatus>(){
+        return executeForEveryJira(new FunctionWithFallback<Either<ResponseStatus, SuccessfulResponse>>(){
 
             @Override
-            public ResponseStatus onInvocationException(Exception e) {
+            public Either<ResponseStatus, SuccessfulResponse> onInvocationException(Exception e) {
                 log.warn("Failed to execute Application Links request", e);
-                return ResponseStatus.communicationFailed(null);
+                return Either.left(ResponseStatus.communicationFailed(null));
             }
 
             @Override
-            public ResponseStatus apply(@Nullable JiraProxy input) {
+            public Either<ResponseStatus, SuccessfulResponse> apply(@Nullable JiraProxy input) {
                 return input.isPluginInstalled();
             }
         });

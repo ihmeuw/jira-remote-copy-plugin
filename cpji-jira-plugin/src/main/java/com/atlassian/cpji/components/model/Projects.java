@@ -1,5 +1,6 @@
-package com.atlassian.cpji.components;
+package com.atlassian.cpji.components.model;
 
+import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 
 /**

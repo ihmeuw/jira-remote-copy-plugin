@@ -88,7 +88,7 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
         {
             return null;
         }
-        
+
         try
         {
             return (Collection) value;

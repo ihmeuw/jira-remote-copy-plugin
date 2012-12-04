@@ -44,7 +44,7 @@ AJS.toInit(function () {
                     JIRA.trace("cpji.fields.load.completed");
                 });
             }
-    
+
         };
 
         if(!JIRA.plugins){

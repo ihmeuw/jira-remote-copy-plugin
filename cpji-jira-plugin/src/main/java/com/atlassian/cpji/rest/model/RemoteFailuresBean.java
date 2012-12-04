@@ -1,6 +1,6 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.model.ResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;

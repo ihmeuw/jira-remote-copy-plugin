@@ -2,10 +2,10 @@ package com.atlassian.cpji.components.remote;
 
 import com.atlassian.applinks.api.*;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.cpji.components.JiraLocation;
-import com.atlassian.cpji.components.Projects;
-import com.atlassian.cpji.components.ResponseStatus;
-import com.atlassian.cpji.components.SuccessfulResponse;
+import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.RemotesResource;
 import com.atlassian.cpji.rest.model.*;
@@ -91,25 +91,18 @@ public class RemoteJiraProxy implements JiraProxy
 
 
     @Override
-    public ResponseStatus isPluginInstalled() {
-        Either<ResponseStatus, Object> result = callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<ResponseStatus>(jiraLocation) {
+    public Either<ResponseStatus, SuccessfulResponse> isPluginInstalled() {
+        return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
             @Override
-            protected ResponseStatus parseResponse(Response response) throws ResponseException, JSONException {
+            protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
                 if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase())) {
                     log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
-                    return ResponseStatus.ok(jiraLocation);
+                    return SuccessfulResponse.build(jiraLocation);
                 }
                 log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin NOT installed.");
-                return ResponseStatus.pluginNotInstalled(jiraLocation);
+                return provideResponseStatus(ResponseStatus.pluginNotInstalled(jiraLocation));
             }
         });
-
-        if(result.isLeft()){
-            return (ResponseStatus) result.left().get();
-        } else {
-            return (ResponseStatus) result.right().get();
-        }
-
     }
 
     @Override
@@ -161,7 +154,7 @@ public class RemoteJiraProxy implements JiraProxy
             @Override
             protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
                 if(response.isSuccessful()){
-                    return new SuccessfulResponse(jiraLocation);
+                    return SuccessfulResponse.build(jiraLocation);
                 } else{
                     return provideResponseStatus(ResponseStatus.errorOccured(jiraLocation, response.getResponseBodyAsString()));
                 }

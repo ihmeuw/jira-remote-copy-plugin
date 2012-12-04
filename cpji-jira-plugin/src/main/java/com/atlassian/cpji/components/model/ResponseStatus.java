@@ -1,7 +1,8 @@
-package com.atlassian.cpji.components;
+package com.atlassian.cpji.components.model;
 
-import com.atlassian.cpji.components.remote.LocalJiraProxy;
+import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.model.ErrorBean;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Predicate;
@@ -87,11 +88,14 @@ public class ResponseStatus extends ResultWithJiraLocation<ResponseStatus.Status
     }
 
 	@Nonnull
-	public static Predicate<ResponseStatus> onlyRemoteJiras() {
-		return new Predicate<ResponseStatus>() {
+	public static Predicate<Either<ResponseStatus, SuccessfulResponse>> onlyRemoteJiras() {
+        final Predicate<JiraLocation> isLocal = JiraProxyFactory.isLocalLocation();
+		return new Predicate<Either<ResponseStatus, SuccessfulResponse>>() {
 			@Override
-			public boolean apply(@Nullable ResponseStatus input) {
-				return input.getJiraLocation() != null && !input.getJiraLocation().equals(LocalJiraProxy.LOCAL_JIRA_LOCATION);
+			public boolean apply(@Nullable Either<ResponseStatus, SuccessfulResponse> input) {
+                ResultWithJiraLocation<?> result = ResultWithJiraLocation.extract(input);
+                final JiraLocation jiraLocation = result.getJiraLocation();
+                return jiraLocation != null && !isLocal.apply(jiraLocation);
 			}
 		};
 	}

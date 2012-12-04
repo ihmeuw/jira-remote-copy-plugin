@@ -7,9 +7,10 @@ import com.atlassian.applinks.api.TypeNotInstalledException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.CopyIssueService;
-import com.atlassian.cpji.components.JiraLocation;
+import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.util.IssueLinkClient;
+import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
@@ -18,6 +19,7 @@ import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -40,8 +42,9 @@ public class JiraProxyFactory {
     private final RemoteIssueLinkManager remoteIssueLinkManager;
     private final ProjectInfoService projectInfoService;
     private final JiraBaseUrls jiraBaseUrls;
+    private final ApplicationProperties applicationProperties;
 
-    public JiraProxyFactory(ApplicationLinkService applicationLinkService, PermissionManager permissionManager, JiraAuthenticationContext jiraAuthenticationContext, InternalHostApplication hostApplication, IssueLinkClient issueLinkClient, CopyIssueService copyIssueService, AttachmentManager attachmentManager, IssueManager issueManager, IssueLinkManager issueLinkManager, RemoteIssueLinkManager remoteIssueLinkManager, ProjectInfoService projectInfoService, JiraBaseUrls jiraBaseUrls) {
+    public JiraProxyFactory(ApplicationLinkService applicationLinkService, PermissionManager permissionManager, JiraAuthenticationContext jiraAuthenticationContext, InternalHostApplication hostApplication, IssueLinkClient issueLinkClient, CopyIssueService copyIssueService, AttachmentManager attachmentManager, IssueManager issueManager, IssueLinkManager issueLinkManager, RemoteIssueLinkManager remoteIssueLinkManager, ProjectInfoService projectInfoService, JiraBaseUrls jiraBaseUrls, ApplicationProperties applicationProperties) {
         this.applicationLinkService = applicationLinkService;
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
@@ -54,11 +57,12 @@ public class JiraProxyFactory {
         this.remoteIssueLinkManager = remoteIssueLinkManager;
         this.projectInfoService = projectInfoService;
         this.jiraBaseUrls = jiraBaseUrls;
+        this.applicationProperties = applicationProperties;
     }
 
     public JiraProxy createJiraProxy(JiraLocation jira) {
-        if (LocalJiraProxy.LOCAL_JIRA_LOCATION.equals(jira))
-            return new LocalJiraProxy(permissionManager, jiraAuthenticationContext, copyIssueService, attachmentManager, issueManager, issueLinkManager, remoteIssueLinkManager, projectInfoService, jiraBaseUrls);
+        if (isLocalLocation().apply(jira))
+            return new LocalJiraProxy(permissionManager, jiraAuthenticationContext, copyIssueService, attachmentManager, issueManager, issueLinkManager, remoteIssueLinkManager, projectInfoService, jiraBaseUrls, applicationProperties);
         else {
             try {
                 final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(new ApplicationId(jira.getId()));
@@ -98,6 +102,19 @@ public class JiraProxyFactory {
             }
         });
     }
+
+
+    public static Predicate<JiraLocation> isLocalLocation(){
+        return new Predicate<JiraLocation>() {
+            @Override
+            public boolean apply(@Nullable JiraLocation input) {
+                if(input == null)
+                    return false;
+                return LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(input.getId());
+            }
+        };
+    }
+
 
 
 }

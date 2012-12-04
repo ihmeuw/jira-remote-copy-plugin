@@ -2,7 +2,7 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.JiraLocation;
+import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;

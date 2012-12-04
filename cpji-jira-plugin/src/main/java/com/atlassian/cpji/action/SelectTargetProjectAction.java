@@ -2,12 +2,14 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.value.UserMappingManager;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -74,22 +76,23 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         }
 
         JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getJiraLocation());
-        ResponseStatus responseStatus = jira.isPluginInstalled();
-
-        if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))
-        {
-            authorizationUrl = jira.generateAuthenticationUrl(Long.toString(id));
-            return AUTHORIZE;
-        }
-        else if (ResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getResult()))
-        {
-            log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
-            addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
-            return ERROR;
-        }
-        else if (ResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getResult()))
-        {
-            addErrorMessage("Authentication failed. Check the authentication configuration.");
+        Either<ResponseStatus,SuccessfulResponse> response = jira.isPluginInstalled();
+        if(response.isLeft()){
+            ResponseStatus responseStatus = (ResponseStatus) response.left().get();
+            if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))
+            {
+                authorizationUrl = jira.generateAuthenticationUrl(Long.toString(id));
+                return AUTHORIZE;
+            }
+            else if (ResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getResult()))
+            {
+                log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
+                addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
+            }
+            else if (ResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getResult()))
+            {
+                addErrorMessage("Authentication failed. Check the authentication configuration.");
+            }
             return ERROR;
         }
         return getRedirect("/secure/CopyDetailsAction.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);

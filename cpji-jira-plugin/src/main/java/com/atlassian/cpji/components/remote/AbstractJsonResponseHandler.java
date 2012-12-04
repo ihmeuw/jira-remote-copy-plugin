@@ -2,8 +2,8 @@ package com.atlassian.cpji.components.remote;
 
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
-import com.atlassian.cpji.components.JiraLocation;
-import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.ResponseStatus;
 import com.atlassian.fugue.Either;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;

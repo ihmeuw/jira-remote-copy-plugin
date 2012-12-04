@@ -3,10 +3,13 @@ package com.atlassian.cpji.rest;
 import com.atlassian.applinks.api.AuthorisationURIGenerator;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.RemoteJiraService;
-import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.ResultWithJiraLocation;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.model.AvailableProjectsBean;
 import com.atlassian.cpji.rest.model.RemotePluginBean;
+import com.atlassian.fugue.Either;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
@@ -39,10 +42,11 @@ public class RemotesResource {
 	public Response getRemotePlugins(@QueryParam("issueId") final String issueId) {
 		return Response.ok(Iterables
 				.transform(Iterables.filter(remoteJiraService.getPluginInfo(), ResponseStatus.onlyRemoteJiras()),
-						new Function<ResponseStatus, RemotePluginBean>() {
+						new Function<Either<ResponseStatus, SuccessfulResponse>, RemotePluginBean>() {
 							@Override
-							public RemotePluginBean apply(@Nullable ResponseStatus input) {
-								return RemotePluginBean.create(input, jiraProxyFactory,issueId);
+							public RemotePluginBean apply(@Nullable Either<ResponseStatus, SuccessfulResponse> input) {
+                                ResultWithJiraLocation<?> result = ResultWithJiraLocation.extract(input);
+                                return RemotePluginBean.create(result, jiraProxyFactory,issueId);
 							}
 						})).build();
 	}

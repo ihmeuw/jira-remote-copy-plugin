@@ -3,8 +3,8 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.ResponseStatus;
-import com.atlassian.cpji.components.SuccessfulResponse;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -79,7 +79,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        
+
         final SelectedProject linkToTargetEntity = getSelectedDestinationProject();
         final JiraProxy proxy = jiraProxyFactory.createJiraProxy(linkToTargetEntity.getJiraLocation());
 

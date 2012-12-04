@@ -1,6 +1,6 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.model.ResultWithJiraLocation;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 
 import javax.annotation.Nonnull;
@@ -24,7 +24,7 @@ public class RemotePluginBean {
 	@XmlElement
 	private final String authorisationUrl;
 
-	public static RemotePluginBean create(@Nonnull ResponseStatus input, @Nonnull JiraProxyFactory proxyFactory, @Nonnull String issueId) {
+	public static RemotePluginBean create(@Nonnull ResultWithJiraLocation<?> input, @Nonnull JiraProxyFactory proxyFactory, @Nonnull String issueId) {
 		return new RemotePluginBean(input.getJiraLocation().getName(),
 				input.getJiraLocation().getId(),
 				input.getResult().toString(),

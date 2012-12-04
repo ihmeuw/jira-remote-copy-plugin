@@ -25,7 +25,7 @@ public interface CustomFieldMapper
 
     /**
      * Create a CustomFieldBean representing the given CustomField and its value in the given Issue.
-     * 
+     *
      * @param customField the CustomField
      * @param issue the Issue
      * @return a CustomFieldBean
@@ -47,7 +47,7 @@ public interface CustomFieldMapper
     /**
      * Applies the values in the given CustomFieldBean to the given IssueInputParameters for the CustomField, Project
      * and IssueType in the current JIRA instance.
-     * 
+     *
      * @param inputParameters the input parameters to apply the custom field values to
      * @param mappingResult the CustomFieldMappingResult containing the valid and invalid custom field values
      * @param customField the CustomField on this JIRA instance to set the value of for the new issue

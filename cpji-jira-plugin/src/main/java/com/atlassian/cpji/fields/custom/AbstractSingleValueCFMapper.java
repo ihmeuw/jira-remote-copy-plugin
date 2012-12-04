@@ -45,7 +45,7 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
 
     /**
      * Determines if the given value is value for the given custom field. The value will not be null.
-     * 
+     *
      * @param value the custom field value, will not be null
      * @param customField
      * @param project

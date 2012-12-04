@@ -1,9 +1,9 @@
 package com.atlassian.cpji.components.remote;
 
-import com.atlassian.cpji.components.JiraLocation;
-import com.atlassian.cpji.components.Projects;
-import com.atlassian.cpji.components.ResponseStatus;
-import com.atlassian.cpji.components.SuccessfulResponse;
+import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
@@ -23,7 +23,7 @@ public interface JiraProxy
 {
     public JiraLocation getJiraLocation();
     public Either<ResponseStatus, Projects> getProjects();
-    public ResponseStatus isPluginInstalled();
+    public Either<ResponseStatus, SuccessfulResponse> isPluginInstalled();
     public String generateAuthenticationUrl(String issueId);
     public Either<ResponseStatus, CopyInformationBean> getCopyInformation(String projectKey);
     public Either<ResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean);
