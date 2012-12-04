@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * @deprecated use {@link com.atlassian.cpji.components.remote.JiraProxy#addAttachment(String, java.io.File, String, String)} instead
  * @since v1.0
  */
+@Deprecated
 public class IssueAttachmentsClient
 {
     private final ApplicationLink applicationLink;

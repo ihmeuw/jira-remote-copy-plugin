@@ -1,8 +1,10 @@
 package com.atlassian.cpji.rest;
 
 /**
+ * @deprecated used only in unused currently {@link com.atlassian.cpji.IssueAttachmentsClient}
  * @since v1.5
  */
+@Deprecated
 public class ResponseHolder
 {
     private boolean successful;

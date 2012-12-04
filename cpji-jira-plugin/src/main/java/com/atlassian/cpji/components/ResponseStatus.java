@@ -1,6 +1,9 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.cpji.components.remote.LocalJiraProxy;
+import com.atlassian.cpji.rest.model.ErrorBean;
+import com.atlassian.jira.util.ErrorCollection;
+import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Predicate;
 
 import javax.annotation.Nonnull;
@@ -13,6 +16,9 @@ import javax.annotation.Nullable;
 */
 public class ResponseStatus extends ResultWithJiraLocation<ResponseStatus.Status>
 {
+
+    private ErrorCollection errors = null;
+
     public ResponseStatus(final JiraLocation jiraLocation, final Status result)
     {
         super(jiraLocation, result);
@@ -27,6 +33,12 @@ public class ResponseStatus extends ResultWithJiraLocation<ResponseStatus.Status
 		return new ResponseStatus(jiraLocation, Status.AUTHENTICATION_FAILED);
 	}
 
+    /**
+     *
+     * @deprecated should use {@link SuccessfulResponse} instead
+     *
+     */
+    @Deprecated
 	public static ResponseStatus ok(JiraLocation jiraLocation) {
 		return new ResponseStatus(jiraLocation, Status.OK);
 	}
@@ -35,17 +47,44 @@ public class ResponseStatus extends ResultWithJiraLocation<ResponseStatus.Status
 		return new ResponseStatus(jiraLocation, Status.PLUGIN_NOT_INSTALLED);
 	}
 
+    public static ResponseStatus errorOccured(JiraLocation jiraLocation, ErrorCollection errors){
+        ResponseStatus result = new ResponseStatus(jiraLocation, Status.ERROR_OCCURRED);
+        result.errors = errors;
+        return result;
+    }
+
+    public static ResponseStatus errorOccured(JiraLocation jiraLocation, ErrorBean errors){
+        ResponseStatus result = new ResponseStatus(jiraLocation, Status.ERROR_OCCURRED);
+        result.errors = new SimpleErrorCollection();
+        result.errors.addErrorMessages(errors.getErrors());
+        return result;
+    }
+
+
+
+    public static ResponseStatus errorOccured(JiraLocation jiraLocation, String singleError){
+        ResponseStatus result = new ResponseStatus(jiraLocation, Status.ERROR_OCCURRED);
+        result.errors = new SimpleErrorCollection();
+        result.errors.addErrorMessage(singleError);
+        return result;
+    }
+
 	public enum Status {
 			COMMUNICATION_FAILED,
 			AUTHORIZATION_REQUIRED,
 			AUTHENTICATION_FAILED,
 			PLUGIN_NOT_INSTALLED,
+            ERROR_OCCURRED,
 			OK
 	}
 
 	public static ResponseStatus authorizationRequired(JiraLocation jiraLocation) {
 		return new ResponseStatus(jiraLocation, Status.AUTHORIZATION_REQUIRED);
 	}
+
+    public ErrorCollection getErrorCollection(){
+        return errors;
+    }
 
 	@Nonnull
 	public static Predicate<ResponseStatus> onlyRemoteJiras() {

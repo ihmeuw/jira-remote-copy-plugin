@@ -1,18 +1,8 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.cpji.components.exceptions.CreationException;
-import com.atlassian.cpji.components.exceptions.IssueCreatedWithErrorsException;
-import com.atlassian.cpji.components.exceptions.IssueNotFoundException;
-import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
-import com.atlassian.cpji.components.exceptions.RemoteLinksNotFoundException;
-import com.atlassian.cpji.components.exceptions.ValidationException;
-import com.atlassian.cpji.fields.CustomFieldMappingResult;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapper;
-import com.atlassian.cpji.fields.FieldMapperFactory;
-import com.atlassian.cpji.fields.IssueCreationFieldMapper;
-import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.components.exceptions.*;
+import com.atlassian.cpji.fields.*;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
@@ -22,12 +12,7 @@ import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.RESTException;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
-import com.atlassian.cpji.rest.model.FieldPermissionsBean;
-import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
@@ -58,14 +43,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 import javax.ws.rs.core.Response;
+import java.util.*;
 
 /**
  * @since v3.0
@@ -458,6 +437,8 @@ public class CopyIssueService
             throw new RESTException(Response.Status.NOT_FOUND, "No issue type with name '" + issueType + "' found!");
         }
     }
+
+
 
 
     private User callingUser()

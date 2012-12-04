@@ -1,39 +1,33 @@
 package com.atlassian.cpji.components.remote;
 
-import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.applinks.api.ApplicationLinkRequest;
-import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
-import com.atlassian.applinks.api.CredentialsRequiredException;
+import com.atlassian.applinks.api.*;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.cpji.IssueAttachmentsClient;
 import com.atlassian.cpji.components.JiraLocation;
 import com.atlassian.cpji.components.Projects;
 import com.atlassian.cpji.components.ResponseStatus;
+import com.atlassian.cpji.components.SuccessfulResponse;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.RemotesResource;
-import com.atlassian.cpji.rest.ResponseHolder;
-import com.atlassian.cpji.rest.model.CopyInformationBean;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.FieldPermissionsBean;
-import com.atlassian.cpji.rest.model.IssueCreationResultBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.cpji.util.IssueLinkClient;
 import com.atlassian.cpji.util.RestResponse;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.attachment.Attachment;
+import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.rest.client.internal.json.BasicProjectsJsonParser;
-import com.atlassian.jira.util.ErrorCollection;
-import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.sal.api.net.Request;
+import com.atlassian.sal.api.net.RequestFilePart;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
+import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONTokener;
 
-import java.util.Collection;
+import java.io.File;
+import java.net.URI;
 
 /**
  *
@@ -139,8 +133,6 @@ public class RemoteJiraProxy implements JiraProxy
     @Override
     public Either<ResponseStatus, IssueCreationResultBean> copyIssue(final CopyIssueBean copyIssueBean) {
 
-        //TODO: retrieving errors on unsuccessful run
-        //ErrorBean errorBean = response.getEntity(ErrorBean.class);
         return callRestService(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/copy", new AbstractJsonResponseHandler<IssueCreationResultBean>(jiraLocation) {
 
             @Override
@@ -152,21 +144,36 @@ public class RemoteJiraProxy implements JiraProxy
 
             @Override
             protected IssueCreationResultBean parseResponse(Response response) throws ResponseException, JSONException {
-                return response.getEntity(IssueCreationResultBean.class);
+                if(response.isSuccessful()){
+                    return response.getEntity(IssueCreationResultBean.class);
+                } else {
+                    ErrorBean errorBean = response.getEntity(ErrorBean.class);
+                    return provideResponseStatus(ResponseStatus.errorOccured(jiraLocation, errorBean));
+                }
+
             }
         });
     }
 
     @Override
-    public ErrorCollection copyAttachments(String issueKey, Collection<Attachment> attachments) {
-        ErrorCollection ec = new SimpleErrorCollection();
-        IssueAttachmentsClient issueAttachmentsClient = new IssueAttachmentsClient(applicationLink);
-        ResponseHolder copyAttachmentResponse = issueAttachmentsClient.addAttachment(issueKey, attachments);
-        if (!copyAttachmentResponse.isSuccessful())
-        {
-            ec.addErrorMessage("Failed to copy attachments. " + copyAttachmentResponse.getResponse());
-        }
-        return ec;
+    public Either<ResponseStatus, SuccessfulResponse> addAttachment(final String issueKey, final File attachmentFile, final String filename, final String contentType) {
+        return callRestService(Request.MethodType.POST, "rest/api/latest/issue/" + issueKey + "/attachments", new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
+            @Override
+            protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
+                if(response.isSuccessful()){
+                    return new SuccessfulResponse(jiraLocation);
+                } else{
+                    return provideResponseStatus(ResponseStatus.errorOccured(jiraLocation, response.getResponseBodyAsString()));
+                }
+            };
+
+            @Override
+            protected void modifyRequest(ApplicationLinkRequest request) {
+                request.addHeader("X-Atlassian-Token", "nocheck");
+                RequestFilePart requestFilePart = new RequestFilePart(contentType, filename, attachmentFile, "file");
+                request.setFiles(ImmutableList.of(requestFilePart));
+            }
+        });
     }
 
     @Override
@@ -185,27 +192,51 @@ public class RemoteJiraProxy implements JiraProxy
     }
 
     @Override
-    public void copyLocalIssueLink(Issue localIssue, String copiedIssueKey, Long copiedIssueId, String localRelationship, String remoteRelationship) {
+    public void copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType,  LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
         try{
             // Create link from the copied issue
+            String remoteRelationship = remoteDirection.getNameFromIssueLinkType(issueLinkType);
             if(remoteRelationship != null){
-                final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(localIssue, applicationLink, copiedIssueKey, remoteRelationship);
+                final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(localIssue, applicationLink, remoteIssueKey, remoteRelationship);
 
                 if (!response.isSuccessful())
                 {
-                    log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
+                    log.error("Failed to create remote issue link from '" + remoteIssueKey + "' to '" + localIssue.getKey() + "'");
                 }
             }
 
             // Create link from the local source issue
+            String localRelationship = localDirection.getNameFromIssueLinkType(issueLinkType);
             if(localRelationship != null){
-                issueLinkClient.createLinkToRemoteIssue(localIssue, applicationLink, copiedIssueKey, copiedIssueId, localRelationship);
+                issueLinkClient.createLinkToRemoteIssue(localIssue, applicationLink, remoteIssueKey, remoteIssueId, localRelationship);
             }
         } catch(Exception e){
             return;
         }
-
     }
+
+//    @Override
+//    public void copyLocalIssueLink(Issue localIssue, String copiedIssueKey, Long copiedIssueId, String localRelationship, String remoteRelationship) {
+//        try{
+//            // Create link from the copied issue
+//            if(remoteRelationship != null){
+//                final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(localIssue, applicationLink, copiedIssueKey, remoteRelationship);
+//
+//                if (!response.isSuccessful())
+//                {
+//                    log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
+//                }
+//            }
+//
+//            // Create link from the local source issue
+//            if(localRelationship != null){
+//                issueLinkClient.createLinkToRemoteIssue(localIssue, applicationLink, copiedIssueKey, copiedIssueId, localRelationship);
+//            }
+//        } catch(Exception e){
+//            return;
+//        }
+//
+//    }
 
     @Override
     public void copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String copiedIssueKey) {
@@ -240,6 +271,12 @@ public class RemoteJiraProxy implements JiraProxy
         callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + CONVERT_ISSUE_LINKS_RESOURCE_PATH + "/" + remoteIssueKey, handler);
 
 
+    }
+
+    @Override
+    public String getIssueUrl(String issueKey) {
+        URI displayUrl = applicationLink.getDisplayUrl();
+        return displayUrl + "/browse/" + issueKey;
     }
 
 

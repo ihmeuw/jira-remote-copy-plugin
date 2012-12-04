@@ -6,8 +6,15 @@ import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.TypeNotInstalledException;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
+import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.JiraLocation;
+import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.util.IssueLinkClient;
+import com.atlassian.jira.issue.AttachmentManager;
+import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
+import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.google.common.base.Function;
@@ -26,22 +33,50 @@ public class JiraProxyFactory {
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final InternalHostApplication hostApplication;
     private final IssueLinkClient issueLinkClient;
+    private final CopyIssueService copyIssueService;
+    private final AttachmentManager attachmentManager;
+    private final IssueManager issueManager;
+    private final IssueLinkManager issueLinkManager;
+    private final RemoteIssueLinkManager remoteIssueLinkManager;
+    private final ProjectInfoService projectInfoService;
+    private final JiraBaseUrls jiraBaseUrls;
 
-    public JiraProxyFactory(ApplicationLinkService applicationLinkService, PermissionManager permissionManager, JiraAuthenticationContext jiraAuthenticationContext, InternalHostApplication hostApplication, IssueLinkClient issueLinkClient) {
+    public JiraProxyFactory(ApplicationLinkService applicationLinkService, PermissionManager permissionManager, JiraAuthenticationContext jiraAuthenticationContext, InternalHostApplication hostApplication, IssueLinkClient issueLinkClient, CopyIssueService copyIssueService, AttachmentManager attachmentManager, IssueManager issueManager, IssueLinkManager issueLinkManager, RemoteIssueLinkManager remoteIssueLinkManager, ProjectInfoService projectInfoService, JiraBaseUrls jiraBaseUrls) {
         this.applicationLinkService = applicationLinkService;
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.hostApplication = hostApplication;
         this.issueLinkClient = issueLinkClient;
+        this.copyIssueService = copyIssueService;
+        this.attachmentManager = attachmentManager;
+        this.issueManager = issueManager;
+        this.issueLinkManager = issueLinkManager;
+        this.remoteIssueLinkManager = remoteIssueLinkManager;
+        this.projectInfoService = projectInfoService;
+        this.jiraBaseUrls = jiraBaseUrls;
     }
 
     public JiraProxy createJiraProxy(JiraLocation jira) {
         if (LocalJiraProxy.LOCAL_JIRA_LOCATION.equals(jira))
-            return new LocalJiraProxy(permissionManager, jiraAuthenticationContext);
+            return new LocalJiraProxy(permissionManager, jiraAuthenticationContext, copyIssueService, attachmentManager, issueManager, issueLinkManager, remoteIssueLinkManager, projectInfoService, jiraBaseUrls);
         else {
             try {
                 final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(new ApplicationId(jira.getId()));
                 return new RemoteJiraProxy(hostApplication, applicationLink, jira, issueLinkClient);
+            } catch (TypeNotInstalledException e) {
+                return null;
+            }
+
+        }
+    }
+
+    public JiraLocation getLocationById(String id) {
+        if(LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(id)){
+            return LocalJiraProxy.LOCAL_JIRA_LOCATION;
+        } else {
+            try {
+                ApplicationLink link = applicationLinkService.getApplicationLink(new ApplicationId(id));
+                return JiraLocation.fromAppLink(link);
             } catch (TypeNotInstalledException e) {
                 return null;
             }

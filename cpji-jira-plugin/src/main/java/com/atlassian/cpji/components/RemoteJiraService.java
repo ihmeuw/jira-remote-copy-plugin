@@ -1,14 +1,11 @@
 package com.atlassian.cpji.components;
 
-import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.ComponentManager;
-import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.security.PermissionManager;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -29,17 +26,11 @@ public class RemoteJiraService {
 	private static final Logger log = Logger.getLogger(RemoteJiraService.class);
 	private static final int THREADS = 5;
 
-	private final ApplicationLinkService applicationLinkService;
 	private final JiraAuthenticationContext authenticationContext;
-    private final JiraBaseUrls baseUrls;
-    private final PermissionManager permissionManager;
     private final JiraProxyFactory jiraProxyFactory;
 
-	public RemoteJiraService(final ApplicationLinkService applicationLinkService, final JiraAuthenticationContext authenticationContext, final JiraBaseUrls baseUrls, final PermissionManager permissionManager, JiraProxyFactory jiraProxyFactory) {
-		this.applicationLinkService = applicationLinkService;
+	public RemoteJiraService(final JiraAuthenticationContext authenticationContext, JiraProxyFactory jiraProxyFactory) {
 		this.authenticationContext = authenticationContext;
-        this.baseUrls = baseUrls;
-        this.permissionManager = permissionManager;
         this.jiraProxyFactory = jiraProxyFactory;
     }
 
