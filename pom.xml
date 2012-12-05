@@ -146,40 +146,6 @@
 				<groupId>com.atlassian.jira</groupId>
 				<artifactId>jira-rest-java-client</artifactId>
 				<version>1.1-m02</version>
-				<exclusions>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-client</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey.contribs</groupId>
-						<artifactId>jersey-multipart</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-						<artifactId>oauth-client</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-						<artifactId>oauth-signature</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey.contribs</groupId>
-						<artifactId>jersey-apache-client</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>stax</groupId>
-						<artifactId>stax-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.google.guava</groupId>
-						<artifactId>guava</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 
 			<!-- Remote Issue Links dependencies -->
@@ -247,7 +213,7 @@
 				<artifactId>jsr305</artifactId>
 				<version>2.0.0</version>
 			</dependency>
-			<dependency>
+			<!--dependency>
 				<groupId>com.sun.jersey.contribs</groupId>
 				<artifactId>jersey-multipart</artifactId>
 				<version>1.8-atlassian-1</version>
@@ -258,7 +224,7 @@
 						<artifactId>jersey-core</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
+			</dependency-->
 			<!--dependency>
 				<groupId>com.sun.jersey</groupId>
 				<artifactId>jersey-json</artifactId>

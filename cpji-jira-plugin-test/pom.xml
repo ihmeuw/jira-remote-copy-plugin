@@ -87,16 +87,6 @@
 			<artifactId>jsr250-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.atlassian.plugins.rest</groupId>
-			<artifactId>atlassian-rest-common</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.atlassian.plugins.rest</groupId>
-			<artifactId>atlassian-rest-module</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client</artifactId>
 		</dependency>
@@ -104,10 +94,6 @@
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
 			<version>2.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey.contribs</groupId>
-			<artifactId>jersey-multipart</artifactId>
 		</dependency>
 	</dependencies>
     <build>
