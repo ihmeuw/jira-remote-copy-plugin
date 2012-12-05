@@ -6,6 +6,8 @@ import com.atlassian.jira.rest.client.domain.{Comment, IssueFieldId, Issue}
 import com.atlassian.jira.rest.client.domain.input.{ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import org.joda.time.DateTime
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, SelectTargetProjectPage}
+import org.junit.Assert._;
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
 	var createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient1)
@@ -24,7 +26,13 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		AbstractCopyIssueTest.restClient1.getIssueClient.addComment(AbstractCopyIssueTest.NPM, issue.getCommentsUri,
 			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null))
 
-		viewIssue(AbstractCopyIssueTest.jira1, issue.getKey)
+		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
+		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+
+		assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
+		assertFalse(copyDetailsPage.isCopyAttachmentsGroupVisible)
+		assertFalse(copyDetailsPage.isCopyIssueLinksGroupVisible)
+		assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 	}
 
 }

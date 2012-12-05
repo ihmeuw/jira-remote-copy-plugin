@@ -42,7 +42,7 @@
 			<h2>$i18n.getText('cpji.advanced')</h2>
 			<fieldset>
 				#if ($action.issueWithComments)
-				<div class="field-group">
+				<div class="field-group" id="copy-comments-group">
 					<span class="field-value">
 						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" checked="checked"/>
 						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
@@ -51,7 +51,7 @@
 				#end
 
 				#if ($action.attachmentsEnabled() && $action.issueWithAttachments)
-				<div class="field-group">
+				<div class="field-group" id="copy-attachments-group">
 					 <span class="field-value">
 						 #if ($action.isSALUpgradeRequired())
 							 $i18n.getText('cpji.attachments.not.moved.sal')
@@ -68,7 +68,7 @@
 				#end
 
 				#if ($action.linksEnabled() && $action.issueWithLinks)
-				<div class="field-group">
+				<div class="field-group" id="copy-issue-links-group">
 					<span class="field-value">
 						<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
 						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
@@ -80,7 +80,7 @@
 				#end
 
 				#if ($action.linksEnabled())
-				<div class="field-group">
+				<div class="field-group" id="create-issue-links-group">
 					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
 					<select name="remoteIssueLink" id="remoteIssueLink">
 						#foreach( $issueLink in $action.getIssueLinkOptions())

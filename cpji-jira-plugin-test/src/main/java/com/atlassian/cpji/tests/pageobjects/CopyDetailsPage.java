@@ -46,4 +46,21 @@ public class CopyDetailsPage extends AbstractJiraPage
         nextButton.click();
         return pageBinder.bind(PermissionChecksPage.class);
     }
+
+	public boolean isCreateIssueLinksGroupVisible() {
+		return elementFinder.find(By.id("create-issue-links-group")).timed().isVisible().now();
+	}
+
+	public boolean isCopyCommentsGroupVisible() {
+		return elementFinder.find(By.id("copy-comments-group")).timed().isVisible().now();
+	}
+
+	public boolean isCopyIssueLinksGroupVisible() {
+		return elementFinder.find(By.id("copy-issue-links-group")).timed().isVisible().now();
+	}
+
+	public boolean isCopyAttachmentsGroupVisible() {
+		return elementFinder.find(By.id("copy-attachments-group")).timed().isVisible().now();
+	}
+
 }
