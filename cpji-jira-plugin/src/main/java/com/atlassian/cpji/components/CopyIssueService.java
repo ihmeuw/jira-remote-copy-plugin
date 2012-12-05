@@ -2,9 +2,9 @@ package com.atlassian.cpji.components;
 
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.exceptions.*;
-import com.atlassian.cpji.fields.*;
-import com.atlassian.cpji.fields.custom.CustomFieldMapper;
-import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
+import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
+import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.system.FieldCreationException;
@@ -19,11 +19,8 @@ import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.IssueInputParametersImpl;
-import com.atlassian.jira.issue.fields.CustomField;
+import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.FieldManager;
-import com.atlassian.jira.issue.fields.OrderableField;
-import com.atlassian.jira.issue.fields.ProjectSystemField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
@@ -65,8 +62,9 @@ public class CopyIssueService {
     private final InternalHostApplication internalHostApplication;
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
+    private final InputParametersService inputParametersService;
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -79,6 +77,7 @@ public class CopyIssueService {
         this.internalHostApplication = internalHostApplication;
         this.issueLinkService = issueLinkService;
         this.remoteIssueLinkService = remoteIssueLinkService;
+        this.inputParametersService = inputParametersService;
     }
 
 
@@ -87,58 +86,20 @@ public class CopyIssueService {
         Project project = getProjectFromIssueBean(copyIssueBean);
 
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
-        Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType);
+
 
         //Not let's start copying values over from the original issue.
-        IssueInputParametersImpl inputParameters = new IssueInputParametersImpl();
-        IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
-        projectFieldMapper.populateInputParameters(inputParameters, copyIssueBean, null, project);
         Map<String, FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
+        InputParametersService.Populator builder = inputParametersService.getFieldsPopulator(project, issueType, copyIssueBean, allSystemFieldMappers);
+
+        builder.populateProjectSystemField();
+
+        Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType);
         for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems) {
-            OrderableField orderableField = fieldLayoutItem.getOrderableField();
-            if (!fieldManager.isCustomField(orderableField)) {
-                IssueCreationFieldMapper fieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(orderableField.getClass());
-                if (fieldMapper != null) {
-                    MappingResult mappingResult = fieldMapper.getMappingResult(copyIssueBean, project);
-                    if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
-                        String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                        if (defaultFieldValue != null) {
-                            inputParameters.getActionParameters().put(orderableField.getId(), defaultFieldValue);
-                        }
-                    } else {
-                        fieldMapper.populateInputParameters(inputParameters, copyIssueBean, fieldLayoutItem, project);
-                    }
-                } else {
-                    if (!allSystemFieldMappers.containsKey(orderableField.getId())) {
-                        log.warn("No support for field '" + orderableField.getName() + "'");
-                    }
-                }
-            } else {
-                CustomField customField = fieldManager.getCustomField(orderableField.getId());
-                CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper().get(customField.getCustomFieldType().getClass().getCanonicalName());
-                if (customFieldMapper != null) {
-                    CustomFieldBean matchingRemoteCustomField = CustomFieldMapperUtil.findMatchingRemoteCustomField(customField, copyIssueBean.getCustomFields());
-                    if (matchingRemoteCustomField != null) {
-                        CustomFieldMappingResult customFieldMappingResult = customFieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, issueType);
-                        if (!customFieldMappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
-                            String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                            if (defaultFieldValue != null) {
-                                inputParameters.addCustomFieldValue(orderableField.getId(), defaultFieldValue);
-                            }
-                        } else {
-                            customFieldMapper.populateInputParameters(inputParameters, customFieldMappingResult, customField, project, issueType);
-                        }
-                    } else if (fieldLayoutItem.isRequired()) {
-                        String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                        if (defaultFieldValue != null) {
-                            inputParameters.addCustomFieldValue(orderableField.getId(), defaultFieldValue);
-                        }
-                    }
-                } else {
-                    log.warn("No support yet for custom field type '" + customField.getCustomFieldType().getClass().getCanonicalName() + "'");
-                }
-            }
+            builder.injectInputParam(fieldLayoutItem);
         }
+
+        IssueInputParameters inputParameters = builder.getInputParameters();
 
         IssueService.CreateValidationResult validationResult = issueService.validateCreate(callingUser(), inputParameters);
 
