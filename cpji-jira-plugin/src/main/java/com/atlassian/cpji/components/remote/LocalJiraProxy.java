@@ -133,7 +133,7 @@ public class LocalJiraProxy implements JiraProxy {
         try {
             return Either.right(copyIssueService.checkFieldPermissions(copyIssueBean));
         } catch (ProjectNotFoundException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
         }
     }
 

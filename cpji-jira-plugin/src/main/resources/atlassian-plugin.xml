@@ -104,6 +104,7 @@
 	<component key="copyIssueService" class="com.atlassian.cpji.components.CopyIssueService"/>
 	<component key="jiraProxyFactory" class="com.atlassian.cpji.components.remote.JiraProxyFactory"/>
 	<component key="projectInfoService" class="com.atlassian.cpji.components.ProjectInfoService"/>
+	<component key="inputParametersService" class="com.atlassian.cpji.components.InputParametersService"/>
 
 	<resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>
 

@@ -48,7 +48,7 @@ public class RemoteJiraProxy implements JiraProxy {
     private final JiraLocation jiraLocation;
     private final IssueLinkClient issueLinkClient;
 
-    public RemoteJiraProxy(InternalHostApplication hostApplication, final ApplicationLink applicationLink, JiraLocation jiraLocation, IssueLinkClient issueLinkClient) {
+    public RemoteJiraProxy(final InternalHostApplication hostApplication, final ApplicationLink applicationLink, final JiraLocation jiraLocation, final IssueLinkClient issueLinkClient) {
         this.hostApplication = hostApplication;
         this.applicationLink = applicationLink;
         this.jiraLocation = jiraLocation;
@@ -207,29 +207,6 @@ public class RemoteJiraProxy implements JiraProxy {
             return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
-
-//    @Override
-//    public void copyLocalIssueLink(Issue localIssue, String copiedIssueKey, Long copiedIssueId, String localRelationship, String remoteRelationship) {
-//        try{
-//            // Create link from the copied issue
-//            if(remoteRelationship != null){
-//                final RestResponse response = issueLinkClient.createLinkFromRemoteIssue(localIssue, applicationLink, copiedIssueKey, remoteRelationship);
-//
-//                if (!response.isSuccessful())
-//                {
-//                    log.error("Failed to create remote issue link from '" + copiedIssueKey + "' to '" + localIssue.getKey() + "'");
-//                }
-//            }
-//
-//            // Create link from the local source issue
-//            if(localRelationship != null){
-//                issueLinkClient.createLinkToRemoteIssue(localIssue, applicationLink, copiedIssueKey, copiedIssueId, localRelationship);
-//            }
-//        } catch(Exception e){
-//            return;
-//        }
-//
-//    }
 
     @Override
     public Either<ResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String copiedIssueKey) {

@@ -33,6 +33,10 @@
 			</exclusions>
 			<scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-core</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.atlassian.selenium</groupId>
 			<artifactId>atlassian-pageobjects-api</artifactId>
@@ -71,6 +75,11 @@
             <groupId>com.atlassian.aui</groupId>
             <artifactId>aui-qunit-util</artifactId>
             <version>0.20</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira</groupId>
+            <artifactId>jira-tests</artifactId>
             <scope>test</scope>
         </dependency>
 		<dependency>
