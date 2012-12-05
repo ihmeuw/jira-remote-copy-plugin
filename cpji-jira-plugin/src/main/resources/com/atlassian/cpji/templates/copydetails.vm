@@ -39,11 +39,10 @@
 				</div>
 			</fieldset>
 
-			<h2>$i18n.getText('cpji.optional.copy.items')</h2>
+			<h2>$i18n.getText('cpji.advanced')</h2>
 			<fieldset>
 				#if ($action.issueWithComments)
 				<div class="field-group">
-
 					<span class="field-value">
 						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" checked="checked"/>
 						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
@@ -51,30 +50,36 @@
 				</div>
 				#end
 
-				#if ($action.attachmentsEnabled())
-					<div class="field-group">
-						 <span class="field-value">
-							 #if ($action.isSALUpgradeRequired())
-								 $i18n.getText('cpji.attachments.not.moved.sal')
-							 #elseif ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
-								 <input type="checkbox" class="checkbox" id="attachments" name="copyAttachments" value="true" checked="checked"/>
-								 <label for="attachments">$i18n.getText('cpji.attachments')</label>
-							 #elseif (!$action.remoteAttachmentsEnabled())
-								 $i18n.getText('cpji.attachments.are.disabled')
-							 #elseif(!$action.hasCreateAttachmentsPermission())
-								 $i18n.getText('cpji.not.permitted.to.create.attachments')
-							 #end
-						 </span>
-					</div>
+				#if ($action.attachmentsEnabled() && $action.issueWithAttachments)
+				<div class="field-group">
+					 <span class="field-value">
+						 #if ($action.isSALUpgradeRequired())
+							 $i18n.getText('cpji.attachments.not.moved.sal')
+						 #elseif ($action.remoteAttachmentsEnabled() && $action.hasCreateAttachmentsPermission())
+							 <input type="checkbox" class="checkbox" id="attachments" name="copyAttachments" value="true" checked="checked"/>
+							 <label for="attachments">$i18n.getText('cpji.copy.attachments')</label>
+						 #elseif (!$action.remoteAttachmentsEnabled())
+							 $i18n.getText('cpji.attachments.are.disabled')
+						 #elseif(!$action.hasCreateAttachmentsPermission())
+							 $i18n.getText('cpji.not.permitted.to.create.attachments')
+						 #end
+					 </span>
+				</div>
 				#end
 
+				#if ($action.linksEnabled() && $action.issueWithLinks)
 				<div class="field-group">
 					<span class="field-value">
 						<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" checked="checked"/>
 						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
+						#if (!$action.copyInfo.issueLinkingEnabled)
+							<div class="description">$i18n.getText('cpji.remote.issue.linking.is.disabled')</div>
+						#end
 					</span>
 				</div>
+				#end
 
+				#if ($action.linksEnabled())
 				<div class="field-group">
 					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
 					<select name="remoteIssueLink" id="remoteIssueLink">
@@ -83,6 +88,7 @@
 						#end
 					</select>
 				</div>
+				#end
 			</fieldset>
 
 			<div class="button-container">

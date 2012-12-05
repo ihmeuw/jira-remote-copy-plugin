@@ -15,17 +15,20 @@ public class CopyInformationBean
     @XmlElement (name = "issueTypes")
     private IssueTypeBean issueTypes;
 
-    @XmlElement( name = "attachmentDisabled")
-    private Boolean attachmentsEnabled;
+    @XmlElement( name = "attachmentsEnabled")
+    private boolean attachmentsEnabled;
+
+	@XmlElement( name = "issueLinkingEnabled")
+	private boolean issueLinkingEnabled;
 
     @XmlElement( name = "hasCreateAttachmentPermission")
-    private Boolean hasCreateAttachmentPermission;
+    private boolean hasCreateAttachmentPermission;
 
     @XmlElement( name = "user")
     private UserBean user;
 
     @XmlElement( name = "hasCreateIssuePermission")
-    private Boolean hasCreateIssuePermission;
+    private boolean hasCreateIssuePermission;
 
     @XmlElement (name = "version")
     private String version;
@@ -38,14 +41,16 @@ public class CopyInformationBean
     public CopyInformationBean
             (
                     final IssueTypeBean issueTypes,
-                    final Boolean attachmentsEnabled,
+                    final boolean attachmentsEnabled,
+					final boolean issueLinkingEnabled,
                     final UserBean user,
-                    final Boolean hasCreateIssuePermission,
-                    final Boolean hasCreateAttachmentPermission,
+                    final boolean hasCreateIssuePermission,
+                    final boolean hasCreateAttachmentPermission,
                     final String version)
     {
         this.issueTypes = issueTypes;
         this.attachmentsEnabled = attachmentsEnabled;
+		this.issueLinkingEnabled = issueLinkingEnabled;
         this.user = user;
         this.hasCreateIssuePermission = hasCreateIssuePermission;
         this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
@@ -57,7 +62,7 @@ public class CopyInformationBean
         return issueTypes;
     }
 
-    public Boolean getAttachmentsEnabled()
+    public boolean getAttachmentsEnabled()
     {
         return attachmentsEnabled;
     }
@@ -67,12 +72,12 @@ public class CopyInformationBean
         return user;
     }
 
-    public Boolean getHasCreateIssuePermission()
+    public boolean getHasCreateIssuePermission()
     {
         return hasCreateIssuePermission;
     }
 
-    public Boolean getHasCreateAttachmentPermission()
+    public boolean getHasCreateAttachmentPermission()
     {
         return hasCreateAttachmentPermission;
     }
@@ -81,4 +86,8 @@ public class CopyInformationBean
     {
         return version;
     }
+
+	public boolean getIssueLinkingEnabled() {
+		return issueLinkingEnabled;
+	}
 }

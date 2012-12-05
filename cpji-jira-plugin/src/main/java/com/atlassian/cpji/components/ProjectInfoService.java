@@ -14,8 +14,8 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.BuildUtilsInfo;
+import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,7 +31,9 @@ public class ProjectInfoService {
     private final PermissionManager permissionManager;
     private final BuildUtilsInfo buildUtilsInfo;
 
-    public ProjectInfoService(com.atlassian.jira.bc.project.ProjectService projectService, IssueTypeSchemeManager issueTypeSchemeManager, ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext, PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo) {
+    public ProjectInfoService(com.atlassian.jira.bc.project.ProjectService projectService, IssueTypeSchemeManager issueTypeSchemeManager,
+			ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext,
+			PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo) {
         this.projectService = projectService;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.applicationProperties = applicationProperties;
@@ -41,7 +43,7 @@ public class ProjectInfoService {
     }
 
     public CopyInformationBean getIssueTypeInformation(String projectKey) throws ProjectNotFoundException {
-        User user = jiraAuthenticationContext.getLoggedInUser();
+        final User user = jiraAuthenticationContext.getLoggedInUser();
         com.atlassian.jira.bc.project.ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
         Project project;
         if (result.isValid()) {
@@ -49,22 +51,30 @@ public class ProjectInfoService {
         } else {
             throw new ProjectNotFoundException(result.getErrorCollection());
         }
-        UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
-        boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
-        boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
+
+        final UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
+        final boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
+        final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 
         if (hasCreateIssuePermission) {
-            Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);
-            List<String> issueTypes = new ArrayList<String>();
+            final Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);
+            final List<String> issueTypes = Lists.newArrayList();
             for (IssueType issueType : issueTypesForProject) {
                 issueTypes.add(issueType.getName());
             }
             IssueTypeBean issueTypesBean = new IssueTypeBean(issueTypes);
-            boolean attachmentsDisabled = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS);
-            CopyInformationBean copyInformationBean = new CopyInformationBean(issueTypesBean, attachmentsDisabled, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
+
+            CopyInformationBean copyInformationBean = new CopyInformationBean(issueTypesBean,
+					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
+					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
+					userBean,
+					hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
             return copyInformationBean;
         } else {
-            CopyInformationBean copyInformationBean = new CopyInformationBean(null, true, userBean, hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
+            CopyInformationBean copyInformationBean = new CopyInformationBean(null,
+					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
+					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING), userBean,
+					hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
             return copyInformationBean;
         }
     }

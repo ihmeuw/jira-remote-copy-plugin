@@ -17,7 +17,9 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,16 +31,16 @@ import java.util.List;
  */
 public class CopyDetailsAction extends AbstractCopyIssueAction
 {
-    private Boolean remoteAttachmentsEnabled;
-    private Boolean hasCreateAttachmentsPermission;
-
     private String remoteUserName;
     private String remoteFullUserName;
 
     private Collection<Option> availableIssueTypes;
     private List<Option> issueLinkOptions;
+	private final IssueLinkManager issueLinkManager;
 
-    public class Option
+	private CopyInformationBean copyInfo;
+
+	public class Option
     {
         private final String value;
         private final boolean selected;
@@ -85,17 +87,37 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             final UserMappingManager userMappingManager,
 			final ApplicationLinkService applicationLinkService,
             final JiraProxyFactory jiraProxyFactory,
-			final WebResourceManager webResourceManager
+			final WebResourceManager webResourceManager,
+			final IssueLinkManager issueLinkManager
     )
     {
         super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
 				copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory, webResourceManager);
-    }
+		this.issueLinkManager = issueLinkManager;
+	}
 
 	public boolean isIssueWithComments() {
 		final MutableIssue issue = getIssueObject();
 		if (issue != null) {
 			return !commentManager.getComments(issue).isEmpty();
+		}
+		return false;
+	}
+
+	public boolean isIssueWithAttachments() {
+		final MutableIssue issue = getIssueObject();
+		if (issue != null) {
+			return !issue.getAttachments().isEmpty();
+		}
+		return false;
+	}
+
+	public boolean isIssueWithLinks() {
+		final MutableIssue issue = getIssueObject();
+		if (issueLinkManager.isLinkingEnabled()) {
+			if (issue != null) {
+				return !issueLinkManager.getOutwardLinks(issue.getId()).isEmpty();
+			}
 		}
 		return false;
 	}
@@ -132,30 +154,25 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-        CopyInformationBean copyInformationBean = (CopyInformationBean) result.right().get();
-        if (!copyInformationBean.getHasCreateIssuePermission())
+        copyInfo = (CopyInformationBean) result.right().get();
+        if (!copyInfo.getHasCreateIssuePermission())
         {
-            addErrorMessage("You don't have the create issue permission for this JIRA project!");
+            addErrorMessage(getText("cpji.you.dont.have.create.issue.permission"));
             return ERROR;
         }
-        issueLinkOptions = new ArrayList<Option>();
 
-		final String remoteJiraVersion = copyInformationBean.getVersion();
-        if (remoteJiraVersion != null && remoteJiraVersion.startsWith("5"))
-        {
-            issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
-            issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
-        }
+		issueLinkOptions = Lists.newArrayList();
+
+		issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
+		issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
         issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
         issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, getText(RemoteIssueLinkType.NONE.getI18nKey())));
 
-        checkIssueTypes(copyInformationBean.getIssueTypes().getGetTypes());
-        remoteAttachmentsEnabled = copyInformationBean.getAttachmentsEnabled();
-        hasCreateAttachmentsPermission = copyInformationBean.getHasCreateAttachmentPermission();
+        checkIssueTypes(copyInfo.getIssueTypes().getGetTypes());
 
-		UserBean user = copyInformationBean.getRemoteUser();
+		UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
-        remoteFullUserName = copyInformationBean.getRemoteUser().getFullName();
+        remoteFullUserName = copyInfo.getRemoteUser().getFullName();
 
         return SUCCESS;
     }
@@ -175,14 +192,23 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         return getApplicationProperties().getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS);
     }
 
-    public boolean remoteAttachmentsEnabled()
+	public boolean linksEnabled()
+	{
+		return getApplicationProperties().getOption(APKeys.JIRA_OPTION_ISSUELINKING);
+	}
+
+	public CopyInformationBean getCopyInfo() {
+		return copyInfo;
+	}
+
+	public boolean remoteAttachmentsEnabled()
     {
-        return remoteAttachmentsEnabled;
+        return getCopyInfo().getAttachmentsEnabled();
     }
 
     public Boolean hasCreateAttachmentsPermission()
     {
-        return hasCreateAttachmentsPermission;
+        return getCopyInfo().getHasCreateAttachmentPermission();
     }
 
     public boolean isSALUpgradeRequired()
