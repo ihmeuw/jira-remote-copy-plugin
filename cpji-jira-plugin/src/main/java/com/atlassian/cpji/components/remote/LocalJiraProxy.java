@@ -6,7 +6,7 @@ import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
 import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -73,7 +73,7 @@ public class LocalJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, Projects> getProjects() {
+    public Either<NegativeResponseStatus, Projects> getProjects() {
         Collection<Project> projects = permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, jiraAuthenticationContext.getLoggedInUser());
 
         Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>() {
@@ -88,7 +88,7 @@ public class LocalJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> isPluginInstalled() {
+    public Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled() {
 
         return Either.right(SuccessfulResponse.build(jiraLocation));
     }
@@ -99,46 +99,46 @@ public class LocalJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, CopyInformationBean> getCopyInformation(String projectKey) {
+    public Either<NegativeResponseStatus, CopyInformationBean> getCopyInformation(String projectKey) {
         try {
             return Either.right(projectInfoService.getIssueTypeInformation(projectKey));
         } catch (ProjectNotFoundException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean) {
+    public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean) {
         try {
             return Either.right(copyIssueService.copyIssue(copyIssueBean));
         } catch (CopyIssueException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType) {
         Issue issue = issueManager.getIssueObject(issueKey);
         try {
             attachmentManager.createAttachment(attachmentFile, filename, contentType, jiraAuthenticationContext.getLoggedInUser(), issue);
             return Either.right(SuccessfulResponse.build(jiraLocation));
         } catch (AttachmentException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
 
     @Override
-    public Either<ResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean) {
+    public Either<NegativeResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean) {
         try {
             return Either.right(copyIssueService.checkFieldPermissions(copyIssueBean));
         } catch (ProjectNotFoundException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
         try {
 
             if (localDirection == LinkCreationDirection.OUTWARD) {
@@ -148,24 +148,24 @@ public class LocalJiraProxy implements JiraProxy {
             }
             return SuccessfulResponse.buildEither(jiraLocation);
         } catch (CreateException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey) {
         Issue issue = issueManager.getIssueObject(remoteIssueKey);
         try {
             RemoteIssueLinkBuilder builder = new RemoteIssueLinkBuilder(remoteIssueLink).issueId(issue.getId()).id(null);
             remoteIssueLinkManager.createRemoteIssueLink(builder.build(), jiraAuthenticationContext.getLoggedInUser());
             return SuccessfulResponse.buildEither(jiraLocation);
         } catch (CreateException e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
         //all local links are also local
         //all remote links are still remote
         //so it is dry run

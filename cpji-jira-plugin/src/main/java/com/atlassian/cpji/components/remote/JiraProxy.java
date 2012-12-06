@@ -1,8 +1,8 @@
 package com.atlassian.cpji.components.remote;
 
 import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.ResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -21,25 +21,25 @@ import java.io.File;
 public interface JiraProxy {
     public JiraLocation getJiraLocation();
 
-    public Either<ResponseStatus, Projects> getProjects();
+    public Either<NegativeResponseStatus, Projects> getProjects();
 
-    public Either<ResponseStatus, SuccessfulResponse> isPluginInstalled();
+    public Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled();
 
 
 
-    public Either<ResponseStatus, CopyInformationBean> getCopyInformation(String projectKey);
+    public Either<NegativeResponseStatus, CopyInformationBean> getCopyInformation(String projectKey);
 
-    public Either<ResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean);
+    public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean);
 
-    public Either<ResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType);
+    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType);
 
-    public Either<ResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean);
+    public Either<NegativeResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean);
 
-    public Either<ResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
 
-    public Either<ResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey);
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey);
 
-    public Either<ResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey);
+    public Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey);
 
     public String generateAuthenticationUrl(String issueId);
 

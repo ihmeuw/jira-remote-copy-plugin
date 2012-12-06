@@ -1,7 +1,7 @@
 package com.atlassian.cpji.rest.model;
 
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.ResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.rest.client.domain.BasicProject;
@@ -31,7 +31,7 @@ public class AvailableProjectsBean {
 		this.failures = failures;
 	}
 
-	public static AvailableProjectsBean create(@Nonnull final JiraProxyFactory proxyFactory, @Nonnull final String issueId, @Nonnull Iterable<Either<ResponseStatus, Projects>> projects) {
+	public static AvailableProjectsBean create(@Nonnull final JiraProxyFactory proxyFactory, @Nonnull final String issueId, @Nonnull Iterable<Either<NegativeResponseStatus, Projects>> projects) {
 		return new AvailableProjectsBean(Iterables.transform(Either.allRight(projects),
 				new ProjectsToProjectGroupBean()),
 				RemoteFailuresBean.create(proxyFactory, issueId, Either.allLeft(projects)));

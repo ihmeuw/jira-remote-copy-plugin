@@ -3,7 +3,7 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
@@ -88,17 +88,17 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
 
         MutableIssue issueToCopy = getIssueObject();
         CopyIssueBean copyIssueBean = createCopyIssueBean(linkToTargetEntity.getProjectKey(), issueToCopy, issueType);
-        Either<ResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
+        Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
 
         if(result.isLeft()){
-            ResponseStatus status = (ResponseStatus) result.left().get();
+            NegativeResponseStatus status = (NegativeResponseStatus) result.left().get();
 
-            if(ResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
+            if(NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
                 log.error("Authentication failed.");
                 addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
-            } else if(ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
+            } else if(NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
                 log.error("OAuth token invalid.");
-            } else if(ResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
+            } else if(NegativeResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
                 log.error("Failed to copy the issue.");
                 addErrorMessage("Failed to copy the issue.");
             }
@@ -112,9 +112,9 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         {
             for(Attachment attachment : issueToCopy.getAttachments()){
                 File attachmentFile = AttachmentUtils.getAttachmentFile(attachment);
-                Either<ResponseStatus, SuccessfulResponse> addResult = proxy.addAttachment(copiedIssueKey, attachmentFile, attachment.getFilename(), attachment.getMimetype());
+                Either<NegativeResponseStatus, SuccessfulResponse> addResult = proxy.addAttachment(copiedIssueKey, attachmentFile, attachment.getFilename(), attachment.getMimetype());
                 if(addResult.isLeft()){
-                    ResponseStatus responseStatus = (ResponseStatus) addResult.left().get();
+                    NegativeResponseStatus responseStatus = (NegativeResponseStatus) addResult.left().get();
                     ErrorCollection ec = responseStatus.getErrorCollection();
                     if(ec != null){
                         addErrorCollection(ec);
@@ -138,8 +138,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
 
             proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
                      Iterables.get(copiedTypeCollection, 0),
-                    remoteIssueLinkType.localHasLink()?JiraProxy.LinkCreationDirection.OUTWARD:JiraProxy.LinkCreationDirection.IGNORE,
-                    remoteIssueLinkType.localHasLink()?JiraProxy.LinkCreationDirection.INWARD:JiraProxy.LinkCreationDirection.IGNORE);
+                    remoteIssueLinkType.hasLocalIssueLinkToRemote()?JiraProxy.LinkCreationDirection.OUTWARD:JiraProxy.LinkCreationDirection.IGNORE,
+                    remoteIssueLinkType.hasLocalIssueLinkToRemote()?JiraProxy.LinkCreationDirection.INWARD:JiraProxy.LinkCreationDirection.IGNORE);
         }
 
         linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());

@@ -7,7 +7,7 @@ import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.RemotesResource;
@@ -61,7 +61,7 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, Projects> getProjects() {
+    public Either<NegativeResponseStatus, Projects> getProjects() {
         return callRestService(Request.MethodType.GET, "/rest/copyissue/1.0/project", new AbstractJsonResponseHandler<Projects>(jiraLocation) {
             @Override
             protected Projects parseResponse(Response response) throws ResponseException, JSONException {
@@ -73,23 +73,23 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
 
-    private <T> Either<ResponseStatus, T> callRestService(Request.MethodType method, final String path, final AbstractJsonResponseHandler handler) {
+    private <T> Either<NegativeResponseStatus, T> callRestService(Request.MethodType method, final String path, final AbstractJsonResponseHandler handler) {
         final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();
         try {
             ApplicationLinkRequest request = requestFactory.createRequest(method, path);
             handler.modifyRequest(request);
-            return (Either<ResponseStatus, T>) request.execute(handler);
+            return (Either<NegativeResponseStatus, T>) request.execute(handler);
         } catch (CredentialsRequiredException ex) {
-            return Either.left(ResponseStatus.authorizationRequired(jiraLocation));
+            return Either.left(NegativeResponseStatus.authorizationRequired(jiraLocation));
         } catch (ResponseException e) {
             log.error(String.format("Failed to transform response from Application Link: %s (%s)", jiraLocation.getId(), e.getMessage()));
-            return Either.left(ResponseStatus.communicationFailed(jiraLocation));
+            return Either.left(NegativeResponseStatus.communicationFailed(jiraLocation));
         }
     }
 
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> isPluginInstalled() {
+    public Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled() {
         return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
             @Override
             protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
@@ -98,7 +98,7 @@ public class RemoteJiraProxy implements JiraProxy {
                     return SuccessfulResponse.build(jiraLocation);
                 }
                 log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin NOT installed.");
-                return provideResponseStatus(ResponseStatus.pluginNotInstalled(jiraLocation));
+                return provideResponseStatus(NegativeResponseStatus.pluginNotInstalled(jiraLocation));
             }
         });
     }
@@ -110,7 +110,7 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, CopyInformationBean> getCopyInformation(String projectKey) {
+    public Either<NegativeResponseStatus, CopyInformationBean> getCopyInformation(String projectKey) {
         return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PROJECT_RESOURCE_PATH + "/issueTypeInformation/" + projectKey,
                 new AbstractJsonResponseHandler<CopyInformationBean>(jiraLocation) {
 
@@ -122,7 +122,7 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, IssueCreationResultBean> copyIssue(final CopyIssueBean copyIssueBean) {
+    public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(final CopyIssueBean copyIssueBean) {
 
         return callRestService(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/copy", new AbstractJsonResponseHandler<IssueCreationResultBean>(jiraLocation) {
 
@@ -139,7 +139,7 @@ public class RemoteJiraProxy implements JiraProxy {
                     return response.getEntity(IssueCreationResultBean.class);
                 } else {
                     ErrorBean errorBean = response.getEntity(ErrorBean.class);
-                    return provideResponseStatus(ResponseStatus.errorOccured(jiraLocation, errorBean));
+                    return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, errorBean));
                 }
 
             }
@@ -147,14 +147,14 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> addAttachment(final String issueKey, final File attachmentFile, final String filename, final String contentType) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(final String issueKey, final File attachmentFile, final String filename, final String contentType) {
         return callRestService(Request.MethodType.POST, "rest/api/latest/issue/" + issueKey + "/attachments", new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
             @Override
             protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
                 if (response.isSuccessful()) {
                     return SuccessfulResponse.build(jiraLocation);
                 } else {
-                    return provideResponseStatus(ResponseStatus.errorOccured(jiraLocation, response.getResponseBodyAsString()));
+                    return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, response.getResponseBodyAsString()));
                 }
             }
 
@@ -170,7 +170,7 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, FieldPermissionsBean> checkPermissions(final CopyIssueBean copyIssueBean) {
+    public Either<NegativeResponseStatus, FieldPermissionsBean> checkPermissions(final CopyIssueBean copyIssueBean) {
         return callRestService(Request.MethodType.PUT, REST_URL_COPY_ISSUE + COPY_ISSUE_RESOURCE_PATH + "/fieldPermissions", new AbstractJsonResponseHandler<FieldPermissionsBean>(jiraLocation) {
             @Override
             protected void modifyRequest(ApplicationLinkRequest request) {
@@ -185,7 +185,7 @@ public class RemoteJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
         try {
             // Create link from the copied issue
             String remoteRelationship = remoteDirection.getNameFromIssueLinkType(issueLinkType);
@@ -204,12 +204,12 @@ public class RemoteJiraProxy implements JiraProxy {
             }
             return SuccessfulResponse.buildEither(jiraLocation);
         } catch (Exception e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String copiedIssueKey) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String copiedIssueKey) {
         try {
             //todo - inline converting remote links into local?
             final RestResponse response = issueLinkClient.createRemoteIssueLink(remoteIssueLink, copiedIssueKey, applicationLink);
@@ -218,12 +218,12 @@ public class RemoteJiraProxy implements JiraProxy {
             }
             return SuccessfulResponse.buildEither(jiraLocation);
         } catch (Exception e) {
-            return Either.left(ResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
         }
     }
 
     @Override
-    public Either<ResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey) {
 
         AbstractJsonResponseHandler<SuccessfulResponse> handler = new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
             @Override
