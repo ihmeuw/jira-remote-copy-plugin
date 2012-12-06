@@ -35,7 +35,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
     private String remoteFullUserName;
 
     private Collection<Option> availableIssueTypes;
-    private List<Option> issueLinkOptions;
 	private final IssueLinkManager issueLinkManager;
 
 	private CopyInformationBean copyInfo;
@@ -161,13 +160,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-		issueLinkOptions = Lists.newArrayList();
-
-		issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
-		issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
-        issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
-        issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, getText(RemoteIssueLinkType.NONE.getI18nKey())));
-
         checkIssueTypes(copyInfo.getIssueTypes().getGetTypes());
 
 		UserBean user = copyInfo.getRemoteUser();
@@ -235,6 +227,19 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
     public List<Option> getIssueLinkOptions()
     {
+		List<Option> issueLinkOptions = Lists.newArrayList();
+
+		if (linksEnabled() && copyInfo.getIssueLinkingEnabled()) {
+			issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
+		}
+		if (copyInfo.getIssueLinkingEnabled()) {
+			issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
+		}
+		if (linksEnabled()) {
+			issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
+		}
+		issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, getText(RemoteIssueLinkType.NONE.getI18nKey())));
+
         return issueLinkOptions;
     }
 
@@ -242,4 +247,43 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
     {
         return availableIssueTypes;
     }
+
+	public boolean isAdvancedSectionVisible() {
+		return isCopyAttachmentsSectionVisible() || isCopyIssueLinksSectionVisible()
+				|| isCreateIssueLinkSectionVisible() || isCopyCommentsSectionVisible();
+	}
+
+	public boolean isCopyAttachmentsSectionVisible() {
+		return attachmentsEnabled() && isIssueWithAttachments();
+	}
+
+	public boolean isCopyIssueLinksSectionVisible() {
+		return linksEnabled() && isIssueWithLinks();
+	}
+
+	public boolean isCreateIssueLinkSectionVisible() {
+		return linksEnabled() || copyInfo.getIssueLinkingEnabled();
+	}
+
+	public boolean isCopyCommentsSectionVisible() {
+		return isIssueWithComments();
+	}
+
+	public String getCopyAttachmentsErrorMessage() {
+		if(isSALUpgradeRequired()) {
+			return getText("cpji.attachments.not.moved.sal");
+		} else if (!copyInfo.getAttachmentsEnabled()) {
+			return getText("cpji.attachments.are.disabled");
+		} else if(!copyInfo.getHasCreateAttachmentPermission()) {
+			return getText("cpji.not.permitted.to.create.attachments");
+		}
+		return "";
+	}
+
+	public String getCopyIssueLinksErrorMessage() {
+		if (!copyInfo.getAttachmentsEnabled()) {
+			return getText("cpji.remote.issue.linking.is.disabled");
+		}
+		return "";
+	}
 }
