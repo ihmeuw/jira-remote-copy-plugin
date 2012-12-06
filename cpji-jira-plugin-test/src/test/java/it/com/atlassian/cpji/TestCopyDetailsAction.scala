@@ -7,8 +7,14 @@ import com.atlassian.jira.rest.client.domain.input.{LinkIssuesInput, ComplexIssu
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import org.joda.time.DateTime
 import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.pageobjects.PageElements._
 import org.junit.Assert._
 import java.io.ByteArrayInputStream
+import org.hamcrest.core.IsCollectionContaining
+import com.google.common.collect.{Collections2, Iterables}
+import com.atlassian.pageobjects.elements.query.Poller
+import org.hamcrest.Matchers
+import com.atlassian.pageobjects.elements.Options
 ;
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
@@ -73,6 +79,41 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 			assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
+		} finally {
+			try { AbstractCopyIssueTest.testkit1.issueLinking().deleteIssueLinkType("Duplicate") } catch { case e: Exception => "" }
+		}
+	}
+
+	@Test def testAdvancedSectionReportsMissingFeaturesOnRemoteSide() {
+		val issue: Issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
+			new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
+			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
+
+		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
+
+		try {
+			AbstractCopyIssueTest.testkit1.issueLinking().createIssueLinkType("Duplicate", "duplicates", "is duplicated by")
+			AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+
+			try {
+				AbstractCopyIssueTest.testkit2.attachments().disable()
+				AbstractCopyIssueTest.testkit2.issueLinking().disable()
+
+				val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
+				val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+
+				assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+				Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed.isEnabled)
+				assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
+				Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed.isEnabled)
+				assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
+				Poller.waitUntilTrue(copyDetailsPage.getCreateIssueLinks.timed.isPresent)
+				assertThat(Collections2.transform(copyDetailsPage.getCreateIssueLinks.getAllOptions, Options.getText), IsCollectionContaining.hasItems("From original to copy", "None"))
+			} finally {
+				AbstractCopyIssueTest.testkit2.attachments().enable()
+				AbstractCopyIssueTest.testkit2.issueLinking().enable()
+			}
 		} finally {
 			try { AbstractCopyIssueTest.testkit1.issueLinking().deleteIssueLinkType("Duplicate") } catch { case e: Exception => "" }
 		}

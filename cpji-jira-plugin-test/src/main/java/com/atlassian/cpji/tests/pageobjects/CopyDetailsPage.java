@@ -1,8 +1,10 @@
 package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
+import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
+import com.atlassian.pageobjects.elements.SelectElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import org.hamcrest.Matchers;
@@ -21,7 +23,19 @@ public class CopyDetailsPage extends AbstractJiraPage
     private final String url;
 
     @ElementBy(className = "submit")
-    private PageElement nextButton;
+    PageElement nextButton;
+
+	@ElementBy(id = "create-issue-links-group")
+	PageElement createIssueLinkGroup;
+
+	@ElementBy (id = "remoteIssueLink")
+	SelectElement remoteIssueLink;
+
+	@ElementBy (id = "attachments")
+	CheckboxElement copyAttachments;
+
+	@ElementBy (id = "copy-issue-links")
+	CheckboxElement copyIssueLinks;
 
     public CopyDetailsPage(final Long issueId, final String targetEntityLink)
     {
@@ -48,7 +62,7 @@ public class CopyDetailsPage extends AbstractJiraPage
     }
 
 	public boolean isCreateIssueLinksGroupVisible() {
-		return elementFinder.find(By.id("create-issue-links-group")).timed().isVisible().now();
+		return createIssueLinkGroup.timed().isVisible().now();
 	}
 
 	public boolean isCopyCommentsGroupVisible() {
@@ -61,6 +75,18 @@ public class CopyDetailsPage extends AbstractJiraPage
 
 	public boolean isCopyAttachmentsGroupVisible() {
 		return elementFinder.find(By.id("copy-attachments-group")).timed().isVisible().now();
+	}
+
+	public SelectElement getCreateIssueLinks() {
+		return remoteIssueLink;
+	}
+
+	public CheckboxElement getCopyIssueLinks() {
+		return copyIssueLinks;
+	}
+
+	public CheckboxElement getCopyAttachments() {
+		return copyAttachments;
 	}
 
 }
