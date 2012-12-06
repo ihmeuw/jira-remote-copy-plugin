@@ -10,7 +10,6 @@ import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.RESTException;
 import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
@@ -35,11 +34,11 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
@@ -57,14 +56,13 @@ public class CopyIssueService {
     private final FieldLayoutManager fieldLayoutManager;
     private final FieldMapperFactory fieldMapperFactory;
     private final FieldManager fieldManager;
-    private final DefaultFieldValuesManager defaultFieldValuesManager;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final InternalHostApplication internalHostApplication;
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
     private final InputParametersService inputParametersService;
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -72,7 +70,6 @@ public class CopyIssueService {
         this.fieldLayoutManager = fieldLayoutManager;
         this.fieldMapperFactory = fieldMapperFactory;
         this.fieldManager = fieldManager;
-        this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.internalHostApplication = internalHostApplication;
         this.issueLinkService = issueLinkService;
@@ -136,6 +133,28 @@ public class CopyIssueService {
 
     }
 
+    private static class OnlyVisible implements Predicate<NonOrderableSystemFieldMapper>{
+        @Override
+        public boolean apply(@Nullable NonOrderableSystemFieldMapper input) {
+            return input.isVisible();
+        }
+    }
+
+    private static class GetFieldIdFromLayoutItem implements Function<FieldLayoutItem, String>{
+        @Override
+        public String apply(@Nullable FieldLayoutItem input) {
+            return input.getOrderableField().getId();
+        }
+    }
+
+    private static class GetIdFromNonOrderableMapper implements Function<NonOrderableSystemFieldMapper, String>{
+
+        @Override
+        public String apply(@Nullable NonOrderableSystemFieldMapper input) {
+            return input.getFieldId();
+        }
+    }
+
 
     public FieldPermissionsBean checkFieldPermissions(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException {
         Project project = getProjectFromIssueBean(copyIssueBean);
@@ -147,24 +166,20 @@ public class CopyIssueService {
 
         final List<SystemFieldPermissionBean> systemFieldPermissionBeans = new ArrayList<SystemFieldPermissionBean>();
         final List<CustomFieldPermissionBean> customFieldPermissionBeans = new ArrayList<CustomFieldPermissionBean>();
-        SystemFieldMappingChecker systemFieldMappingChecker = new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout);
-        CustomFieldMappingChecker customFieldMappingChecker = new CustomFieldMappingChecker(defaultFieldValuesManager, copyIssueBean, project, fieldLayout, fieldManager, fieldMapperFactory, issueTypeSchemeManager);
+        SystemFieldMappingChecker systemFieldMappingChecker = inputParametersService.getSystemFieldMappingChecker(project, copyIssueBean, fieldLayout);
+        CustomFieldMappingChecker customFieldMappingChecker = inputParametersService.getCustomFieldMappingChecker(project, copyIssueBean, fieldLayout);
 
         systemFieldPermissionBeans.addAll(systemFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
         customFieldPermissionBeans.addAll(customFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));
 
-        Iterable<String> orderableFieldIds = Iterables.transform(fieldLayoutItems, new Function<FieldLayoutItem, String>() {
-            public String apply(final FieldLayoutItem from) {
-                return from.getOrderableField().getId();
-            }
-        });
-        ArrayList<String> fieldIds = Lists.newArrayList(orderableFieldIds);
-        Map<String, NonOrderableSystemFieldMapper> nonOrderableSystemFieldMappers = fieldMapperFactory.getNonOrderableSystemFieldMappers();
-        for (NonOrderableSystemFieldMapper nonOrderableSystemFieldMapper : nonOrderableSystemFieldMappers.values()) {
-            if (nonOrderableSystemFieldMapper.isVisible()) {
-                fieldIds.add(nonOrderableSystemFieldMapper.getFieldId());
-            }
-        }
+
+        Iterable<String> orderableFieldIds = Iterables.transform(fieldLayoutItems, new GetFieldIdFromLayoutItem());
+
+        Collection<NonOrderableSystemFieldMapper> nonOrderableSystemFieldMappers = fieldMapperFactory.getNonOrderableSystemFieldMappers().values();
+        Iterable<String> nonOrderableFieldIds = Iterables.transform(
+        Iterables.filter(nonOrderableSystemFieldMappers, new OnlyVisible()), new GetIdFromNonOrderableMapper());
+
+        Iterable<String> fieldIds = Iterables.concat(orderableFieldIds, nonOrderableFieldIds);
 
         for (String fieldId : fieldIds) {
             if (fieldManager.isCustomField(fieldId)) {
