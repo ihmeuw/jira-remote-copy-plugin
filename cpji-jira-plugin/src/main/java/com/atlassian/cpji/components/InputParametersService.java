@@ -3,6 +3,8 @@ package com.atlassian.cpji.components;
 import com.atlassian.cpji.fields.*;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
+import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
+import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
@@ -12,9 +14,12 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.ProjectSystemField;
+import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
+import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -29,17 +34,28 @@ public class InputParametersService {
     private final FieldMapperFactory fieldMapperFactory;
     private final FieldManager fieldManager;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
+    private final JiraAuthenticationContext authenticationContext;
+    private final IssueTypeSchemeManager issueTypeSchemeManager;
 
-    public InputParametersService(FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager) {
+    public InputParametersService(FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager, JiraAuthenticationContext authenticationContext, IssueTypeSchemeManager issueTypeSchemeManager) {
         this.fieldMapperFactory = fieldMapperFactory;
         this.fieldManager = fieldManager;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
+        this.authenticationContext = authenticationContext;
+        this.issueTypeSchemeManager = issueTypeSchemeManager;
     }
 
     public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, FieldMapper> allSystemFieldMappers){
         return new Populator(project, issueType, allSystemFieldMappers, source, new IssueInputParametersImpl(), fieldMapperFactory, fieldManager, defaultFieldValuesManager);
     }
 
+    public SystemFieldMappingChecker getSystemFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout){
+        return new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout);
+    }
+
+    public CustomFieldMappingChecker getCustomFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout){
+        return new CustomFieldMappingChecker(defaultFieldValuesManager, copyIssueBean, project, fieldLayout, fieldManager, fieldMapperFactory, issueTypeSchemeManager);
+    }
 
 
     public static class Populator{
