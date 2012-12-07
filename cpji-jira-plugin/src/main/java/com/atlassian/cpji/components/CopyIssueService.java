@@ -30,7 +30,6 @@ import com.atlassian.jira.plugin.viewissue.issuelink.GlobalIdFactory;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.ErrorCollection;
-import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -61,9 +60,9 @@ public class CopyIssueService {
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
     private final InputParametersService inputParametersService;
-    private final I18nHelper i18nHelper;
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, I18nHelper i18nHelper) {
+
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -76,7 +75,6 @@ public class CopyIssueService {
         this.issueLinkService = issueLinkService;
         this.remoteIssueLinkService = remoteIssueLinkService;
         this.inputParametersService = inputParametersService;
-        this.i18nHelper = i18nHelper;
     }
 
 
@@ -124,7 +122,7 @@ public class CopyIssueService {
 
             if (errors.hasAnyErrors()) {
                 log.warn("Issue created with errors: " + errors);
-                errors.addErrorMessage(i18nHelper.getText("cpji.errors.issue.created.with.errors", createIssueResult.getIssue().getKey()));
+                errors.addErrorMessage(authenticationContext.getI18nHelper().getText("cpji.errors.issue.created.with.errors", createIssueResult.getIssue().getKey()));
                 throw new IssueCreatedWithErrorsException(resultBean, errors);
             }
 

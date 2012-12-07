@@ -89,13 +89,13 @@ public class TestCopyIssueService {
     private Project project;
     @Mock
     private MutableIssue createdIssue;
-    @Mock
-    private I18nHelper i18nHelper;
 
     @Before
     public void setUp() throws Exception {
         JiraAuthenticationContext authenticationContext = mock(JiraAuthenticationContext.class);
         when(authenticationContext.getLoggedInUser()).thenReturn(currentUser);
+        I18nHelper i18nHelper = mock(I18nHelper.class);
+        when(authenticationContext.getI18nHelper()).thenReturn(i18nHelper);
 
         when(issueType.getName()).thenReturn(ISSUE_TYPE);
         when(issueTypeSchemeManager.getIssueTypesForProject(project)).thenReturn(ImmutableList.of(issueType));
@@ -105,7 +105,7 @@ public class TestCopyIssueService {
         when(createdIssue.getKey()).thenReturn(ISSUE_KEY);
         when(createdIssue.getId()).thenReturn(ISSUE_ID);
 
-        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, i18nHelper);
+        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService);
     }
 
 

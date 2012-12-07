@@ -5,6 +5,7 @@ import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
@@ -24,14 +25,14 @@ import java.util.List;
  */
 public class ProjectInfoService {
 
-    private final com.atlassian.jira.bc.project.ProjectService projectService;
+    private final ProjectService projectService;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final ApplicationProperties applicationProperties;
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final PermissionManager permissionManager;
     private final BuildUtilsInfo buildUtilsInfo;
 
-    public ProjectInfoService(com.atlassian.jira.bc.project.ProjectService projectService, IssueTypeSchemeManager issueTypeSchemeManager,
+    public ProjectInfoService(ProjectService projectService, IssueTypeSchemeManager issueTypeSchemeManager,
 			ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext,
 			PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo) {
         this.projectService = projectService;
@@ -44,7 +45,7 @@ public class ProjectInfoService {
 
     public CopyInformationBean getIssueTypeInformation(String projectKey) throws ProjectNotFoundException {
         final User user = jiraAuthenticationContext.getLoggedInUser();
-        com.atlassian.jira.bc.project.ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
+        ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
         Project project;
         if (result.isValid()) {
             project = result.getProject();
