@@ -32,6 +32,7 @@ import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.util.I18nHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -88,6 +89,8 @@ public class TestCopyIssueService {
     private Project project;
     @Mock
     private MutableIssue createdIssue;
+    @Mock
+    private I18nHelper i18nHelper;
 
     @Before
     public void setUp() throws Exception {
@@ -102,7 +105,7 @@ public class TestCopyIssueService {
         when(createdIssue.getKey()).thenReturn(ISSUE_KEY);
         when(createdIssue.getId()).thenReturn(ISSUE_ID);
 
-        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService);
+        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, i18nHelper);
     }
 
 
@@ -129,7 +132,8 @@ public class TestCopyIssueService {
 
         SystemFieldPostIssueCreationFieldMapper mapperWithException = mock(SystemFieldPostIssueCreationFieldMapper.class);
         SystemFieldPostIssueCreationFieldMapper mapper = mock(SystemFieldPostIssueCreationFieldMapper.class);
-        doThrow(new FieldCreationException("msg", "fieldId")).when(mapperWithException).process(createdIssue, reqs.copyBean);
+        when(mapperWithException.getFieldId()).thenReturn("fieldWithExceptionId");
+        doThrow(new FieldCreationException("field creation message", "fieldId")).when(mapperWithException).process(createdIssue, reqs.copyBean);
 
         when(fieldMapperFactory.getPostIssueCreationFieldMapper()).thenReturn(ImmutableList.of(
                 mapper,mapperWithException

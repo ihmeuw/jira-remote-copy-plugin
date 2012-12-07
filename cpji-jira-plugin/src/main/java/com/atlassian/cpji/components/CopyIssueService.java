@@ -26,16 +26,16 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
+import com.atlassian.jira.plugin.viewissue.issuelink.GlobalIdFactory;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.ErrorCollection;
+import com.atlassian.jira.util.I18nHelper;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -61,8 +61,9 @@ public class CopyIssueService {
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
     private final InputParametersService inputParametersService;
+    private final I18nHelper i18nHelper;
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, I18nHelper i18nHelper) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -75,6 +76,7 @@ public class CopyIssueService {
         this.issueLinkService = issueLinkService;
         this.remoteIssueLinkService = remoteIssueLinkService;
         this.inputParametersService = inputParametersService;
+        this.i18nHelper = i18nHelper;
     }
 
 
@@ -121,7 +123,8 @@ public class CopyIssueService {
             IssueCreationResultBean resultBean = new IssueCreationResultBean(createIssueResult.getIssue().getKey(), createIssueResult.getIssue().getProjectObject().getKey(), createIssueResult.getIssue().getId());
 
             if (errors.hasAnyErrors()) {
-                errors.addErrorMessage("Created issue '" + createIssueResult.getIssue().getKey() + "'. But there were some errors.'");
+                log.warn("Issue created with errors: " + errors);
+                errors.addErrorMessage(i18nHelper.getText("cpji.errors.issue.created.with.errors", createIssueResult.getIssue().getKey()));
                 throw new IssueCreatedWithErrorsException(resultBean, errors);
             }
 
@@ -220,7 +223,7 @@ public class CopyIssueService {
         for (final RemoteIssueLink remoteIssueLink : linksResult.getRemoteIssueLinks()) {
             // We are only interested in JIRA links
             if (RemoteIssueLink.APPLICATION_TYPE_JIRA.equals(remoteIssueLink.getApplicationType())) {
-                final Map<String, String> values = decode(remoteIssueLink.getGlobalId(), GLOBAL_ID_KEYS);
+                final Map<String, String> values =  GlobalIdFactory.decode(remoteIssueLink.getGlobalId(), GLOBAL_ID_KEYS);
                 if (internalHostApplication.getId().get().equals(values.get("appId"))) {
                     // It links to this JIRA instance, make it a local link
                     final Issue issueToLinkTo = getIssue(user, Long.parseLong(values.get("issueId")));
@@ -261,64 +264,7 @@ public class CopyIssueService {
         if (!result.isValid()) {
             return null;
         }
-
         return result.getIssue();
-    }
-
-    // TODO, once a newer version of 5.0 is released (e.g. beta3), change to use GlobalIdFactory in the view-issue-plugin
-
-    /**
-     * Decode the given String to a Map of values.
-     *
-     * @param globalId the String to decode
-     * @param keys     the order in which the keys should appear. If the keys are not in this order an
-     *                 IllegalArgumentException is thrown.
-     * @return a Map of values
-     */
-    public static Map<String, String> decode(final String globalId, final List<String> keys) {
-        final List<NameValuePair> params = new ArrayList<NameValuePair>();
-        final Scanner scanner = new Scanner(globalId);
-
-        try {
-            URLEncodedUtils.parse(params, scanner, "UTF-8");
-        } catch (Exception e) {
-            throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId, e);
-        }
-
-        // Check that we have the right number of keys
-        if (params.size() != keys.size()) {
-            throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId);
-        }
-
-        // Get the values, and make sure the keys are in the correct order
-        final Map<String, String> result = new HashMap<String, String>(params.size());
-        for (int i = 0; i < params.size(); i++) {
-            final NameValuePair param = params.get(i);
-            if (!param.getName().equals(keys.get(i))) {
-                throw new IllegalArgumentException("globalId is invalid, expected format is: " + getExpectedFormat(keys) + ", found: " + globalId);
-            }
-
-            result.put(param.getName(), param.getValue());
-        }
-
-        return result;
-    }
-
-    private static String getExpectedFormat(final List<String> keys) {
-        final StringBuilder sb = new StringBuilder();
-        boolean first = true;
-
-        for (final String key : keys) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append("&");
-            }
-
-            sb.append(key).append("=<").append(key).append(">");
-        }
-
-        return sb.toString();
     }
 
 
