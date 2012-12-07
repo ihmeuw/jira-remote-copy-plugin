@@ -198,7 +198,7 @@ public class CopyIssueService {
         return new FieldPermissionsBean(systemFieldPermissionBeans, customFieldPermissionBeans);
     }
 
-    public void convertRemoteLinksToLocal(String issueKey) throws IssueNotFoundException, RemoteLinksNotFoundException {
+    public void convertRemoteLinksToLocal(String issueKey) throws IssueNotFoundException, RemoteLinksNotFoundException, IssueLinkCreationException {
         final User user = callingUser();
 
         // Get issue
@@ -215,6 +215,8 @@ public class CopyIssueService {
             throw new RemoteLinksNotFoundException(linksResult.getErrorCollection());
         }
 
+        SimpleErrorCollection errors = new SimpleErrorCollection();
+
         for (final RemoteIssueLink remoteIssueLink : linksResult.getRemoteIssueLinks()) {
             // We are only interested in JIRA links
             if (RemoteIssueLink.APPLICATION_TYPE_JIRA.equals(remoteIssueLink.getApplicationType())) {
@@ -222,28 +224,35 @@ public class CopyIssueService {
                 if (internalHostApplication.getId().get().equals(values.get("appId"))) {
                     // It links to this JIRA instance, make it a local link
                     final Issue issueToLinkTo = getIssue(user, Long.parseLong(values.get("issueId")));
-                    createIssueLink(user, issue, issueToLinkTo, remoteIssueLink.getRelationship());
-
-                    // Delete the remote issue link, it is no longer needed
-                    final RemoteIssueLinkService.DeleteValidationResult deleteValidationResult = remoteIssueLinkService.validateDelete(user, remoteIssueLink.getId());
-                    if (deleteValidationResult.isValid()) {
-                        remoteIssueLinkService.delete(user, deleteValidationResult);
+                    try{
+                        createIssueLink(user, issue, issueToLinkTo, remoteIssueLink.getRelationship());
+                        // Delete the remote issue link, it is no longer needed
+                        final RemoteIssueLinkService.DeleteValidationResult deleteValidationResult = remoteIssueLinkService.validateDelete(user, remoteIssueLink.getId());
+                        if (deleteValidationResult.isValid()) {
+                            remoteIssueLinkService.delete(user, deleteValidationResult);
+                        }
+                    } catch(IssueLinkCreationException e){
+                        errors.addError(remoteIssueLink.getGlobalId(), e.toString());
                     }
                 }
             }
         }
+
+        if(errors.hasAnyErrors()){
+            throw new IssueLinkCreationException(errors);
+        }
     }
 
 
-    private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship) {
+    private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship) throws IssueLinkCreationException {
         final IssueLinkService.AddIssueLinkValidationResult addIssueLinkValidationResult = issueLinkService.validateAddIssueLinks(
                 user, fromIssue, relationship, ImmutableList.<String>of(toIssue.getKey()));
 
         if (addIssueLinkValidationResult.isValid()) {
             issueLinkService.addIssueLinks(user, addIssueLinkValidationResult);
         } else {
-            // TODO handle error
             log.warn("Error creating local link from " + fromIssue.getKey() + " to " + toIssue.getKey() + ". " + addIssueLinkValidationResult.getErrorCollection());
+            throw new IssueLinkCreationException(addIssueLinkValidationResult.getErrorCollection());
         }
     }
 

@@ -13,8 +13,18 @@ abstract public class CopyIssueException extends Exception {
         this.errorCollection = errorCollection;
     }
 
+
     public ErrorCollection getErrorCollection() {
         return errorCollection;
     }
 
+
+    @Override
+    public String getMessage() {
+        if(errorCollection != null){
+            return errorCollection.toString();
+        } else {
+            return super.getMessage();
+        }
+    }
 }

@@ -77,7 +77,7 @@ public class CopyIssueResource
      */
     @GET
     @Path ("convertIssueLinks/{issueKey}")
-    public Response checkFieldPermissions(@PathParam ("issueKey") String issueKey)
+    public Response convertIssueLinks(@PathParam ("issueKey") String issueKey)
     {
         try{
             copyIssueService.convertRemoteLinksToLocal(issueKey);
