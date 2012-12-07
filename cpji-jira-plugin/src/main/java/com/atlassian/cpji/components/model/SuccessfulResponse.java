@@ -16,7 +16,7 @@ public class SuccessfulResponse extends ResultWithJiraLocation<String> {
         return new SuccessfulResponse(jiraLocation);
     }
 
-    public static Either<ResponseStatus, SuccessfulResponse> buildEither(final JiraLocation jiraLocation) {
+    public static Either<NegativeResponseStatus, SuccessfulResponse> buildEither(final JiraLocation jiraLocation) {
         return Either.right(new SuccessfulResponse(jiraLocation));
     }
 }

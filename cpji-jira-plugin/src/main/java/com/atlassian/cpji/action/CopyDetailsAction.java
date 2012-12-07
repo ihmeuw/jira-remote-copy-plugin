@@ -2,7 +2,7 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -137,15 +137,15 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         }
 
         JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
-        Either<ResponseStatus, CopyInformationBean> result = proxy.getCopyInformation(entityLink.getProjectKey());
+        Either<NegativeResponseStatus, CopyInformationBean> result = proxy.getCopyInformation(entityLink.getProjectKey());
         if(result.isLeft()) {
-            ResponseStatus status = (ResponseStatus) result.left().get();
-            if(ResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
+            NegativeResponseStatus status = (NegativeResponseStatus) result.left().get();
+            if(NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
                 log.error("Authentication failed.");
                 addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
-            } else if(ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
+            } else if(NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
                 log.error("OAuth token invalid.");
-            } else if(ResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
+            } else if(NegativeResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
                 log.error("Failed to retrieve the list of issue fields from the remote JIRA instance.");
                 addErrorMessage("Failed to retrieve the list of issue fields from the remote JIRA instance.");
             }

@@ -22,12 +22,12 @@ public enum RemoteIssueLinkType
         return i18nKey;
     }
 
-    public boolean remoteHasLink(){
+    public boolean hasRemoteIssueLinkToLocal(){
         return equals(RECIPROCAL) || equals(OUTGOING);
     }
 
 
-    public boolean localHasLink(){
+    public boolean hasLocalIssueLinkToRemote(){
         return equals(RECIPROCAL) || equals(INCOMING);
     }
 }

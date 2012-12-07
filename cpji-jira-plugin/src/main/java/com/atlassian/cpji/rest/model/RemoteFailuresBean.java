@@ -1,6 +1,6 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -24,13 +24,13 @@ public class RemoteFailuresBean {
 	@XmlElement
 	private final List<RemotePluginBean> authentication;
 
-	public static RemoteFailuresBean create(@Nonnull final JiraProxyFactory jiraProxyFactory, @Nonnull final String issueId, @Nonnull Iterable<ResponseStatus> responseStatuses) {
+	public static RemoteFailuresBean create(@Nonnull final JiraProxyFactory jiraProxyFactory, @Nonnull final String issueId, @Nonnull Iterable<NegativeResponseStatus> responseStatuses) {
 		final List<RemotePluginBean> notInstalled = Lists.newArrayList();
 		final List<RemotePluginBean> communication = Lists.newArrayList();
 		final List<RemotePluginBean> authorization = Lists.newArrayList();
 		final List<RemotePluginBean> authentication = Lists.newArrayList();
 
-		for(ResponseStatus status : responseStatuses) {
+		for(NegativeResponseStatus status : responseStatuses) {
 			switch (status.getResult()) {
 				case PLUGIN_NOT_INSTALLED:
 					notInstalled.add(RemotePluginBean.create(status, jiraProxyFactory, issueId));

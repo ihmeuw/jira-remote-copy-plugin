@@ -274,37 +274,37 @@ public class TestLocalJiraProxy {
     }
 
 //
-//    private <T,F> void test(T service, F serviceResult, Function<T, F> serviceCall, Function<LocalJiraProxy, Either<ResponseStatus, F>> proxyCall, Exception thrownException){
+//    private <T,F> void test(T service, F serviceResult, Function<T, F> serviceCall, Function<LocalJiraProxy, Either<NegativeResponseStatus, F>> proxyCall, Exception thrownException){
 //        when(serviceCall.apply(service)).thenReturn(serviceResult);
 //        F result = extractRight(proxyCall.apply(localJiraProxy));
 //        assertSame(serviceResult, result);
 //
 //        when(serviceCall.apply(service)).thenThrow(thrownException);
-//        ResponseStatus response = extractLeft(proxyCall.apply(localJiraProxy));
+//        NegativeResponseStatus response = extractLeft(proxyCall.apply(localJiraProxy));
 //        response.getErrorCollection()
 //
 //    }
 
 
-    private ResponseStatus verifyFailure(Either<ResponseStatus, ?> either){
+    private NegativeResponseStatus verifyFailure(Either<NegativeResponseStatus, ?> either){
         return EitherTestingUtils.verifyFailure(either, localJiraProxy.getJiraLocation());
     }
 
-    private ResponseStatus verifyFailure(Either<ResponseStatus, ?> either, ErrorCollection errors){
+    private NegativeResponseStatus verifyFailure(Either<NegativeResponseStatus, ?> either, ErrorCollection errors){
         return EitherTestingUtils.verifyFailure(either, errors, localJiraProxy.getJiraLocation());
     }
 
 
-    private SuccessfulResponse verifySuccess(Either<ResponseStatus, SuccessfulResponse> either){
+    private SuccessfulResponse verifySuccess(Either<NegativeResponseStatus, SuccessfulResponse> either){
         return EitherTestingUtils.verifySuccess(either, localJiraProxy.getJiraLocation());
     }
 
-    private <T extends ResultWithJiraLocation<?>> T extractResult(Either<ResponseStatus, T > either){
+    private <T extends ResultWithJiraLocation<?>> T extractResult(Either<NegativeResponseStatus, T > either){
         return EitherTestingUtils.extractResult(either, localJiraProxy.getJiraLocation());
     }
 
 
-    private <T> T extractRight(Either<ResponseStatus, T > either){
+    private <T> T extractRight(Either<NegativeResponseStatus, T > either){
         return EitherTestingUtils.extractRight(either);
     }
 

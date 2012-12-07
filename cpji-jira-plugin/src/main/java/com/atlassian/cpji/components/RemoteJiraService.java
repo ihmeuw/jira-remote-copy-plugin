@@ -1,7 +1,7 @@
 package com.atlassian.cpji.components;
 
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.ResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
@@ -43,18 +43,18 @@ public class RemoteJiraService {
      * @return
      */
     @Nonnull
-    public Iterable<Either<ResponseStatus, SuccessfulResponse>> getPluginInfo() {
+    public Iterable<Either<NegativeResponseStatus, SuccessfulResponse>> getPluginInfo() {
 
-        return executeForEveryJira(new FunctionWithFallback<Either<ResponseStatus, SuccessfulResponse>>() {
+        return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, SuccessfulResponse>>() {
 
             @Override
-            public Either<ResponseStatus, SuccessfulResponse> onInvocationException(Exception e) {
+            public Either<NegativeResponseStatus, SuccessfulResponse> onInvocationException(Exception e) {
                 log.warn("Failed to execute Application Links request", e);
-                return Either.left(ResponseStatus.communicationFailed(null));
+                return Either.left(NegativeResponseStatus.communicationFailed(null));
             }
 
             @Override
-            public Either<ResponseStatus, SuccessfulResponse> apply(@Nullable JiraProxy input) {
+            public Either<NegativeResponseStatus, SuccessfulResponse> apply(@Nullable JiraProxy input) {
                 return input.isPluginInstalled();
             }
         });
@@ -107,16 +107,16 @@ public class RemoteJiraService {
 
 
     @Nonnull
-    public Iterable<Either<ResponseStatus, Projects>> getProjects() {
+    public Iterable<Either<NegativeResponseStatus, Projects>> getProjects() {
 
-        return executeForEveryJira(new FunctionWithFallback<Either<ResponseStatus, Projects>>() {
+        return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, Projects>>() {
             @Override
-            public Either<ResponseStatus, Projects> onInvocationException(Exception e) {
-                return Either.left(ResponseStatus.communicationFailed(null));
+            public Either<NegativeResponseStatus, Projects> onInvocationException(Exception e) {
+                return Either.left(NegativeResponseStatus.communicationFailed(null));
             }
 
             @Override
-            public Either<ResponseStatus, Projects> apply(JiraProxy input) {
+            public Either<NegativeResponseStatus, Projects> apply(JiraProxy input) {
                 return input.getProjects();
             }
         });

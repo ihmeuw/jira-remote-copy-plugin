@@ -2,6 +2,7 @@ package com.atlassian.cpji.components.model;
 
 import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLink;
+import com.google.common.base.Preconditions;
 
 /**
  * @since v3.0
@@ -31,9 +32,8 @@ public class JiraLocation {
     }
 
     public JiraLocation(final String id, final String name) {
-        this.id = id;
+        this.id = Preconditions.checkNotNull(id);
         this.name = name;
-
     }
 
     public String getId() {

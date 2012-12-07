@@ -2,7 +2,7 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
@@ -76,20 +76,20 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         }
 
         JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getJiraLocation());
-        Either<ResponseStatus,SuccessfulResponse> response = jira.isPluginInstalled();
+        Either<NegativeResponseStatus,SuccessfulResponse> response = jira.isPluginInstalled();
         if(response.isLeft()){
-            ResponseStatus responseStatus = (ResponseStatus) response.left().get();
-            if (ResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))
+            NegativeResponseStatus responseStatus = (NegativeResponseStatus) response.left().get();
+            if (NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))
             {
                 authorizationUrl = jira.generateAuthenticationUrl(Long.toString(id));
                 return AUTHORIZE;
             }
-            else if (ResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getResult()))
+            else if (NegativeResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getResult()))
             {
                 log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
                 addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
             }
-            else if (ResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getResult()))
+            else if (NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getResult()))
             {
                 addErrorMessage("Authentication failed. Check the authentication configuration.");
             }

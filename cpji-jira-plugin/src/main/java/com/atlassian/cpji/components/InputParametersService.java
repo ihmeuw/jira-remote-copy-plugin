@@ -45,20 +45,20 @@ public class InputParametersService {
         this.issueTypeSchemeManager = issueTypeSchemeManager;
     }
 
-    public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, FieldMapper> allSystemFieldMappers){
+    public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, FieldMapper> allSystemFieldMappers) {
         return new Populator(project, issueType, allSystemFieldMappers, source, new IssueInputParametersImpl(), fieldMapperFactory, fieldManager, defaultFieldValuesManager);
     }
 
-    public SystemFieldMappingChecker getSystemFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout){
+    public SystemFieldMappingChecker getSystemFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout) {
         return new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout);
     }
 
-    public CustomFieldMappingChecker getCustomFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout){
+    public CustomFieldMappingChecker getCustomFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout) {
         return new CustomFieldMappingChecker(defaultFieldValuesManager, copyIssueBean, project, fieldLayout, fieldManager, fieldMapperFactory, issueTypeSchemeManager);
     }
 
 
-    public static class Populator{
+    public static class Populator {
 
         private final FieldMapperFactory fieldMapperFactory;
         private final FieldManager fieldManager;
@@ -70,7 +70,7 @@ public class InputParametersService {
         private final IssueInputParameters inputParameters;
         private final CopyIssueBean copyIssueBean;
 
-        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean,  IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager) {
+        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager) {
             this.project = project;
             this.issueType = issueType;
             this.allSystemFieldMappers = allSystemFieldMappers;
@@ -82,16 +82,16 @@ public class InputParametersService {
             this.defaultFieldValuesManager = defaultFieldValuesManager;
         }
 
-        public void injectInputParam(FieldLayoutItem item){
+        public void injectInputParam(FieldLayoutItem item) {
             OrderableField orderableField = item.getOrderableField();
             if (!fieldManager.isCustomField(orderableField)) {
-              populateSystemField(item, orderableField);
+                populateSystemField(item, orderableField);
             } else {
                 populateCustomField(item, orderableField);
             }
         }
 
-        public void populateProjectSystemField(){
+        public void populateProjectSystemField() {
             IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
             projectFieldMapper.populateInputParameters(inputParameters, copyIssueBean, null, project);
         }
@@ -104,19 +104,19 @@ public class InputParametersService {
                 if (matchingRemoteCustomField != null) {
                     CustomFieldMappingResult customFieldMappingResult = customFieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, issueType);
                     if (!customFieldMappingResult.hasOneValidValue() && item.isRequired()) {
-                        populateDefaultValue(orderableField);
+                        populateWithDefaultValue(orderableField);
                     } else {
                         customFieldMapper.populateInputParameters(inputParameters, customFieldMappingResult, customField, project, issueType);
                     }
                 } else if (item.isRequired()) {
-                    populateDefaultValue(orderableField);
+                    populateWithDefaultValue(orderableField);
                 }
             } else {
                 log.warn("No support yet for custom field type '" + customField.getCustomFieldType().getClass().getCanonicalName() + "'");
             }
         }
 
-        private void populateDefaultValue(OrderableField orderableField) {
+        private void populateWithDefaultValue(OrderableField orderableField) {
             String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
             if (defaultFieldValue != null) {
                 inputParameters.addCustomFieldValue(orderableField.getId(), defaultFieldValue);
@@ -142,7 +142,7 @@ public class InputParametersService {
             }
         }
 
-        public IssueInputParameters getInputParameters(){
+        public IssueInputParameters getInputParameters() {
             return inputParameters;
         }
 

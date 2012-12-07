@@ -3,7 +3,7 @@ package com.atlassian.cpji.components.remote;
 import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
 import com.atlassian.cpji.components.model.JiraLocation;
-import com.atlassian.cpji.components.model.ResponseStatus;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.fugue.Either;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
@@ -13,32 +13,32 @@ import org.codehaus.jettison.json.JSONException;
 /**
  * @since v1.0
  */
-abstract class AbstractJsonResponseHandler<T> implements ApplicationLinkResponseHandler<Either<ResponseStatus, T>> {
+abstract class AbstractJsonResponseHandler<T> implements ApplicationLinkResponseHandler<Either<NegativeResponseStatus, T>> {
     private static final Logger log = Logger.getLogger(AbstractJsonResponseHandler.class);
 
     private final JiraLocation jiraLocation;
-    private ResponseStatus providedResponseStatus = null;
+    private NegativeResponseStatus providedResponseStatus = null;
 
     AbstractJsonResponseHandler(JiraLocation jiraLocation) {
         this.jiraLocation = jiraLocation;
     }
 
-    public Either<ResponseStatus, T> credentialsRequired(final Response response) throws ResponseException {
-        return Either.left(ResponseStatus.authorizationRequired(jiraLocation));
+    public Either<NegativeResponseStatus, T> credentialsRequired(final Response response) throws ResponseException {
+        return Either.left(NegativeResponseStatus.authorizationRequired(jiraLocation));
     }
 
-    public Either<ResponseStatus, T> handle(final Response response) throws ResponseException {
+    public Either<NegativeResponseStatus, T> handle(final Response response) throws ResponseException {
         if (log.isDebugEnabled()) {
             log.debug("Response is: " + response.getResponseBodyAsString());
         }
         if (response.getStatusCode() == 401) {
-            return Either.left(ResponseStatus.authenticationFailed(jiraLocation));
+            return Either.left(NegativeResponseStatus.authenticationFailed(jiraLocation));
         }
         if (response.getStatusCode() == 404) {
-            return Either.left(ResponseStatus.pluginNotInstalled(jiraLocation));
+            return Either.left(NegativeResponseStatus.pluginNotInstalled(jiraLocation));
         }
         if (!response.isSuccessful()) {
-            return Either.left(ResponseStatus.communicationFailed(jiraLocation));
+            return Either.left(NegativeResponseStatus.communicationFailed(jiraLocation));
         }
         try {
             T parsedResponse = parseResponse(response);
@@ -49,11 +49,11 @@ abstract class AbstractJsonResponseHandler<T> implements ApplicationLinkResponse
             }
         } catch (JSONException e) {
             log.error(String.format("Failed to parse JSON from Application Link: %s (%s)", jiraLocation.getId(), e.getMessage()));
-            return Either.left(ResponseStatus.communicationFailed(jiraLocation));
+            return Either.left(NegativeResponseStatus.communicationFailed(jiraLocation));
         }
     }
 
-    protected T provideResponseStatus(ResponseStatus status) {
+    protected T provideResponseStatus(NegativeResponseStatus status) {
         providedResponseStatus = status;
         return null;
     }
