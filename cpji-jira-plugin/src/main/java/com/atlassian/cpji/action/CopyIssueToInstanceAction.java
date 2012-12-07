@@ -123,8 +123,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
 
 
         Collection<IssueLinkType> copiedTypeCollection = issueLinkTypeManager.getIssueLinkTypesByName("Copied");
-        if(copiedTypeCollection.size() > 0){
-
+        if(copiedTypeCollection.size() > 0) {
             proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
                      Iterables.get(copiedTypeCollection, 0),
                     remoteIssueLinkType.hasLocalIssueLinkToRemote()?JiraProxy.LinkCreationDirection.OUTWARD:JiraProxy.LinkCreationDirection.IGNORE,

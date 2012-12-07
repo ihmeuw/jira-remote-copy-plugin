@@ -5,9 +5,6 @@ import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapperFactory;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.fugue.Either;
@@ -15,9 +12,9 @@ import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.CommentManager;
-import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.collect.Lists;
 
@@ -36,6 +33,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
     private Collection<Option> availableIssueTypes;
 	private final IssueLinkManager issueLinkManager;
+	private final IssueLinkTypeManager issueLinkTypeManager;
 
 	private CopyInformationBean copyInfo;
 
@@ -76,23 +74,20 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
 
     public CopyDetailsAction(
-            final SubTaskManager subTaskManager,
-            final FieldLayoutManager fieldLayoutManager,
-            final CommentManager commentManager,
-            final FieldManager fieldManager,
-            final FieldMapperFactory fieldMapperFactory,
-            final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final CopyIssuePermissionManager copyIssuePermissionManager,
-            final UserMappingManager userMappingManager,
+			final SubTaskManager subTaskManager,
+			final FieldLayoutManager fieldLayoutManager,
+			final CommentManager commentManager,
+			final CopyIssuePermissionManager copyIssuePermissionManager,
 			final ApplicationLinkService applicationLinkService,
-            final JiraProxyFactory jiraProxyFactory,
+			final JiraProxyFactory jiraProxyFactory,
 			final WebResourceManager webResourceManager,
-			final IssueLinkManager issueLinkManager
-    )
+			final IssueLinkManager issueLinkManager,
+			final IssueLinkTypeManager issueLinkTypeManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
+		this.issueLinkTypeManager = issueLinkTypeManager;
 	}
 
 	public boolean isIssueWithComments() {
@@ -132,7 +127,8 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         SelectedProject entityLink = getSelectedDestinationProject();
 
         JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
-        Either<NegativeResponseStatus, CopyInformationBean> response = proxy.getCopyInformation(entityLink.getProjectKey());
+        Either<NegativeResponseStatus, CopyInformationBean> response = proxy.getCopyInformation(
+				entityLink.getProjectKey());
         copyInfo = handleGenericResponseStatus(proxy, response, null);
         if(copyInfo == null){
             return getGenericResponseHandlerResult();
@@ -246,7 +242,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 	}
 
 	public boolean isCreateIssueLinkSectionVisible() {
-		return linksEnabled() || copyInfo.getIssueLinkingEnabled();
+		return (linksEnabled() || copyInfo.getIssueLinkingEnabled()) && !issueLinkTypeManager.getIssueLinkTypesByName("Copied").isEmpty();
 	}
 
 	public boolean isCopyCommentsSectionVisible() {
