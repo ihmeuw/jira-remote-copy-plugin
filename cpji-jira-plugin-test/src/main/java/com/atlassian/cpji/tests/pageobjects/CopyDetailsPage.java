@@ -31,11 +31,14 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (id = "remoteIssueLink")
 	SelectElement remoteIssueLink;
 
-	@ElementBy (id = "attachments")
+	@ElementBy (id = "copy-attachments")
 	CheckboxElement copyAttachments;
 
 	@ElementBy (id = "copy-issue-links")
 	CheckboxElement copyIssueLinks;
+
+	@ElementBy (id = "copy-comments")
+	CheckboxElement copyComments;
 
     public CopyDetailsPage(final Long issueId, final String targetEntityLink)
     {
@@ -87,6 +90,10 @@ public class CopyDetailsPage extends AbstractJiraPage
 
 	public CheckboxElement getCopyAttachments() {
 		return copyAttachments;
+	}
+
+	public CheckboxElement getCopyComments() {
+		return copyComments;
 	}
 
 }

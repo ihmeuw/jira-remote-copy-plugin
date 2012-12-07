@@ -93,8 +93,9 @@
             <input type="hidden" name="id" value="$action.getId()"/>
             <input type="hidden" name="targetEntityLink" value="$textutils.htmlEncode($action.targetEntityLink)"/>
             <input type="hidden" name="issueType" value="$textutils.htmlEncode($action.getIssueType())"/>
-            <input type="hidden" name="copyAttachments" value="$action.copyAttachments()"/>
-            <input type="hidden" name="copyIssueLinks" value="$action.copyIssueLinks()"/>
+            <input type="hidden" name="copyAttachments" value="$action.copyAttachments"/>
+            <input type="hidden" name="copyIssueLinks" value="$action.copyIssueLinks"/>
+			<input type="hidden" name="copyComments" value="$action.copyComments"/>
             <input type="hidden" name="remoteIssueLink" value="$textutils.htmlEncode($action.remoteIssueLink())"/>
         </form>
     </div>

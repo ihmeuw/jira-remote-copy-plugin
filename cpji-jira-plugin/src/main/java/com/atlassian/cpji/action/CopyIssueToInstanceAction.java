@@ -3,13 +3,11 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssueBeanFactory;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapperFactory;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.fugue.Either;
@@ -18,9 +16,13 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
-import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.issue.link.*;
+import com.atlassian.jira.issue.link.IssueLink;
+import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.IssueLinkType;
+import com.atlassian.jira.issue.link.IssueLinkTypeManager;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
@@ -40,6 +42,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     private String copiedIssueKey;
     private boolean copyAttachments;
     private boolean copyIssueLinks;
+	private boolean copyComments;
     private String issueType;
     private String remoteIssueLink;
 
@@ -47,31 +50,29 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
     private final IssueLinkManager issueLinkManager;
     private final RemoteIssueLinkManager remoteIssueLinkManager;
     private final IssueLinkTypeManager issueLinkTypeManager;
-    private String linkToNewIssue;
+	private final CopyIssueBeanFactory copyIssueBeanFactory;
+	private String linkToNewIssue;
 
-    public CopyIssueToInstanceAction
-            (
-                    final SubTaskManager subTaskManager,
-                    final FieldLayoutManager fieldLayoutManager,
-                    final CommentManager commentManager,
-                    final FieldManager fieldManager,
-                    final FieldMapperFactory fieldMapperFactory,
-                    final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-                    final CopyIssuePermissionManager copyIssuePermissionManager,
-                    final UserMappingManager userMappingManager,
-                    final IssueLinkManager issueLinkManager,
-                    final RemoteIssueLinkManager remoteIssueLinkManager,
-                    final ApplicationLinkService applicationLinkService,
-                    final JiraProxyFactory jiraProxyFactory, IssueLinkTypeManager issueLinkTypeManager,
-					final WebResourceManager webResourceManager)
+    public CopyIssueToInstanceAction(
+					final SubTaskManager subTaskManager,
+					final FieldLayoutManager fieldLayoutManager,
+					final CommentManager commentManager,
+					final CopyIssuePermissionManager copyIssuePermissionManager,
+					final IssueLinkManager issueLinkManager,
+					final RemoteIssueLinkManager remoteIssueLinkManager,
+					final ApplicationLinkService applicationLinkService,
+					final JiraProxyFactory jiraProxyFactory, IssueLinkTypeManager issueLinkTypeManager,
+					final WebResourceManager webResourceManager,
+					final CopyIssueBeanFactory copyIssueBeanFactory)
     {
-        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory,
+        super(subTaskManager, fieldLayoutManager, commentManager,
+				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory,
 				webResourceManager);
         this.issueLinkManager = issueLinkManager;
         this.remoteIssueLinkManager = remoteIssueLinkManager;
         this.issueLinkTypeManager = issueLinkTypeManager;
-    }
+		this.copyIssueBeanFactory = copyIssueBeanFactory;
+	}
 
     @Override
     @RequiresXsrfCheck
@@ -87,7 +88,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         final JiraProxy proxy = jiraProxyFactory.createJiraProxy(linkToTargetEntity.getJiraLocation());
 
         MutableIssue issueToCopy = getIssueObject();
-        CopyIssueBean copyIssueBean = createCopyIssueBean(linkToTargetEntity.getProjectKey(), issueToCopy, issueType);
+        CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(linkToTargetEntity.getProjectKey(), issueToCopy,
+				issueType, copyComments);
         Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
         IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result, null);
         if(copiedIssue == null){
@@ -95,8 +97,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         }
 
         copiedIssueKey = copiedIssue.getIssueKey();
-
-        if (copyAttachments() && !issueToCopy.getAttachments().isEmpty())
+        if (getCopyAttachments() && !issueToCopy.getAttachments().isEmpty())
         {
             for(Attachment attachment : issueToCopy.getAttachments()){
                 File attachmentFile = AttachmentUtils.getAttachmentFile(attachment);
@@ -111,7 +112,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
             }
         }
 
-        if (copyIssueLinks() && issueLinkManager.isLinkingEnabled())
+        if (getCopyIssueLinks() && issueLinkManager.isLinkingEnabled())
         {
             copyLocalIssueLinks(proxy, issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
             copyRemoteIssueLinks(proxy, issueToCopy, copiedIssue.getIssueKey());
@@ -170,7 +171,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         return copiedIssueKey;
     }
 
-    public boolean copyAttachments()
+    public boolean getCopyAttachments()
     {
         return copyAttachments;
     }
@@ -180,7 +181,15 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         this.copyAttachments = copyAttachments;
     }
 
-    public boolean copyIssueLinks()
+	public boolean getCopyComments() {
+		return copyComments;
+	}
+
+	public void setCopyComments(boolean copyComments) {
+		this.copyComments = copyComments;
+	}
+
+	public boolean getCopyIssueLinks()
     {
         return copyIssueLinks;
     }

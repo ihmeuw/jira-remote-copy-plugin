@@ -278,7 +278,7 @@
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
         <applinks.version>3.5.6</applinks.version>
-		<testkit.version>5.0.21</testkit.version>
+		<testkit.version>5.0.22</testkit.version>
 		<test-basics.version>1.9.5</test-basics.version>
 		<amps.version>4.0</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
@@ -318,14 +318,14 @@
 			<id>jira-5.2.x</id>
 			<properties>
 				<jira.version>5.2</jira.version>
-				<testkit.version>6.0.1</testkit.version>
+				<testkit.version>6.0.2</testkit.version>
 			</properties>
 		</profile>
 		<profile>
 			<id>jira-6</id>
 			<properties>
 				<jira.version>6.0-SNAPSHOT</jira.version>
-				<testkit.version>6.0.1</testkit.version>
+				<testkit.version>6.0.2</testkit.version>
 			</properties>
 		</profile>
 		<profile>

@@ -90,8 +90,8 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 			final IssueLinkManager issueLinkManager
     )
     {
-        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory, fieldLayoutItemsRetriever,
-				copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory, webResourceManager);
+        super(subTaskManager, fieldLayoutManager, commentManager,
+				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
 	}
 

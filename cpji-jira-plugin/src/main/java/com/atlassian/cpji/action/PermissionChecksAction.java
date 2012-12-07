@@ -2,14 +2,13 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssueBeanFactory;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
@@ -17,7 +16,6 @@ import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
-import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.plugin.webresource.WebResourceManager;
@@ -36,28 +34,29 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
     private List<FieldPermission> customFieldPermissions;
     private boolean canCopyIssue = true;
     private final FieldMapperFactory fieldMapperFactory;
-    private boolean copyAttachments;
+	private final CopyIssueBeanFactory copyIssueBeanFactory;
+	private boolean copyAttachments;
     private boolean copyIssueLinks;
+	private boolean copyComments;
     private String remoteIssueLink;
 
     public PermissionChecksAction(
-            final SubTaskManager subTaskManager,
-            final FieldLayoutManager fieldLayoutManager,
-            final CommentManager commentManager,
-            final FieldMapperFactory fieldMapperFactory,
-            final FieldManager fieldManager,
-            final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
-            final CopyIssuePermissionManager copyIssuePermissionManager,
-            final UserMappingManager userMappingManager,
+			final SubTaskManager subTaskManager,
+			final FieldLayoutManager fieldLayoutManager,
+			final CommentManager commentManager,
+			final FieldMapperFactory fieldMapperFactory,
+			final CopyIssuePermissionManager copyIssuePermissionManager,
 			final ApplicationLinkService applicationLinkService,
-            final JiraProxyFactory jiraProxyFactory,
-			final WebResourceManager webResourceManager)
+			final JiraProxyFactory jiraProxyFactory,
+			final WebResourceManager webResourceManager,
+			final CopyIssueBeanFactory copyIssueBeanFactory)
     {
-        super(subTaskManager, fieldLayoutManager, commentManager, fieldManager, fieldMapperFactory,
-				fieldLayoutItemsRetriever, copyIssuePermissionManager, userMappingManager, applicationLinkService, jiraProxyFactory,
+        super(subTaskManager, fieldLayoutManager, commentManager,
+				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory,
 				webResourceManager);
         this.fieldMapperFactory = fieldMapperFactory;
-    }
+		this.copyIssueBeanFactory = copyIssueBeanFactory;
+	}
 
     public class FieldPermission
     {
@@ -100,8 +99,8 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         final SelectedProject entityLink = getSelectedDestinationProject();
         final JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
 
-
-        CopyIssueBean copyIssueBean = createCopyIssueBean(entityLink.getProjectKey(), getIssueObject(), issueType);
+        CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(entityLink.getProjectKey(), getIssueObject(),
+				issueType, copyComments);
         Either<NegativeResponseStatus, FieldPermissionsBean> result = proxy.checkPermissions(copyIssueBean);
         FieldPermissionsBean fieldValidationBean = handleGenericResponseStatus(proxy, result, null);
         if(fieldValidationBean == null){
@@ -178,7 +177,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         return customFieldPermissions;
     }
 
-    public boolean copyAttachments()
+    public boolean getCopyAttachments()
     {
         return copyAttachments;
     }
@@ -188,7 +187,7 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         this.copyAttachments = copyAttachments;
     }
 
-    public boolean copyIssueLinks()
+    public boolean getCopyIssueLinks()
     {
         return copyIssueLinks;
     }
@@ -198,7 +197,15 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
         this.copyIssueLinks = copyIssueLinks;
     }
 
-    public String remoteIssueLink()
+	public boolean getCopyComments() {
+		return copyComments;
+	}
+
+	public void setCopyComments(boolean copyComments) {
+		this.copyComments = copyComments;
+	}
+
+	public String remoteIssueLink()
     {
         return remoteIssueLink;
     }

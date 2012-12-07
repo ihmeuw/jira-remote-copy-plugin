@@ -55,6 +55,7 @@ public abstract class AbstractCopyIssueTest
 	public static DirtyWarningTerminatorRule dirtyWarningTerminatorRule = new DirtyWarningTerminatorRule();
 
 	static JiraRestClient restClient1 = getJiraRestClient(jira1);
+	static JiraRestClient restClient2 = getJiraRestClient(jira2);
 
 	private static JiraRestClient getJiraRestClient(JiraTestedProduct jira1) {
 		return new JerseyJiraRestClientFactory().createWithBasicHttpAuthentication(
