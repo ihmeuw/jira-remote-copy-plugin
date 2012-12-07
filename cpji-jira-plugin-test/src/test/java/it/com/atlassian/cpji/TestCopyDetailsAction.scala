@@ -65,20 +65,15 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 		}
 
-		try {
-			AbstractCopyIssueTest.testkit1.issueLinking().createIssueLinkType("Duplicate", "duplicates", "is duplicated by")
-			AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+		AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
 
-			val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
+		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
 
-			assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
-			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
-			assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
-			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
-		} finally {
-			try { AbstractCopyIssueTest.testkit1.issueLinking().deleteIssueLinkType("Duplicate") } catch { case e: Exception => "" }
-		}
+		assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
+		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+		assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
+		assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 	}
 
 	@Test def testAdvancedSectionReportsMissingFeaturesOnRemoteSide() {
@@ -89,30 +84,25 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
 
+		AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+
 		try {
-			AbstractCopyIssueTest.testkit1.issueLinking().createIssueLinkType("Duplicate", "duplicates", "is duplicated by")
-			AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+			AbstractCopyIssueTest.testkit2.attachments().disable()
+			AbstractCopyIssueTest.testkit2.issueLinking().disable()
 
-			try {
-				AbstractCopyIssueTest.testkit2.attachments().disable()
-				AbstractCopyIssueTest.testkit2.issueLinking().disable()
+			val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
+			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
 
-				val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-				val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
-
-				assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
-				Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed.isEnabled)
-				assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
-				Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed.isEnabled)
-				assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
-				Poller.waitUntilTrue(copyDetailsPage.getCreateIssueLinks.timed.isPresent)
-				assertThat(Collections2.transform(copyDetailsPage.getCreateIssueLinks.getAllOptions, Options.getText), IsCollectionContaining.hasItems("From original to copy", "None"))
-			} finally {
-				AbstractCopyIssueTest.testkit2.attachments().enable()
-				AbstractCopyIssueTest.testkit2.issueLinking().enable()
-			}
+			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+			Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed.isEnabled)
+			assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
+			Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed.isEnabled)
+			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
+			Poller.waitUntilTrue(copyDetailsPage.getCreateIssueLinks.timed.isPresent)
+			assertThat(Collections2.transform(copyDetailsPage.getCreateIssueLinks.getAllOptions, Options.getText), IsCollectionContaining.hasItems("From original to copy", "None"))
 		} finally {
-			try { AbstractCopyIssueTest.testkit1.issueLinking().deleteIssueLinkType("Duplicate") } catch { case e: Exception => "" }
+			AbstractCopyIssueTest.testkit2.attachments().enable()
+			AbstractCopyIssueTest.testkit2.issueLinking().enable()
 		}
 	}
 

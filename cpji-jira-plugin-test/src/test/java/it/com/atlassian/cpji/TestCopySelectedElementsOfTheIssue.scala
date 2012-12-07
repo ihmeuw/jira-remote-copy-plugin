@@ -35,12 +35,10 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
 
-		AbstractCopyIssueTest.testkit1.issueLinking().createIssueLinkType("Duplicate", "duplicates", "is duplicated by")
 		AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
 	}
 
 	@After def tearDown() {
-		try { AbstractCopyIssueTest.testkit1.issueLinking().deleteIssueLinkType("Duplicate") } catch { case e: Exception => "" }
 		try { AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM) } catch { case e: Exception => "" }
 	}
 
