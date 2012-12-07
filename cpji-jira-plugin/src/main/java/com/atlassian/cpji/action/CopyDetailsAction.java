@@ -133,7 +133,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 
         JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
         Either<NegativeResponseStatus, CopyInformationBean> response = proxy.getCopyInformation(entityLink.getProjectKey());
-        CopyInformationBean copyInfo = handleGenericResponseStatus(proxy, response, null);
+        copyInfo = handleGenericResponseStatus(proxy, response, null);
         if(copyInfo == null){
             return getGenericResponseHandlerResult();
         }
