@@ -3,20 +3,17 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.value.UserMappingManager;
-import com.atlassian.cpji.rest.model.CommentBean;
-import com.atlassian.cpji.rest.model.ComponentBean;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.cpji.rest.model.TimeTrackingBean;
-import com.atlassian.cpji.rest.model.UserBean;
-import com.atlassian.cpji.rest.model.VersionBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.bc.ServiceOutcome;
 import com.atlassian.jira.bc.issue.vote.VoteService;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
@@ -29,21 +26,7 @@ import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.comments.Comment;
 import com.atlassian.jira.issue.comments.CommentManager;
-import com.atlassian.jira.issue.fields.AffectedVersionsSystemField;
-import com.atlassian.jira.issue.fields.AssigneeSystemField;
-import com.atlassian.jira.issue.fields.ComponentsSystemField;
-import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.fields.DescriptionSystemField;
-import com.atlassian.jira.issue.fields.DueDateSystemField;
-import com.atlassian.jira.issue.fields.EnvironmentSystemField;
-import com.atlassian.jira.issue.fields.FieldManager;
-import com.atlassian.jira.issue.fields.FixVersionsSystemField;
-import com.atlassian.jira.issue.fields.LabelsSystemField;
-import com.atlassian.jira.issue.fields.OrderableField;
-import com.atlassian.jira.issue.fields.PrioritySystemField;
-import com.atlassian.jira.issue.fields.ReporterSystemField;
-import com.atlassian.jira.issue.fields.SecurityLevelSystemField;
-import com.atlassian.jira.issue.fields.TimeTrackingSystemField;
+import com.atlassian.jira.issue.fields.*;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.label.Label;
@@ -58,20 +41,14 @@ import org.ofbiz.core.entity.GenericValue;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @since v1.4
  */
 public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
-	public static final String REST_URL_COPY_ISSUE = "/rest/copyissue/latest/";
-	public static final String COPY_ISSUE_RESOURCE_PATH = "copyissue";
-	public static final String PROJECT_RESOURCE_PATH = "project";
-	public static final String CONVERT_ISSUE_LINKS_RESOURCE_PATH = COPY_ISSUE_RESOURCE_PATH + "/convertIssueLinks";
+    public static final String AUTHORIZE = "authorize";
+
 	public static final String PLUGIN_KEY = "com.atlassian.cpji.cpji-jira-plugin";
 	public static final String RESOURCES_ADMIN_JS = PLUGIN_KEY + ":admin-js";
 
@@ -87,6 +64,8 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 	private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
 	private final CopyIssuePermissionManager copyIssuePermissionManager;
 	private final UserMappingManager userMappingManager;
+    private String genericResponseHandlerResult = ERROR;
+    private String authorizationUrl;
 
 
 	public AbstractCopyIssueAction(final SubTaskManager subTaskManager,
@@ -122,6 +101,39 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 			throw new RuntimeException("UTF-8 encoding not supported", ex);
 		}
 	}
+
+    protected <T> T handleGenericResponseStatus(JiraProxy jira, Either<NegativeResponseStatus, T> response, Function<NegativeResponseStatus, Void> errorOccuredHandler){
+        if(response.isRight()){
+            return (T)response.right().get();
+        } else {
+            NegativeResponseStatus status = (NegativeResponseStatus) response.left().get();
+            log.error(status);
+            switch(status.getResult()){
+                case AUTHENTICATION_FAILED:
+                    addErrorMessage(getText("cpji.errors.authentication.failed"));
+                    break;
+                case AUTHORIZATION_REQUIRED:
+                    addErrorMessage(getText("cpji.errors.oauth.token.invalid"));
+                    authorizationUrl = jira.generateAuthenticationUrl(Long.toString(id));
+                    genericResponseHandlerResult = AUTHORIZE;
+                    break;
+                case PLUGIN_NOT_INSTALLED:
+                    addErrorMessage(getText("cpji.errors.plugin.not.installed"));
+                    break;
+                case COMMUNICATION_FAILED:
+                    addErrorMessage(getText("cpji.errors.communication.failed"));
+                    break;
+                case ERROR_OCCURRED:
+                    if(errorOccuredHandler != null){
+                        errorOccuredHandler.apply(status);
+                    } else {
+                        addErrorMessage(getText("cpji.errors.error.occured.generic"));
+                    }
+            }
+            return null;
+        }
+
+    }
 
 	@SuppressWarnings("unused")
 	public void setTargetEntityLink(String targetEntityLink) {
@@ -285,6 +297,14 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 	public String getIssueKey() {
 		return getIssueObject().getKey();
 	}
+
+    public String getAuthorizationUrl(){
+        return authorizationUrl;
+    }
+
+    public String getGenericResponseHandlerResult(){
+        return genericResponseHandlerResult;
+    }
 
 	public static class SelectedProject {
 		private final JiraLocation jiraLocation;

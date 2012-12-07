@@ -130,30 +130,14 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             return permissionCheck;
         }
         SelectedProject entityLink = getSelectedDestinationProject();
-        if (entityLink == null)
-        {
-            addErrorMessage("Failed to find the entity link.");
-            return ERROR;
-        }
 
         JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
-        Either<NegativeResponseStatus, CopyInformationBean> result = proxy.getCopyInformation(entityLink.getProjectKey());
-        if(result.isLeft()) {
-            NegativeResponseStatus status = (NegativeResponseStatus) result.left().get();
-            if(NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
-                log.error("Authentication failed.");
-                addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
-            } else if(NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
-                log.error("OAuth token invalid.");
-            } else if(NegativeResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
-                log.error("Failed to retrieve the list of issue fields from the remote JIRA instance.");
-                addErrorMessage("Failed to retrieve the list of issue fields from the remote JIRA instance.");
-            }
-
-            return ERROR;
+        Either<NegativeResponseStatus, CopyInformationBean> response = proxy.getCopyInformation(entityLink.getProjectKey());
+        copyInfo = handleGenericResponseStatus(proxy, response, null);
+        if(copyInfo == null){
+            return getGenericResponseHandlerResult();
         }
 
-        copyInfo = (CopyInformationBean) result.right().get();
         if (!copyInfo.getHasCreateIssuePermission())
         {
             addErrorMessage(getText("cpji.you.dont.have.create.issue.permission"));

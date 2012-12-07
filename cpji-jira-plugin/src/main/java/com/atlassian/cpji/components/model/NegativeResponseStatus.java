@@ -11,8 +11,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * TODO: Document this class / interface here
- *
  * @since v5.2
  */
 public class NegativeResponseStatus extends ResultWithJiraLocation<NegativeResponseStatus.Status> {
@@ -84,5 +82,16 @@ public class NegativeResponseStatus extends ResultWithJiraLocation<NegativeRespo
                 return jiraLocation != null && !isLocal.apply(jiraLocation);
             }
         };
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("NegativeResponseStatus(").append(getResult());
+        if(errors != null){
+            sb.append(", errors: ").append(errors);
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

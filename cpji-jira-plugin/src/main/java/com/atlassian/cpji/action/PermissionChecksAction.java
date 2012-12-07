@@ -98,35 +98,15 @@ public class PermissionChecksAction extends AbstractCopyIssueAction
             return permissionCheck;
         }
         final SelectedProject entityLink = getSelectedDestinationProject();
-        if (entityLink == null)
-        {
-            addErrorMessage("Failed to find the destination project.");
-            return ERROR;
-        }
-        final SelectedProject linkToTargetEntity = getSelectedDestinationProject();
-        final JiraProxy proxy = jiraProxyFactory.createJiraProxy(linkToTargetEntity.getJiraLocation());
+        final JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
 
 
         CopyIssueBean copyIssueBean = createCopyIssueBean(entityLink.getProjectKey(), getIssueObject(), issueType);
         Either<NegativeResponseStatus, FieldPermissionsBean> result = proxy.checkPermissions(copyIssueBean);
-
-        if(result.isLeft()){
-            NegativeResponseStatus status = (NegativeResponseStatus) result.left().get();
-
-            if(NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
-                log.error("Authentication failed.");
-                addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
-            } else if(NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
-                log.error("OAuth token invalid.");
-            } else if(NegativeResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
-                log.error("Failed to retrieve the list of issue fields from the remote JIRA instance.");
-                addErrorMessage("Failed to retrieve the list of issue fields from the remote JIRA instance.");
-            }
-
-            return ERROR;
+        FieldPermissionsBean fieldValidationBean = handleGenericResponseStatus(proxy, result, null);
+        if(fieldValidationBean == null){
+            return getGenericResponseHandlerResult();
         }
-
-        FieldPermissionsBean fieldValidationBean = (FieldPermissionsBean) result.right().get();
 
         List<SystemFieldPermissionBean> fieldPermissionBeans = fieldValidationBean.getSystemFieldPermissionBeans();
         systemFieldPermissions = new ArrayList<FieldPermission>();

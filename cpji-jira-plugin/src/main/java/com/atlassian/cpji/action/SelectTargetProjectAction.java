@@ -24,10 +24,9 @@ import org.apache.log4j.Logger;
 public class SelectTargetProjectAction extends AbstractCopyIssueAction
 {
 
-    public static final String AUTHORIZE = "authorize";
+
 
 	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
-    private String authorizationUrl;
 
 	public SelectTargetProjectAction(
             final SubTaskManager subTaskManager,
@@ -63,45 +62,15 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         {
             return permissionCheck;
         }
-        final SelectedProject selectedEntityLink;
-        try
-        {
-            selectedEntityLink = getSelectedDestinationProject();
-        }
-        catch (Exception ex)
-        {
-            log.error("Failed to find entity link", ex);
-            addErrorMessage("Failed to find entity link! Reason: '" + targetEntityLink + ex.getMessage() + "'");
-            return ERROR;
-        }
-
+        final SelectedProject selectedEntityLink= getSelectedDestinationProject();
         JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getJiraLocation());
         Either<NegativeResponseStatus,SuccessfulResponse> response = jira.isPluginInstalled();
-        if(response.isLeft()){
-            NegativeResponseStatus responseStatus = (NegativeResponseStatus) response.left().get();
-            if (NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(responseStatus.getResult()))
-            {
-                authorizationUrl = jira.generateAuthenticationUrl(Long.toString(id));
-                return AUTHORIZE;
-            }
-            else if (NegativeResponseStatus.Status.PLUGIN_NOT_INSTALLED.equals(responseStatus.getResult()))
-            {
-                log.warn("Remote JIRA instance does NOT have the CPJI plugin installed.");
-                addErrorMessage("Remote JIRA instance does NOT have the CPJI plugin installed.");
-            }
-            else if (NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(responseStatus.getResult()))
-            {
-                addErrorMessage("Authentication failed. Check the authentication configuration.");
-            }
-            return ERROR;
+        SuccessfulResponse result = handleGenericResponseStatus(jira, response, null);
+        if(result == null){
+            return getGenericResponseHandlerResult();
         }
+
         return getRedirect("/secure/CopyDetailsAction.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);
-    }
-
-
-    public String getAuthorizationUrl()
-    {
-        return authorizationUrl;
     }
 
 

@@ -32,6 +32,7 @@ import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.util.I18nHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -93,6 +94,8 @@ public class TestCopyIssueService {
     public void setUp() throws Exception {
         JiraAuthenticationContext authenticationContext = mock(JiraAuthenticationContext.class);
         when(authenticationContext.getLoggedInUser()).thenReturn(currentUser);
+        I18nHelper i18nHelper = mock(I18nHelper.class);
+        when(authenticationContext.getI18nHelper()).thenReturn(i18nHelper);
 
         when(issueType.getName()).thenReturn(ISSUE_TYPE);
         when(issueTypeSchemeManager.getIssueTypesForProject(project)).thenReturn(ImmutableList.of(issueType));
@@ -129,7 +132,8 @@ public class TestCopyIssueService {
 
         SystemFieldPostIssueCreationFieldMapper mapperWithException = mock(SystemFieldPostIssueCreationFieldMapper.class);
         SystemFieldPostIssueCreationFieldMapper mapper = mock(SystemFieldPostIssueCreationFieldMapper.class);
-        doThrow(new FieldCreationException("msg", "fieldId")).when(mapperWithException).process(createdIssue, reqs.copyBean);
+        when(mapperWithException.getFieldId()).thenReturn("fieldWithExceptionId");
+        doThrow(new FieldCreationException("field creation message", "fieldId")).when(mapperWithException).process(createdIssue, reqs.copyBean);
 
         when(fieldMapperFactory.getPostIssueCreationFieldMapper()).thenReturn(ImmutableList.of(
                 mapper,mapperWithException

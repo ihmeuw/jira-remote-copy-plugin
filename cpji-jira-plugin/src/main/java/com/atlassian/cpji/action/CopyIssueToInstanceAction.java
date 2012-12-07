@@ -89,25 +89,13 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         MutableIssue issueToCopy = getIssueObject();
         CopyIssueBean copyIssueBean = createCopyIssueBean(linkToTargetEntity.getProjectKey(), issueToCopy, issueType);
         Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
-
-        if(result.isLeft()){
-            NegativeResponseStatus status = (NegativeResponseStatus) result.left().get();
-
-            if(NegativeResponseStatus.Status.AUTHENTICATION_FAILED.equals(status.getResult())){
-                log.error("Authentication failed.");
-                addErrorMessage("Authentication failed. If using Trusted Apps, do you have a user with the same user name in the remote JIRA instance?");
-            } else if(NegativeResponseStatus.Status.AUTHORIZATION_REQUIRED.equals(status.getResult())){
-                log.error("OAuth token invalid.");
-            } else if(NegativeResponseStatus.Status.COMMUNICATION_FAILED.equals(status.getResult())){
-                log.error("Failed to copy the issue.");
-                addErrorMessage("Failed to copy the issue.");
-            }
-
-            return ERROR;
+        IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result, null);
+        if(copiedIssue == null){
+            return getGenericResponseHandlerResult();
         }
 
-        IssueCreationResultBean copiedIssue = (IssueCreationResultBean) result.right().get();
         copiedIssueKey = copiedIssue.getIssueKey();
+
         if (copyAttachments() && !issueToCopy.getAttachments().isEmpty())
         {
             for(Attachment attachment : issueToCopy.getAttachments()){

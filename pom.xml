@@ -224,6 +224,12 @@
 				<artifactId>slf4j-api</artifactId>
 				<version>1.5.8</version>
 			</dependency>
+            <dependency>
+                <artifactId>jira-view-issue-plugin</artifactId>
+                <groupId>com.atlassian.jira</groupId>
+                <version>${jira.version}</version>
+                <scope>provided</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
