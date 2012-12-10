@@ -3,6 +3,7 @@ package com.atlassian.cpji.tests.pageobjects.admin;
 import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.PageElements;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
+import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
@@ -36,6 +37,14 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 	@Override
 	public String getUrl() {
 		return "/plugins/servlet/applinks/listApplicationLinks";
+	}
+
+	@Init
+	public void removeDirtyWarning() {
+		// get out of any IFrame
+		driver.switchTo().defaultContent();
+		// just make it WOOOORK
+		elementFinder.find(By.tagName("body")).javascript().execute("window.onbeforeunload=null;");
 	}
 
 	public SetApplicationUrlDialog clickAddApplicationLink() {

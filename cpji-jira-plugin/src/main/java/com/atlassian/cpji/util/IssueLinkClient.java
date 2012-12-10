@@ -25,8 +25,8 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.sal.api.net.ReturningResponseHandler;
 import org.apache.log4j.Logger;
 
-import java.util.Iterator;
 import javax.ws.rs.core.MediaType;
+import java.util.Iterator;
 
 /**
  * Component for create (remote) issue links.
@@ -42,7 +42,8 @@ public class IssueLinkClient
 
     private static final Logger log = Logger.getLogger(IssueLinkClient.class);
 
-    public IssueLinkClient(InternalHostApplication internalHostApplication, final JiraAuthenticationContext jiraAuthenticationContext, final RemoteIssueLinkService remoteIssueLinkService)
+    public IssueLinkClient(InternalHostApplication internalHostApplication, final JiraAuthenticationContext jiraAuthenticationContext,
+			final RemoteIssueLinkService remoteIssueLinkService)
     {
         this.internalHostApplication = internalHostApplication;
         this.remoteIssueLinkService = remoteIssueLinkService;
@@ -171,8 +172,7 @@ public class IssueLinkClient
     {
         return new UrlBuilder(baseUri)
                 .addPathUnsafe("browse")
-                        // TODO use addPath() when we go to a more recent version of JIRA
-                .addPathUnsafe(issueKey)
+                .addPath(issueKey)
                 .asUrlString();
     }
 
@@ -180,8 +180,7 @@ public class IssueLinkClient
             throws CredentialsRequiredException
     {
         final UrlBuilder urlBuilder = new UrlBuilder(REST_BASE_URL)
-                        // TODO use addPath() when we go to a more recent version of JIRA
-                .addPathUnsafe(issueKey)
+                .addPath(issueKey)
                 .addPathUnsafe(REMOTE_LINK_RESOURCE);
         final String restUrl = urlBuilder.asUrlString();
         final ApplicationLinkRequestFactory requestFactory = applicationLink.createAuthenticatedRequestFactory();

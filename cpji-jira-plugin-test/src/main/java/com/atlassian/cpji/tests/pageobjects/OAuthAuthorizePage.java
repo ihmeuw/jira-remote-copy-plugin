@@ -8,9 +8,7 @@ import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 
 /**
- * TODO: Document this class / interface here
- *
- * @since v5.2
+ * @since v3.0
  */
 public class OAuthAuthorizePage implements Page {
 	@javax.inject.Inject
