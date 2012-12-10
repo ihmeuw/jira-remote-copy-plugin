@@ -90,7 +90,7 @@ public class JiraProxyFactory {
 
 
     public Iterable<JiraProxy> getAllJiraProxies() {
-        return Iterables.concat(getRemoteProxies(), ImmutableList.of(createJiraProxy(LocalJiraProxy.LOCAL_JIRA_LOCATION)));
+        return Iterables.concat(ImmutableList.of(createJiraProxy(LocalJiraProxy.LOCAL_JIRA_LOCATION)), getRemoteProxies());
     }
 
     public Iterable<JiraProxy> getRemoteProxies() {

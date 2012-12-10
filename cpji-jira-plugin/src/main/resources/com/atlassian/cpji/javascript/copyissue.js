@@ -6,7 +6,9 @@ AJS.$(function($){
             contextPath : contextPath,
             loader : null,
             projectsSelect : null,
-            submitButton : null
+            submitButton : null,
+            defaultInstance : "LOCAL",
+            defaultProject : null
         },
 
         singleSelect : null,
@@ -37,6 +39,9 @@ AJS.$(function($){
             for(var i in json.projects) {
                 var project = json.projects[i];
                 var projElem = $("<option></option>");
+                if(json.id == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject){
+                    projElem.attr("selected", "selected");
+                }
                 projElem.attr('value', json.id + "|" + project.key);
                 projElem.text(project.name + " (" + project.key + ")");
                 elem.append(projElem);
@@ -46,18 +51,30 @@ AJS.$(function($){
 
         getProjectsSuccess : function(data) {
 			copyIssue.settings.container.find(".description").remove();
-			if (data.projects) {
-				for(var server in data.projects) {
-					var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
-					copyIssue.settings.projectsSelect.append(serverElem);
-				}
+
+            if (data.projects) {
+                var projectCount = _.reduce(data.projects, function(sum, server){return sum + server.projects.length}, 0);
+                if(projectCount > 0){
+                    for(var server in data.projects) {
+                        var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
+                        copyIssue.settings.projectsSelect.append(serverElem);
+                    }
+                    copyIssue.toggleLoadingState(false);
+                    copyIssue.prepareSelect();
+                } else {
+                    copyIssue.settings.container.append(RIC.Templates.warningMsg({closeable: false, msg : AJS.I18n.getText("cpji.you.dont.have.create.issue.permission.for.any.project")}));
+                    copyIssue.onValueUnselected();
+                    copyIssue.settings.loader.toggleClass("hidden", true);
+                    copyIssue.settings.projectsSelect.toggleClass("hidden", true);
+                }
 			}
+
 			if (data.failures && Object.keys(data.failures).length > 0) {
 				copyIssue.settings.container.append(AJS.$("<div class='description'></div>")
 						.append(RIC.Templates.remoteDestinationsNotAvailable(data.failures)));
 			}
-            copyIssue.toggleLoadingState(false);
-            copyIssue.prepareSelect();
+
+
         },
 
         prepareSelect : function() {
@@ -86,6 +103,7 @@ AJS.$(function($){
 		container: $("#targetEntityLink-container"),
         projectsSelect: $("#targetEntityLink"),
         loader : $("#targetEntityLinkLoader"),
-        submitButton : $("#select-project-submit")
+        submitButton : $("#select-project-submit"),
+        defaultProject : $("#cpji-current-project-key").text()
     });
 });

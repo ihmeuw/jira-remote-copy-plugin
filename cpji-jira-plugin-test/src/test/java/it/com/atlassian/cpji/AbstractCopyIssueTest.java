@@ -32,23 +32,25 @@ public abstract class AbstractCopyIssueTest
 
     static JiraTestedProduct jira1 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2990/jira", "jira1", 2990, "/jira"), null);
     static JiraTestedProduct jira2 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2991/jira", "jira2", 2991, "/jira"), null);
+    static JiraTestedProduct jira3 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2992/jira", "jira3", 2992, "/jira"), null);
 
 	static Backdoor testkit1 = BackdoorFactory.getBackdoor(jira1);
 	static Backdoor testkit2 = BackdoorFactory.getBackdoor(jira2);
+	static Backdoor testkit3 = BackdoorFactory.getBackdoor(jira3);
 
 	@ClassRule
-	public static EnableDarkFeatureRule pldRule = new EnableDarkFeatureRule("com.atlassian.jira.config.PDL", testkit1, testkit2);
+	public static EnableDarkFeatureRule pldRule = new EnableDarkFeatureRule("com.atlassian.jira.config.PDL", testkit1, testkit2, testkit3);
 	@ClassRule
-	public static EnableDarkFeatureRule commonHeaderRule = new EnableDarkFeatureRule("com.atlassian.jira.darkfeature.CommonHeader", testkit1, testkit2);
+	public static EnableDarkFeatureRule commonHeaderRule = new EnableDarkFeatureRule("com.atlassian.jira.darkfeature.CommonHeader", testkit1, testkit2, testkit3);
 	@ClassRule
-	public static EmptySystemDashboardRule emptySystemDashboardRule = new EmptySystemDashboardRule(testkit1, testkit2);
+	public static EmptySystemDashboardRule emptySystemDashboardRule = new EmptySystemDashboardRule(testkit1, testkit2, testkit3);
 
 	@Rule
 	public static SessionCleanupRule sessionCleanupRule = new SessionCleanupRule();
 	@Rule
 	public static MaximizeWindow maximizeWindow = new MaximizeWindow();
 	@Rule
-	public WebSudoRule webSudoRule = new WebSudoRule(testkit1, testkit2);
+	public WebSudoRule webSudoRule = new WebSudoRule(testkit1, testkit2, testkit3);
 	@Rule
 	public static WebDriverScreenshot webDriverScreenshot = new WebDriverScreenshot();
 	@Rule
@@ -56,6 +58,7 @@ public abstract class AbstractCopyIssueTest
 
 	static JiraRestClient restClient1 = getJiraRestClient(jira1);
 	static JiraRestClient restClient2 = getJiraRestClient(jira2);
+	static JiraRestClient restClient3 = getJiraRestClient(jira3);
 
 	private static JiraRestClient getJiraRestClient(JiraTestedProduct jira1) {
 		return new JerseyJiraRestClientFactory().createWithBasicHttpAuthentication(

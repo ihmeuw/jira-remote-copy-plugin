@@ -7,9 +7,9 @@
 <div id="stepped-process" class="content-container">
     <div class="content-related">
         <ol class="steps">
-            <li class="current">Select project</li>
-            <li class="todo">Select Issue Type</li>
-            <li class="todo">Confirmation</li>
+            <li class="current">$i18n.getText('cpji.select.project')</li>
+            <li class="todo">$i18n.getText('cpji.select.issue.type')</li>
+            <li class="todo">$i18n.getText('cpji.confirmation')</li>
         </ol>
     </div>
     <div class="content-body aui-panel">
@@ -20,11 +20,13 @@
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
 					<div style="width: 250px;"><select name="targetEntityLink" id="targetEntityLink" class="hidden"></select></div>
                     <span id="targetEntityLinkLoader" class="icon loading hidden"></span>
+                    <div class="hidden" id="cpji-current-project-key">$selectedIssueProjectKey</div>
 				</div>
             </fieldset>
             <div class="button-container">
                 <div class="buttons">
-                    <input id="select-project-submit" type="submit" value="Next" class="button submit"/>
+                    <input id="select-project-submit" type="submit" value="$i18n.getText('common.forms.next')" class="button submit"/>
+                    <a href="$req.contextPath$viewUrl" class="aui-button-cancel">$i18n.getText("common.forms.cancel")</a>
                 </div>
             </div>
             <input type="hidden" name="id" value="$action.getId()"/>

@@ -6,13 +6,9 @@ import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapperFactory;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
-import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.plugin.webresource.WebResourceManager;
@@ -32,11 +28,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final SubTaskManager subTaskManager,
             final FieldLayoutManager fieldLayoutManager,
             final CommentManager commentManager,
-            final FieldManager fieldManager,
-            final FieldMapperFactory fieldMapperFactory,
-            final FieldLayoutItemsRetriever fieldLayoutItemsRetriever,
             final CopyIssuePermissionManager copyIssuePermissionManager,
-            final UserMappingManager userMappingManager,
 			final ApplicationLinkService applicationLinkService,
             final WebResourceManager webResourceManager,
             final JiraProxyFactory jiraProxyFactory
@@ -71,6 +63,11 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         }
 
         return getRedirect("/secure/CopyDetailsAction.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);
+    }
+
+    @SuppressWarnings("unused")
+    public String getSelectedIssueProjectKey(){
+        return getIssueObject().getProjectObject().getKey();
     }
 
 

@@ -17,21 +17,26 @@ import java.io.IOException;
 
 import static com.atlassian.cpji.tests.RawRestUtil.getIssueJson;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @since v2.1
  */
 public class TestCopyIssue extends AbstractCopyIssueTest
 {
-    private static final String DATE_PICKER_CF = "customfield_10001";
-    private static final String GROUP_PICKER_CF = "customfield_10002";
-    private static final String MULTI_GROUP_PICKER_CF = "customfield_10004";
-    private static final String FREE_TEXT_FIELD_CF = "customfield_10000";
-    private static final String SELECT_LIST_CF = "customfield_10006";
-    private static final String NUMBER_FIELD_CF = "customfield_10005";
+    private static final String JIRA2_DATE_PICKER_CF = "customfield_10001";
+    private static final String JIRA2_GROUP_PICKER_CF = "customfield_10002";
+    private static final String JIRA2_MULTI_GROUP_PICKER_CF = "customfield_10004";
+    private static final String JIRA2_FREE_TEXT_FIELD_CF = "customfield_10000";
+    private static final String JIRA2_SELECT_LIST_CF = "customfield_10006";
+    private static final String JIRA2_NUMBER_FIELD_CF = "customfield_10005";
+
+    private static final String JIRA1_DATE_PICKER_CF = "customfield_10000";
+    private static final String JIRA1_GROUP_PICKER_CF = "customfield_10001";
+    private static final String JIRA1_MULTI_GROUP_PICKER_CF = "customfield_10002";
+    private static final String JIRA1_FREE_TEXT_FIELD_CF = "customfield_10005";
+    private static final String JIRA1_SELECT_LIST_CF = "customfield_10004";
+    private static final String JIRA1_NUMBER_FIELD_CF = "customfield_10003";
 
 	@Rule
 	public CreateIssues createIssues = new CreateIssues(restClient1);
@@ -57,16 +62,16 @@ public class TestCopyIssue extends AbstractCopyIssueTest
         assertEquals("Blah blah blah", fields.getString("description"));
 
         // Custom fields
-        assertEquals("2011-09-30", fields.getString(DATE_PICKER_CF));
-        assertEquals("jira-developers", fields.getJSONObject(GROUP_PICKER_CF).getString("name"));
+        assertEquals("2011-09-30", fields.getString(JIRA2_DATE_PICKER_CF));
+        assertEquals("jira-developers", fields.getJSONObject(JIRA2_GROUP_PICKER_CF).getString("name"));
 
-        final JSONArray multiGroup = fields.getJSONArray(MULTI_GROUP_PICKER_CF);
+        final JSONArray multiGroup = fields.getJSONArray(JIRA2_MULTI_GROUP_PICKER_CF);
         assertEquals("jira-developers", multiGroup.getJSONObject(0).getString("name"));
         assertEquals("jira-users", multiGroup.getJSONObject(1).getString("name"));
 
-        assertEquals("Free text field.", fields.getString(FREE_TEXT_FIELD_CF));
-        assertEquals("beta", fields.getJSONObject(SELECT_LIST_CF).getString("value"));
-        assertEquals(12345.679, fields.getDouble(NUMBER_FIELD_CF), 0);
+        assertEquals("Free text field.", fields.getString(JIRA2_FREE_TEXT_FIELD_CF));
+        assertEquals("beta", fields.getJSONObject(JIRA2_SELECT_LIST_CF).getString("value"));
+        assertEquals(12345.679, fields.getDouble(JIRA2_NUMBER_FIELD_CF), 0);
     }
 
     @Test
@@ -106,18 +111,25 @@ public class TestCopyIssue extends AbstractCopyIssueTest
         assertEquals(JSONObject.NULL, fields.opt("description"));
 
         // Custom fields
-        assertEquals(JSONObject.NULL, fields.opt(DATE_PICKER_CF));
-        assertEquals(JSONObject.NULL, fields.opt(GROUP_PICKER_CF));
-        assertEquals(JSONObject.NULL, fields.opt(MULTI_GROUP_PICKER_CF));
-        assertEquals(JSONObject.NULL, fields.opt(FREE_TEXT_FIELD_CF));
-        assertEquals(JSONObject.NULL, fields.opt(SELECT_LIST_CF));
-        assertEquals(JSONObject.NULL, fields.opt(NUMBER_FIELD_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_DATE_PICKER_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_GROUP_PICKER_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_MULTI_GROUP_PICKER_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_FREE_TEXT_FIELD_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_SELECT_LIST_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_NUMBER_FIELD_CF));
     }
 
     private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId)
     {
+        return remoteCopy(jira, issueKey, issueId, "Blah");
+    }
+
+    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject)
+    {
         viewIssue(jira, issueKey);
         SelectTargetProjectPage selectTargetProjectPage = jira.visit(SelectTargetProjectPage.class, issueId);
+        if(destinationProject != null)
+            selectTargetProjectPage.setDestinationProject(destinationProject);
 
         final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
         final PermissionChecksPage permissionChecksPage = copyDetailsPage.next();
@@ -134,21 +146,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 
 	@Test
 	public void testCopyForProjectWithoutProjectEntityLinks() throws IOException, JSONException {
-		viewIssue(jira1, "NEL-3");
-		SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, 10301L);
-
-		selectTargetProjectPage.setDestinationProject("Destination not entity links");
-
-		final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
-		final PermissionChecksPage permissionChecksPage = copyDetailsPage.next();
-
-		assertTrue(permissionChecksPage.isAllSystemFieldsRetained());
-		assertTrue(permissionChecksPage.isAllCustomFieldsRetained());
-
-		final CopyIssueToInstancePage copyIssueToInstancePage = permissionChecksPage.copyIssue();
-		assertTrue(copyIssueToInstancePage.isSuccessful());
-
-		final String remoteIssueKey = copyIssueToInstancePage.getRemoteIssueKey();
+        final String remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links");
 		assertThat(remoteIssueKey, startsWith("DNEL"));
 
 		// Query the remotely copied issue via REST
@@ -161,11 +159,11 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 		assertEquals(JSONObject.NULL, fields.opt("description"));
 
 		// Custom fields
-		assertEquals(JSONObject.NULL, fields.opt(DATE_PICKER_CF));
-		assertEquals(JSONObject.NULL, fields.opt(GROUP_PICKER_CF));
-		assertEquals(JSONObject.NULL, fields.opt(MULTI_GROUP_PICKER_CF));
-		assertEquals(JSONObject.NULL, fields.opt(FREE_TEXT_FIELD_CF));
-		assertEquals(JSONObject.NULL, fields.opt(SELECT_LIST_CF));
-		assertEquals(JSONObject.NULL, fields.opt(NUMBER_FIELD_CF));
+		assertEquals(JSONObject.NULL, fields.opt(JIRA2_DATE_PICKER_CF));
+		assertEquals(JSONObject.NULL, fields.opt(JIRA2_GROUP_PICKER_CF));
+		assertEquals(JSONObject.NULL, fields.opt(JIRA2_MULTI_GROUP_PICKER_CF));
+		assertEquals(JSONObject.NULL, fields.opt(JIRA2_FREE_TEXT_FIELD_CF));
+		assertEquals(JSONObject.NULL, fields.opt(JIRA2_SELECT_LIST_CF));
+		assertEquals(JSONObject.NULL, fields.opt(JIRA2_NUMBER_FIELD_CF));
 	}
 }
