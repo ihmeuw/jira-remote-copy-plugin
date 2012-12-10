@@ -5,6 +5,7 @@ import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
+import com.atlassian.pageobjects.binder.PageBindingWaitException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.UnhandledAlertException;
@@ -39,10 +40,14 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 
 			try {
 				viewIssue(jira1, issueKey);
-			} catch (UnhandledAlertException e) {
-				// sometimes we get a dirty warning here
-				jira1.getTester().getDriver().switchTo().alert().dismiss();
-				viewIssue(jira1, issueKey);
+			} catch (PageBindingWaitException e) {
+				if (e.getCause() instanceof UnhandledAlertException) {
+					// sometimes we get a dirty warning here
+					jira1.getTester().getDriver().switchTo().alert().dismiss();
+					viewIssue(jira1, issueKey);
+				} else {
+					throw e;
+				}
 			}
 
 			SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, issueId);
