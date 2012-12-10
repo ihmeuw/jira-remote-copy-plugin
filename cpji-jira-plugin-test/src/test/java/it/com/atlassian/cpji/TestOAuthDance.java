@@ -7,6 +7,7 @@ import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.UnhandledAlertException;
 
 import static org.junit.Assert.assertFalse;
 
@@ -34,11 +35,16 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 					.setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
 					.setUseDifferentUsers().next();
 
-//			assertThat(appLinks.getNamesOfApplicationLinks(), IsCollectionContaining.hasItems("JIRA3", "Your Company JIRA"));
-
 			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application link added");
 
-			viewIssue(jira1, issueKey);
+			try {
+				viewIssue(jira1, issueKey);
+			} catch (UnhandledAlertException e) {
+				// sometimes we get a dirty warning here
+				jira1.getTester().getDriver().switchTo().alert().dismiss();
+				viewIssue(jira1, issueKey);
+			}
+
 			SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, issueId);
 
 			// usually you'd not have to log in when returning to first JIRA but since JIRA is usually accessed using localhost
