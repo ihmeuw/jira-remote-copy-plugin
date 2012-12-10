@@ -11,6 +11,8 @@ import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.cpji.tests.rules.CreateIssues
 import org.joda.time.DateTime
 import org.hamcrest.collection.IsIterableWithSize
+import com.atlassian.cpji.tests.RawRestUtil._
+import org.json.JSONArray
 
 class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 
@@ -58,6 +60,8 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](0))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
+		val remoteLinks: JSONArray = getIssueRemoteLinksJson(AbstractCopyIssueTest.jira2, issueRest.getKey)
+		assertEquals(2, remoteLinks.length())
 	}
 
 	@Test def testNotCopyingAttachments() {
@@ -76,5 +80,27 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](1))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](0))
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
+		val remoteLinks: JSONArray = getIssueRemoteLinksJson(AbstractCopyIssueTest.jira2, issueRest.getKey)
+		assertEquals(2, remoteLinks.length())
+	}
+
+	@Test def testNotCopyingLinks() {
+		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
+		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+
+		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
+		copyDetailsPage.getCopyIssueLinks.uncheck()
+
+		val issueToInstancePage: CopyIssueToInstancePage = copyDetailsPage.next().copyIssue()
+		assertTrue(issueToInstancePage.isSuccessful)
+
+		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)
+		assertEquals(issueRest.getSummary, "Issue with comments and attachments")
+		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](1))
+		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
+		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
+		val remoteLinks: JSONArray = getIssueRemoteLinksJson(AbstractCopyIssueTest.jira2, issueRest.getKey)
+		assertEquals(1, remoteLinks.length())
 	}
 }

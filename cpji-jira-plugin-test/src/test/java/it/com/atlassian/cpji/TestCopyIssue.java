@@ -6,11 +6,6 @@ import com.atlassian.cpji.tests.pageobjects.PermissionChecksPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,6 +15,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static com.atlassian.cpji.tests.RawRestUtil.getIssueJson;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -134,17 +130,6 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 
         final String remoteIssueKey = copyIssueToInstancePage.getRemoteIssueKey();
         return remoteIssueKey;
-    }
-
-    private JSONObject getIssueJson(final JiraTestedProduct jira, final String remoteIssueKey) throws IOException, JSONException
-    {
-        final String restUrl = jira.getProductInstance().getBaseUrl() + "/rest/api/2/issue/" + remoteIssueKey + "?os_username=admin&os_password=admin";
-        final HttpClient httpClient = new DefaultHttpClient();
-        final HttpGet httpGet = new HttpGet(restUrl);
-        final HttpResponse response = httpClient.execute(httpGet);
-        assertEquals(200, response.getStatusLine().getStatusCode());
-        final String entity = EntityUtils.toString(response.getEntity());
-        return new JSONObject(entity);
     }
 
 	@Test
