@@ -189,7 +189,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         availableIssueTypes = Lists.newArrayList();
         for (IssueTypeBean value : values)
         {
-            if (value.equals(issue.getIssueTypeObject().getName()))
+            if (value.getName().equals(issue.getIssueTypeObject().getName()))
             {
                 availableIssueTypes.add(new Option(value.getName(), true));
             }

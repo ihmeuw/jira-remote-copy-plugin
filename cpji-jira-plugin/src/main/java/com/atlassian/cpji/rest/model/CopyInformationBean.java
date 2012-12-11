@@ -1,54 +1,52 @@
 package com.atlassian.cpji.rest.model;
 
 import com.google.common.collect.Lists;
-import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonRootName;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
  * @since v1.0
  */
-@JsonRootName("copyInformation")
+@XmlRootElement(name = "copyInformation")
 @JsonIgnoreProperties (ignoreUnknown = true)
 public class CopyInformationBean
 {
-	@JsonProperty
+	@XmlElement
     private List<IssueTypeBean> issueTypes;
 
-	@JsonProperty
+	@XmlElement
     private boolean attachmentsEnabled;
 
-	@JsonProperty
+	@XmlElement
 	private boolean issueLinkingEnabled;
 
-	@JsonProperty
+	@XmlElement
     private boolean hasCreateAttachmentPermission;
 
-	@JsonProperty
+	@XmlElement
     private UserBean user;
 
-	@JsonProperty
+	@XmlElement
     private boolean hasCreateIssuePermission;
 
-	@JsonProperty
+	@XmlElement
     private String jiraVersion;
 
 	// for testing
 	public CopyInformationBean() {
 	}
 
-	@JsonCreator
     public CopyInformationBean(
-                    @JsonProperty("issueTypes") final Iterable<IssueTypeBean> issueTypes,
-                    @JsonProperty("attachmentsEnabled") final boolean attachmentsEnabled,
-					@JsonProperty("issueLinkingEnabled") final boolean issueLinkingEnabled,
-                    @JsonProperty("user") final UserBean user,
-                    @JsonProperty("hasCreateIssuePermission") final boolean hasCreateIssuePermission,
-                    @JsonProperty("hasCreateAttachmentPermission") final boolean hasCreateAttachmentPermission,
-                    @JsonProperty("jiraVersion") final String jiraVersion)
+                    final Iterable<IssueTypeBean> issueTypes,
+                    final boolean attachmentsEnabled,
+					final boolean issueLinkingEnabled,
+                    final UserBean user,
+                    final boolean hasCreateIssuePermission,
+                    final boolean hasCreateAttachmentPermission,
+                    final String jiraVersion)
     {
         this.issueTypes = Lists.newArrayList(issueTypes);
         this.attachmentsEnabled = attachmentsEnabled;

@@ -1,22 +1,21 @@
 package com.atlassian.cpji.rest.model;
 
 import com.google.common.collect.Lists;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.map.annotate.JsonRootName;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
  * @since v1.0
  */
-@JsonRootName("issueType")
+@XmlRootElement(name = "issueType")
 public class IssueTypeBean
 {
-	@JsonProperty
+	@XmlElement
     private String name;
 
-	@JsonProperty
+	@XmlElement
 	private List<String> requiredFields;
 
 	// used by jersey
@@ -24,8 +23,7 @@ public class IssueTypeBean
 	public IssueTypeBean() {
 	}
 
-	@JsonCreator
-    public IssueTypeBean(@JsonProperty("name") final String name, @JsonProperty("requiredFields") final Iterable<String> requiredFields)
+    public IssueTypeBean(final String name, final Iterable<String> requiredFields)
     {
         this.name = name;
 		this.requiredFields = Lists.newArrayList(requiredFields);
