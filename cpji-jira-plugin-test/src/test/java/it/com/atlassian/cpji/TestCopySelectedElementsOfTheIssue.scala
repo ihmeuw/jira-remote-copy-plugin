@@ -13,6 +13,7 @@ import org.joda.time.DateTime
 import org.hamcrest.collection.IsIterableWithSize
 import com.atlassian.cpji.tests.RawRestUtil._
 import org.json.JSONArray
+import com.atlassian.cpji.CopyIssueProcess
 
 class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 
@@ -44,9 +45,10 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		try { AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM) } catch { case e: Exception => "" }
 	}
 
-	@Test def testNotCopyingComments() {
-		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+  def goToCopyDetails = CopyIssueProcess.goToCopyDetails(AbstractCopyIssueTest.jira1, _ : java.lang.Long)
+
+  @Test def testNotCopyingComments() {
+		val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
 		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
@@ -65,8 +67,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 	}
 
 	@Test def testNotCopyingAttachments() {
-		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+    val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
 		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
@@ -85,8 +86,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 	}
 
 	@Test def testNotCopyingLinks() {
-		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+    val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
 		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)

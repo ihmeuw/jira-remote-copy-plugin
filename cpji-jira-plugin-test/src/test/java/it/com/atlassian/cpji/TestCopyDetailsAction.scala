@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream
 import org.hamcrest.core.IsCollectionContaining
 import com.google.common.collect.Collections2
 import com.atlassian.pageobjects.elements.query.Poller
+import com.atlassian.cpji.CopyIssueProcess
 ;
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
@@ -19,9 +20,11 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 
 	@Rule def createIssuesRule = createIssues
 
-	@Before def setUp {
+  @Before def setUp {
 		login(AbstractCopyIssueTest.jira1)
 	}
+
+  def goToCopyDetails = CopyIssueProcess.goToCopyDetails(AbstractCopyIssueTest.jira1, _ : java.lang.Long)
 
 	@Test def testAdvancedSectionIncludesItemsBasedOnIssueContent() {
 		val issue: Issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
@@ -29,8 +32,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 
 		{
-			val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+      val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertFalse(copyDetailsPage.isCopyCommentsGroupVisible)
 			assertFalse(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -42,8 +44,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null))
 
 		{
-			val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+      val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
 			assertFalse(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -56,8 +57,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
 
 		{
-			val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+      val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
 			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -67,14 +67,14 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 
 		AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
 
-		val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+    val copyDetailsPage = goToCopyDetails(issue.getId)
 
 		assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
 		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 		assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
 		assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 	}
+
 
 	@Test def testAdvancedSectionReportsMissingFeaturesOnRemoteSide() {
 		val issue: Issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
@@ -90,8 +90,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			AbstractCopyIssueTest.testkit2.attachments().disable()
 			AbstractCopyIssueTest.testkit2.issueLinking().disable()
 
-			val selectTargetProjectPage: SelectTargetProjectPage = AbstractCopyIssueTest.jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
-			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next()
+			val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 			Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed.isEnabled)
