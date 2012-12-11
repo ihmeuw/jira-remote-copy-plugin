@@ -29,6 +29,7 @@ import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -38,7 +39,6 @@ import java.util.Collection;
  */
 public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
 {
-    public static final int CONNECTION_TIMEOUTS = 100000;
     private String copiedIssueKey;
     private boolean copyAttachments;
     private boolean copyIssueLinks;
@@ -119,16 +119,17 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
             proxy.convertRemoteIssueLinksIntoLocal(copiedIssueKey);
         }
 
-        RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
+		if (StringUtils.isNotBlank(remoteIssueLink)) {
+			final Collection<IssueLinkType> copiedTypeCollection = issueLinkTypeManager.getIssueLinkTypesByName("Copied");
+			if(copiedTypeCollection.size() > 0) {
+				final RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
 
-
-        Collection<IssueLinkType> copiedTypeCollection = issueLinkTypeManager.getIssueLinkTypesByName("Copied");
-        if(copiedTypeCollection.size() > 0) {
-            proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
-                     Iterables.get(copiedTypeCollection, 0),
-                    remoteIssueLinkType.hasLocalIssueLinkToRemote()?JiraProxy.LinkCreationDirection.OUTWARD:JiraProxy.LinkCreationDirection.IGNORE,
-                    remoteIssueLinkType.hasLocalIssueLinkToRemote()?JiraProxy.LinkCreationDirection.INWARD:JiraProxy.LinkCreationDirection.IGNORE);
-        }
+				proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
+						 Iterables.get(copiedTypeCollection, 0),
+						remoteIssueLinkType.hasLocalIssueLinkToRemote() ? JiraProxy.LinkCreationDirection.OUTWARD : JiraProxy.LinkCreationDirection.IGNORE,
+						remoteIssueLinkType.hasLocalIssueLinkToRemote() ? JiraProxy.LinkCreationDirection.INWARD : JiraProxy.LinkCreationDirection.IGNORE);
+			}
+		}
 
         linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());
 
