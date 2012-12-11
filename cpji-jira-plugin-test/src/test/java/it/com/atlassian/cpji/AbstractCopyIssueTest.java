@@ -1,6 +1,7 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.cpji.tests.BackdoorFactory;
+import com.atlassian.cpji.tests.backdoor.ExtendedBackdoor;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.pageobjects.pages.DashboardPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
@@ -8,7 +9,6 @@ import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
-import com.atlassian.jira.testkit.client.Backdoor;
 import com.atlassian.jira.testkit.client.rules.EmptySystemDashboardRule;
 import com.atlassian.jira.testkit.client.rules.EnableDarkFeatureRule;
 import com.atlassian.jira.testkit.client.rules.WebSudoRule;
@@ -34,9 +34,9 @@ public abstract class AbstractCopyIssueTest
     static JiraTestedProduct jira2 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2991/jira", "jira2", 2991, "/jira"), null);
     static JiraTestedProduct jira3 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2992/jira", "jira3", 2992, "/jira"), null);
 
-	static Backdoor testkit1 = BackdoorFactory.getBackdoor(jira1);
-	static Backdoor testkit2 = BackdoorFactory.getBackdoor(jira2);
-	static Backdoor testkit3 = BackdoorFactory.getBackdoor(jira3);
+	static ExtendedBackdoor testkit1 = BackdoorFactory.getExtendedBackdoor(jira1);
+	static ExtendedBackdoor testkit2 = BackdoorFactory.getExtendedBackdoor(jira2);
+	static ExtendedBackdoor testkit3 = BackdoorFactory.getExtendedBackdoor(jira3);
 
 	@ClassRule
 	public static EnableDarkFeatureRule pldRule = new EnableDarkFeatureRule("com.atlassian.jira.config.PDL", testkit1, testkit2, testkit3);

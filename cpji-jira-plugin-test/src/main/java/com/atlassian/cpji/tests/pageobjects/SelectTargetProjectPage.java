@@ -31,6 +31,9 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 
 	@ElementBy(id = "targetEntityLink-container")
 	private PageElement targetEntityLinkContainer;
+
+    @ElementBy(className = "warning", within = "targetEntityLinkContainer")
+    private PageElement targetEntityErrorMessage;
     
     private SingleSelect entitySelection;
 
@@ -92,6 +95,10 @@ public class SelectTargetProjectPage extends AbstractJiraPage
         final String targetEntityLink = entitySelection.getValue();
         nextButton.click();
         return pageBinder.bind(CopyDetailsPage.class, issueId, targetEntityLink);
+    }
+
+    public String getTargetEntityWarningMessage(){
+        return targetEntityErrorMessage.timed().getText().byDefaultTimeout();
     }
 
 	@Nonnull

@@ -8,6 +8,8 @@ import java.lang.String
 import com.atlassian.cpji.tests.pageobjects.{PermissionChecksPage, SelectTargetProjectPage}
 import org.junit.Assert._
 import com.atlassian.jira.pageobjects.JiraTestedProduct
+import com.atlassian.jira.webtests.Permissions
+import org.hamcrest.Matchers
 
 class TestCopyIssueToLocal extends AbstractCopyIssueTest {
 
@@ -63,6 +65,24 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
 				.getIssue(copiedIssueKey, AbstractCopyIssueTest.NPM)
 		issuesEquals(issue, copiedIssue)
 	}
+
+  @Test
+  def warningMessageIsDisplayedWhenUserHasNoRightsToCreateIssue() {
+
+    val issue = createIssue("Sample issue")
+
+    try {
+      AbstractCopyIssueTest.testkit3.extendedPermissionSchemesControl().removeProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
+      viewIssue(AbstractCopyIssueTest.jira3, issue.getKey)
+
+      val selectTargetProjectPage = AbstractCopyIssueTest.jira3.visit(classOf[SelectTargetProjectPage], issue.getId)
+      assertThat(selectTargetProjectPage.getTargetEntityWarningMessage, Matchers.startsWith("You can't clone issue"))
+
+    } finally {
+      AbstractCopyIssueTest.testkit3.extendedPermissionSchemesControl().addProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
+    }
+
+  }
 
 
 	def issuesEquals(a: Issue, b: Issue) {
