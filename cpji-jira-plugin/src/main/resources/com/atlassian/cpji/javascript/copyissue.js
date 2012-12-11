@@ -99,6 +99,17 @@ AJS.$(function($){
 
     }
 
+    if(!JIRA.plugins){
+        JIRA.plugins = {
+            cpjiPlugin : {}
+        };
+    } else {
+        JIRA.plugins.cpjiPlugin = {};
+    }
+
+    JIRA.plugins.cpjiPlugin.selectTarget = copyIssue;
+
+
     copyIssue.initSelectProject({
 		container: $("#targetEntityLink-container"),
         projectsSelect: $("#targetEntityLink"),
