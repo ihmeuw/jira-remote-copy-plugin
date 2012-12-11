@@ -6,7 +6,7 @@ import com.atlassian.jira.rest.client.domain.{Comment, IssueFieldId, Issue}
 import com.atlassian.jira.rest.client.domain.input.{LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import org.joda.time.DateTime
-import com.atlassian.cpji.tests.pageobjects.{Options, CopyDetailsPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.pageobjects.Options
 import org.junit.Assert._
 import java.io.ByteArrayInputStream
 import org.hamcrest.core.IsCollectionContaining
@@ -20,11 +20,11 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 
 	@Rule def createIssuesRule = createIssues
 
-  @Before def setUp {
+	@Before def setUp {
 		login(AbstractCopyIssueTest.jira1)
 	}
 
-  def goToCopyDetails = CopyIssueProcess.goToCopyDetails(AbstractCopyIssueTest.jira1, _ : java.lang.Long)
+	def goToCopyDetails = CopyIssueProcess.goToCopyDetails(AbstractCopyIssueTest.jira1, _: java.lang.Long)
 
 	@Test def testAdvancedSectionIncludesItemsBasedOnIssueContent() {
 		val issue: Issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
@@ -32,7 +32,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 
 		{
-      val copyDetailsPage = goToCopyDetails(issue.getId)
+			val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertFalse(copyDetailsPage.isCopyCommentsGroupVisible)
 			assertFalse(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -44,7 +44,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null))
 
 		{
-      val copyDetailsPage = goToCopyDetails(issue.getId)
+			val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
 			assertFalse(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -54,10 +54,11 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 
 
 		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
-			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
+			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
+			this.getClass.getCanonicalName)
 
 		{
-      val copyDetailsPage = goToCopyDetails(issue.getId)
+			val copyDetailsPage = goToCopyDetails(issue.getId)
 
 			assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
 			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -65,9 +66,10 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 		}
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+		AbstractCopyIssueTest.restClient1.getIssueClient
+				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
 
-    val copyDetailsPage = goToCopyDetails(issue.getId)
+		val copyDetailsPage = goToCopyDetails(issue.getId)
 
 		assertTrue(copyDetailsPage.isCopyCommentsGroupVisible)
 		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
@@ -82,9 +84,11 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 
 		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
-			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
+			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
+			this.getClass.getCanonicalName)
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+		AbstractCopyIssueTest.restClient1.getIssueClient
+				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
 
 		try {
 			AbstractCopyIssueTest.testkit2.attachments().disable()
@@ -94,11 +98,13 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 
 			assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
 			Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed.isEnabled)
-			assertTrue(copyDetailsPage.isCopyIssueLinksGroupVisible)
+			assertTrue("Copy Issue Link section should be visible when remote JIRA has link disabled (so we can show the meaningful message)",
+				copyDetailsPage.isCopyIssueLinksGroupVisible)
 			Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed.isEnabled)
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 			Poller.waitUntilTrue(copyDetailsPage.getCreateIssueLinks.timed.isPresent)
-			assertThat(Collections2.transform(copyDetailsPage.getCreateIssueLinks.getAllOptions, Options.getText), IsCollectionContaining.hasItems("From original to copy", "None"))
+			assertThat(Collections2.transform(copyDetailsPage.getCreateIssueLinks.getAllOptions, Options.getText),
+				IsCollectionContaining.hasItems("From original to copy", "None"))
 		} finally {
 			AbstractCopyIssueTest.testkit2.attachments().enable()
 			AbstractCopyIssueTest.testkit2.issueLinking().enable()

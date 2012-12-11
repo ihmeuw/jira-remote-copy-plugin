@@ -1,6 +1,7 @@
 package com.atlassian.cpji;
 
 import com.atlassian.cpji.components.ProjectInfoService;
+import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -54,10 +55,13 @@ public class TestProjectInfoService {
     private BuildUtilsInfo buildUtilsInfo;
     @Mock
     private User mockedUser;
+	@Mock
+	private FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
 
     @Before
     public void setUp() throws Exception {
-        projectInfoService = new ProjectInfoService(projectService, issueTypeSchemeManager, applicationProperties, jiraAuthenticationContext, permissionManager, buildUtilsInfo);
+        projectInfoService = new ProjectInfoService(projectService, issueTypeSchemeManager, applicationProperties, jiraAuthenticationContext, permissionManager, buildUtilsInfo,
+				fieldLayoutItemsRetriever);
         when(jiraAuthenticationContext.getLoggedInUser()).thenReturn(mockedUser);
     }
 

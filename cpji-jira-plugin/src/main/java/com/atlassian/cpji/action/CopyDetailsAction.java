@@ -18,6 +18,7 @@ import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -189,7 +190,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         availableIssueTypes = Lists.newArrayList();
         for (IssueTypeBean value : values)
         {
-            if (value.getName().equals(issue.getIssueTypeObject().getName()))
+            if (StringUtils.endsWithIgnoreCase(value.getName(), issue.getIssueTypeObject().getName()))
             {
                 availableIssueTypes.add(new Option(value.getName(), true));
             }
@@ -233,7 +234,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 	}
 
 	public boolean isCopyIssueLinksSectionVisible() {
-		return linksEnabled() && copyInfo.getIssueLinkingEnabled() && isIssueWithLinks();
+		return linksEnabled() && isIssueWithLinks();
 	}
 
 	public boolean isCreateIssueLinkSectionVisible() {

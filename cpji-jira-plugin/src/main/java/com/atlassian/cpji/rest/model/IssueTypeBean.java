@@ -16,14 +16,14 @@ public class IssueTypeBean
     private String name;
 
 	@XmlElement
-	private List<String> requiredFields;
+	private List<IssueFieldBean> requiredFields;
 
 	// used by jersey
 	@SuppressWarnings("unused")
 	public IssueTypeBean() {
 	}
 
-    public IssueTypeBean(final String name, final Iterable<String> requiredFields)
+    public IssueTypeBean(final String name, final Iterable<IssueFieldBean> requiredFields)
     {
         this.name = name;
 		this.requiredFields = Lists.newArrayList(requiredFields);
@@ -34,7 +34,7 @@ public class IssueTypeBean
         return name;
     }
 
-	public List<String> getRequiredFields() {
+	public List<IssueFieldBean> getRequiredFields() {
 		return requiredFields;
 	}
 
@@ -42,7 +42,7 @@ public class IssueTypeBean
 		this.name = name;
 	}
 
-	public void setRequiredFields(List<String> requiredFields) {
+	public void setRequiredFields(List<IssueFieldBean> requiredFields) {
 		this.requiredFields = Lists.newArrayList(requiredFields);
 	}
 }

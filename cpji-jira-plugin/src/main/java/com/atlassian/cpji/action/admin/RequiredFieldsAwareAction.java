@@ -28,13 +28,12 @@ import java.util.NoSuchElementException;
 
 public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport implements OperationContext
 {
+	public static final ArrayList<String> UNMODIFIABLE_FIELDS = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE, IssueFieldConstants.PROJECT, IssueFieldConstants.SUMMARY);
 
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final IssueFactory issueFactory;
     private final DefaultFieldValuesManager defaultFieldValuesManager;
-    private static final ArrayList<String> unmodifiableFields = Lists.newArrayList(IssueFieldConstants.ISSUE_TYPE, IssueFieldConstants.PROJECT, IssueFieldConstants.SUMMARY);
-
 
     private String projectKey;
     private String issuetype;
@@ -74,7 +73,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
         {
             public boolean apply(final FieldLayoutItem input)
             {
-                return !unmodifiableFields.contains(input.getOrderableField().getId()) && input.isRequired();
+                return !UNMODIFIABLE_FIELDS.contains(input.getOrderableField().getId()) && input.isRequired();
             }
         });
         return Lists.newArrayList(filter);
