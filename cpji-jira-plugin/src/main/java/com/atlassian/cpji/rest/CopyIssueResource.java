@@ -45,6 +45,7 @@ public class CopyIssueResource
         }
         catch (CopyIssueException e)
         {
+			log.error(String.format("Failed to copy issue: %s", e.getMessage()));
             return Response.serverError().entity(ErrorBean.convertErrorCollection(e.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
     }
