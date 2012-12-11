@@ -9,6 +9,7 @@ import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
+import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -26,11 +27,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @since v3.0
@@ -63,6 +68,7 @@ public class TestProjectInfoService {
         projectInfoService = new ProjectInfoService(projectService, issueTypeSchemeManager, applicationProperties, jiraAuthenticationContext, permissionManager, buildUtilsInfo,
 				fieldLayoutItemsRetriever);
         when(jiraAuthenticationContext.getLoggedInUser()).thenReturn(mockedUser);
+		when(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(any(Project.class), any(IssueType.class))).thenReturn(Collections.<FieldLayoutItem>emptyList());
     }
 
     @Test
