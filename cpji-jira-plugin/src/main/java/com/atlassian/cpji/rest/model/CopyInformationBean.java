@@ -1,52 +1,54 @@
 package com.atlassian.cpji.rest.model;
 
 import com.google.common.collect.Lists;
+import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonRootName;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**
  * @since v1.0
  */
-@XmlRootElement (name = "copyInformation")
+@JsonRootName("copyInformation")
 @JsonIgnoreProperties (ignoreUnknown = true)
 public class CopyInformationBean
 {
-    @XmlElement (name = "issueTypes")
+	@JsonProperty
     private List<IssueTypeBean> issueTypes;
 
-    @XmlElement( name = "attachmentsEnabled")
+	@JsonProperty
     private boolean attachmentsEnabled;
 
-	@XmlElement( name = "issueLinkingEnabled")
+	@JsonProperty
 	private boolean issueLinkingEnabled;
 
-    @XmlElement( name = "hasCreateAttachmentPermission")
+	@JsonProperty
     private boolean hasCreateAttachmentPermission;
 
-    @XmlElement( name = "user")
+	@JsonProperty
     private UserBean user;
 
-    @XmlElement( name = "hasCreateIssuePermission")
+	@JsonProperty
     private boolean hasCreateIssuePermission;
 
-    @XmlElement (name = "jiraVersion")
+	@JsonProperty
     private String jiraVersion;
 
 	// for testing
 	public CopyInformationBean() {
 	}
 
+	@JsonCreator
     public CopyInformationBean(
-                    final Iterable<IssueTypeBean> issueTypes,
-                    final boolean attachmentsEnabled,
-					final boolean issueLinkingEnabled,
-                    final UserBean user,
-                    final boolean hasCreateIssuePermission,
-                    final boolean hasCreateAttachmentPermission,
-                    final String jiraVersion)
+                    @JsonProperty("issueTypes") final Iterable<IssueTypeBean> issueTypes,
+                    @JsonProperty("attachmentsEnabled") final boolean attachmentsEnabled,
+					@JsonProperty("issueLinkingEnabled") final boolean issueLinkingEnabled,
+                    @JsonProperty("user") final UserBean user,
+                    @JsonProperty("hasCreateIssuePermission") final boolean hasCreateIssuePermission,
+                    @JsonProperty("hasCreateAttachmentPermission") final boolean hasCreateAttachmentPermission,
+                    @JsonProperty("jiraVersion") final String jiraVersion)
     {
         this.issueTypes = Lists.newArrayList(issueTypes);
         this.attachmentsEnabled = attachmentsEnabled;
@@ -89,5 +91,33 @@ public class CopyInformationBean
 
 	public boolean getIssueLinkingEnabled() {
 		return issueLinkingEnabled;
+	}
+
+	public void setIssueTypes(List<IssueTypeBean> issueTypes) {
+		this.issueTypes = Lists.newArrayList(issueTypes);
+	}
+
+	public void setAttachmentsEnabled(boolean attachmentsEnabled) {
+		this.attachmentsEnabled = attachmentsEnabled;
+	}
+
+	public void setIssueLinkingEnabled(boolean issueLinkingEnabled) {
+		this.issueLinkingEnabled = issueLinkingEnabled;
+	}
+
+	public void setHasCreateAttachmentPermission(boolean hasCreateAttachmentPermission) {
+		this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
+	}
+
+	public void setUser(UserBean user) {
+		this.user = user;
+	}
+
+	public void setHasCreateIssuePermission(boolean hasCreateIssuePermission) {
+		this.hasCreateIssuePermission = hasCreateIssuePermission;
+	}
+
+	public void setJiraVersion(String jiraVersion) {
+		this.jiraVersion = jiraVersion;
 	}
 }
