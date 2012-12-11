@@ -1,8 +1,10 @@
 package com.atlassian.cpji.rest.model;
 
-import java.util.List;
+import com.google.common.collect.Lists;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * @since v1.0
@@ -10,21 +12,29 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "issueType")
 public class IssueTypeBean
 {
-    @XmlElement (name = "types")
-    private List<String> getTypes;
+    @XmlElement (name = "name")
+    private String name;
 
-    @SuppressWarnings("unused")
-    public IssueTypeBean()
+	@XmlElement (name = "requiredFields")
+	private List<String> requiredFields;
+
+	// used by jersey
+	@SuppressWarnings("unused")
+	public IssueTypeBean() {
+	}
+
+    public IssueTypeBean(final String name, final Iterable<String> requiredFields)
     {
+        this.name = name;
+		this.requiredFields = Lists.newArrayList(requiredFields);
     }
 
-    public IssueTypeBean(final List<String> getTypes)
+    public String getName()
     {
-        this.getTypes = getTypes;
+        return name;
     }
 
-    public List<String> getGetTypes()
-    {
-        return getTypes;
-    }
+	public List<String> getRequiredFields() {
+		return requiredFields;
+	}
 }

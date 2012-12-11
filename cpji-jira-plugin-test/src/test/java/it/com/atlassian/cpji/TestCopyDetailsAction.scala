@@ -16,7 +16,7 @@ import com.atlassian.cpji.CopyIssueProcess
 ;
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
-	var createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient1)
+	val createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient1)
 
 	@Rule def createIssuesRule = createIssues
 

@@ -15,10 +15,11 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.BuildUtilsInfo;
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @since v3.0
@@ -58,14 +59,7 @@ public class ProjectInfoService {
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 
         if (hasCreateIssuePermission) {
-            final Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);
-            final List<String> issueTypes = Lists.newArrayList();
-            for (IssueType issueType : issueTypesForProject) {
-                issueTypes.add(issueType.getName());
-            }
-            IssueTypeBean issueTypesBean = new IssueTypeBean(issueTypes);
-
-            CopyInformationBean copyInformationBean = new CopyInformationBean(issueTypesBean,
+            CopyInformationBean copyInformationBean = new CopyInformationBean(getIssueTypes(project),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
 					userBean,
@@ -79,4 +73,13 @@ public class ProjectInfoService {
             return copyInformationBean;
         }
     }
+
+	protected Collection<IssueTypeBean> getIssueTypes(final Project project) {
+		return Collections2.transform(issueTypeSchemeManager.getIssueTypesForProject(project), new Function<IssueType, IssueTypeBean>() {
+			@Override
+			public IssueTypeBean apply(IssueType issueType) {
+				return new IssueTypeBean(issueType.getName(), Lists.<String>newArrayList());
+			}
+		});
+	}
 }

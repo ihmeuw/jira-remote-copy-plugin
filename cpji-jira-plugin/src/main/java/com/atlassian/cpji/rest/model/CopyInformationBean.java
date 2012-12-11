@@ -1,9 +1,11 @@
 package com.atlassian.cpji.rest.model;
 
+import com.google.common.collect.Lists;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * @since v1.0
@@ -13,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class CopyInformationBean
 {
     @XmlElement (name = "issueTypes")
-    private IssueTypeBean issueTypes;
+    private List<IssueTypeBean> issueTypes;
 
     @XmlElement( name = "attachmentsEnabled")
     private boolean attachmentsEnabled;
@@ -30,34 +32,32 @@ public class CopyInformationBean
     @XmlElement( name = "hasCreateIssuePermission")
     private boolean hasCreateIssuePermission;
 
-    @XmlElement (name = "version")
-    private String version;
+    @XmlElement (name = "jiraVersion")
+    private String jiraVersion;
 
-    @SuppressWarnings("unused")
-    public CopyInformationBean()
-    {
-    }
+	// for testing
+	public CopyInformationBean() {
+	}
 
-    public CopyInformationBean
-            (
-                    final IssueTypeBean issueTypes,
+    public CopyInformationBean(
+                    final Iterable<IssueTypeBean> issueTypes,
                     final boolean attachmentsEnabled,
 					final boolean issueLinkingEnabled,
                     final UserBean user,
                     final boolean hasCreateIssuePermission,
                     final boolean hasCreateAttachmentPermission,
-                    final String version)
+                    final String jiraVersion)
     {
-        this.issueTypes = issueTypes;
+        this.issueTypes = Lists.newArrayList(issueTypes);
         this.attachmentsEnabled = attachmentsEnabled;
 		this.issueLinkingEnabled = issueLinkingEnabled;
         this.user = user;
         this.hasCreateIssuePermission = hasCreateIssuePermission;
         this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
-        this.version = version;
+        this.jiraVersion = jiraVersion;
     }
 
-    public IssueTypeBean getIssueTypes()
+    public List<IssueTypeBean> getIssueTypes()
     {
         return issueTypes;
     }
@@ -82,9 +82,9 @@ public class CopyInformationBean
         return hasCreateAttachmentPermission;
     }
 
-    public String getVersion()
+    public String getJiraVersion()
     {
-        return version;
+        return jiraVersion;
     }
 
 	public boolean getIssueLinkingEnabled() {

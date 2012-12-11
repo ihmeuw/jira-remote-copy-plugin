@@ -2,6 +2,7 @@ package com.atlassian.cpji;
 
 import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
+import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
@@ -16,6 +17,7 @@ import com.atlassian.jira.webtests.Permissions;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -82,7 +85,12 @@ public class TestProjectInfoService {
 
         assertEquals(true, result.getHasCreateIssuePermission());
         assertEquals(false, result.getHasCreateAttachmentPermission());
-        assertEquals(result.getIssueTypes().getGetTypes(), issueTypeNames);
+        assertThat(Iterables.transform(result.getIssueTypes(), new Function<IssueTypeBean, String>() {
+			@Override
+			public String apply(IssueTypeBean input) {
+				return input.getName();
+			}
+		}), IsIterableContainingInAnyOrder.<String> containsInAnyOrder(issueTypeNames.toArray(new String[] {})));
         assertEquals(true, result.getAttachmentsEnabled());
         assertEquals(true, result.getIssueLinkingEnabled());
         verify(permissionManager).hasPermission(Permissions.CREATE_ISSUE, project, mockedUser);

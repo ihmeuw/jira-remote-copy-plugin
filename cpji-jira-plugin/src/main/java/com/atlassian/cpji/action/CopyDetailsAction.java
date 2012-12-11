@@ -6,6 +6,7 @@ import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
+import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
@@ -18,7 +19,6 @@ import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -140,7 +140,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
             return ERROR;
         }
 
-        checkIssueTypes(copyInfo.getIssueTypes().getGetTypes());
+        checkIssueTypes(copyInfo.getIssueTypes());
 
 		UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
@@ -183,24 +183,19 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
         return getCopyInfo().getHasCreateAttachmentPermission();
     }
 
-    public boolean isSALUpgradeRequired()
-    {
-        return false;
-    }
-
-    private void checkIssueTypes(final Collection<String> values)
+    private void checkIssueTypes(final Collection<IssueTypeBean> values)
     {
         MutableIssue issue = getIssueObject();
-        availableIssueTypes = new ArrayList<Option>();
-        for (String value : values)
+        availableIssueTypes = Lists.newArrayList();
+        for (IssueTypeBean value : values)
         {
             if (value.equals(issue.getIssueTypeObject().getName()))
             {
-                availableIssueTypes.add(new Option(value, true));
+                availableIssueTypes.add(new Option(value.getName(), true));
             }
             else
             {
-                availableIssueTypes.add(new Option(value, false));
+                availableIssueTypes.add(new Option(value.getName(), false));
             }
         }
     }
@@ -238,7 +233,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 	}
 
 	public boolean isCopyIssueLinksSectionVisible() {
-		return linksEnabled() && isIssueWithLinks();
+		return linksEnabled() && copyInfo.getIssueLinkingEnabled() && isIssueWithLinks();
 	}
 
 	public boolean isCreateIssueLinkSectionVisible() {
@@ -250,9 +245,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction
 	}
 
 	public String getCopyAttachmentsErrorMessage() {
-		if(isSALUpgradeRequired()) {
-			return getText("cpji.attachments.not.moved.sal");
-		} else if (!copyInfo.getAttachmentsEnabled()) {
+		if (!copyInfo.getAttachmentsEnabled()) {
 			return getText("cpji.attachments.are.disabled");
 		} else if(!copyInfo.getHasCreateAttachmentPermission()) {
 			return getText("cpji.not.permitted.to.create.attachments");
