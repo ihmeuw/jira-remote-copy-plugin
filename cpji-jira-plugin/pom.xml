@@ -130,6 +130,7 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+					<extractDependencies>false</extractDependencies>
                     <products>
                         <product>
                             <id>jira</id>

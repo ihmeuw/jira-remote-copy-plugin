@@ -137,6 +137,7 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+					<extractDependencies>false</extractDependencies>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
 						<atlassian.test.target.dir>target</atlassian.test.target.dir>
