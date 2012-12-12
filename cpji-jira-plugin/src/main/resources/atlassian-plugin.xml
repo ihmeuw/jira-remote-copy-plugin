@@ -14,7 +14,10 @@
 			/secure/SelectTargetProjectAction!default.jspa?id=${issueId}
 		</link>
 		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
-		<condition class="com.atlassian.cpji.conditions.JiraApplicationLinkIsConfiguredOrCanCreateIssuesCondition"/>
+        <conditions type="OR">
+            <condition class="com.atlassian.cpji.conditions.JiraApplicationLinkIsConfiguredCondition"/>
+            <condition class="com.atlassian.cpji.conditions.HasCreateIssuePermissionInAnyProjectCondition"/>
+        </conditions>
 		<condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
 	</web-item>
 
