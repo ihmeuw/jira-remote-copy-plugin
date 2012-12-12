@@ -72,14 +72,14 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
     val issue = createIssue("Sample issue")
 
     try {
-      AbstractCopyIssueTest.testkit3.extendedPermissionSchemesControl().removeProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
+      AbstractCopyIssueTest.testkit3.permissionSchemes().removeProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
       viewIssue(AbstractCopyIssueTest.jira3, issue.getKey)
 
       val selectTargetProjectPage = AbstractCopyIssueTest.jira3.visit(classOf[SelectTargetProjectPage], issue.getId)
       assertThat(selectTargetProjectPage.getTargetEntityWarningMessage, Matchers.startsWith("You can't clone issue"))
 
     } finally {
-      AbstractCopyIssueTest.testkit3.extendedPermissionSchemesControl().addProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
+      AbstractCopyIssueTest.testkit3.permissionSchemes().addProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
     }
 
   }

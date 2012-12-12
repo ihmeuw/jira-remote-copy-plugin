@@ -1,6 +1,5 @@
 package com.atlassian.cpji.tests;
 
-import com.atlassian.cpji.tests.backdoor.ExtendedBackdoor;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.testkit.client.Backdoor;
 import com.atlassian.jira.testkit.client.util.TestKitLocalEnvironmentData;
@@ -11,11 +10,6 @@ import java.util.Properties;
 public final class BackdoorFactory {
     private BackdoorFactory() {
         throw new AssertionError("Don't instantiate me");
-    }
-
-    public static ExtendedBackdoor getExtendedBackdoor(JiraTestedProduct jira) {
-        final TestKitLocalEnvironmentData testKitLocalEnvironmentData = getTestKitLocalEnvironmentData(jira);
-        return new ExtendedBackdoor(testKitLocalEnvironmentData);
     }
 
     public static Backdoor getBackdoor(JiraTestedProduct jira) {
