@@ -106,6 +106,7 @@
 	<component key="projectInfoService" class="com.atlassian.cpji.components.ProjectInfoService"/>
 	<component key="inputParametersService" class="com.atlassian.cpji.components.InputParametersService"/>
 	<component key="copyIssueBeanFactory" class="com.atlassian.cpji.components.CopyIssueBeanFactory"/>
+	<component key="fieldLayoutService" class="com.atlassian.cpji.components.FieldLayoutService"/>
 
 	<resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>
 

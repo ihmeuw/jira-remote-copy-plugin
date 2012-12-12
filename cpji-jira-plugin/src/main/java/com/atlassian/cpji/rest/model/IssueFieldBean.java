@@ -1,7 +1,12 @@
 package com.atlassian.cpji.rest.model;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Collection;
 
 /**
  * @since v3.0
@@ -31,5 +36,15 @@ public class IssueFieldBean {
 
 	public String getId() {
 		return id;
+	}
+
+	public static Predicate<IssueFieldBean> hasId(final Collection<String> ids) {
+		Preconditions.checkNotNull(ids);
+		return new Predicate<IssueFieldBean>() {
+			@Override
+			public boolean apply(@Nullable IssueFieldBean input) {
+				return input != null && ids.contains(input.getId());
+			}
+		};
 	}
 }

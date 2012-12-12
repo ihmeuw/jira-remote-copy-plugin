@@ -90,7 +90,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
         return IssueOperations.EDIT_ISSUE_OPERATION;
     }
 
-    protected Map getDisplayParameters()
+    public static Map getDisplayParameters()
     {
         Map displayParameters = new HashMap();
         displayParameters.put("theme", "aui");

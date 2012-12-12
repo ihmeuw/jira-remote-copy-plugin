@@ -1,7 +1,11 @@
 package com.atlassian.cpji.rest.model;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -44,5 +48,15 @@ public class IssueTypeBean
 
 	public void setRequiredFields(List<IssueFieldBean> requiredFields) {
 		this.requiredFields = Lists.newArrayList(requiredFields);
+	}
+	
+	public static Predicate<IssueTypeBean> hasName(final String name) {
+		Preconditions.checkNotNull(name);
+		return new Predicate<IssueTypeBean>() {
+			@Override
+			public boolean apply(@Nullable IssueTypeBean input) {
+				return input != null && StringUtils.equals(input.getName(), name);
+			}
+		};		
 	}
 }

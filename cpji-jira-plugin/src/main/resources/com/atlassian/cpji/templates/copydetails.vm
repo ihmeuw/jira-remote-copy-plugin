@@ -25,6 +25,14 @@
 						#end
 					</select>
 				</div>
+
+				<p>$i18n.getText("cpji.admin.default.values")</p>
+				<div id="cpji-required-fields">
+					<div id="cpji-fields">
+						#parse("/com/atlassian/cpji/templates/htmlfields.vm")
+					</div>
+					<input type="hidden" id="project-key" name="projectKey" name value="$action.getProjectKey()"/>
+				</div>
 			</fieldset>
 
 			<h2>$i18n.getText('cpji.remote.user')</h2>
