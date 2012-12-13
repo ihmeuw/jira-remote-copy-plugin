@@ -50,11 +50,17 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		} finally {
 			testkit3.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 		}
-
 	}
 
 	@Test def shouldDisplayIfUserHasNoPermissionToCreateIssueButApplicationLinkExists() {
-
+		try {
+			testkit1.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+			login(jira1)
+			val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
+			Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
+		} finally {
+			testkit1.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+		}
 	}
 
 	@Test def shouldShowAnErrorWhenUserHasNoPermissionToCreateIssuesInRemoteApplications() {
