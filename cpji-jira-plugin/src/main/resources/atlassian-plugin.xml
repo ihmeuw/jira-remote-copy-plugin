@@ -5,11 +5,9 @@
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
 	</plugin-info>
 
-	<web-item key="copy-issue" i18n-name-key="webfragments.view.issue.opsbar.operations.copy" name="Copy this issue"
-			  section="operations-operations" weight="140">
-		<label key="issue.operations.copy.to.other.instance"/>
-		<tooltip key="issue.operations.simple.copy"/>
-		<styleClass>issueaction-movie-issue</styleClass>
+	<web-item key="clone-issue-ric" i18n-name-key="webfragments.view.issue.opsbar.operations.ops.clone" name="Clone this issue" section="operations-operations" weight="20">
+        <label key="cloneissue.operation"/>
+        <tooltip key="admin.issue.operations.plugin.clone.issue.name"/>
 		<link linkId="copy-issue-to-other-instance">
 			/secure/SelectTargetProjectAction!default.jspa?id=${issueId}
 		</link>
@@ -133,8 +131,6 @@
 			<transformer key="lessTransformer"/>
 		</transformation>
 
-		<context>remote-issue-copy</context>
-
 		<dependency>jira.webresources:jira-fields</dependency>
 		<resource type="download" name="global.css" location="com/atlassian/cpji/css/global.less"/>
 	</web-resource>
@@ -148,6 +144,11 @@
 		<resource type="download" name="admin.js" location="com/atlassian/cpji/javascript/admin.js"/>
 		<resource type="download" name="admin.css" location="com/atlassian/cpji/css/admin.less"/>
 	</web-resource>
+
+    <web-resource key="issuepage">
+        <context>jira.view.issue</context>
+        <resource type="download" name="admin.js" location="com/atlassian/cpji/javascript/issuepage.js"/>
+    </web-resource>
 
     <web-resource key="selectTargetProjectAction">
 		<transformation extension="js">
