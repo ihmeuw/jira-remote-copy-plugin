@@ -143,13 +143,13 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction
         for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(localIssue.getId()))
         {
             final IssueLinkType type = inwardLink.getIssueLinkType();
-            remoteJira.copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId,  type, JiraProxy.LinkCreationDirection.INWARD, JiraProxy.LinkCreationDirection.OUTWARD);
+            remoteJira.copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId,  type, JiraProxy.LinkCreationDirection.OUTWARD, JiraProxy.LinkCreationDirection.INWARD);
         }
         for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(localIssue.getId()))
         {
 
             final IssueLinkType type = outwardLink.getIssueLinkType();
-            remoteJira.copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type, JiraProxy.LinkCreationDirection.OUTWARD, JiraProxy.LinkCreationDirection.INWARD);
+            remoteJira.copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type, JiraProxy.LinkCreationDirection.INWARD, JiraProxy.LinkCreationDirection.OUTWARD);
         }
     }
 
