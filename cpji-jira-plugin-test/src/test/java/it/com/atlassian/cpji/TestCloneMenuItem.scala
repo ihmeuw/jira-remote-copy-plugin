@@ -4,6 +4,8 @@ import org.junit.{Test, Before}
 import org.junit.Assert._
 import org.openqa.selenium.{WebElement, By}
 import org.hamcrest.collection.IsIterableWithSize
+import com.atlassian.cpji.tests.pageobjects.{ExtendedViewIssuePage, IssueActionsFragment}
+import com.atlassian.pageobjects.elements.query.Poller
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -23,9 +25,8 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 	val testkit2 = AbstractCopyIssueTest.testkit2
 
 	@Test def shouldNotDisplayLinkIfUserIsNotLoggedIn() {
-		viewIssue(jira1, "AN-1")
-		assertThat(jira1.getTester.getDriver.findElements(By.id(new RemoteCopyOperation().id)),
-			IsIterableWithSize.iterableWithSize[WebElement](0))
+		val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "AN-1")
+		Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
 	}
 
 	@Test def shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks() {
