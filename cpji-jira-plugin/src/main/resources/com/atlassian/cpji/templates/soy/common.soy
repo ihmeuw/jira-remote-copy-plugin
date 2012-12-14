@@ -1,0 +1,40 @@
+{namespace RIC.Templates}
+
+/**
+* Warning message
+* @param msg
+* @param? closeable
+* @param? title
+* @param? id
+*/
+{template .warningMsg}
+	{call .genericMsg}
+		{param msg: $msg /}
+		{param type: 'warning' /}
+		{param closeable: $closeable /}
+		{param title: $title /}
+		{param id: $id /}
+	{/call}
+{/template}
+
+/**
+* Warning message
+* @param msg
+* @param type
+* @param? closeable
+* @param? title
+* @param? id
+*/
+{template .genericMsg}
+<div class="aui-message {$type} {if $closeable}closeable{/if}" {if $id}id="{$id}"{/if}>
+	{if $title}
+	<p class="title"><span class="aui-icon icon-{$type}"></span><strong>{$title}</strong></p>
+	{else}
+    <span class="aui-icon icon-{$type}"></span>
+    {/if}
+    {$msg|noAutoescape}
+    {if $closeable}
+        <span class="aui-icon icon-close"></span>
+    {/if}
+</div>
+{/template}

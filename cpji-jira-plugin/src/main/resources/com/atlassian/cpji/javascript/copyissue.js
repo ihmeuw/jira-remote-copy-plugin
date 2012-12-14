@@ -67,7 +67,8 @@ AJS.$(function ($) {
                     copyIssue.toggleLoadingState(false);
                     copyIssue.prepareSelect();
                 } else {
-                    copyIssue.settings.container.append(RIC.Templates.warningMsg({closeable: false, msg: AJS.I18n.getText("cpji.you.dont.have.create.issue.permission.for.any.project")}));
+                    copyIssue.settings.container.append(RIC.Templates.warningMsg({id: "userCantCreateIssues",
+						msg: AJS.I18n.getText("cpji.you.dont.have.create.issue.permission.for.any.project")}));
                     copyIssue.onValueUnselected();
                     copyIssue.settings.loader.toggleClass("hidden", true);
                     copyIssue.settings.projectsSelect.toggleClass("hidden", true);

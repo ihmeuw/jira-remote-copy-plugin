@@ -162,6 +162,7 @@
 		<dependency>com.atlassian.cpji.cpji-jira-plugin:global</dependency>
 
         <resource type="download" name="copyissue.js" location="com/atlassian/cpji/javascript/copyissue.js"/>
+		<resource type="download" name="common.js" location="com/atlassian/cpji/templates/soy/common.soy"/>
 		<resource type="download" name="selectTargetProject.js" location="com/atlassian/cpji/templates/soy/selectTargetProject.soy"/>
     </web-resource>
 

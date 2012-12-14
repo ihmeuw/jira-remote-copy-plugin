@@ -77,6 +77,8 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 
 	@Test def shouldShowAnErrorWhenUserHasNoPermissionToCreateIssuesInRemoteApplications() {
 		try {
+			testkit1.permissionSchemes().removeProjectRolePermission(10001, Permissions.CREATE_ISSUE, 10000)
+
 			try {
 				testkit1.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 
@@ -87,7 +89,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 					Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
 					issuePage.invokeRIC()
 					val selectTargetPage = jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], java.lang.Long.valueOf(10000L))
-					selectTargetPage.waitForDestinationProjectField()
+					selectTargetPage.getTargetEntitySingleSelect()
 				} finally {
 					testkit2.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 				}

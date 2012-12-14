@@ -6,6 +6,7 @@ import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
+import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import com.google.common.base.Preconditions;
@@ -27,15 +28,18 @@ public class SelectTargetProjectPage extends AbstractJiraPage
     private final String url;
 
     @ElementBy(className = "submit")
-    private PageElement nextButton;
+    protected PageElement nextButton;
 
 	@ElementBy(id = "targetEntityLink-container")
-	private PageElement targetEntityLinkContainer;
+	protected PageElement targetEntityLinkContainer;
 
     @ElementBy(className = "warning", within = "targetEntityLinkContainer")
-    private PageElement targetEntityErrorMessage;
-    
-    private SingleSelect entitySelection;
+	protected PageElement targetEntityErrorMessage;
+
+	@ElementBy (id = "targetEntityLink-single-select", timeoutType = TimeoutType.SLOW_PAGE_LOAD)
+	protected PageElement targetEntitySingleSelect;
+
+	private SingleSelect entitySelection;
 
     public SelectTargetProjectPage(final Long issueId)
     {
@@ -50,16 +54,16 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	}
 
 	public SelectTargetProjectPage setDestinationProject(@Nonnull String name) {
-        waitForDestinationProjectField();
+        Poller.waitUntilTrue(getTargetEntitySingleSelect().timed().isPresent());
         if(entitySelection.type(name).isSuggestionsOpen().by(5)) {
 			entitySelection.clickSuggestion();
 		}
 		return this;
 	}
 
-    public void waitForDestinationProjectField()
+    public PageElement getTargetEntitySingleSelect()
     {
-        elementFinder.find(By.id("targetEntityLink-single-select"), TimeoutType.SLOW_PAGE_LOAD).timed().isPresent().byDefaultTimeout();
+        return targetEntitySingleSelect;
     }
 
     @Override
@@ -77,7 +81,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 
 	public boolean hasOAuthApproval(String applicationId) {
 		Preconditions.checkNotNull(applicationId);
-		waitForDestinationProjectField();
+		Poller.waitUntilTrue(getTargetEntitySingleSelect().timed().isPresent());
 		return !elementFinder.findAll(By.cssSelector(String.format("a[data-application-id=%s]", applicationId))).isEmpty();
 	}
 
@@ -91,7 +95,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 
     public CopyDetailsPage next()
     {
-        waitForDestinationProjectField();
+        Poller.waitUntilTrue(getTargetEntitySingleSelect().timed().isPresent());
         final String targetEntityLink = entitySelection.getValue();
         nextButton.click();
         return pageBinder.bind(CopyDetailsPage.class, issueId, targetEntityLink);
