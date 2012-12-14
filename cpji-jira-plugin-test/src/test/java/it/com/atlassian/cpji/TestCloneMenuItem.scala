@@ -12,6 +12,7 @@ import com.atlassian.jira.rest.client.domain.{IssueFieldId, Issue}
 import com.atlassian.jira.rest.client.domain.input.{ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.lang.String
+import BackdoorHelpers._
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -66,38 +67,31 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 
 	@Test def shouldDisplayIfUserHasNoPermissionToCreateIssueButApplicationLinkExists() {
 		try {
-			testkit1.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+			removeProjectRolePermission(testkit1, 0, Permissions.CREATE_ISSUE, 10000)
 			login(jira1)
 			val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
 			Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
 		} finally {
-			testkit1.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+			addProjectRolePermission(testkit1, 0, Permissions.CREATE_ISSUE, 10000)
 		}
 	}
 
 	@Test def shouldShowAnErrorWhenUserHasNoPermissionToCreateIssuesInRemoteApplications() {
 		try {
-			testkit1.permissionSchemes().removeProjectRolePermission(10001, Permissions.CREATE_ISSUE, 10000)
+			removeProjectRolePermission(testkit1, 10001, Permissions.CREATE_ISSUE, 10000)
+			removeProjectRolePermission(testkit1, 0, Permissions.CREATE_ISSUE, 10000)
+			removeProjectRolePermission(testkit2, 0, Permissions.CREATE_ISSUE, 10000)
 
-			try {
-				testkit1.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
-
-				try {
-					testkit2.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
-					login(jira1)
-					val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
-					Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
-					issuePage.invokeRIC()
-					val selectTargetPage = jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], java.lang.Long.valueOf(10000L))
-					selectTargetPage.getTargetEntitySingleSelect()
-				} finally {
-					testkit2.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
-				}
-			} finally {
-				testkit1.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
-			}
+			login(jira1)
+			val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
+			Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
+			issuePage.invokeRIC()
+			val selectTargetProjectPage = jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], java.lang.Long.valueOf(10000L))
+			Poller.waitUntilTrue(selectTargetProjectPage.getTargetEntityWarningMessage.timed().isPresent)
 		} finally {
-			testkit1.permissionSchemes().addProjectRolePermission(10001, Permissions.CREATE_ISSUE, 10000)
+			addProjectRolePermission(testkit2, 0, Permissions.CREATE_ISSUE, 10000)
+			addProjectRolePermission(testkit1, 0, Permissions.CREATE_ISSUE, 10000)
+			addProjectRolePermission(testkit1, 10001, Permissions.CREATE_ISSUE, 10000)
 		}
 	}
 

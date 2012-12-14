@@ -67,7 +67,7 @@ AJS.$(function ($) {
                     copyIssue.toggleLoadingState(false);
                     copyIssue.prepareSelect();
                 } else {
-                    copyIssue.settings.container.append(RIC.Templates.warningMsg({id: "userCantCreateIssues",
+                    copyIssue.settings.container.find(".field-value").css("width", "100%").append(RIC.Templates.errorMsg({id: "noDestinationProjectError",
 						msg: AJS.I18n.getText("cpji.you.dont.have.create.issue.permission.for.any.project")}));
                     copyIssue.onValueUnselected();
                     copyIssue.settings.loader.toggleClass("hidden", true);
@@ -75,12 +75,12 @@ AJS.$(function ($) {
                 }
             }
 
-            if (data.failures && Object.keys(data.failures).length > 0) {
-                copyIssue.settings.container.append(AJS.$("<div class='description'></div>")
-                    .append(RIC.Templates.remoteDestinationsNotAvailable(data.failures)));
+            if (data.failures) {
+				var errors =  RIC.Templates.remoteDestinationsNotAvailable(data.failures);
+				if (errors.trim() != "") {
+                	copyIssue.settings.container.append(AJS.$("<div class='description'></div>").append(errors));
+				}
             }
-
-
         },
 
         prepareSelect: function () {
@@ -121,6 +121,6 @@ AJS.$(function ($) {
         projectsSelect: $("#targetEntityLink"),
         loader: $("#targetEntityLinkLoader"),
         submitButton: $("#select-project-submit"),
-        defaultProject: $("#cpji-current-project-key").text()
+        defaultProject: $("#targetEntityLink-container").data("selected-project-key")
     });
 });

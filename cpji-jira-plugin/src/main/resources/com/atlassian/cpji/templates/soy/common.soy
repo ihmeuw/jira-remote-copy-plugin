@@ -18,6 +18,23 @@
 {/template}
 
 /**
+* Error message
+* @param msg
+* @param? closeable
+* @param? title
+* @param? id
+*/
+{template .errorMsg}
+	{call .genericMsg}
+		{param msg: $msg /}
+		{param type: 'error' /}
+		{param closeable: $closeable /}
+		{param title: $title /}
+		{param id: $id /}
+	{/call}
+{/template}
+
+/**
 * Warning message
 * @param msg
 * @param type

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from subprocess import Popen
+from subprocess import Popen, call
 
 Popen(["atlas-mvn", "-o", 
 	"com.atlassian.maven.plugins:maven-jira-plugin:copy-bundled-dependencies",
@@ -12,11 +12,7 @@ Popen(["atlas-mvn", "-o",
 	"com.atlassian.maven.plugins:maven-jira-plugin:jar",
 	"org.apache.maven.plugins:maven-install-plugin:install"]).wait()
 
-processes = []
 for p in range(1, 4):
-	processes.append(Popen(["atlas-mvn", "-o", "-q",
+	call(["atlas-mvn", "-o", "-q",
 		"com.atlassian.maven.plugins:maven-jira-plugin:install",
-		"-Pjira" + str(p)]))
-
-for process in processes:
-	process.wait()
+		"-Pjira" + str(p)])

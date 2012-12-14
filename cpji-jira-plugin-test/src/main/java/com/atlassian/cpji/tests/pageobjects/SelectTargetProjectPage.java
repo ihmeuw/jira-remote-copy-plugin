@@ -101,8 +101,8 @@ public class SelectTargetProjectPage extends AbstractJiraPage
         return pageBinder.bind(CopyDetailsPage.class, issueId, targetEntityLink);
     }
 
-    public String getTargetEntityWarningMessage(){
-        return targetEntityErrorMessage.timed().getText().byDefaultTimeout();
+    public PageElement getTargetEntityWarningMessage() {
+        return targetEntityErrorMessage;
     }
 
 	@Nonnull

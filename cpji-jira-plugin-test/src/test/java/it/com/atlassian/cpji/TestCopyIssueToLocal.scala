@@ -12,6 +12,7 @@ import com.atlassian.jira.webtests.Permissions
 import org.hamcrest.Matchers
 import java.io.ByteArrayInputStream
 import scala.collection.JavaConverters._
+import com.atlassian.pageobjects.elements.query.Poller
 
 class TestCopyIssueToLocal extends AbstractCopyIssueTest {
 
@@ -107,8 +108,9 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
       viewIssue(AbstractCopyIssueTest.jira3, issue.getKey)
 
       val selectTargetProjectPage = AbstractCopyIssueTest.jira3.visit(classOf[SelectTargetProjectPage], issue.getId)
-      assertThat(selectTargetProjectPage.getTargetEntityWarningMessage, Matchers.startsWith("You can't clone issue"))
 
+	  Poller.waitUntilTrue(selectTargetProjectPage.getTargetEntityWarningMessage.timed().isPresent)
+      assertThat(selectTargetProjectPage.getTargetEntityWarningMessage.getText, Matchers.startsWith("You can't clone issue"))
     } finally {
       AbstractCopyIssueTest.testkit3.permissionSchemes().addProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
     }
