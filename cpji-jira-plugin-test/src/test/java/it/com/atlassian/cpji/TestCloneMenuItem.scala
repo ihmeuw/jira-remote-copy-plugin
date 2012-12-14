@@ -76,7 +76,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 	}
 
 	@Test def shouldShowAnErrorWhenUserHasNoPermissionToCreateIssuesInRemoteApplications() {
-
+		try {
 			try {
 				testkit1.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 
