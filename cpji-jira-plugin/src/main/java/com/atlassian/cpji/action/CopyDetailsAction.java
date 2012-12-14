@@ -246,7 +246,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	}
 
 	public String getCopyIssueLinksErrorMessage() {
-		if (!copyInfo.getAttachmentsEnabled()) {
+		if (!copyInfo.getIssueLinkingEnabled()) {
 			return getText("cpji.remote.issue.linking.is.disabled");
 		}
 		return "";
