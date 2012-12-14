@@ -131,6 +131,8 @@
 			<transformer key="lessTransformer"/>
 		</transformation>
 
+		<context>com.atlassian.cpji.cpji-jira-plugin.copy-context</context>
+
 		<dependency>jira.webresources:jira-fields</dependency>
 		<resource type="download" name="global.css" location="com/atlassian/cpji/css/global.less"/>
 	</web-resource>

@@ -55,7 +55,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 		this.applicationLinkService = applicationLinkService;
 		this.jiraProxyFactory = jiraProxyFactory;
 
-		webResourceManager.requireResourcesForContext("remote-issue-copy");
+		webResourceManager.requireResourcesForContext("com.atlassian.cpji.cpji-jira-plugin.copy-context");
 	}
 
 	public SelectedProject getSelectedDestinationProject() {
