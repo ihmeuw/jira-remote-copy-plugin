@@ -26,19 +26,6 @@ public class TestAllowedGroups extends AbstractCopyIssueTest {
 		login(jira1);
 	}
 
-
-    @Test
-    public void whenPluginIsInstalledCloneIssueActionShouldBeRemovedAndOurShouldExist() {
-        ConfigureCopyIssuesAdminActionPage adminPage = jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "TST");
-        assertThat(adminPage.getAllowedGroups(), IsIterableWithSize.<String>iterableWithSize(0));
-
-        final ExtendedViewIssuePage viewIssue = AbstractCopyIssueTest.jira1.visit(ExtendedViewIssuePage.class, "TST-1");
-        Poller.waitUntilFalse(viewIssue.getIssueActionsFragment().hasDefaultCloneAction());
-        Poller.waitUntilTrue(viewIssue.getIssueActionsFragment().hasRICCloneAction());
-
-    }
-
-
     @Test
 	public void allowedGroupsAreRemembered() {
 		jira1.visit(ConfigureCopyIssuesAdminActionPage.class, "TST").setAllowedGroups(ImmutableList.of("jira-administrators")).submit();

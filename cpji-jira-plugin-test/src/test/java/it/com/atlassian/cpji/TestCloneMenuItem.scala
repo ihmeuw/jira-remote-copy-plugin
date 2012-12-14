@@ -4,13 +4,14 @@ import org.junit.{Rule, Test, Before}
 import org.junit.Assert._
 import org.openqa.selenium.{WebElement, By}
 import org.hamcrest.collection.IsIterableWithSize
-import com.atlassian.cpji.tests.pageobjects.{ExtendedViewIssuePage, IssueActionsFragment}
+import com.atlassian.cpji.tests.pageobjects.{ConfigureCopyIssuesAdminActionPage, ExtendedViewIssuePage, IssueActionsFragment}
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.jira.security.Permissions
 import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.rest.client.domain.{IssueFieldId, Issue}
 import com.atlassian.jira.rest.client.domain.input.{ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
+import java.lang.String
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -31,6 +32,16 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 	val jira3 = AbstractCopyIssueTest.jira3
 	val testkit1 = AbstractCopyIssueTest.testkit1
 	val testkit3 = AbstractCopyIssueTest.testkit3
+
+	@Test def sholudNotDisplayDefaultCloneActionWhenPluginIsInstalled {
+		login(jira1)
+		val adminPage: ConfigureCopyIssuesAdminActionPage = jira1.visit(classOf[ConfigureCopyIssuesAdminActionPage], "TST")
+		assertThat(adminPage.getAllowedGroups, IsIterableWithSize.iterableWithSize[String](0))
+		val viewIssue: ExtendedViewIssuePage = AbstractCopyIssueTest.jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
+		Poller.waitUntilFalse(viewIssue.getIssueActionsFragment.hasDefaultCloneAction)
+		Poller.waitUntilTrue(viewIssue.getIssueActionsFragment.hasRICCloneAction)
+	}
+
 
 	@Test def shouldNotDisplayLinkIfUserIsNotLoggedIn() {
 		val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "AN-1")
