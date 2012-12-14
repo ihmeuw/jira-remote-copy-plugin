@@ -4,7 +4,7 @@ import org.junit.{Rule, Test, Before}
 import org.junit.Assert._
 import org.openqa.selenium.{WebElement, By}
 import org.hamcrest.collection.IsIterableWithSize
-import com.atlassian.cpji.tests.pageobjects.{ConfigureCopyIssuesAdminActionPage, ExtendedViewIssuePage, IssueActionsFragment}
+import com.atlassian.cpji.tests.pageobjects.{SelectTargetProjectPage, ConfigureCopyIssuesAdminActionPage, ExtendedViewIssuePage, IssueActionsFragment}
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.jira.security.Permissions
 import com.atlassian.cpji.tests.rules.CreateIssues
@@ -31,6 +31,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 	val jira1 = AbstractCopyIssueTest.jira1
 	val jira3 = AbstractCopyIssueTest.jira3
 	val testkit1 = AbstractCopyIssueTest.testkit1
+	val testkit2 = AbstractCopyIssueTest.testkit2
 	val testkit3 = AbstractCopyIssueTest.testkit3
 
 	@Test def sholudNotDisplayDefaultCloneActionWhenPluginIsInstalled {
@@ -76,6 +77,26 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 
 	@Test def shouldShowAnErrorWhenUserHasNoPermissionToCreateIssuesInRemoteApplications() {
 
+			try {
+				testkit1.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+
+				try {
+					testkit2.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+					login(jira1)
+					val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
+					Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
+					issuePage.invokeRIC()
+					val selectTargetPage = jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], java.lang.Long.valueOf(10000L))
+					selectTargetPage.waitForDestinationProjectField()
+				} finally {
+					testkit2.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+				}
+			} finally {
+				testkit1.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+			}
+		} finally {
+			testkit1.permissionSchemes().addProjectRolePermission(10001, Permissions.CREATE_ISSUE, 10000)
+		}
 	}
 
 }
