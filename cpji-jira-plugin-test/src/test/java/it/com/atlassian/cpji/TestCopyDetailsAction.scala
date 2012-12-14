@@ -6,19 +6,13 @@ import com.atlassian.jira.rest.client.domain._
 import com.atlassian.jira.rest.client.domain.input.{LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import org.joda.time.DateTime
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstancePage, CopyDetailsPage, Options}
+import com.atlassian.cpji.tests.pageobjects.Options
 import org.junit.Assert._
 import java.io.ByteArrayInputStream
 import org.hamcrest.core.IsCollectionContaining
 import com.google.common.collect.Collections2
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.cpji.CopyIssueProcess
-import it.com.atlassian.cpji.BackdoorHelpers._
-import com.atlassian.jira.security.Permissions
-import org.hamcrest.collection.IsIterableWithSize
-import org.json.JSONArray
-import com.atlassian.cpji.tests.RawRestUtil._
-import org.hamcrest.{Matcher, Matchers}
 import org.hamcrest.Matchers.containsString
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
@@ -104,8 +98,8 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 
 			Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 			Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed.isEnabled)
-			Poller.waitUntil(copyDetailsPage.getCopyIssueLinksGroup.timed().getText,
-				containsString("Copy Issue Link section should be visible when remote JIRA has link disabled (so we can show the meaningful message)"))
+			Poller.waitUntilTrue("Copy Issue Link section should be visible when remote JIRA has link disabled (so we can show the meaningful message)",
+				copyDetailsPage.getCopyIssueLinksGroup.timed().isVisible)
 			Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed.isEnabled)
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 			Poller.waitUntilTrue(copyDetailsPage.getCreateIssueLinks.timed.isPresent)

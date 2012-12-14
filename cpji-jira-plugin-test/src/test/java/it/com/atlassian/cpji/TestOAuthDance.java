@@ -9,6 +9,8 @@ import com.atlassian.pageobjects.binder.PageBindingWaitException;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.UnhandledAlertException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertFalse;
 
@@ -16,6 +18,7 @@ import static org.junit.Assert.assertFalse;
  * @since v3.0
  */
 public class TestOAuthDance extends AbstractCopyIssueTest {
+	private static final Logger logger = LoggerFactory.getLogger(TestOAuthDance.class);
 
 	@Before
 	public void setup() {
@@ -65,7 +68,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 			try {
 				jira1.visit(ListApplicationLinksPage.class).clickDelete("http://localhost:2992/jira").delete().deleteAndReturn();
 			} catch (Exception e) {
-//				ignore it here, don't want hide the original exception
+				logger.error("Unable to delete Application Link", e);
 			}
 		}
 	}
