@@ -82,9 +82,9 @@
 			<artifactId>js</artifactId>
 		</dependency>
         <dependency>
-            <groupId>com.atlassian.aui</groupId>
-            <artifactId>aui-qunit-util</artifactId>
-            <version>0.20</version>
+            <groupId>com.atlassian.qunit</groupId>
+            <artifactId>atlassian-qunit-plugin-util</artifactId>
+            <version>${atlassian.qunit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -166,9 +166,9 @@
 									<version>${jira.version}</version>
 								</pluginArtifact>
                                 <pluginArtifact>
-                                    <groupId>com.atlassian.aui</groupId>
-                                    <artifactId>aui-qunit-plugin</artifactId>
-                                    <version>${aui.qunit.version}</version>
+                                    <groupId>com.atlassian.qunit</groupId>
+                                    <artifactId>atlassian-qunit-plugin</artifactId>
+                                    <version>${atlassian.qunit.version}</version>
                                 </pluginArtifact>
                             </pluginArtifacts>
                         </product>
@@ -196,9 +196,9 @@
 									<version>${jira.version}</version>
 								</pluginArtifact>
                                 <pluginArtifact>
-                                    <groupId>com.atlassian.aui</groupId>
-                                    <artifactId>aui-qunit-plugin</artifactId>
-                                    <version>${aui.qunit.version}</version>
+                                    <groupId>com.atlassian.qunit</groupId>
+                                    <artifactId>atlassian-qunit-plugin</artifactId>
+                                    <version>${atlassian.qunit.version}</version>
                                 </pluginArtifact>
                             </pluginArtifacts>
                         </product>
@@ -227,9 +227,9 @@
 									<version>${jira.version}</version>
 								</pluginArtifact>
 								<pluginArtifact>
-									<groupId>com.atlassian.aui</groupId>
-									<artifactId>aui-qunit-plugin</artifactId>
-									<version>${aui.qunit.version}</version>
+                                    <groupId>com.atlassian.qunit</groupId>
+                                    <artifactId>atlassian-qunit-plugin</artifactId>
+                                    <version>${atlassian.qunit.version}</version>
 								</pluginArtifact>
 							</pluginArtifacts>
 						</product>

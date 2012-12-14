@@ -5,13 +5,7 @@
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
 	</plugin-info>
 
-
     <resource type="qunit" name="js/admin-tests.js" location="js/admin-tests.js"/>
     <resource type="qunit" name="js/copyissue-tests.js" location="js/copyissue-tests.js"/>
-
-    <web-resource key="ajs-test-walkaround">
-        <resource type="download" name="ajstest.js" location="js/qunit-result-collector.js"/>
-    </web-resource>
-
 
 </atlassian-plugin>

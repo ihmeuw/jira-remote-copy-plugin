@@ -1,7 +1,6 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.aui.test.runner.QUnitPageObjectsHelper;
-import com.atlassian.cpji.TemporaryQunitPageObjectsHelper;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.tests.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
@@ -27,7 +26,7 @@ public class TestQunit {
 
     @Test
     public void runJustOurTest() throws Exception {
-        QUnitPageObjectsHelper helper = new TemporaryQunitPageObjectsHelper(outdir, jira1.getPageBinder());
-        helper.runTests(TemporaryQunitPageObjectsHelper.suiteNameContains("cpji-jira-plugin"));
+        QUnitPageObjectsHelper helper = new QUnitPageObjectsHelper(outdir, jira1.getPageBinder());
+        helper.runTests(QUnitPageObjectsHelper.suiteNameContains("cpji-jira-plugin"));
     }
 }
