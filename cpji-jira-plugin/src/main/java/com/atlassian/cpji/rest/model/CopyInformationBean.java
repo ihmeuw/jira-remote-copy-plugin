@@ -11,81 +11,83 @@ import java.util.List;
  * @since v1.0
  */
 @XmlRootElement(name = "copyInformation")
-@JsonIgnoreProperties (ignoreUnknown = true)
-public class CopyInformationBean
-{
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CopyInformationBean {
 	@XmlElement
-    private List<IssueTypeBean> issueTypes;
+	private List<IssueTypeBean> issueTypes;
 
 	@XmlElement
-    private boolean attachmentsEnabled;
+	private boolean attachmentsEnabled;
+
+	@XmlElement
+	private boolean hasCreateCommentPermission;
 
 	@XmlElement
 	private boolean issueLinkingEnabled;
 
 	@XmlElement
-    private boolean hasCreateAttachmentPermission;
+	private boolean hasCreateAttachmentPermission;
 
 	@XmlElement
-    private UserBean user;
+	private UserBean user;
 
 	@XmlElement
-    private boolean hasCreateIssuePermission;
+	private boolean hasCreateIssuePermission;
 
 	@XmlElement
-    private String jiraVersion;
+	private boolean hasCreateLinksPermission;
+
+	@XmlElement
+	private String jiraVersion;
 
 	// for testing
 	public CopyInformationBean() {
 	}
 
-    public CopyInformationBean(
-                    final Iterable<IssueTypeBean> issueTypes,
-                    final boolean attachmentsEnabled,
-					final boolean issueLinkingEnabled,
-                    final UserBean user,
-                    final boolean hasCreateIssuePermission,
-                    final boolean hasCreateAttachmentPermission,
-                    final String jiraVersion)
-    {
-        this.issueTypes = Lists.newArrayList(issueTypes);
-        this.attachmentsEnabled = attachmentsEnabled;
+	public CopyInformationBean(
+			final Iterable<IssueTypeBean> issueTypes,
+			final boolean attachmentsEnabled,
+			final boolean issueLinkingEnabled,
+			final UserBean user,
+			final boolean hasCreateIssuePermission,
+			final boolean hasCreateAttachmentPermission,
+			final boolean hasCreateCommentPermission,
+			final boolean hasCreateLinksPermission,
+			final String jiraVersion) {
+		this.hasCreateCommentPermission = hasCreateCommentPermission;
+		this.hasCreateLinksPermission = hasCreateLinksPermission;
+		this.issueTypes = Lists.newArrayList(issueTypes);
+		this.attachmentsEnabled = attachmentsEnabled;
 		this.issueLinkingEnabled = issueLinkingEnabled;
-        this.user = user;
-        this.hasCreateIssuePermission = hasCreateIssuePermission;
-        this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
-        this.jiraVersion = jiraVersion;
-    }
+		this.user = user;
+		this.hasCreateIssuePermission = hasCreateIssuePermission;
+		this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
+		this.jiraVersion = jiraVersion;
+	}
 
-    public List<IssueTypeBean> getIssueTypes()
-    {
-        return issueTypes;
-    }
+	public List<IssueTypeBean> getIssueTypes() {
+		return issueTypes;
+	}
 
-    public boolean getAttachmentsEnabled()
-    {
-        return attachmentsEnabled;
-    }
+	public boolean getAttachmentsEnabled() {
+		return attachmentsEnabled;
+	}
 
-    public UserBean getRemoteUser()
-    {
-        return user;
-    }
+	public UserBean getRemoteUser() {
+		return user;
+	}
 
-    public boolean getHasCreateIssuePermission()
-    {
-        return hasCreateIssuePermission;
-    }
+	public boolean getHasCreateIssuePermission() {
+		return hasCreateIssuePermission;
+	}
 
-    public boolean getHasCreateAttachmentPermission()
-    {
-        return hasCreateAttachmentPermission;
-    }
+	public boolean getHasCreateAttachmentPermission() {
+		return hasCreateAttachmentPermission;
+	}
 
-    public String getJiraVersion()
-    {
-        return jiraVersion;
-    }
+	public String getJiraVersion() {
+		return jiraVersion;
+	}
 
 	public boolean getIssueLinkingEnabled() {
 		return issueLinkingEnabled;
@@ -117,5 +119,21 @@ public class CopyInformationBean
 
 	public void setJiraVersion(String jiraVersion) {
 		this.jiraVersion = jiraVersion;
+	}
+
+	public boolean getHasCreateCommentPermission() {
+		return hasCreateCommentPermission;
+	}
+
+	public void setHasCreateCommentPermission(boolean hasCreateCommentPermission) {
+		this.hasCreateCommentPermission = hasCreateCommentPermission;
+	}
+
+	public boolean getHasCreateLinksPermission() {
+		return hasCreateLinksPermission;
+	}
+
+	public void setHasCreateLinksPermission(boolean hasCreateLinksPermission) {
+		this.hasCreateLinksPermission = hasCreateLinksPermission;
 	}
 }

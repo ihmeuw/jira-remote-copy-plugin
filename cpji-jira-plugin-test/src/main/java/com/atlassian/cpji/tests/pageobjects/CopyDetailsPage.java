@@ -28,17 +28,35 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy(id = "create-issue-links-group")
 	PageElement createIssueLinkGroup;
 
+	@ElementBy (id = "copy-comments")
+	CheckboxElement copyComments;
+
+	@ElementBy (id = "copy-comments-group")
+	PageElement copyCommentsGroup;
+
+	@ElementBy (className = "notice", within = "copyCommentsGroup")
+	PageElement copyCommentsNotice;
+
 	@ElementBy (id = "remoteIssueLink")
 	SelectElement remoteIssueLink;
-
-	@ElementBy (id = "copy-attachments")
-	CheckboxElement copyAttachments;
 
 	@ElementBy (id = "copy-issue-links")
 	CheckboxElement copyIssueLinks;
 
-	@ElementBy (id = "copy-comments")
-	CheckboxElement copyComments;
+	@ElementBy (id = "copy-issue-links-group")
+	PageElement copyIssueLinksGroup;
+
+	@ElementBy (className = "notice", within = "copyIssueLinksGroup")
+	PageElement copyIssueLinksNotice;
+
+	@ElementBy (id = "copy-attachments")
+	CheckboxElement copyAttachments;
+
+	@ElementBy (id = "copy-attachments-group")
+	PageElement copyAttachmentsGroup;
+
+	@ElementBy (className = "notice", within = "copyAttachmentsGroup")
+	PageElement copyAttachmentsNotice;
 
     public CopyDetailsPage(final Long issueId, final String targetEntityLink)
     {
@@ -68,16 +86,16 @@ public class CopyDetailsPage extends AbstractJiraPage
 		return createIssueLinkGroup.timed().isVisible().now();
 	}
 
-	public boolean isCopyCommentsGroupVisible() {
-		return elementFinder.find(By.id("copy-comments-group")).timed().isVisible().now();
+	public PageElement getCopyCommentsGroup() {
+		return copyCommentsGroup;
 	}
 
-	public boolean isCopyIssueLinksGroupVisible() {
-		return elementFinder.find(By.id("copy-issue-links-group")).timed().isVisible().now();
+	public PageElement getCopyIssueLinksGroup() {
+		return copyIssueLinksGroup;
 	}
 
-	public boolean isCopyAttachmentsGroupVisible() {
-		return elementFinder.find(By.id("copy-attachments-group")).timed().isVisible().now();
+	public PageElement getCopyAttachmentsGroup() {
+		return copyAttachmentsGroup;
 	}
 
 	public SelectElement getCreateIssueLinks() {
@@ -96,4 +114,15 @@ public class CopyDetailsPage extends AbstractJiraPage
 		return copyComments;
 	}
 
+	public PageElement getCopyCommentsNotice() {
+		return copyCommentsNotice;
+	}
+
+	public PageElement getCopyIssueLinksNotice() {
+		return copyIssueLinksNotice;
+	}
+
+	public PageElement getCopyAttachmentsNotice() {
+		return copyAttachmentsNotice;
+	}
 }

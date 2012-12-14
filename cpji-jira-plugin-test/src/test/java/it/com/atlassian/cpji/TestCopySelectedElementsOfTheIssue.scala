@@ -14,6 +14,8 @@ import org.hamcrest.collection.IsIterableWithSize
 import com.atlassian.cpji.tests.RawRestUtil._
 import org.json.JSONArray
 import com.atlassian.cpji.CopyIssueProcess
+import it.com.atlassian.cpji.BackdoorHelpers._
+import com.atlassian.jira.security.Permissions
 
 class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 
@@ -50,7 +52,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
   @Test def testNotCopyingComments() {
 		val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
-		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyComments.uncheck()
 
@@ -67,9 +69,9 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 	}
 
 	@Test def testNotCopyingAttachments() {
-    val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
+    	val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
-		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyAttachments.uncheck()
 
@@ -88,7 +90,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 	@Test def testNotCopyingLinks() {
     val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
-		assertTrue(copyDetailsPage.isCopyAttachmentsGroupVisible)
+		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyIssueLinks.uncheck()
 
@@ -103,4 +105,5 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		val remoteLinks: JSONArray = getIssueRemoteLinksJson(AbstractCopyIssueTest.jira2, issueRest.getKey)
 		assertEquals(1, remoteLinks.length())
 	}
+
 }

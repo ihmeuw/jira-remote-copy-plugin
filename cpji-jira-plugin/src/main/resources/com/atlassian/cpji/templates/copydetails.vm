@@ -44,10 +44,14 @@
 			<fieldset>
 				#if ($action.copyCommentsSectionVisible)
 				<div class="field-group" id="copy-comments-group">
-					<span class="field-value">
-						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" checked="checked"/>
+					#set ($error = $action.copyCommentsErrorMessage)
+					<span class="field-value #if ($error != "") disabled #end">
+						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
 					</span>
+					#if ($error)
+						<div class="notice">$error</div>
+					#end
 				</div>
 				#end
 
@@ -59,7 +63,7 @@
 						<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 					</span>
 					#if ($error)
-						<div>$error</div>
+						<div class="notice">$error</div>
 					#end
 				</div>
 				#end
@@ -72,7 +76,7 @@
 						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
 					</span>
 					#if ($error)
-						<div>$error</div>
+						<div class="notice">$error</div>
 					#end
 				</div>
 				#end

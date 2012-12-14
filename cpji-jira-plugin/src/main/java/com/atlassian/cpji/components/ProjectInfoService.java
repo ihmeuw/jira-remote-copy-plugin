@@ -66,19 +66,23 @@ public class ProjectInfoService {
         final UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
         final boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
+		final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
+		final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
 
         if (hasCreateIssuePermission) {
             CopyInformationBean copyInformationBean = new CopyInformationBean(getIssueTypes(project),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
 					userBean,
-					hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
+					hasCreateIssuePermission, hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
+					buildUtilsInfo.getVersion());
             return copyInformationBean;
         } else {
             CopyInformationBean copyInformationBean = new CopyInformationBean(null,
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING), userBean,
-					hasCreateIssuePermission, hasCreateAttachmentPermission, buildUtilsInfo.getVersion());
+					hasCreateIssuePermission, hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
+					buildUtilsInfo.getVersion());
             return copyInformationBean;
         }
     }

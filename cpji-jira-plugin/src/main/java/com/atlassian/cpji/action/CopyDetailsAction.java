@@ -199,7 +199,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		if (linksEnabled() && copyInfo.getIssueLinkingEnabled()) {
 			issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
 		}
-		if (copyInfo.getIssueLinkingEnabled()) {
+		if (copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {
 			issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
 		}
 		if (linksEnabled()) {
@@ -248,6 +248,15 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	public String getCopyIssueLinksErrorMessage() {
 		if (!copyInfo.getIssueLinkingEnabled()) {
 			return getText("cpji.remote.issue.linking.is.disabled");
+		} else if (!copyInfo.getHasCreateLinksPermission()) {
+			return getText("cpji.not.permitted.to.link.issues");
+		}
+		return "";
+	}
+
+	public String getCopyCommentsErrorMessage() {
+		if (!copyInfo.getHasCreateCommentPermission()) {
+			return getText("cpji.not.permitted.to.create.comments");
 		}
 		return "";
 	}
