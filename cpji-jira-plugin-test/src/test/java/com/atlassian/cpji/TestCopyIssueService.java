@@ -125,6 +125,10 @@ public class TestCopyIssueService {
         assertEquals(ISSUE_ID, result.getIssueId());
     }
 
+	/**
+	 * This test produces log entry for 2012-12-14 13:46:12,850 main WARN [atlassian.cpji.components.CopyIssueService] Exception when creating field 'fieldId'
+	 * @throws Exception
+	 */
     @Test(expected = IssueCreatedWithErrorsException.class)
     public void copyIssueWithPostCreationErrors() throws Exception{
         CopyRequirements reqs = new CopyRequirements();
