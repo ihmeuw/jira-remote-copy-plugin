@@ -4,6 +4,7 @@ import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.PageElementFinder;
+import org.openqa.selenium.By;
 
 import javax.inject.Inject;
 
@@ -18,8 +19,10 @@ public class ExtendedViewIssuePage extends ViewIssuePage {
     @Inject
     protected PageElementFinder pageElementFinder;
 
-
+    @Inject
     protected IssueActionsFragment issueActionsFragment;
+
+
 
 
 
@@ -39,5 +42,10 @@ public class ExtendedViewIssuePage extends ViewIssuePage {
 
     public void invokeRIC(){
         getIssueMenu().invoke(issueActionsFragment.getRICOperation());
+    }
+
+    public IssueActionsDialog openDOTSection(){
+        pageElementFinder.find(By.tagName("body")).type(".");
+        return pageBinder.bind(IssueActionsDialog.class);
     }
 }
