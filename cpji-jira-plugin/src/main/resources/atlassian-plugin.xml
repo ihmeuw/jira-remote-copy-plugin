@@ -149,6 +149,8 @@
 
     <web-resource key="issuepage">
         <context>jira.view.issue</context>
+        <context>jira.navigator.advanced</context>
+        <context>jira.navigator.simple</context>
         <resource type="download" name="admin.js" location="com/atlassian/cpji/javascript/issuepage.js"/>
     </web-resource>
 
