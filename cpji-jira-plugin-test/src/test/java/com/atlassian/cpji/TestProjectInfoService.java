@@ -90,6 +90,7 @@ public class TestProjectInfoService {
 
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS)).thenReturn(true);
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING)).thenReturn(true);
+        when(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE)).thenReturn("1000");
 
         CopyInformationBean result = projectInfoService.getIssueTypeInformation("KEY");
 
@@ -103,6 +104,7 @@ public class TestProjectInfoService {
 		}), IsIterableContainingInAnyOrder.<String> containsInAnyOrder(issueTypeNames.toArray(new String[] {})));
         assertEquals(true, result.getAttachmentsEnabled());
         assertEquals(true, result.getIssueLinkingEnabled());
+        assertEquals(1000L, result.getMaxAttachmentSize().longValue());
         verify(permissionManager).hasPermission(Permissions.CREATE_ISSUE, project, mockedUser);
         verify(permissionManager).hasPermission(Permissions.CREATE_ATTACHMENT, project, mockedUser);
     }
