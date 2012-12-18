@@ -41,7 +41,7 @@ public class TestJiraProxyFactory {
         LocalJiraProxy localProxy = new LocalJiraProxy(null, null, null, null, null, null, null, null, null, ap);
         assertTrue(predicate.apply(localProxy.getJiraLocation()));
 
-        RemoteJiraProxy remoteProxy = new RemoteJiraProxy(null, null, new JiraLocation("MyAwesomeRemoteJira", null), null);
+        RemoteJiraProxy remoteProxy = new RemoteJiraProxy(null, null, new JiraLocation("MyAwesomeRemoteJira", null), null, null);
         assertFalse(predicate.apply(remoteProxy.getJiraLocation()));
 
         assertFalse(predicate.apply(null));
