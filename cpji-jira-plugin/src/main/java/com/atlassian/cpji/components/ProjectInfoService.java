@@ -25,6 +25,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class ProjectInfoService {
 		final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
 
         if (hasCreateIssuePermission) {
-            CopyInformationBean copyInformationBean = new CopyInformationBean(getIssueTypes(project),
+            CopyInformationBean copyInformationBean = new CopyInformationBean(getMasterIssueTypes(project),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
 					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
 					userBean,
@@ -87,8 +88,16 @@ public class ProjectInfoService {
         }
     }
 
-	protected Collection<IssueTypeBean> getIssueTypes(final Project project) {
-		return Collections2.transform(issueTypeSchemeManager.getIssueTypesForProject(project), new Function<IssueType, IssueTypeBean>() {
+	protected Collection<IssueTypeBean> getMasterIssueTypes(final Project project) {
+		return Collections2.transform(
+                Collections2.filter(issueTypeSchemeManager.getIssueTypesForProject(project), new Predicate<IssueType>() {
+                    @Override
+                    public boolean apply(@Nullable IssueType input) {
+                        if(input != null)
+                            return !input.isSubTask();
+                        return false;
+                    }
+                }), new Function<IssueType, IssueTypeBean>() {
 			@Override
 			public IssueTypeBean apply(IssueType issueType) {
 				return new IssueTypeBean(issueType.getName(), getRequiredFields(project, issueType));
