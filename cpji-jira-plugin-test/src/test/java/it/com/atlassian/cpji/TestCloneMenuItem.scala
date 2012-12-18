@@ -2,9 +2,9 @@ package it.com.atlassian.cpji
 
 import org.junit.{Rule, Test}
 import org.junit.Assert._
-import org.hamcrest.collection.IsIterableWithSize
+import org.hamcrest.collection.{IsIterableContainingInOrder, IsIterableWithSize}
 import com.atlassian.cpji.tests.pageobjects._
-import com.atlassian.pageobjects.elements.query.Poller
+import com.atlassian.pageobjects.elements.query.{TimedQuery, Poller}
 import com.atlassian.jira.security.Permissions
 import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.rest.client.domain.IssueFieldId
@@ -13,7 +13,7 @@ import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.lang.String
 import BackdoorHelpers._
 import org.hamcrest.core.StringContains
-import org.hamcrest.Matchers
+import org.hamcrest.{Description, BaseMatcher, Matchers, Matcher}
 import com.atlassian.jira.pageobjects.navigator.BasicSearch
 
 /**
@@ -51,9 +51,8 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		val viewIssue: ExtendedViewIssuePage = AbstractCopyIssueTest.jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
 		var dialog = viewIssue.openDOTSection()
 		val actionLinks = dialog.getActionsLinksByQuery("clone")
-		assertEquals(1, actionLinks.size)
-		assertThat(actionLinks.head, StringContains.containsString("SelectTargetProjectAction"))
-		assertThat(actionLinks.head, Matchers.not(StringContains.containsString("CloneIssueDetails")))
+		assertThat(actionLinks, Matchers.contains(Matchers.containsString("SelectTargetProjectAction")));
+		assertThat(actionLinks, Matchers.not(Matchers.contains(Matchers.containsString("CloneIssueDetails"))));
 	}
 
 	@Test def shouldNotDisplayDefaultCloneActionAtIssueNavigator() {
@@ -63,9 +62,20 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		var actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
 		actionsMenu.open()
 
+
 		val links = actionsMenu.getActionLinks()
-		assertTrue(links.filter(_.contains("SelectTargetProjectAction")).nonEmpty)
-		assertTrue(links.filter(_.contains("CloneIssueDetails")).isEmpty)
+
+		Poller.waitUntil(
+			links.asInstanceOf[TimedQuery[Object]],
+			Matchers.hasItem(Matchers.containsString("SelectTargetProjectAction")).asInstanceOf[Matcher[Object]]
+		)
+
+
+		Poller.waitUntil(
+			links.asInstanceOf[TimedQuery[Object]],
+			Matchers.not(Matchers.hasItem(Matchers.containsString("CloneIssueDetails"))).asInstanceOf[Matcher[Object]]
+		)
+
 	}
 
 	@Test def shouldNotDisplayLinkIfUserIsNotLoggedIn() {
