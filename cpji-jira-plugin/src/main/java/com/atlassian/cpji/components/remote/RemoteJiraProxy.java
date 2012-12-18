@@ -19,11 +19,13 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.rest.client.internal.json.BasicProjectsJsonParser;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.sal.api.net.Request;
 import com.atlassian.sal.api.net.RequestFilePart;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -47,12 +49,15 @@ public class RemoteJiraProxy implements JiraProxy {
     private final ApplicationLink applicationLink;
     private final JiraLocation jiraLocation;
     private final IssueLinkClient issueLinkClient;
+    private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public RemoteJiraProxy(final InternalHostApplication hostApplication, final ApplicationLink applicationLink, final JiraLocation jiraLocation, final IssueLinkClient issueLinkClient) {
+
+    public RemoteJiraProxy(final InternalHostApplication hostApplication, final ApplicationLink applicationLink, final JiraLocation jiraLocation, final IssueLinkClient issueLinkClient, final JiraAuthenticationContext jiraAuthenticationContext) {
         this.hostApplication = hostApplication;
         this.applicationLink = applicationLink;
         this.jiraLocation = jiraLocation;
         this.issueLinkClient = issueLinkClient;
+        this.jiraAuthenticationContext = jiraAuthenticationContext;
     }
 
     @Override
@@ -149,6 +154,21 @@ public class RemoteJiraProxy implements JiraProxy {
     @Override
     public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(final String issueKey, final File attachmentFile, final String filename, final String contentType) {
         return callRestService(Request.MethodType.POST, "rest/api/latest/issue/" + issueKey + "/attachments", new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
+
+            @Override
+            public Either<NegativeResponseStatus, SuccessfulResponse> handle(Response response) throws ResponseException {
+                //api provides 404 when attachments exceeds max size
+                if(response.getStatusCode() == 404){
+                    final String responseString = response.getResponseBodyAsString();
+                    if(StringUtils.contains(responseString, "exceeds its maximum")){
+                        String message = jiraAuthenticationContext.getI18nHelper().getText("cpji.attachment.is.too.big");
+                        return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, message));
+                    }
+
+                }
+                return super.handle(response);
+            }
+
             @Override
             protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
                 if (response.isSuccessful()) {
@@ -157,8 +177,6 @@ public class RemoteJiraProxy implements JiraProxy {
                     return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, response.getResponseBodyAsString()));
                 }
             }
-
-            ;
 
             @Override
             protected void modifyRequest(ApplicationLinkRequest request) {
