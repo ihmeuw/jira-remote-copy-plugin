@@ -40,6 +40,10 @@ public class CopyInformationBean {
 	@XmlElement
 	private String jiraVersion;
 
+
+    @XmlElement
+    private Long maxAttachmentSize;
+
 	// for testing
 	public CopyInformationBean() {
 	}
@@ -53,7 +57,10 @@ public class CopyInformationBean {
 			final boolean hasCreateAttachmentPermission,
 			final boolean hasCreateCommentPermission,
 			final boolean hasCreateLinksPermission,
-			final String jiraVersion) {
+			final String jiraVersion,
+            final Long maxAttachmentSize
+
+    ) {
 		this.hasCreateCommentPermission = hasCreateCommentPermission;
 		this.hasCreateLinksPermission = hasCreateLinksPermission;
 		this.issueTypes = Lists.newArrayList(issueTypes);
@@ -63,6 +70,7 @@ public class CopyInformationBean {
 		this.hasCreateIssuePermission = hasCreateIssuePermission;
 		this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
 		this.jiraVersion = jiraVersion;
+        this.maxAttachmentSize = maxAttachmentSize;
 	}
 
 	public List<IssueTypeBean> getIssueTypes() {
@@ -136,4 +144,8 @@ public class CopyInformationBean {
 	public void setHasCreateLinksPermission(boolean hasCreateLinksPermission) {
 		this.hasCreateLinksPermission = hasCreateLinksPermission;
 	}
+
+    public Long getMaxAttachmentSize() {
+        return maxAttachmentSize;
+    }
 }

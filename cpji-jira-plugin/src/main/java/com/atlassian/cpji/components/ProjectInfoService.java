@@ -69,23 +69,19 @@ public class ProjectInfoService {
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 		final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
 		final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
+        final long maxAttachmentSize = Long.parseLong(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE));
 
-        if (hasCreateIssuePermission) {
-            CopyInformationBean copyInformationBean = new CopyInformationBean(getMasterIssueTypes(project),
-					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
-					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
-					userBean,
-					hasCreateIssuePermission, hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
-					buildUtilsInfo.getVersion());
-            return copyInformationBean;
-        } else {
-            CopyInformationBean copyInformationBean = new CopyInformationBean(null,
-					applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
-					applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING), userBean,
-					hasCreateIssuePermission, hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
-					buildUtilsInfo.getVersion());
-            return copyInformationBean;
-        }
+
+        CopyInformationBean copyInformationBean = new CopyInformationBean(
+                hasCreateIssuePermission?getMasterIssueTypes(project):null,
+                applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
+                applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
+                userBean,
+                hasCreateIssuePermission, hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
+                buildUtilsInfo.getVersion(),
+                maxAttachmentSize);
+        return copyInformationBean;
+
     }
 
 	protected Collection<IssueTypeBean> getMasterIssueTypes(final Project project) {
@@ -93,9 +89,7 @@ public class ProjectInfoService {
                 Collections2.filter(issueTypeSchemeManager.getIssueTypesForProject(project), new Predicate<IssueType>() {
                     @Override
                     public boolean apply(@Nullable IssueType input) {
-                        if(input != null)
-                            return !input.isSubTask();
-                        return false;
+                        return input != null && !input.isSubTask();
                     }
                 }), new Function<IssueType, IssueTypeBean>() {
 			@Override

@@ -57,11 +57,12 @@
 
 				#if ($action.copyAttachmentsSectionVisible)
 				<div class="field-group" id="copy-attachments-group">
-					#set ($error = $action.copyAttachmentsErrorMessage)
-					<span class="field-value #if ($error != "") disabled #end">
-						<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
+					#set ($isEnabled = $action.copyAttachmentsEnabled)
+					<span class="field-value #if (!$isEnabled) disabled #end">
+						<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if (!$isEnabled) disabled="" #else checked="checked" #end/>
 						<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 					</span>
+					#set ($error = $action.copyAttachmentsErrorMessage)
 					#if ($error)
 						<div class="notice">$error</div>
 					#end

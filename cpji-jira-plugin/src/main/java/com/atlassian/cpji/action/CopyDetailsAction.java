@@ -16,6 +16,7 @@ import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.customfields.OperationContext;
 import com.atlassian.jira.issue.fields.OrderableField;
@@ -29,6 +30,7 @@ import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -236,12 +238,39 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		return isIssueWithComments();
 	}
 
+    private int getExceedingAttachmentsCount(){
+        return Iterables.size(
+            Iterables.filter(getIssueObject().getAttachments(), new Predicate<Attachment>() {
+                @Override
+                public boolean apply(@Nullable Attachment input) {
+                    return input.getFilesize() > copyInfo.getMaxAttachmentSize();
+                }
+            })
+        );
+    }
+
+    private int getAllAttachmentsCount(){
+        return getIssueObject().getAttachments().size();
+    }
+
+    public boolean isCopyAttachmentsEnabled(){
+        return copyInfo.getAttachmentsEnabled() && copyInfo.getHasCreateAttachmentPermission()
+                && getExceedingAttachmentsCount() < getAllAttachmentsCount();
+    }
+
 	public String getCopyAttachmentsErrorMessage() {
 		if (!copyInfo.getAttachmentsEnabled()) {
 			return getText("cpji.attachments.are.disabled");
 		} else if(!copyInfo.getHasCreateAttachmentPermission()) {
 			return getText("cpji.not.permitted.to.create.attachments");
-		}
+		} else{
+            int count = getExceedingAttachmentsCount();
+            if(count == getAllAttachmentsCount()){
+                return getText("cpji.all.attachments.are.too.big");
+            } else if(count > 0){
+                return getText("cpji.some.attachments.are.too.big");
+            }
+        }
 		return "";
 	}
 
