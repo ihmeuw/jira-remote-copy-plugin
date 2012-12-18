@@ -1,6 +1,7 @@
 package it.com.atlassian.cpji
 
 import org.junit._
+import org.junit.Assert._
 import com.atlassian.jira.rest.client.domain._
 import input.{IssueInput, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
@@ -12,6 +13,10 @@ import org.joda.time.DateTime
 import com.atlassian.cpji.CopyIssueProcess
 import it.com.atlassian.cpji.BackdoorHelpers._
 import com.atlassian.jira.security.Permissions
+import com.atlassian.jira.config.properties.APKeys
+import com.atlassian.pageobjects.elements.{PageElement, CheckboxElement}
+import org.apache.commons.lang.StringUtils
+import org.hamcrest.Matchers
 
 class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
@@ -57,11 +62,8 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 			removeProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.COMMENT_ISSUE, 10000)
 
 			val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
+			isPresentAndDisabled(copyDetailsPage, _.getCopyCommentsGroup, _.getCopyComments, _.getCopyCommentsNotice)
 
-			Poller.waitUntilTrue(copyDetailsPage.getCopyCommentsGroup.timed().isVisible)
-			Poller.waitUntilTrue(copyDetailsPage.getCopyComments.timed().isPresent)
-			Poller.waitUntilFalse(copyDetailsPage.getCopyComments.timed().isEnabled)
-			Poller.waitUntilTrue(copyDetailsPage.getCopyCommentsNotice.timed.isVisible)
 		} finally {
 			addProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.COMMENT_ISSUE, 10000)
 		}
@@ -72,11 +74,8 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 			removeProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.LINK_ISSUE, 10001)
 
 			val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
+			isPresentAndDisabled(copyDetailsPage, _.getCopyIssueLinksGroup, _.getCopyIssueLinks, _.getCopyIssueLinksNotice)
 
-			Poller.waitUntilTrue(copyDetailsPage.getCopyIssueLinksGroup.timed().isVisible)
-			Poller.waitUntilTrue(copyDetailsPage.getCopyIssueLinks.timed().isPresent)
-			Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed().isEnabled)
-			Poller.waitUntilTrue(copyDetailsPage.getCopyIssueLinksNotice.timed.isVisible)
 		} finally {
 			addProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.LINK_ISSUE, 10001)
 		}
@@ -87,13 +86,57 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 			removeProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.CREATE_ATTACHMENT, 10000)
 
 			val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
-
-			Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
-			Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed().isPresent)
-			Poller.waitUntilFalse(copyDetailsPage.getCopyAttachments.timed().isEnabled)
-			Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsNotice.timed.isVisible)
+			isAttachmentsPresentAndDisabled(copyDetailsPage)
 		} finally {
 			addProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.CREATE_ATTACHMENT, 10000)
 		}
 	}
+
+	@Test def shouldDisplayWarningMessageWhenSomeAttachmentsExceedMaxSize() {
+		var apControl = AbstractCopyIssueTest.testkit2.applicationProperties()
+		val attachmentSize =  apControl.getString(APKeys.JIRA_ATTACHMENT_SIZE)
+		try{
+			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, 30L.toString)
+			AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+				issue.getAttachmentsUri, new ByteArrayInputStream(StringUtils.repeat("this is a stream", 100).getBytes("UTF-8")),
+				this.getClass.getCanonicalName)
+
+			var detailsPage = goToCopyDetails(issue.getId)
+			isAttachmentsPresentAndEnabled(detailsPage)
+			Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("Some of attachments exceed"))
+		} finally {
+			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, attachmentSize)
+		}
+	}
+
+	@Test def shouldDisableCopyAttachmentsCheckboxWhenAllAttachmentsExceedMaxSize(){
+		var apControl = AbstractCopyIssueTest.testkit2.applicationProperties()
+		val attachmentSize =  apControl.getString(APKeys.JIRA_ATTACHMENT_SIZE)
+		try{
+			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, 1L.toString)
+			var detailsPage = goToCopyDetails(issue.getId)
+			isAttachmentsPresentAndDisabled(detailsPage)
+		} finally {
+			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, attachmentSize)
+		}
+	}
+
+	private def isAttachmentsPresentAndDisabled = isPresentAndDisabled(_ : CopyDetailsPage, _.getCopyAttachmentsGroup, _.getCopyAttachments, _.getCopyAttachmentsNotice)
+	private def isAttachmentsPresentAndEnabled = isPresentAndEnabled(_ : CopyDetailsPage, _.getCopyAttachmentsGroup, _.getCopyAttachments, _.getCopyAttachmentsNotice)
+
+	private def isPresentAndEnabled(obj:CopyDetailsPage, group: CopyDetailsPage => PageElement, checkbox: CopyDetailsPage=>CheckboxElement, notice : CopyDetailsPage => PageElement) = {
+		Poller.waitUntilTrue(group(obj).timed().isVisible)
+		Poller.waitUntilTrue(checkbox(obj).timed().isPresent)
+		Poller.waitUntilTrue(checkbox(obj).timed().isEnabled)
+		Poller.waitUntilTrue(notice(obj).timed.isVisible)
+	}
+
+
+	private def isPresentAndDisabled(obj:CopyDetailsPage, group: CopyDetailsPage => PageElement, checkbox: CopyDetailsPage=>CheckboxElement, notice : CopyDetailsPage => PageElement) = {
+		Poller.waitUntilTrue(group(obj).timed().isVisible)
+		Poller.waitUntilTrue(checkbox(obj).timed().isPresent)
+		Poller.waitUntilFalse(checkbox(obj).timed().isEnabled)
+		Poller.waitUntilTrue(notice(obj).timed.isVisible)
+	}
+
 }
