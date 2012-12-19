@@ -1,4 +1,13 @@
 {namespace RIC.Templates}
+/**
+* Validation/error at from level
+* @param msg
+* @param? id
+*/
+{template .formError}
+<div  {if $id}id="{$id}"{/if} class="error">{$msg}</div>
+{/template}
+
 
 /**
 * Warning message

@@ -67,7 +67,8 @@ AJS.$(function ($) {
                     copyIssue.toggleLoadingState(false);
                     copyIssue.prepareSelect();
                 } else {
-                    copyIssue.settings.container.find(".field-value").css("width", "100%").append(RIC.Templates.errorMsg({id: "noDestinationProjectError",
+                    copyIssue.settings.container.find(".field-value").hide();
+                    copyIssue.settings.container.append(RIC.Templates.formError({id: "noDestinationProjectError",
 						msg: AJS.I18n.getText("cpji.you.dont.have.create.issue.permission.for.any.project")}));
                     copyIssue.onValueUnselected();
                     copyIssue.settings.loader.toggleClass("hidden", true);
