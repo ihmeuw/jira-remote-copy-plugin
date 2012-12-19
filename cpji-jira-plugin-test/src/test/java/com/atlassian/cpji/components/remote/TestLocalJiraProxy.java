@@ -4,6 +4,7 @@ import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
 import com.atlassian.cpji.components.model.*;
+import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
@@ -110,7 +111,8 @@ public class TestLocalJiraProxy {
 
     @Test
     public void testPluginInstalled(){
-        verifySuccess(localJiraProxy.isPluginInstalled());
+        final Either<NegativeResponseStatus, PluginVersion> pluginInstalled = localJiraProxy.isPluginInstalled();
+        assertEquals(PluginInfoResource.PLUGIN_VERSION, pluginInstalled.right().get().getResult());
     }
 
     @Test(expected = UnsupportedOperationException.class)
