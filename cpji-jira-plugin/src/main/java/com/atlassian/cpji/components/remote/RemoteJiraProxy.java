@@ -92,38 +92,24 @@ public class RemoteJiraProxy implements JiraProxy {
 
     @Override
     public Either<NegativeResponseStatus, PluginVersion> isPluginInstalled() {
-        Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled = callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
+        return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<PluginVersion>(jiraLocation) {
             @Override
-            protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
-                if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase())) {
+            protected PluginVersion parseResponse(Response response) throws ResponseException, JSONException {
+                final String version = response.getResponseBodyAsString().trim();
+                if (version.startsWith(PluginInfoResource.PLUGIN_INSTALLED)) {
                     log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
-                    return SuccessfulResponse.build(jiraLocation);
+                    if(version.equals(PluginInfoResource.PLUGIN_INSTALLED)){
+                        return new PluginVersion(jiraLocation, PluginInfoResource.PLUGIN_INSTALLED);
+                    } else {
+                        String[] respArray = StringUtils.split(version, " ", 2);
+                        return new PluginVersion(jiraLocation, respArray[1]);
+                    }
+
                 }
                 log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin NOT installed.");
                 return provideResponseStatus(NegativeResponseStatus.pluginNotInstalled(jiraLocation));
             }
         });
-
-        if(isPluginInstalled.isLeft()){
-            return Either.left(isPluginInstalled.left().get());
-        }
-
-        final String version_path = REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH + "/" + PluginInfoResource.RESOURCE_VERSION_PATH;
-        return callRestService(Request.MethodType.GET, version_path, new AbstractJsonResponseHandler<PluginVersion>(jiraLocation) {
-            @Override
-            public Either<NegativeResponseStatus, PluginVersion> handle(Response response) throws ResponseException {
-                if(response.getStatusCode() == 404){
-                    return Either.right(new PluginVersion(jiraLocation, "installed"));
-                }
-                return super.handle(response);
-            }
-
-            @Override
-            protected PluginVersion parseResponse(Response response) throws ResponseException, JSONException {
-                return new PluginVersion(jiraLocation, response.getResponseBodyAsString());
-            }
-        });
-
 
     }
 

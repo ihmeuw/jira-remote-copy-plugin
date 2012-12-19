@@ -27,7 +27,7 @@ public class PluginInfoResource
     @AnonymousAllowed
     public Response pluginInfo()
     {
-        return Response.ok(PLUGIN_INSTALLED).build();
+        return Response.ok(PLUGIN_INSTALLED + " " + PLUGIN_VERSION).build();
     }
 
     @GET
