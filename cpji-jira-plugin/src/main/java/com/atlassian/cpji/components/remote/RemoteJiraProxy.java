@@ -5,10 +5,7 @@ import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.cpji.components.model.JiraLocation;
-import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.NegativeResponseStatus;
-import com.atlassian.cpji.components.model.SuccessfulResponse;
+import com.atlassian.cpji.components.model.*;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.RemotesResource;
 import com.atlassian.cpji.rest.model.*;
@@ -67,7 +64,7 @@ public class RemoteJiraProxy implements JiraProxy {
 
     @Override
     public Either<NegativeResponseStatus, Projects> getProjects() {
-        return callRestService(Request.MethodType.GET, "/rest/copyissue/1.0/project", new AbstractJsonResponseHandler<Projects>(jiraLocation) {
+        return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PROJECT_RESOURCE_PATH, new AbstractJsonResponseHandler<Projects>(jiraLocation) {
             @Override
             protected Projects parseResponse(Response response) throws ResponseException, JSONException {
                 return new Projects(jiraLocation, new BasicProjectsJsonParser().parse(
@@ -94,8 +91,8 @@ public class RemoteJiraProxy implements JiraProxy {
 
 
     @Override
-    public Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled() {
-        return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
+    public Either<NegativeResponseStatus, PluginVersion> isPluginInstalled() {
+        Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled = callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
             @Override
             protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
                 if (PluginInfoResource.PLUGIN_INSTALLED.equals(response.getResponseBodyAsString().toLowerCase())) {
@@ -106,6 +103,28 @@ public class RemoteJiraProxy implements JiraProxy {
                 return provideResponseStatus(NegativeResponseStatus.pluginNotInstalled(jiraLocation));
             }
         });
+
+        if(isPluginInstalled.isLeft()){
+            return Either.left(isPluginInstalled.left().get());
+        }
+
+        final String version_path = REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH + "/" + PluginInfoResource.RESOURCE_VERSION_PATH;
+        return callRestService(Request.MethodType.GET, version_path, new AbstractJsonResponseHandler<PluginVersion>(jiraLocation) {
+            @Override
+            public Either<NegativeResponseStatus, PluginVersion> handle(Response response) throws ResponseException {
+                if(response.getStatusCode() == 404){
+                    return Either.right(new PluginVersion(jiraLocation, "installed"));
+                }
+                return super.handle(response);
+            }
+
+            @Override
+            protected PluginVersion parseResponse(Response response) throws ResponseException, JSONException {
+                return new PluginVersion(jiraLocation, response.getResponseBodyAsString());
+            }
+        });
+
+
     }
 
     @Override

@@ -19,12 +19,22 @@ import javax.ws.rs.core.Response;
 public class PluginInfoResource
 {
     public static final String RESOURCE_PATH = "plugininfo";
+    public static final String RESOURCE_VERSION_PATH = "version";
     public static final String PLUGIN_INSTALLED = "installed";
+    public static final String PLUGIN_VERSION = "3.0";
 
     @GET
     @AnonymousAllowed
     public Response pluginInfo()
     {
         return Response.ok(PLUGIN_INSTALLED).build();
+    }
+
+    @GET
+    @Path(RESOURCE_VERSION_PATH)
+    @AnonymousAllowed
+    public Response pluginVersion()
+    {
+        return Response.ok(PLUGIN_VERSION).build();
     }
 }

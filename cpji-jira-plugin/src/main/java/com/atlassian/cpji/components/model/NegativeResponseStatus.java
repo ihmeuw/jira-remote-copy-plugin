@@ -33,6 +33,9 @@ public class NegativeResponseStatus extends ResultWithJiraLocation<NegativeRespo
     public static NegativeResponseStatus pluginNotInstalled(JiraLocation jiraLocation) {
         return new NegativeResponseStatus(jiraLocation, Status.PLUGIN_NOT_INSTALLED);
     }
+    public static NegativeResponseStatus unsupportedVersion(JiraLocation jiraLocation) {
+        return new NegativeResponseStatus(jiraLocation, Status.UNSUPPORTED_VERSION);
+    }
 
     public static NegativeResponseStatus errorOccured(JiraLocation jiraLocation, ErrorCollection errors) {
         NegativeResponseStatus result = new NegativeResponseStatus(jiraLocation, Status.ERROR_OCCURRED);
@@ -60,6 +63,7 @@ public class NegativeResponseStatus extends ResultWithJiraLocation<NegativeRespo
         AUTHORIZATION_REQUIRED,
         AUTHENTICATION_FAILED,
         PLUGIN_NOT_INSTALLED,
+        UNSUPPORTED_VERSION,
         ERROR_OCCURRED
     }
 

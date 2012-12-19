@@ -1,10 +1,11 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.components.model.PluginVersion;
 import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
+import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.ComponentManager;
@@ -43,18 +44,18 @@ public class RemoteJiraService {
      * @return
      */
     @Nonnull
-    public Iterable<Either<NegativeResponseStatus, SuccessfulResponse>> getPluginInfo() {
+    public Iterable<Either<NegativeResponseStatus, PluginVersion>> getPluginInfo() {
 
-        return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, SuccessfulResponse>>() {
+        return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, PluginVersion>>() {
 
             @Override
-            public Either<NegativeResponseStatus, SuccessfulResponse> onInvocationException(Exception e) {
+            public Either<NegativeResponseStatus, PluginVersion> onInvocationException(Exception e) {
                 log.warn("Failed to execute Application Links request", e);
                 return Either.left(NegativeResponseStatus.communicationFailed(null));
             }
 
             @Override
-            public Either<NegativeResponseStatus, SuccessfulResponse> apply(@Nullable JiraProxy input) {
+            public Either<NegativeResponseStatus, PluginVersion> apply(@Nullable JiraProxy input) {
                 return input.isPluginInstalled();
             }
         });
@@ -117,7 +118,15 @@ public class RemoteJiraService {
 
             @Override
             public Either<NegativeResponseStatus, Projects> apply(JiraProxy input) {
-                return input.getProjects();
+                Either<NegativeResponseStatus, PluginVersion> version = input.isPluginInstalled();
+                if(version.isLeft())
+                    return Either.left(version.left().get());
+
+                if(version.right().get().getResult().equals(PluginInfoResource.PLUGIN_VERSION)){
+                    return input.getProjects();
+                } else {
+                    return Either.left(NegativeResponseStatus.unsupportedVersion(input.getJiraLocation()));
+                }
             }
         });
     }

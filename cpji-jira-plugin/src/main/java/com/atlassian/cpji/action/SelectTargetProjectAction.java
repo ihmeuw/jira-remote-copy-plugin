@@ -3,7 +3,7 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
-import com.atlassian.cpji.components.model.SuccessfulResponse;
+import com.atlassian.cpji.components.model.PluginVersion;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
@@ -56,8 +56,8 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         }
         final SelectedProject selectedEntityLink= getSelectedDestinationProject();
         JiraProxy jira = jiraProxyFactory.createJiraProxy(selectedEntityLink.getJiraLocation());
-        Either<NegativeResponseStatus,SuccessfulResponse> response = jira.isPluginInstalled();
-        SuccessfulResponse result = handleGenericResponseStatus(jira, response, null);
+        Either<NegativeResponseStatus,PluginVersion> response = jira.isPluginInstalled();
+        PluginVersion result = handleGenericResponseStatus(jira, response, null);
         if(result == null){
             return getGenericResponseHandlerResult();
         }

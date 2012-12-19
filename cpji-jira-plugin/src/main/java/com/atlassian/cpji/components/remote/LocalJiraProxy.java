@@ -4,10 +4,8 @@ import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
-import com.atlassian.cpji.components.model.JiraLocation;
-import com.atlassian.cpji.components.model.Projects;
-import com.atlassian.cpji.components.model.NegativeResponseStatus;
-import com.atlassian.cpji.components.model.SuccessfulResponse;
+import com.atlassian.cpji.components.model.*;
+import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
@@ -88,9 +86,8 @@ public class LocalJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<NegativeResponseStatus, SuccessfulResponse> isPluginInstalled() {
-
-        return Either.right(SuccessfulResponse.build(jiraLocation));
+    public Either<NegativeResponseStatus, PluginVersion> isPluginInstalled() {
+        return Either.right(new PluginVersion(jiraLocation, PluginInfoResource.PLUGIN_VERSION));
     }
 
     @Override

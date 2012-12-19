@@ -3,15 +3,8 @@ package com.atlassian.cpji.rest;
 import com.atlassian.applinks.api.AuthorisationURIGenerator;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.RemoteJiraService;
-import com.atlassian.cpji.components.model.NegativeResponseStatus;
-import com.atlassian.cpji.components.model.ResultWithJiraLocation;
-import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.model.AvailableProjectsBean;
-import com.atlassian.cpji.rest.model.RemotePluginBean;
-import com.atlassian.fugue.Either;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,19 +30,19 @@ public class RemotesResource {
         this.jiraProxyFactory = jiraProxyFactory;
     }
 
-	@GET
-	@Path("plugins")
-	public Response getRemotePlugins(@QueryParam("issueId") final String issueId) {
-		return Response.ok(Iterables
-				.transform(Iterables.filter(remoteJiraService.getPluginInfo(), NegativeResponseStatus.onlyRemoteJiras()),
-						new Function<Either<NegativeResponseStatus, SuccessfulResponse>, RemotePluginBean>() {
-							@Override
-							public RemotePluginBean apply(@Nullable Either<NegativeResponseStatus, SuccessfulResponse> input) {
-                                ResultWithJiraLocation<?> result = ResultWithJiraLocation.extract(input);
-                                return RemotePluginBean.create(result, jiraProxyFactory,issueId);
-							}
-						})).build();
-	}
+//	@GET
+//	@Path("plugins")
+//	public Response getRemotePlugins(@QueryParam("issueId") final String issueId) {
+//		return Response.ok(Iterables
+//				.transform(Iterables.filter(remoteJiraService.getPluginInfo(), NegativeResponseStatus.onlyRemoteJiras()),
+//						new Function<Either<NegativeResponseStatus, SuccessfulResponse>, RemotePluginBean>() {
+//							@Override
+//							public RemotePluginBean apply(@Nullable Either<NegativeResponseStatus, SuccessfulResponse> input) {
+//                                ResultWithJiraLocation<?> result = ResultWithJiraLocation.extract(input);
+//                                return RemotePluginBean.create(result, jiraProxyFactory,issueId);
+//							}
+//						})).build();
+//	}
 
 	@Nullable
 	public static String generateAuthorizationUrl(@Nonnull InternalHostApplication hostApplication, @Nonnull AuthorisationURIGenerator uriGenerator, @Nonnull String issueId)

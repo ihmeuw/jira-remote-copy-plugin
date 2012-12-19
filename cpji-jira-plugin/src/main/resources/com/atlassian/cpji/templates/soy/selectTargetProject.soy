@@ -5,6 +5,7 @@
  * @param? authentication
  * @param? communication
  * @param? notInstalled
+ * @param? unsupported
  */
 {template .remoteDestinationsNotAvailable}
 		{if $authorization and length($authorization) > 0}
@@ -19,7 +20,9 @@
 		{/if}
 		{if ($authentication and length($authentication))
 			or ($communication and length($communication))
-			or ($notInstalled and length($notInstalled))}
+			or ($notInstalled and length($notInstalled))
+			or ($unsupported and length($unsupported))
+		}
 			{call .warningMsg}
 				{param title}
 					{getText('cpji.please.contact.admin')}
@@ -46,6 +49,14 @@
 						{getText('cpji.remote.copying.not.installed')}
 						{call .listServers}
 							{param servers: $notInstalled /}
+						{/call}
+						</div>
+					{/if}
+					{if $unsupported and length($unsupported)}
+						<div>
+						{getText('cpji.unsupported.version')}
+						{call .listServers}
+							{param servers: $unsupported /}
 						{/call}
 						</div>
 					{/if}
