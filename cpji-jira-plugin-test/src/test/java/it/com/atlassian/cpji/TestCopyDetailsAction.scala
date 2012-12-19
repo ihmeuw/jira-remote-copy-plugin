@@ -75,6 +75,8 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyIssueLinksGroup.timed().isVisible)
 		assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
+
+		AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
 	}
 
 
@@ -108,6 +110,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		} finally {
 			AbstractCopyIssueTest.testkit2.attachments().enable()
 			AbstractCopyIssueTest.testkit2.issueLinking().enable()
+			AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
 		}
 	}
 
