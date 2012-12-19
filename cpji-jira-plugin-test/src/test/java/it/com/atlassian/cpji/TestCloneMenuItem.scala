@@ -15,6 +15,7 @@ import BackdoorHelpers._
 import org.hamcrest.core.StringContains
 import org.hamcrest.{Description, BaseMatcher, Matchers, Matcher}
 import com.atlassian.jira.pageobjects.navigator.{AdvancedSearch, BasicSearch}
+import com.atlassian.cpji.tests.ScreenshotUtil
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -60,6 +61,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		AbstractCopyIssueTest.jira1.visit(classOf[CommonBasicSearch])
 
 		var actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
+		ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira1.getTester.getDriver.getDriver, "before opening actions menu")
 		actionsMenu.open()
 
 
