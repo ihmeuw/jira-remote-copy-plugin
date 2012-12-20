@@ -18,6 +18,7 @@ import org.hamcrest.{Description, BaseMatcher, Matchers, Matcher}
 import com.atlassian.jira.pageobjects.navigator.{AdvancedSearch, BasicSearch}
 import com.atlassian.cpji.tests.ScreenshotUtil
 import com.atlassian.pageobjects.binder.PageBindingException
+import org.apache.log4j.Logger
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -30,6 +31,8 @@ import com.atlassian.pageobjects.binder.PageBindingException
  * Check [[it.com.atlassian.cpji.TestAllowedGroups]] for a test for allowed groups.
  */
 class TestCloneMenuItem extends AbstractCopyIssueTest {
+	val logger = Logger.getLogger(classOf[TestCloneMenuItem])
+
 	val createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient3)
 
 	@Rule def createIssuesRule = createIssues
@@ -97,7 +100,9 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 			try{
 				jira3.visit(classOf[ListApplicationLinksPage]).getApplicationLinks
 			}  catch {
-				case e: PageBindingException => {}
+				case e: PageBindingException => {
+					logger.error("Page cannot be binded", e)
+				}
 			}
 			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "applink window")
 
@@ -105,6 +110,10 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 			issuePage.getMoreActionsMenu.open()
 			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "before checking RIC clone action")
 			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
+		} catch{
+			case e: Exception => {
+				logger.error("Troubles during checking permissions", e)
+			}
 		} finally {
 			testkit3.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 			AbstractCopyIssueTest.restClient3.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)

@@ -7,8 +7,11 @@ import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
+import com.atlassian.pageobjects.elements.query.AbstractTimedCondition;
+import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
+import com.atlassian.pageobjects.elements.timeout.Timeouts;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -18,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -29,9 +33,21 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
     @ElementBy (className = "links-loading")
     private PageElement linksLoading;
 
-	@Override
+    @ElementBy(id="application-links-table")
+    private PageElement applicationLinksTable;
+
+    @Inject
+    private Timeouts timeouts;
+
+    @Override
 	public TimedCondition isAt() {
-		return linksLoading.timed().isVisible();
+//		return linksLoading.timed().isVisible();
+        return new AbstractTimedCondition(timeouts.timeoutFor(TimeoutType.DEFAULT), timeouts.timeoutFor(TimeoutType.EVALUATION_INTERVAL)) {
+            @Override
+            protected Boolean currentValue() {
+                return applicationLinksTable.isPresent() && !linksLoading.isVisible();
+            }
+        };
 	}
 
 	@Override
@@ -62,7 +78,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 	}
 
     protected PageElement getApplicationLinksTable() {
-        driver.waitUntilElementIsNotVisible(By.className("links-loading"));
+        Poller.waitUntilFalse(linksLoading.timed().isVisible());
         return elementFinder.find(By.id("application-links-table"), TimeoutType.SLOW_PAGE_LOAD);
     }
 
@@ -100,6 +116,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 		public ListApplicationLinksPage deleteAndReturn() {
 		    this.delete();
+            Poller.waitUntilFalse(dialog.timed().isVisible());
 			return pageBinder.bind(ListApplicationLinksPage.class);
 		}
 
