@@ -95,7 +95,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 			login(jira3)
 
 			try{
-				jira3.visit(classOf[ListApplicationLinksPage])
+				jira3.visit(classOf[ListApplicationLinksPage]).getApplicationLinks
 			}  catch {
 				case e: PageBindingException => {}
 			}
