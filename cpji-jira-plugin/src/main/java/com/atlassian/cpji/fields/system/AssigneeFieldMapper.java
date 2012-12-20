@@ -15,8 +15,8 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +27,19 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
     private final PermissionManager permissionManager;
     private final ApplicationProperties applicationProperties;
     private final UserMappingManager userMappingManager;
+
+    private static class InternalMappingResult{
+        private final User mappedUser;
+        private final MappingResultDecision decision;
+        public enum MappingResultDecision {
+            FOUND,NOT_FOUND
+        }
+
+        private InternalMappingResult(User mappedUser, MappingResultDecision decision) {
+            this.mappedUser = mappedUser;
+            this.decision = decision;
+        }
+    }
 
     public AssigneeFieldMapper(PermissionManager permissionManager, final ApplicationProperties applicationProperties, Field field, final UserMappingManager userMappingManager)
     {
@@ -46,59 +59,61 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
         return permissionManager.hasPermission(Permissions.ASSIGN_ISSUE, project, user);
     }
 
+
     public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
     {
         boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
-        List<String> unmappedFieldValues = new ArrayList<String>();
-        if (bean.getAssignee() != null)
-        {
-            final User assignee = findUser(bean.getAssignee(), project);
-            if (assignee == null)
-            {
-                unmappedFieldValues.add(bean.getAssignee().getUserName());
-                if (unassignedAllowed)
-                {
-                    return new MappingResult(unmappedFieldValues, true, false);
+        InternalMappingResult mapResult = mapUser(bean.getAssignee(), project);
+        switch(mapResult.decision){
+            case FOUND:
+                return new MappingResult(ImmutableList.<String>of(), true, false);
+            case NOT_FOUND:
+                List<String> unmapped = bean.getAssignee() != null?
+                        ImmutableList.of(bean.getAssignee().getUserName()):
+                        ImmutableList.<String>of();
+                if(unassignedAllowed){
+                    return new MappingResult(unmapped, true, unmapped.isEmpty());
+                } else {
+                    return new MappingResult(unmapped, false, unmapped.isEmpty());
                 }
-                return new MappingResult(unmappedFieldValues, false, false);
-            }
-            else
-            {
-                if (!permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, assignee))
-                {
-                    unmappedFieldValues.add(bean.getAssignee().getUserName());
-                    return new MappingResult(unmappedFieldValues, false, false);
-                }
-                return new MappingResult(unmappedFieldValues, true, false);
-            }
+            default:
+                return null;
         }
-        if (unassignedAllowed)
-        {
-            return new MappingResult(unmappedFieldValues, true, true);
-        }
-        return new MappingResult(unmappedFieldValues, false, true);
     }
+
+    private InternalMappingResult mapUser(UserBean user, final Project project){
+        if(user == null){
+            return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+        }
+        User assignee = findUser(user, project);
+        if(assignee == null){
+            return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+        } else {
+            if (permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, assignee)){
+                return new InternalMappingResult(assignee, InternalMappingResult.MappingResultDecision.FOUND);
+            } else {
+                return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+            }
+        }
+
+
+
+    }
+
+
 
     public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
-        if (bean.getAssignee() != null)
-        {
-            final User assignee = findUser(bean.getAssignee(), project);
-            if (assignee != null)
-            {
-                if (permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, assignee))
-                {
-                    inputParameters.setAssigneeId(assignee.getName());
+        InternalMappingResult assignee = mapUser(bean.getAssignee(), project);
+        boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
+        switch(assignee.decision){
+            case FOUND:
+                inputParameters.setAssigneeId(assignee.mappedUser.getName());
+            case NOT_FOUND:
+                if(!unassignedAllowed){
+                    inputParameters.setAssigneeId(project.getLeadUserName());
                 }
-            }
-            else if (!applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED))
-            {
-                inputParameters.setAssigneeId(project.getLeadUserName());
-            }
-        }
-        else if (!applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED))
-        {
-            inputParameters.setAssigneeId(project.getLeadUserName());
+
         }
     }
 
