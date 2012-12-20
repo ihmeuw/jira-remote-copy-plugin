@@ -4,6 +4,7 @@ import org.junit.{Rule, Test}
 import org.junit.Assert._
 import org.hamcrest.collection.{IsIterableContainingInOrder, IsIterableWithSize}
 import com.atlassian.cpji.tests.pageobjects._
+import admin.ListApplicationLinksPage
 import com.atlassian.pageobjects.elements.query.{TimedQuery, Poller}
 import com.atlassian.jira.security.Permissions
 import com.atlassian.cpji.tests.rules.CreateIssues
@@ -16,6 +17,7 @@ import org.hamcrest.core.StringContains
 import org.hamcrest.{Description, BaseMatcher, Matchers, Matcher}
 import com.atlassian.jira.pageobjects.navigator.{AdvancedSearch, BasicSearch}
 import com.atlassian.cpji.tests.ScreenshotUtil
+import com.atlassian.pageobjects.binder.PageBindingException
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -91,9 +93,17 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		try {
 			testkit3.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 			login(jira3)
+
+			try{
+				jira3.visit(classOf[ListApplicationLinksPage])
+			}  catch {
+				case e: PageBindingException => {}
+			}
+			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "applink window")
+
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
 			issuePage.getMoreActionsMenu.open()
-			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "before cheking RIC clone action")
+			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "before checking RIC clone action")
 			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
 		} finally {
 			testkit3.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
