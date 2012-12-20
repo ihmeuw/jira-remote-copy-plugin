@@ -7,7 +7,6 @@ import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.binder.PageBindingWaitException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.UnhandledAlertException;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 	}
 
 	@Test
-    @Ignore
+//    @Ignore
 	public void doTheDanceBaby() {
 		final String issueKey = "TST-2";
 		final Long issueId = 10100L;

@@ -45,7 +45,10 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
         return new AbstractTimedCondition(timeouts.timeoutFor(TimeoutType.DEFAULT), timeouts.timeoutFor(TimeoutType.EVALUATION_INTERVAL)) {
             @Override
             protected Boolean currentValue() {
-                return applicationLinksTable.isPresent() && !linksLoading.isVisible();
+                final boolean present = applicationLinksTable.isPresent();
+                final boolean visible = linksLoading.isVisible();
+                logger.warn("TableIsPresent{}, linksLoadingPresent: {}", present, visible);
+                return present && !visible;
             }
         };
 	}
