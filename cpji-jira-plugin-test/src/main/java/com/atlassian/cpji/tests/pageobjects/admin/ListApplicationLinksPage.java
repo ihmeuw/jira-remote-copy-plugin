@@ -225,6 +225,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 		public ListApplicationLinksPage next() {
 			Iterables.get(Iterables.filter(dialog.findAll(By.cssSelector(".button-panel-button.wizard-submit")), PageElements.isVisible()), 0).click();
+            Poller.waitUntilFalse(differenUserRadio.timed().isVisible());
 			return pageBinder.bind(ListApplicationLinksPage.class);
 		}
 
