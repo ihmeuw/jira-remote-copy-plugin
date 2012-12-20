@@ -60,8 +60,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		login(jira1)
 		AbstractCopyIssueTest.jira1.visit(classOf[CommonBasicSearch])
 
-		var actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
-		ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira1.getTester.getDriver.getDriver, "before opening actions menu")
+		val actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
 		actionsMenu.open()
 
 
@@ -89,14 +88,16 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		val issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
 			new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "AFER")),
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
-
 		try {
 			testkit3.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 			login(jira3)
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
+			issuePage.getMoreActionsMenu.open()
+			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "before cheking RIC clone action")
 			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
 		} finally {
 			testkit3.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
+			AbstractCopyIssueTest.restClient3.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
 		}
 	}
 

@@ -109,10 +109,12 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
         switch(assignee.decision){
             case FOUND:
                 inputParameters.setAssigneeId(assignee.mappedUser.getName());
+                break;
             case NOT_FOUND:
                 if(!unassignedAllowed){
                     inputParameters.setAssigneeId(project.getLeadUserName());
                 }
+                break;
 
         }
     }
