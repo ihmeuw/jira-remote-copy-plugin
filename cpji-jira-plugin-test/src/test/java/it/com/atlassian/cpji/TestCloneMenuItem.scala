@@ -97,18 +97,9 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 			testkit3.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 			login(jira3)
 
-			try{
-				jira3.visit(classOf[ListApplicationLinksPage])
-			}  catch {
-				case e: PageBindingException => {
-					logger.error("Page cannot be binded", e)
-				}
-			}
-			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "applink window")
 
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
 			issuePage.getMoreActionsMenu.open()
-			ScreenshotUtil.attemptScreenshot(AbstractCopyIssueTest.jira3.getTester.getDriver.getDriver, "before checking RIC clone action")
 			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
 		} catch{
 			case e: Exception => {

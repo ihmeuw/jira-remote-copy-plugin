@@ -1,6 +1,5 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
@@ -26,7 +25,6 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 	}
 
 	@Test
-//    @Ignore
 	public void doTheDanceBaby() {
 		final String issueKey = "TST-2";
 		final Long issueId = 10100L;
@@ -34,13 +32,10 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 
 		try {
 			ListApplicationLinksPage appLinks = jira1.visit(ListApplicationLinksPage.class);
-			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "list application links");
 
 			appLinks = appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
 					.setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
 					.setUseDifferentUsers().next();
-
-			ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application link added");
 
 			try {
 				viewIssue(jira1, issueKey);
@@ -68,9 +63,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 
 			try {
                 ListApplicationLinksPage page = jira1.visit(ListApplicationLinksPage.class);
-                ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application links list before delete");
                 page.clickDelete("http://localhost:2992/jira").delete().deleteAndReturn();
-                ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "application links list after delete");
 			} catch (Exception e) {
 				logger.error("Unable to delete Application Link", e);
 			}

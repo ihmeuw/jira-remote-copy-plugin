@@ -40,13 +40,11 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
     @Override
 	public TimedCondition isAt() {
-//		return linksLoading.timed().isVisible();
         return new AbstractTimedCondition(timeouts.timeoutFor(TimeoutType.SLOW_PAGE_LOAD), timeouts.timeoutFor(TimeoutType.EVALUATION_INTERVAL)) {
             @Override
             protected Boolean currentValue() {
                 final boolean present = applicationLinksTable.isPresent();
                 final boolean visible = linksLoading.isVisible();
-                logger.warn("TableIsPresent{}, linksLoadingPresent: {}", present, visible);
                 return present && !visible;
             }
         };

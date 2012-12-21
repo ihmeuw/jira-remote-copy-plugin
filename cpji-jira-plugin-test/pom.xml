@@ -137,6 +137,8 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <shutdownTimeout>30000</shutdownTimeout>
+                    <parallel>true</parallel>
 					<extractDependencies>false</extractDependencies>
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
