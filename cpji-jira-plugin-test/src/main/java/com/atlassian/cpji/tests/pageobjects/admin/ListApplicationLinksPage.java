@@ -1,6 +1,5 @@
 package com.atlassian.cpji.tests.pageobjects.admin;
 
-import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.PageElements;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.binder.Init;
@@ -42,7 +41,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
     @Override
 	public TimedCondition isAt() {
 //		return linksLoading.timed().isVisible();
-        return new AbstractTimedCondition(timeouts.timeoutFor(TimeoutType.DEFAULT), timeouts.timeoutFor(TimeoutType.EVALUATION_INTERVAL)) {
+        return new AbstractTimedCondition(timeouts.timeoutFor(TimeoutType.SLOW_PAGE_LOAD), timeouts.timeoutFor(TimeoutType.EVALUATION_INTERVAL)) {
             @Override
             protected Boolean currentValue() {
                 final boolean present = applicationLinksTable.isPresent();
@@ -73,7 +72,6 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 	public DeleteDialog clickDelete(String url) {
 		Preconditions.checkNotNull(url);
-		ScreenshotUtil.attemptScreenshot(driver.getDriver(), "before click delete");
 		final By by = By.cssSelector(String.format("tr[id='ual-row-%s'] .app-delete-link", url));
 		driver.waitUntilElementIsVisible(by);
 		elementFinder.find(by).click();
