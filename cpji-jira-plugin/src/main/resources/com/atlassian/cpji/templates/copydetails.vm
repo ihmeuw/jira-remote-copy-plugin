@@ -50,7 +50,7 @@
 						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
 					</span>
 					#if ($error)
-						<div class="notice">$error</div>
+						<div class="warning">$error</div>
 					#end
 				</div>
 				#end
@@ -64,7 +64,7 @@
 					</span>
 					#set ($error = $action.copyAttachmentsErrorMessage)
 					#if ($error)
-						<div class="notice">$error</div>
+						<div class="warning">$error</div>
 					#end
 				</div>
 				#end
@@ -77,7 +77,7 @@
 						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
 					</span>
 					#if ($error)
-						<div class="notice">$error</div>
+						<div class="warning">$error</div>
 					#end
 				</div>
 				#end
