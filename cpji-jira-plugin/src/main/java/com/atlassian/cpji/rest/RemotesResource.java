@@ -30,19 +30,6 @@ public class RemotesResource {
         this.jiraProxyFactory = jiraProxyFactory;
     }
 
-//	@GET
-//	@Path("plugins")
-//	public Response getRemotePlugins(@QueryParam("issueId") final String issueId) {
-//		return Response.ok(Iterables
-//				.transform(Iterables.filter(remoteJiraService.getPluginInfo(), NegativeResponseStatus.onlyRemoteJiras()),
-//						new Function<Either<NegativeResponseStatus, SuccessfulResponse>, RemotePluginBean>() {
-//							@Override
-//							public RemotePluginBean apply(@Nullable Either<NegativeResponseStatus, SuccessfulResponse> input) {
-//                                ResultWithJiraLocation<?> result = ResultWithJiraLocation.extract(input);
-//                                return RemotePluginBean.create(result, jiraProxyFactory,issueId);
-//							}
-//						})).build();
-//	}
 
 	@Nullable
 	public static String generateAuthorizationUrl(@Nonnull InternalHostApplication hostApplication, @Nonnull AuthorisationURIGenerator uriGenerator, @Nonnull String issueId)
