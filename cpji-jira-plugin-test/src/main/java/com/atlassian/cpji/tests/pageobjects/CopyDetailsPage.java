@@ -34,7 +34,7 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (id = "copy-comments-group")
 	PageElement copyCommentsGroup;
 
-	@ElementBy (className = "notice", within = "copyCommentsGroup")
+	@ElementBy (className = "warning", within = "copyCommentsGroup")
 	PageElement copyCommentsNotice;
 
 	@ElementBy (id = "remoteIssueLink")
@@ -46,7 +46,7 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (id = "copy-issue-links-group")
 	PageElement copyIssueLinksGroup;
 
-	@ElementBy (className = "notice", within = "copyIssueLinksGroup")
+	@ElementBy (className = "warning", within = "copyIssueLinksGroup")
 	PageElement copyIssueLinksNotice;
 
 	@ElementBy (id = "copy-attachments")
@@ -55,7 +55,7 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (id = "copy-attachments-group")
 	PageElement copyAttachmentsGroup;
 
-	@ElementBy (className = "notice", within = "copyAttachmentsGroup")
+	@ElementBy (className = "warning", within = "copyAttachmentsGroup")
 	PageElement copyAttachmentsNotice;
 
     public CopyDetailsPage(final Long issueId, final String targetEntityLink)
