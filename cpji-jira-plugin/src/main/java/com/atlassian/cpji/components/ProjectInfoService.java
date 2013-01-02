@@ -73,7 +73,7 @@ public class ProjectInfoService {
 
 
         CopyInformationBean copyInformationBean = new CopyInformationBean(
-                hasCreateIssuePermission?getMasterIssueTypes(project):null,
+                hasCreateIssuePermission ? getMasterIssueTypes(project) : null,
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
                 userBean,

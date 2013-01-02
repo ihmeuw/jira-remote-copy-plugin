@@ -238,7 +238,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		return isIssueWithComments();
 	}
 
-    private int getExceedingAttachmentsCount(){
+    private int getNumberOfAttachmentsLargerThanAllowed(){
         return Iterables.size(
             Iterables.filter(getIssueObject().getAttachments(), new Predicate<Attachment>() {
                 @Override
@@ -255,7 +255,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 
     public boolean isCopyAttachmentsEnabled(){
         return copyInfo.getAttachmentsEnabled() && copyInfo.getHasCreateAttachmentPermission()
-                && getExceedingAttachmentsCount() < getAllAttachmentsCount();
+                && getNumberOfAttachmentsLargerThanAllowed() < getAllAttachmentsCount();
     }
 
 	public String getCopyAttachmentsErrorMessage() {
@@ -264,7 +264,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		} else if(!copyInfo.getHasCreateAttachmentPermission()) {
 			return getText("cpji.not.permitted.to.create.attachments");
 		} else{
-            int count = getExceedingAttachmentsCount();
+            int count = getNumberOfAttachmentsLargerThanAllowed();
             if(count == getAllAttachmentsCount()){
                 return getText("cpji.all.attachments.are.too.big");
             } else if(count > 0){
