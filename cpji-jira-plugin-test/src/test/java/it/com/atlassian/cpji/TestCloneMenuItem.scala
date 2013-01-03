@@ -1,6 +1,6 @@
 package it.com.atlassian.cpji
 
-import org.junit.{Rule, Test}
+import org.junit.{Ignore, Rule, Test}
 import org.junit.Assert._
 import org.hamcrest.collection.{IsIterableContainingInOrder, IsIterableWithSize}
 import com.atlassian.cpji.tests.pageobjects._
@@ -43,7 +43,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 	val testkit2 = AbstractCopyIssueTest.testkit2
 	val testkit3 = AbstractCopyIssueTest.testkit3
 
-	@Test def shouldNotDisplayDefaultCloneActionWhenPluginIsInstalled() {
+	@Ignore @Test def shouldNotDisplayDefaultCloneActionWhenPluginIsInstalled() {
 		login(jira1)
 		val adminPage: ConfigureCopyIssuesAdminActionPage = jira1.visit(classOf[ConfigureCopyIssuesAdminActionPage], "TST")
 		assertThat(adminPage.getAllowedGroups, IsIterableWithSize.iterableWithSize[String](0))
@@ -52,7 +52,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		Poller.waitUntilTrue(viewIssue.getIssueActionsFragment.hasRICCloneAction)
 	}
 
-	@Test def shouldNotDisplayDefaultCloneActionAtDOTWindow() {
+	@Ignore @Test def shouldNotDisplayDefaultCloneActionAtDOTWindow() {
 		login(jira1)
 		val viewIssue: ExtendedViewIssuePage = AbstractCopyIssueTest.jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
 		var dialog = viewIssue.openDOTSection()
@@ -61,7 +61,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 		assertThat(actionLinks, Matchers.not(Matchers.contains(Matchers.containsString("CloneIssueDetails"))));
 	}
 
-	@Test def shouldNotDisplayDefaultCloneActionAtIssueNavigator() {
+	@Ignore @Test def shouldNotDisplayDefaultCloneActionAtIssueNavigator() {
 		login(jira1)
 		AbstractCopyIssueTest.jira1.visit(classOf[CommonBasicSearch])
 
