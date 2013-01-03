@@ -67,6 +67,10 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 		}
 	}
 
+	public boolean isTargetLocal() {
+		return getSelectedDestinationProject().getJiraLocation().isLocal();
+	}
+
     protected <T> T handleGenericResponseStatus(JiraProxy jira, Either<NegativeResponseStatus, T> response, Function<NegativeResponseStatus, Void> errorOccuredHandler){
         if(response.isRight()){
             return response.right().get();

@@ -27,6 +27,7 @@
 				</div>
 			</fieldset>
 
+			#if (!$action.targetLocal)
 			<h2>$i18n.getText('cpji.remote.user')</h2>
 			<fieldset>
 				<div class="field-group">
@@ -38,6 +39,7 @@
 					<span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName())</span>
 				</div>
 			</fieldset>
+			#end
 
 			#if ($action.advancedSectionVisible)
 			<h2>$i18n.getText('cpji.advanced')</h2>

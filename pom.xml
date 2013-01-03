@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>atlassian-closedsource-pom</artifactId>
-        <version>27</version>
+        <version>25</version>
     </parent>
 
     <groupId>com.atlassian.cpji</groupId>
@@ -267,6 +267,11 @@
 					<releaseProfiles>releaseProfile</releaseProfiles>
 					<!--allowTimestampedSnapshots>true</allowTimestampedSnapshots-->
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>net.sf.alchim</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>0.7.1</version>
 			</plugin>
 			<plugin>
 				<groupId>com.atlassian.maven.plugins</groupId>
