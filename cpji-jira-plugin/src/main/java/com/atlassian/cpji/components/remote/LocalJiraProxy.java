@@ -37,7 +37,8 @@ import java.util.Collection;
  */
 public class LocalJiraProxy implements JiraProxy {
 
-    static final JiraLocation LOCAL_JIRA_LOCATION = new JiraLocation("LOCAL", "LOCAL");
+	public static final String LOCAL_ID = "LOCAL";
+	static final JiraLocation LOCAL_JIRA_LOCATION = new JiraLocation(LOCAL_ID, LOCAL_ID);
 
     private final JiraLocation jiraLocation;
     private final PermissionManager permissionManager;

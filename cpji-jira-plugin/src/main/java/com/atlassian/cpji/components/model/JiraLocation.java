@@ -2,6 +2,7 @@ package com.atlassian.cpji.components.model;
 
 import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLink;
+import com.atlassian.cpji.components.remote.LocalJiraProxy;
 import com.google.common.base.Preconditions;
 
 /**
@@ -9,8 +10,7 @@ import com.google.common.base.Preconditions;
  */
 public class JiraLocation {
 
-
-    private final String id;
+	private final String id;
 
     private final String name;
 
@@ -42,7 +42,11 @@ public class JiraLocation {
 
     public String getName() {
         return name;
-    }
+	}
+
+	public boolean isLocal() {
+		return id.equalsIgnoreCase(LocalJiraProxy.LOCAL_ID);
+	}
 
     public ApplicationId toApplicationId() {
         return new ApplicationId(id);
