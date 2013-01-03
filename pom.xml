@@ -307,7 +307,7 @@
 			<id>releaseProfile</id>
 			<properties>
 				<maven.test.unit.skip>false</maven.test.unit.skip>
-				<maven.test.it.skip>false</maven.test.it.skip>
+				<maven.test.it.skip>true</maven.test.it.skip>
 			</properties>
 		</profile>
 		<profile>
