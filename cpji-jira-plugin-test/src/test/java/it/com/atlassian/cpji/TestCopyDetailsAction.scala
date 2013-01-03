@@ -13,7 +13,6 @@ import org.hamcrest.core.IsCollectionContaining
 import com.google.common.collect.Collections2
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.cpji.CopyIssueProcess
-import org.hamcrest.Matchers.containsString
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
 	val createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient1)

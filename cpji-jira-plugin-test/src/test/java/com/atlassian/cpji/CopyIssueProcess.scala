@@ -1,6 +1,6 @@
 package com.atlassian.cpji
 
-import tests.pageobjects.{SelectTargetProjectPage, CopyDetailsPage}
+import com.atlassian.cpji.tests.pageobjects.{SelectTargetProjectPage, CopyDetailsPage}
 import com.atlassian.jira.pageobjects.JiraTestedProduct
 
 object CopyIssueProcess {

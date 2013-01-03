@@ -1,11 +1,6 @@
 package it.com.atlassian.cpji
 
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstancePage, PermissionChecksPage, CopyDetailsPage, SelectTargetProjectPage}
-import org.junit.Assert._
-import java.lang.String
-import org.hamcrest.Matchers._
-import org.json.JSONObject
-import com.atlassian.cpji.tests.RawRestUtil._
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, SelectTargetProjectPage}
 import org.junit.{Before, Test}
 import com.atlassian.jira.pageobjects.JiraTestedProduct
 

@@ -5,7 +5,7 @@ import com.atlassian.jira.rest.client.domain._
 import input.{IssueInput, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.io.ByteArrayInputStream
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstancePage, CopyDetailsPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstancePage, CopyDetailsPage}
 import org.junit.Assert._
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.cpji.tests.rules.CreateIssues
@@ -14,8 +14,6 @@ import org.hamcrest.collection.IsIterableWithSize
 import com.atlassian.cpji.tests.RawRestUtil._
 import org.json.JSONArray
 import com.atlassian.cpji.CopyIssueProcess
-import it.com.atlassian.cpji.BackdoorHelpers._
-import com.atlassian.jira.security.Permissions
 
 class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 

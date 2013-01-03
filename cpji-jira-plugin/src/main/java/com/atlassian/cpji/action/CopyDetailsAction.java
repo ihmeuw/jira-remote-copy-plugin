@@ -198,7 +198,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     {
 		List<Option> issueLinkOptions = Lists.newArrayList();
 
-		if (linksEnabled() && copyInfo.getIssueLinkingEnabled()) {
+		if (linksEnabled() && copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {
 			issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
 		}
 		if (copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {

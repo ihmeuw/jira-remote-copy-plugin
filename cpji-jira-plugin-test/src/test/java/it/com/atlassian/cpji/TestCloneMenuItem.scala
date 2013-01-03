@@ -2,9 +2,8 @@ package it.com.atlassian.cpji
 
 import org.junit.{Rule, Test}
 import org.junit.Assert._
-import org.hamcrest.collection.{IsIterableContainingInOrder, IsIterableWithSize}
+import org.hamcrest.collection.IsIterableWithSize
 import com.atlassian.cpji.tests.pageobjects._
-import admin.ListApplicationLinksPage
 import com.atlassian.pageobjects.elements.query.{TimedQuery, Poller}
 import com.atlassian.jira.security.Permissions
 import com.atlassian.cpji.tests.rules.CreateIssues
@@ -13,11 +12,7 @@ import com.atlassian.jira.rest.client.domain.input.{ComplexIssueInputFieldValue,
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.lang.String
 import BackdoorHelpers._
-import org.hamcrest.core.StringContains
-import org.hamcrest.{Description, BaseMatcher, Matchers, Matcher}
-import com.atlassian.jira.pageobjects.navigator.{AdvancedSearch, BasicSearch}
-import com.atlassian.cpji.tests.ScreenshotUtil
-import com.atlassian.pageobjects.binder.PageBindingException
+import org.hamcrest.{Matchers, Matcher}
 import org.apache.log4j.Logger
 
 /**
