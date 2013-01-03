@@ -2,14 +2,10 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
-import com.atlassian.cpji.action.admin.RequiredFieldsAwareAction;
-import com.atlassian.cpji.components.FieldLayoutService;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
-import com.atlassian.cpji.rest.model.IssueFieldBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.fugue.Either;
@@ -19,32 +15,22 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.customfields.OperationContext;
-import com.atlassian.jira.issue.fields.OrderableField;
-import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.plugin.webresource.WebResourceManager;
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
-import webwork.action.ActionContext;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.atlassian.cpji.action.admin.RequiredFieldsAwareAction.getDisplayParameters;
 
 /**
  *
@@ -58,8 +44,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     private Collection<Option> availableIssueTypes;
 	private final IssueLinkManager issueLinkManager;
 	private final IssueLinkTypeManager issueLinkTypeManager;
-	private final FieldLayoutService fieldLayoutService;
-	private final DefaultFieldValuesManager defaultFieldValuesManager;
 
 	private CopyInformationBean copyInfo;
 
@@ -72,16 +56,12 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 			final JiraProxyFactory jiraProxyFactory,
 			final WebResourceManager webResourceManager,
 			final IssueLinkManager issueLinkManager,
-			final IssueLinkTypeManager issueLinkTypeManager,
-			final FieldLayoutService fieldLayoutService,
-			final DefaultFieldValuesManager defaultFieldValuesManager)
+			final IssueLinkTypeManager issueLinkTypeManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
 		this.issueLinkTypeManager = issueLinkTypeManager;
-		this.fieldLayoutService = fieldLayoutService;
-		this.defaultFieldValuesManager = defaultFieldValuesManager;
 	}
 
 	public boolean isIssueWithComments() {
@@ -162,20 +142,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	{
 		return getApplicationProperties().getOption(APKeys.JIRA_OPTION_ISSUELINKING);
 	}
-
-	public CopyInformationBean getCopyInfo() {
-		return copyInfo;
-	}
-
-	public boolean remoteAttachmentsEnabled()
-    {
-        return getCopyInfo().getAttachmentsEnabled();
-    }
-
-    public Boolean hasCreateAttachmentsPermission()
-    {
-        return getCopyInfo().getHasCreateAttachmentPermission();
-    }
 
     private void checkIssueTypes(final Collection<IssueTypeBean> values)
     {
@@ -288,57 +254,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 			return getText("cpji.not.permitted.to.create.comments");
 		}
 		return "";
-	}
-
-	public IssueTypeBean getRemoteIssueType() {
-		final MutableIssue issue = getIssueObject();
-		final IssueType issueType = issue.getIssueTypeObject();
-
-		IssueTypeBean remoteIssueType = Iterables.getFirst(
-				Iterables.filter(copyInfo.getIssueTypes(), IssueTypeBean.hasName(issueType.getName())), null);
-		if (remoteIssueType == null) {
-			remoteIssueType = Iterables.getFirst(copyInfo.getIssueTypes(), null);
-		}
-		return remoteIssueType;
-	}
-
-	public List<FieldLayoutItem> getFieldLayoutItems() {
-		final MutableIssue issue = getIssueObject();
-		final IssueType issueType = issue.getIssueTypeObject();
-
-		final IssueTypeBean remoteIssueType = getRemoteIssueType();
-		Preconditions.checkNotNull("Remote JIRA has not Issue Types", remoteIssueType);
-
-		final Iterable<IssueFieldBean> fields = Iterables.filter(remoteIssueType.getRequiredFields(), Predicates.not(IssueFieldBean.hasId(
-				RequiredFieldsAwareAction.UNMODIFIABLE_FIELDS)));
-
-		return Lists.newArrayList(Iterables.transform(fields, new Function<IssueFieldBean, FieldLayoutItem>() {
-			@Override
-			public FieldLayoutItem apply(@Nullable IssueFieldBean input) {
-				return fieldLayoutService.createDefaultFieldLayoutItem(input.getId(), true);
-			}
-		}));
-	}
-
-	public String getHtmlForField(FieldLayoutItem fieldLayoutItem)
-	{
-		final IssueTypeBean remoteIssueType = getRemoteIssueType();
-		Preconditions.checkNotNull("Remote JIRA has not Issue Types", remoteIssueType);
-
-		OrderableField orderableField = fieldLayoutItem.getOrderableField();
-		Object defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(getSelectedDestinationProject().getProjectKey(),
-				orderableField.getId(), remoteIssueType.getName());
-		if (ActionContext.getParameters().get(orderableField.getId()) == null)
-		{
-			if (defaultFieldValue != null)
-			{
-				Map actionParams = new HashMap();
-				actionParams.put(orderableField.getId(), defaultFieldValue);
-				orderableField.populateFromParams(Maps.newHashMap(), actionParams);
-			}
-		}
-
-		return orderableField.getEditHtml(fieldLayoutItem, this, this, getIssueObject(), getDisplayParameters());
 	}
 
 	@Override
