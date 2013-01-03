@@ -69,9 +69,9 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 
     protected <T> T handleGenericResponseStatus(JiraProxy jira, Either<NegativeResponseStatus, T> response, Function<NegativeResponseStatus, Void> errorOccuredHandler){
         if(response.isRight()){
-            return (T)response.right().get();
+            return response.right().get();
         } else {
-            NegativeResponseStatus status = (NegativeResponseStatus) response.left().get();
+            NegativeResponseStatus status = response.left().get();
             log.error(status);
             switch(status.getResult()){
                 case AUTHENTICATION_FAILED:
