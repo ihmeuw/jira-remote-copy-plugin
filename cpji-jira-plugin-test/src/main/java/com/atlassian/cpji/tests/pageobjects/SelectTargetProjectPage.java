@@ -33,7 +33,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	@ElementBy(id = "targetEntityLink-container")
 	protected PageElement targetEntityLinkContainer;
 
-    @ElementBy(className = "error", within = "targetEntityLinkContainer")
+    @ElementBy(className = "error", within = "targetEntityLinkContainer", timeoutType = TimeoutType.SLOW_PAGE_LOAD)
 	protected PageElement targetEntityErrorMessage;
 
 	@ElementBy (id = "targetEntityLink-single-select", timeoutType = TimeoutType.SLOW_PAGE_LOAD)
