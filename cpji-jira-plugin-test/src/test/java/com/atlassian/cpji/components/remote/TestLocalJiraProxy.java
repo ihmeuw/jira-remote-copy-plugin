@@ -6,6 +6,7 @@ import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
 import com.atlassian.cpji.components.model.*;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
+import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -16,6 +17,7 @@ import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.issue.link.*;
 import com.atlassian.jira.mock.issue.MockIssue;
@@ -36,13 +38,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import java.io.File;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertSame;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -137,13 +141,43 @@ public class TestLocalJiraProxy {
         assertSame(bean, copyResult);
     }
 
-
     @Test
     public void copyIssueShouldReturnResponseStatusOnException() throws Exception {
+        CopyIssueBean bean = new CopyIssueBean();
 
-        when(copyIssueService.copyIssue(null)).thenThrow(new ProjectNotFoundException(errors));
+        when(copyIssueService.copyIssue(bean)).thenThrow(new ProjectNotFoundException(errors));
 
-        verifyFailure(localJiraProxy.copyIssue(null), errors);
+        verifyFailure(localJiraProxy.copyIssue(bean), errors);
+
+    }
+
+    @Test
+    public void copyIssueShouldSetParentIdOnCloningSubtaskToTheSameProject() throws Exception {
+        CopyIssueBean bean = new CopyIssueBean();
+        bean.setOriginalKey("KEY-ORIGINAL");
+        bean.setTargetProjectKey("TARGET");
+
+        MutableIssue clonedIssue = new MockIssue();
+        final MockProject project = new MockProject();
+        project.setKey("TARGET");
+        clonedIssue.setProjectObject(project);
+        clonedIssue.setParentId(123L);
+
+        when(projectInfoService.isIssueTypeASubtask(null, "TARGET")).thenReturn(true);
+        when(issueManager.getIssueObject("KEY-ORIGINAL")).thenReturn(clonedIssue);
+        when(copyIssueService.copyIssue(Matchers.<CopyIssueBean>any())).thenReturn(new IssueCreationResultBean());
+
+        localJiraProxy.copyIssue(bean);
+
+        ArgumentMatcher<CopyIssueBean> containsParentIssueId = new ArgumentMatcher<CopyIssueBean>() {
+            @Override
+            public boolean matches(Object argument) {
+                return ((CopyIssueBean)argument).getTargetParentId() == 123L;
+            }
+        };
+
+        verify(copyIssueService).copyIssue(argThat(containsParentIssueId));
+
 
     }
 
@@ -151,12 +185,13 @@ public class TestLocalJiraProxy {
     @Test
     public void copyIssueShouldUseService() throws Exception {
         IssueCreationResultBean bean = new IssueCreationResultBean();
-        when(copyIssueService.copyIssue(null)).thenReturn(bean);
+        CopyIssueBean copyIssueBean = new CopyIssueBean();
+        when(copyIssueService.copyIssue(copyIssueBean)).thenReturn(bean);
 
-        IssueCreationResultBean result = extractRight(localJiraProxy.copyIssue(null));
+        IssueCreationResultBean result = extractRight(localJiraProxy.copyIssue(copyIssueBean));
 
         assertSame(bean, result);
-        verify(copyIssueService).copyIssue(null);
+        verify(copyIssueService).copyIssue(copyIssueBean);
     }
 
 
