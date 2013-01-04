@@ -58,6 +58,10 @@
                     #end
                 </tbody>
             </table>
+
+			#foreach($item in $action.fieldLayoutItems)
+				$action.getHtmlForField($item)
+			#end
         #end
         <h4 class="sub-heading">Custom fields</h4>
         #if ($action.getCustomFieldPermissions().isEmpty())
