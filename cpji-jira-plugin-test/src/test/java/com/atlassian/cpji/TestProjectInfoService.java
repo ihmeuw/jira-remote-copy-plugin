@@ -19,7 +19,6 @@ import com.atlassian.jira.webtests.Permissions;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,14 +27,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.hasItems;
+import static org.mockito.Mockito.*;
 
 /**
  * @since v3.0
@@ -78,15 +74,11 @@ public class TestProjectInfoService {
 
         when(permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, mockedUser)).thenReturn(true);
 
-        ImmutableList<String> issueTypeNames = ImmutableList.of("ISSUETYPE1", "Another type");
-        List<IssueType> issueTypes = ImmutableList.copyOf(Iterables.transform(issueTypeNames, new Function<String, IssueType>() {
-            @Override
-            public IssueType apply(@Nullable String input) {
-                return mockIssueType(input);
-            }
-        }));
+        ImmutableList<IssueType> issueTypes = ImmutableList.of(mockIssueType("ISSUETYPE1"), mockIssueType("Another type"));
+        ImmutableList<IssueType> subTaskIssueTypes = ImmutableList.of(mockIssueType("sub1"), mockIssueType("subtask2"));
 
-        when(issueTypeSchemeManager.getIssueTypesForProject(project)).thenReturn(issueTypes);
+        when(issueTypeSchemeManager.getNonSubTaskIssueTypesForProject(project)).thenReturn(issueTypes);
+        when(issueTypeSchemeManager.getSubTaskIssueTypesForProject(project)).thenReturn(subTaskIssueTypes);
 
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS)).thenReturn(true);
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING)).thenReturn(true);
@@ -96,12 +88,14 @@ public class TestProjectInfoService {
 
         assertEquals(true, result.getHasCreateIssuePermission());
         assertEquals(false, result.getHasCreateAttachmentPermission());
-        assertThat(Iterables.transform(result.getIssueTypes(), new Function<IssueTypeBean, String>() {
-			@Override
-			public String apply(IssueTypeBean input) {
-				return input.getName();
-			}
-		}), IsIterableContainingInAnyOrder.<String> containsInAnyOrder(issueTypeNames.toArray(new String[] {})));
+        assertThat(
+                Iterables.transform(result.getIssueTypes(), issueTypeBeanToName()),
+                hasItems(Iterables.toArray(Iterables.transform(issueTypes, issueTypeToName()), String.class))
+        );
+        assertThat(
+                Iterables.transform(result.getSubtaskIssueTypes(), issueTypeBeanToName()),
+                hasItems(Iterables.toArray(Iterables.transform(subTaskIssueTypes, issueTypeToName()), String.class))
+        );
         assertEquals(true, result.getAttachmentsEnabled());
         assertEquals(true, result.getIssueLinkingEnabled());
         assertEquals(1000L, result.getMaxAttachmentSize().longValue());
@@ -113,6 +107,24 @@ public class TestProjectInfoService {
         IssueType type = mock(IssueType.class);
         when(type.getName()).thenReturn(name);
         return type;
+    }
+
+    public static Function<IssueTypeBean, String> issueTypeBeanToName(){
+        return new Function<IssueTypeBean, String>() {
+            @Override
+            public String apply(@Nullable IssueTypeBean input) {
+                return input.getName();
+            }
+        };
+    }
+
+    public static Function<IssueType, String> issueTypeToName(){
+        return new Function<IssueType, String>() {
+            @Override
+            public String apply(@Nullable IssueType input) {
+                return input.getName();
+            }
+        };
     }
 
 

@@ -20,6 +20,7 @@ import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.bc.project.ProjectService;
+import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
@@ -30,6 +31,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
+import com.atlassian.jira.mock.issue.MockIssue;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.I18nHelper;
@@ -55,6 +57,7 @@ public class TestCopyIssueService {
     public static final String ISSUE_TYPE = "Issue type";
     public static final String PROJECT_KEY = "PKEY";
     public static final String ISSUE_KEY = "PKEY-4";
+    public static final Long PARENT_ISSUE_ID = 123L;
     public static final Long ISSUE_ID = 1L;
 
     private CopyIssueService copyIssueService;
@@ -89,6 +92,8 @@ public class TestCopyIssueService {
     private Project project;
     @Mock
     private MutableIssue createdIssue;
+    @Mock
+    private SubTaskManager subTaskManager;
 
     @Before
     public void setUp() throws Exception {
@@ -105,7 +110,7 @@ public class TestCopyIssueService {
         when(createdIssue.getKey()).thenReturn(ISSUE_KEY);
         when(createdIssue.getId()).thenReturn(ISSUE_ID);
 
-        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService);
+        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, subTaskManager);
     }
 
 
@@ -123,6 +128,21 @@ public class TestCopyIssueService {
         assertEquals(project.getKey(), result.getProject());
         assertEquals(ISSUE_KEY, result.getIssueKey());
         assertEquals(ISSUE_ID, result.getIssueId());
+    }
+
+    @Test()
+    public void copyIssueShouldCreateSubtaskWhenParentIdWasGiven() throws Exception {
+        final MutableIssue parentIssue = new MockIssue(PARENT_ISSUE_ID);
+        CopyRequirements reqs = new CopyRequirements();
+        reqs.copyBean.setTargetParentId(parentIssue.getId());
+
+        prepareIssueServiceForSubtask(parentIssue);
+
+        copyIssueService.copyIssue(reqs.copyBean);
+
+        verify(issueService).validateSubTaskCreate(currentUser, PARENT_ISSUE_ID, null);
+        verify(issueService).create(eq(currentUser), (IssueService.CreateValidationResult) any());
+        verify(subTaskManager).createSubTaskIssueLink(parentIssue, createdIssue, currentUser);
     }
 
 	/**
@@ -330,12 +350,26 @@ public class TestCopyIssueService {
     }
 
 
-
     private Pair<IssueService.CreateValidationResult, IssueService.IssueResult> prepareIssueService(){
+        return prepareIssueService(false);
+    }
+
+    private Pair<IssueService.CreateValidationResult, IssueService.IssueResult> prepareIssueServiceForSubtask(MutableIssue parentIssue){
+        Pair<IssueService.CreateValidationResult, IssueService.IssueResult> result = prepareIssueService(true);
+        when(issueService.getIssue(currentUser, PARENT_ISSUE_ID)).thenReturn(new IssueService.IssueResult(parentIssue));
+        return result;
+
+    }
+
+    private Pair<IssueService.CreateValidationResult, IssueService.IssueResult> prepareIssueService(boolean prepareSubTaskCreation){
         //validation result
         IssueService.CreateValidationResult validationResult = mock(IssueService.CreateValidationResult.class);
         when(validationResult.isValid()).thenReturn(true);
-        when(issueService.validateCreate(currentUser, null)).thenReturn(validationResult);
+        if(prepareSubTaskCreation){
+            when(issueService.validateSubTaskCreate(currentUser, PARENT_ISSUE_ID, null)).thenReturn(validationResult);
+        } else {
+            when(issueService.validateCreate(currentUser, null)).thenReturn(validationResult);
+        }
 
         //creation result
         IssueService.IssueResult issueResult = mock(IssueService.IssueResult.class);

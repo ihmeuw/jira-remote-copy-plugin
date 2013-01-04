@@ -16,6 +16,9 @@ public class CopyInformationBean {
 	@XmlElement
 	private List<IssueTypeBean> issueTypes;
 
+    @XmlElement
+    private List<IssueTypeBean> subtaskIssueTypes;
+
 	@XmlElement
 	private boolean attachmentsEnabled;
 
@@ -50,6 +53,7 @@ public class CopyInformationBean {
 
 	public CopyInformationBean(
 			final Iterable<IssueTypeBean> issueTypes,
+			final Iterable<IssueTypeBean> subtaskIssueTypes,
 			final boolean attachmentsEnabled,
 			final boolean issueLinkingEnabled,
 			final UserBean user,
@@ -63,6 +67,7 @@ public class CopyInformationBean {
     ) {
 		this.hasCreateCommentPermission = hasCreateCommentPermission;
 		this.hasCreateLinksPermission = hasCreateLinksPermission;
+        this.subtaskIssueTypes = Lists.newArrayList(subtaskIssueTypes);
 		this.issueTypes = Lists.newArrayList(issueTypes);
 		this.attachmentsEnabled = attachmentsEnabled;
 		this.issueLinkingEnabled = issueLinkingEnabled;
@@ -147,5 +152,13 @@ public class CopyInformationBean {
 
     public Long getMaxAttachmentSize() {
         return maxAttachmentSize;
+    }
+
+    public List<IssueTypeBean> getSubtaskIssueTypes() {
+        return subtaskIssueTypes;
+    }
+
+    public void setSubtaskIssueTypes(List<IssueTypeBean> subtaskIssueTypes) {
+        this.subtaskIssueTypes = subtaskIssueTypes;
     }
 }

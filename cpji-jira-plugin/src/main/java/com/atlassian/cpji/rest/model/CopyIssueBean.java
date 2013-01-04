@@ -1,9 +1,9 @@
 package com.atlassian.cpji.rest.model;
 
-import java.util.Date;
-import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @since v1.0
@@ -22,6 +22,8 @@ public class CopyIssueBean
     private String targetProjectKey;
 
     private String targetIssueType;
+
+    private Long targetParentId;
 
     private String priority;
 
@@ -279,6 +281,14 @@ public class CopyIssueBean
     public List<CustomFieldBean> getCustomFields()
     {
         return customFields;
+    }
+
+    public Long getTargetParentId() {
+        return targetParentId;
+    }
+
+    public void setTargetParentId(Long targetParentId) {
+        this.targetParentId = targetParentId;
     }
 }
 
