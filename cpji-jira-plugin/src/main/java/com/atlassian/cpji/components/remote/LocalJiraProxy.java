@@ -106,8 +106,6 @@ public class LocalJiraProxy implements JiraProxy {
         }
     }
 
-
-
     @Override
     public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean) {
         try {
