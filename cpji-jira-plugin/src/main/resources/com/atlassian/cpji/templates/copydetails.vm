@@ -13,7 +13,7 @@
 		</ol>
 	</div>
 	<div class="content-body aui-panel">
-		<form action="PermissionChecksAction.jspa" class="aui" method="post">
+		<form action="CopyIssueToInstanceAction!default.jspa" class="aui" method="post">
 			<h2>$i18n.getText('cpji.issue.type')</h2>
 			<fieldset>
 				<div class="field-group">

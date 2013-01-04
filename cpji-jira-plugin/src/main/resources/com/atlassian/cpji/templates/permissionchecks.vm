@@ -1,4 +1,4 @@
-#* @vtlvariable name="action" type="com.atlassian.cpji.action.PermissionChecksAction" *#
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.CopyIssueToInstanceAction" *#
 <html>
 <head>
     <title>$i18n.getText('cpji.confirm.new.values')</title>
@@ -13,9 +13,9 @@
         </ol>
     </div>
     <div class="content-body aui-panel">
-        <form #if ($action.canCopyIssue()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui" >
+        <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui" >
 			<h2>$i18n.getText('cpji.confirm.new.values')</h2>
-			#if(!$action.canCopyIssue())
+			#if(!$action.isCopyingPossible())
 				<div class="aui-message error"><span class="aui-icon icon-error"></span><p>$i18n.getText('cpji.cant.copy.issue')</p>
 				   <ul>
 					 #foreach( $permission in $action.getSystemFieldPermissions() )
@@ -46,11 +46,7 @@
 				$i18n.getText('cpji.some.fields.are.missing') #if ($action.selectedDestinationProject.jiraLocation.local) $i18n.getText('cpji.please.set.values') #end
 
 				#foreach( $permission in $action.getSystemFieldPermissions() )
-					#parse('/com/atlassian/cpji/templates/default.html.for.field.vm')
-				#end
-
-				#foreach($item in $action.fieldLayoutItems)
-					$action.getHtmlForField($item)
+					$action.getHtmlForField($permission)
 				#end
 			#end
 
@@ -58,16 +54,16 @@
 			#if ($action.getCustomFieldPermissions().isEmpty())
 				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.all.custom.fields.retained')</p></div>
 			#else
-				$i18n.getText('cpji.some.fields.are.missing')
+				$i18n.getText('cpji.some.fields.are.missing') #if ($action.selectedDestinationProject.jiraLocation.local) $i18n.getText('cpji.please.set.values') #end
 
 				#foreach( $permission in $action.customFieldPermissions )
-					#parse('/com/atlassian/cpji/templates/default.html.for.field.vm')
+					$action.getHtmlForField($permission)
 				#end
 			#end
 
             <div class="button-container">
                 <div class="buttons">
-                   #if ($action.canCopyIssue())
+                   #if ($action.isCopyingPossible())
                     <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="button submit"/>
                    #else
                     <input type="submit" value="$i18n.getText('common.forms.cancel')" class="button submit"/>
