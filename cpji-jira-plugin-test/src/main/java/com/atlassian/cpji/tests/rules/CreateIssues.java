@@ -32,11 +32,15 @@ public class CreateIssues extends ExternalResource {
 	}
 
 	public Issue newIssue(FieldInput... fieldInput) {
-		Issue issue = restClient.getIssueClient().getIssue(
-				restClient.getIssueClient().createIssue(IssueInput.createWithFields(fieldInput), NPM).getKey(), NPM);
-		issues.add(issue);
-		return issue;
+        return newIssue(IssueInput.createWithFields(fieldInput));
 	}
+
+    public Issue newIssue(IssueInput input){
+        Issue issue = restClient.getIssueClient().getIssue(
+                restClient.getIssueClient().createIssue(input, NPM).getKey(), NPM);
+        issues.add(issue);
+        return issue;
+    }
 
 	@Override
 	protected void after() {
