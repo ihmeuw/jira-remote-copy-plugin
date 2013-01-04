@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     private String remoteFullUserName;
 
     private Collection<Option> availableIssueTypes;
+    private Collection<Option> availableSubTaskTypes;
 	private final IssueLinkManager issueLinkManager;
 	private final IssueLinkTypeManager issueLinkTypeManager;
 
@@ -113,8 +115,16 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             addErrorMessage(getText("cpji.you.dont.have.create.issue.permission"));
             return ERROR;
         }
+        availableIssueTypes = getIssueTypeOptionsList(copyInfo.getIssueTypes());
 
-        checkIssueTypes(copyInfo.getIssueTypes());
+        //if we copy to the same project display also subtask types
+        if(proxy.getJiraLocation().isLocal() && getIssueObject().getProjectObject().getKey().equals(entityLink.getProjectKey())){
+            availableSubTaskTypes = getIssueTypeOptionsList(copyInfo.getSubtaskIssueTypes());
+        } else {
+            availableSubTaskTypes = Collections.emptyList();
+        }
+
+
 
 		UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
@@ -143,28 +153,31 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		return getApplicationProperties().getOption(APKeys.JIRA_OPTION_ISSUELINKING);
 	}
 
-    private void checkIssueTypes(final Collection<IssueTypeBean> values)
+	private List<Option> getIssueTypeOptionsList(final Collection<IssueTypeBean> values)
     {
         MutableIssue issue = getIssueObject();
-        availableIssueTypes = Lists.newArrayList();
+        List<Option> result = Lists.newArrayList();
+        if(values != null){
         for (IssueTypeBean value : values)
-        {
-            if (StringUtils.equalsIgnoreCase(value.getName(), issue.getIssueTypeObject().getName()))
             {
-                availableIssueTypes.add(new Option(value.getName(), true));
-            }
-            else
-            {
-                availableIssueTypes.add(new Option(value.getName(), false));
+                if (StringUtils.equalsIgnoreCase(value.getName(), issue.getIssueTypeObject().getName()))
+                {
+                    result.add(new Option(value.getName(), true));
+                }
+                else
+                {
+                    result.add(new Option(value.getName(), false));
+                }
             }
         }
+        return result;
     }
 
     public List<Option> getIssueLinkOptions()
     {
 		List<Option> issueLinkOptions = Lists.newArrayList();
 
-		if (linksEnabled() && copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {
+		if (linksEnabled() && copyInfo.getIssueLinkingEnabled()) {
 			issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
 		}
 		if (copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {
@@ -265,4 +278,8 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	public IssueOperation getIssueOperation() {
 		return IssueOperations.EDIT_ISSUE_OPERATION;
 	}
+
+    public Collection<Option> getAvailableSubTaskTypes() {
+        return availableSubTaskTypes;
+    }
 }

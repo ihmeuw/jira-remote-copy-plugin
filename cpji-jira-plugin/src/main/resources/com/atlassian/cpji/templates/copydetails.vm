@@ -19,9 +19,21 @@
 				<div class="field-group">
 					<label for="issueType">$i18n.getText('cpji.issue.type')</label>
 					<select name="issueType" id="issueType">
+						#if(!$action.availableSubTaskTypes.empty)
+							<optgroup label="$i18n.getText('cpji.subtask')">
+								#foreach( $issueType in $action.availableSubTaskTypes)
+                                    <option #if(${issueType.isSelected()}) selected #end
+                                                                           value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
+								#end
+							</optgroup>
+                        <optgroup label="$i18n.getText('cpji.issue.type')">
+						#end
 						#foreach( $issueType in $action.getAvailableIssueTypes())
 							<option #if(${issueType.isSelected()}) selected #end
 																   value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
+						#end
+						#if(!$action.availableSubTaskTypes.empty)
+						</optgroup>
 						#end
 					</select>
 				</div>

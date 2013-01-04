@@ -20,6 +20,7 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.BuildUtilsInfo;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -72,8 +73,19 @@ public class ProjectInfoService {
         final long maxAttachmentSize = Long.parseLong(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE));
 
 
+        Iterable<IssueTypeBean> issueTypesForProject = null;
+        Iterable<IssueTypeBean> subTaskIssueTypesForProject = null;
+
+        if(hasCreateIssuePermission){
+            issueTypesForProject = Collections2.transform(issueTypeSchemeManager.getNonSubTaskIssueTypesForProject(project), convertIssueType(project));
+            subTaskIssueTypesForProject = Collections2.transform(issueTypeSchemeManager.getSubTaskIssueTypesForProject(project), convertIssueType(project));
+        }
+
+
+
         CopyInformationBean copyInformationBean = new CopyInformationBean(
-                hasCreateIssuePermission ? getMasterIssueTypes(project) : null,
+                issueTypesForProject,
+                subTaskIssueTypesForProject,
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
                 userBean,
@@ -84,20 +96,31 @@ public class ProjectInfoService {
 
     }
 
-	protected Collection<IssueTypeBean> getMasterIssueTypes(final Project project) {
-		return Collections2.transform(
-                Collections2.filter(issueTypeSchemeManager.getIssueTypesForProject(project), new Predicate<IssueType>() {
-                    @Override
-                    public boolean apply(@Nullable IssueType input) {
-                        return input != null && !input.isSubTask();
-                    }
-                }), new Function<IssueType, IssueTypeBean>() {
-			@Override
-			public IssueTypeBean apply(IssueType issueType) {
-				return new IssueTypeBean(issueType.getName(), getRequiredFields(project, issueType));
-			}
-		});
-	}
+    public boolean isIssueTypeASubtask(final String issueTypeName, String projectKey){
+        Preconditions.checkNotNull(issueTypeName);
+
+        ProjectService.GetProjectResult project = projectService.getProjectByKey(jiraAuthenticationContext.getLoggedInUser(), projectKey);
+        Collection<IssueType> subTaskTypes = issueTypeSchemeManager.getSubTaskIssueTypesForProject(project.getProject());
+
+        Collection<IssueType> subTasksWithEqualName = Collections2.filter(subTaskTypes, new Predicate<IssueType>() {
+            @Override
+            public boolean apply(@Nullable IssueType input) {
+                return issueTypeName.equals(input.getName());
+            }
+        });
+        return !subTasksWithEqualName.isEmpty();
+    }
+
+    protected Function<IssueType, IssueTypeBean> convertIssueType(final Project project){
+        return new Function<IssueType, IssueTypeBean>() {
+            @Override
+            public IssueTypeBean apply(@Nullable IssueType input) {
+                return new IssueTypeBean(input.getName(), getRequiredFields(project, input));
+            }
+        };
+    }
+
+
 
 	protected List<IssueFieldBean> getRequiredFields(Project project, final IssueType issueType)
 	{

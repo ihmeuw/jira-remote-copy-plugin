@@ -17,6 +17,8 @@ import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.bc.project.ProjectService;
+import com.atlassian.jira.config.SubTaskManager;
+import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -60,9 +62,10 @@ public class CopyIssueService {
     private final IssueLinkService issueLinkService;
     private final RemoteIssueLinkService remoteIssueLinkService;
     private final InputParametersService inputParametersService;
+    private final SubTaskManager subTaskManager;
 
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, SubTaskManager subTaskManager) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.projectService = projectService;
@@ -75,6 +78,7 @@ public class CopyIssueService {
         this.issueLinkService = issueLinkService;
         this.remoteIssueLinkService = remoteIssueLinkService;
         this.inputParametersService = inputParametersService;
+        this.subTaskManager = subTaskManager;
     }
 
 
@@ -98,7 +102,15 @@ public class CopyIssueService {
 
         IssueInputParameters inputParameters = builder.getInputParameters();
 
-        IssueService.CreateValidationResult validationResult = issueService.validateCreate(callingUser(), inputParameters);
+        IssueService.CreateValidationResult validationResult = null;
+
+        final boolean createAsSubtask = copyIssueBean.getTargetParentId() != null;
+
+        if(createAsSubtask){
+            validationResult = issueService.validateSubTaskCreate(callingUser(), copyIssueBean.getTargetParentId(), inputParameters);
+        } else {
+            validationResult = issueService.validateCreate(callingUser(), inputParameters);
+        }
 
         if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrorCollection());
@@ -107,8 +119,21 @@ public class CopyIssueService {
         IssueService.IssueResult createIssueResult = issueService.create(callingUser(), validationResult);
 
         if (createIssueResult.isValid()) {
-            final List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = fieldMapperFactory.getPostIssueCreationFieldMapper();
             final ErrorCollection errors = new SimpleErrorCollection();
+
+            try{
+                if(createAsSubtask){
+                    IssueService.IssueResult parentIssue = issueService.getIssue(callingUser(), copyIssueBean.getTargetParentId());
+                    subTaskManager.createSubTaskIssueLink(parentIssue.getIssue(), createIssueResult.getIssue(), callingUser());
+                }
+            }catch(CreateException e){
+                errors.addErrorMessage(authenticationContext.getI18nHelper().getText("cpji.errors.cannot.create.subtask.link"));
+                log.warn("Cannot create issue link", e);
+            }
+
+
+            final List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = fieldMapperFactory.getPostIssueCreationFieldMapper();
+
             for (SystemFieldPostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper) {
                 try {
                     issueCreationFieldMapper.process(createIssueResult.getIssue(), copyIssueBean);

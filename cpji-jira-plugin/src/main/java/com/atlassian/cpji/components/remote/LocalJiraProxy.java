@@ -17,6 +17,7 @@ import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.issue.link.*;
 import com.atlassian.jira.project.Project;
@@ -108,6 +109,13 @@ public class LocalJiraProxy implements JiraProxy {
     @Override
     public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean) {
         try {
+            if(projectInfoService.isIssueTypeASubtask(copyIssueBean.getTargetIssueType(), copyIssueBean.getTargetProjectKey())){
+                MutableIssue sourceIssue = issueManager.getIssueObject(copyIssueBean.getOriginalKey());
+                if(sourceIssue.getProjectObject().getKey().equals(copyIssueBean.getTargetProjectKey())){
+                    copyIssueBean.setTargetParentId(sourceIssue.getParentId());
+                }
+
+            }
             return Either.right(copyIssueService.copyIssue(copyIssueBean));
         } catch (CopyIssueException e) {
             return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
