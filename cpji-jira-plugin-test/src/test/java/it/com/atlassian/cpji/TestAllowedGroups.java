@@ -62,7 +62,6 @@ public class TestAllowedGroups extends AbstractCopyIssueTest {
                 jira1.visit(PermissionViolationPage.class, "SelectTargetProjectAction!default.jspa?key=TST-1");
 				jira1.visit(PermissionViolationPage.class, "CopyDetailsAction.jspa?id=10000&targetEntityLink=8835b6b9-5676-3de4-ad59-bbe987416662|TST");
 				final String atl_token = (String) jira1.getTester().getDriver().executeScript("return atl_token()");
-				jira1.visit(PermissionViolationPage.class, "PermissionChecksAction.jspa?key=TST-1&atl_token=" + atl_token);
 				jira1.visit(PermissionViolationPage.class, "CopyIssueToInstanceAction.jspa?key=TST-1&atl_token=" + atl_token);
 			}
 
