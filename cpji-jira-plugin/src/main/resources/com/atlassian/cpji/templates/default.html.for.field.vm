@@ -1,0 +1,4 @@
+<div class="field-group" #if (!$permission.canCopyIssue()) class="status-inactive" #end>
+	<label>$textutils.htmlEncode($permission.fieldName)</label>
+	$textutils.htmlEncode($permission.getValidationMessage())
+</div>
