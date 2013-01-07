@@ -61,22 +61,14 @@ public class ProjectInfoService {
         Project project = getProjectForCreateIssue(projectKey);
 
         final UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
-        final boolean hasCreateIssuePermission = true;
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 		final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
 		final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
         final long maxAttachmentSize = Long.parseLong(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE));
 
 
-        Iterable<IssueTypeBean> issueTypesForProject = null;
-        Iterable<IssueTypeBean> subTaskIssueTypesForProject = null;
-
-        if(hasCreateIssuePermission){
-            issueTypesForProject = Collections2.transform(issueTypeSchemeManager.getNonSubTaskIssueTypesForProject(project), convertIssueType(project));
-            subTaskIssueTypesForProject = Collections2.transform(issueTypeSchemeManager.getSubTaskIssueTypesForProject(project), convertIssueType(project));
-        }
-
-
+        Iterable<IssueTypeBean> issueTypesForProject = Collections2.transform(issueTypeSchemeManager.getNonSubTaskIssueTypesForProject(project), convertIssueType(project));
+        Iterable<IssueTypeBean> subTaskIssueTypesForProject = Collections2.transform(issueTypeSchemeManager.getSubTaskIssueTypesForProject(project), convertIssueType(project));
 
         CopyInformationBean copyInformationBean = new CopyInformationBean(
                 issueTypesForProject,
@@ -84,7 +76,7 @@ public class ProjectInfoService {
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING),
                 userBean,
-                hasCreateIssuePermission, hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
+                hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
                 buildUtilsInfo.getVersion(),
                 maxAttachmentSize);
         return copyInformationBean;

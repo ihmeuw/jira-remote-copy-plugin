@@ -35,9 +35,6 @@ public class CopyInformationBean {
 	private UserBean user;
 
 	@XmlElement
-	private boolean hasCreateIssuePermission;
-
-	@XmlElement
 	private boolean hasCreateLinksPermission;
 
 	@XmlElement
@@ -57,7 +54,6 @@ public class CopyInformationBean {
 			final boolean attachmentsEnabled,
 			final boolean issueLinkingEnabled,
 			final UserBean user,
-			final boolean hasCreateIssuePermission,
 			final boolean hasCreateAttachmentPermission,
 			final boolean hasCreateCommentPermission,
 			final boolean hasCreateLinksPermission,
@@ -72,7 +68,6 @@ public class CopyInformationBean {
 		this.attachmentsEnabled = attachmentsEnabled;
 		this.issueLinkingEnabled = issueLinkingEnabled;
 		this.user = user;
-		this.hasCreateIssuePermission = hasCreateIssuePermission;
 		this.hasCreateAttachmentPermission = hasCreateAttachmentPermission;
 		this.jiraVersion = jiraVersion;
         this.maxAttachmentSize = maxAttachmentSize;
@@ -88,10 +83,6 @@ public class CopyInformationBean {
 
 	public UserBean getRemoteUser() {
 		return user;
-	}
-
-	public boolean getHasCreateIssuePermission() {
-		return hasCreateIssuePermission;
 	}
 
 	public boolean getHasCreateAttachmentPermission() {
@@ -124,10 +115,6 @@ public class CopyInformationBean {
 
 	public void setUser(UserBean user) {
 		this.user = user;
-	}
-
-	public void setHasCreateIssuePermission(boolean hasCreateIssuePermission) {
-		this.hasCreateIssuePermission = hasCreateIssuePermission;
 	}
 
 	public void setJiraVersion(String jiraVersion) {

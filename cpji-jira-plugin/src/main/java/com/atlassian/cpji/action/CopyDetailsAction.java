@@ -110,11 +110,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             return getGenericResponseHandlerResult();
         }
 
-        if (!copyInfo.getHasCreateIssuePermission())
-        {
-            addErrorMessage(getText("cpji.you.dont.have.create.issue.permission"));
-            return ERROR;
-        }
         availableIssueTypes = getIssueTypeOptionsList(copyInfo.getIssueTypes());
 
         //if we copy to the same project display also subtask types

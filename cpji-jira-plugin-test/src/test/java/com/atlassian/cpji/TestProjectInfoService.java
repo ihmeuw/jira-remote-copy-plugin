@@ -87,7 +87,6 @@ public class TestProjectInfoService {
 
         CopyInformationBean result = projectInfoService.getIssueTypeInformation("KEY");
 
-        assertEquals(true, result.getHasCreateIssuePermission());
         assertEquals(false, result.getHasCreateAttachmentPermission());
         assertThat(
                 Iterables.transform(result.getIssueTypes(), issueTypeBeanToName()),
