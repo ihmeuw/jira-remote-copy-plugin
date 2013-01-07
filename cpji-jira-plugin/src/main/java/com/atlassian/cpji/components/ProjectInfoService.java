@@ -40,20 +40,20 @@ public class ProjectInfoService {
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final PermissionManager permissionManager;
     private final BuildUtilsInfo buildUtilsInfo;
-	private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
+    private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final ProjectManager projectManager;
 
     public ProjectInfoService(ProjectManager projectManager, IssueTypeSchemeManager issueTypeSchemeManager,
-			ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext,
-			PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo, FieldLayoutItemsRetriever fieldLayoutItemsRetriever) {
+                              ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext,
+                              PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo, FieldLayoutItemsRetriever fieldLayoutItemsRetriever) {
         this.projectManager = projectManager;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.applicationProperties = applicationProperties;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.permissionManager = permissionManager;
         this.buildUtilsInfo = buildUtilsInfo;
-		this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
-	}
+        this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
+    }
 
     public CopyInformationBean getIssueTypeInformation(final String projectKey) throws ProjectNotFoundException {
         final User user = jiraAuthenticationContext.getLoggedInUser();
@@ -62,8 +62,8 @@ public class ProjectInfoService {
 
         final UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
-		final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
-		final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
+        final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
+        final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
         final long maxAttachmentSize = Long.parseLong(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE));
 
 
@@ -85,10 +85,10 @@ public class ProjectInfoService {
 
     public Project getProjectForCreateIssue(final String projectKey) throws ProjectNotFoundException {
         Project project = projectManager.getProjectObjByKey(projectKey);
-        if(project == null){
+        if (project == null) {
             throw new ProjectNotFoundException("Cannot find specified project");
         }
-        if(!permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, jiraAuthenticationContext.getLoggedInUser(), true)){
+        if (!permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, jiraAuthenticationContext.getLoggedInUser(), true)) {
             throw new ProjectNotFoundException("Cannot find specified project");
         }
         return project;
@@ -97,19 +97,19 @@ public class ProjectInfoService {
     public boolean isIssueTypeASubtask(final String issueTypeName, String projectKey) throws ProjectNotFoundException {
         Preconditions.checkNotNull(issueTypeName);
 
-        Project project = getProjectForCreateIssue(projectKey);
-        Collection<IssueType> subTaskTypes = issueTypeSchemeManager.getSubTaskIssueTypesForProject(project);
+        final Project project = getProjectForCreateIssue(projectKey);
+        final Collection<IssueType> subTaskTypes = issueTypeSchemeManager.getSubTaskIssueTypesForProject(project);
 
-        Collection<IssueType> subTasksWithEqualName = Collections2.filter(subTaskTypes, new Predicate<IssueType>() {
-            @Override
-            public boolean apply(@Nullable IssueType input) {
-                return issueTypeName.equals(input.getName());
+        for (IssueType issueType : subTaskTypes) {
+            if (issueTypeName.equals(issueType.getName())) {
+                return true;
             }
-        });
-        return !subTasksWithEqualName.isEmpty();
+        }
+
+        return false;
     }
 
-    protected Function<IssueType, IssueTypeBean> convertIssueType(final Project project){
+    protected Function<IssueType, IssueTypeBean> convertIssueType(final Project project) {
         return new Function<IssueType, IssueTypeBean>() {
             @Override
             public IssueTypeBean apply(@Nullable IssueType input) {
@@ -119,22 +119,20 @@ public class ProjectInfoService {
     }
 
 
-
-	protected List<IssueFieldBean> getRequiredFields(Project project, final IssueType issueType)
-	{
-		Iterable<FieldLayoutItem> filter = Iterables
-				.filter(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType),
-						new Predicate<FieldLayoutItem>() {
-							public boolean apply(final FieldLayoutItem input) {
-								return !RequiredFieldsAwareAction.UNMODIFIABLE_FIELDS.contains(input.getOrderableField().getId()) && input
-										.isRequired();
-							}
-						});
-		return Lists.newArrayList(Iterables.transform(filter, new Function<FieldLayoutItem, IssueFieldBean>() {
-			@Override
-			public IssueFieldBean apply(FieldLayoutItem input) {
-				return new IssueFieldBean(input.getOrderableField().getName(), input.getOrderableField().getId());
-			}
-		}));
-	}
+    protected List<IssueFieldBean> getRequiredFields(Project project, final IssueType issueType) {
+        Iterable<FieldLayoutItem> filter = Iterables
+                .filter(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType),
+                        new Predicate<FieldLayoutItem>() {
+                            public boolean apply(final FieldLayoutItem input) {
+                                return !RequiredFieldsAwareAction.UNMODIFIABLE_FIELDS.contains(input.getOrderableField().getId()) && input
+                                        .isRequired();
+                            }
+                        });
+        return Lists.newArrayList(Iterables.transform(filter, new Function<FieldLayoutItem, IssueFieldBean>() {
+            @Override
+            public IssueFieldBean apply(FieldLayoutItem input) {
+                return new IssueFieldBean(input.getOrderableField().getName(), input.getOrderableField().getId());
+            }
+        }));
+    }
 }
