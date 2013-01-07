@@ -91,14 +91,17 @@ public class CopyIssueService {
         InputParametersService.Populator builder = inputParametersService.getFieldsPopulator(project, issueType, copyIssueBean, allSystemFieldMappers);
 
 		if (copyIssueBean.getActionParams() != null && copyIssueBean.getFieldValuesHolder() != null) {
+			builder.getInputParameters().setFieldValuesHolder(copyIssueBean.getFieldValuesHolder());
 			builder.getInputParameters().getActionParameters().putAll(copyIssueBean.getActionParams());
-			builder.getInputParameters().setFieldValuesHolder(copyIssueBean.getFieldValuesHolder()); // populate it with map first
 		}
 
         builder.populateProjectSystemField();
 
         Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType);
         for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems) {
+			if (fieldLayoutItem.getOrderableField() != null) {
+				fieldLayoutItem.getOrderableField().populateFromParams(copyIssueBean.getFieldValuesHolder(), copyIssueBean.getActionParams());
+			}
             builder.injectInputParam(fieldLayoutItem);
         }
 
