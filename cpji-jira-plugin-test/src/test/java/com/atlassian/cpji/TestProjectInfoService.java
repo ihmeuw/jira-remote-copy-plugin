@@ -1,6 +1,7 @@
 package com.atlassian.cpji;
 
 import com.atlassian.cpji.components.ProjectInfoService;
+import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
@@ -11,6 +12,7 @@ import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
+import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
@@ -27,6 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,7 +42,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TestProjectInfoService {
 
-    
+
     private ProjectInfoService projectInfoService;
 
     @Mock
@@ -56,23 +59,21 @@ public class TestProjectInfoService {
     private BuildUtilsInfo buildUtilsInfo;
     @Mock
     private User mockedUser;
-	@Mock
-	private FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
+    @Mock
+    private FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
 
     @Before
     public void setUp() throws Exception {
         projectInfoService = new ProjectInfoService(projectService, issueTypeSchemeManager, applicationProperties, jiraAuthenticationContext, permissionManager, buildUtilsInfo,
-				fieldLayoutItemsRetriever);
+                fieldLayoutItemsRetriever);
         when(jiraAuthenticationContext.getLoggedInUser()).thenReturn(mockedUser);
-		when(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(any(Project.class), any(IssueType.class))).thenReturn(Collections.<FieldLayoutItem>emptyList());
+        when(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(any(Project.class), any(IssueType.class))).thenReturn(Collections.<FieldLayoutItem>emptyList());
     }
 
     @Test
     public void getIssueTypeInformationShouldCheckPermissions() throws Exception {
-        Project project = mock(Project.class);
-        when(projectService.getProjectByKey(mockedUser, "KEY")).thenReturn(new ProjectService.GetProjectResult(project));
-
-        when(permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, mockedUser)).thenReturn(true);
+        Project project = new MockProject(3L, "KEY");
+        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, mockedUser)).thenReturn(ImmutableList.of(project));
 
         ImmutableList<IssueType> issueTypes = ImmutableList.of(mockIssueType("ISSUETYPE1"), mockIssueType("Another type"));
         ImmutableList<IssueType> subTaskIssueTypes = ImmutableList.of(mockIssueType("sub1"), mockIssueType("subtask2"));
@@ -99,17 +100,38 @@ public class TestProjectInfoService {
         assertEquals(true, result.getAttachmentsEnabled());
         assertEquals(true, result.getIssueLinkingEnabled());
         assertEquals(1000L, result.getMaxAttachmentSize().longValue());
-        verify(permissionManager).hasPermission(Permissions.CREATE_ISSUE, project, mockedUser);
         verify(permissionManager).hasPermission(Permissions.CREATE_ATTACHMENT, project, mockedUser);
     }
 
-    private IssueType mockIssueType(String name){
+    @Test
+    public void getProjectForCreateIssueShouldReturnProjectWhenItHasCreateIssuePermission() throws Exception {
+        final List<Project> projects = ImmutableList.<Project>of(new MockProject(1L, "ABC"), new MockProject(2L, "MyKey"),
+                new MockProject(3L, "CBA"), new MockProject(4L, "DDD"));
+
+        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, mockedUser)).thenReturn(projects);
+
+        final Project found = projectInfoService.getProjectForCreateIssue("MyKey");
+        assertEquals(2L, found.getId().longValue());
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void getProjectForCreateIssueShouldThrowProjectNotFoundExceptionWhenProjectIsNotFound() throws Exception {
+        final List<Project> projects = ImmutableList.<Project>of(new MockProject(1L, "ABC"), new MockProject(3L, "CBA"), new MockProject(4L, "DDD"));
+
+        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, mockedUser)).thenReturn(projects);
+
+        projectInfoService.getProjectForCreateIssue("MyKey");
+
+    }
+
+
+    private IssueType mockIssueType(String name) {
         IssueType type = mock(IssueType.class);
         when(type.getName()).thenReturn(name);
         return type;
     }
 
-    public static Function<IssueTypeBean, String> issueTypeBeanToName(){
+    public static Function<IssueTypeBean, String> issueTypeBeanToName() {
         return new Function<IssueTypeBean, String>() {
             @Override
             public String apply(@Nullable IssueTypeBean input) {
@@ -118,7 +140,7 @@ public class TestProjectInfoService {
         };
     }
 
-    public static Function<IssueType, String> issueTypeToName(){
+    public static Function<IssueType, String> issueTypeToName() {
         return new Function<IssueType, String>() {
             @Override
             public String apply(@Nullable IssueType input) {
@@ -128,6 +150,4 @@ public class TestProjectInfoService {
     }
 
 
-    
-    
 }

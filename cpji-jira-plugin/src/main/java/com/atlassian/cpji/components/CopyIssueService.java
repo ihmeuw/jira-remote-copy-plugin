@@ -16,7 +16,6 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
-import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.Issue;
@@ -52,7 +51,6 @@ public class CopyIssueService {
 
     private final IssueService issueService;
     private final JiraAuthenticationContext authenticationContext;
-    private final ProjectService projectService;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final FieldLayoutManager fieldLayoutManager;
     private final FieldMapperFactory fieldMapperFactory;
@@ -63,12 +61,12 @@ public class CopyIssueService {
     private final RemoteIssueLinkService remoteIssueLinkService;
     private final InputParametersService inputParametersService;
     private final SubTaskManager subTaskManager;
+    private final ProjectInfoService projectInfoService;
 
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final ProjectService projectService, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, SubTaskManager subTaskManager) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, SubTaskManager subTaskManager, ProjectInfoService projectInfoService) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
-        this.projectService = projectService;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.fieldLayoutManager = fieldLayoutManager;
         this.fieldMapperFactory = fieldMapperFactory;
@@ -79,12 +77,13 @@ public class CopyIssueService {
         this.remoteIssueLinkService = remoteIssueLinkService;
         this.inputParametersService = inputParametersService;
         this.subTaskManager = subTaskManager;
+        this.projectInfoService = projectInfoService;
     }
 
 
     public IssueCreationResultBean copyIssue(final CopyIssueBean copyIssueBean)
             throws ValidationException, IssueCreatedWithErrorsException, CreationException, ProjectNotFoundException {
-        Project project = getProjectFromIssueBean(copyIssueBean);
+        final Project project = projectInfoService.getProjectForCreateIssue(copyIssueBean.getTargetProjectKey());
 
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
 
@@ -183,7 +182,7 @@ public class CopyIssueService {
 
 
     public FieldPermissionsBean checkFieldPermissions(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException {
-        Project project = getProjectFromIssueBean(copyIssueBean);
+        final Project project = projectInfoService.getProjectForCreateIssue(copyIssueBean.getTargetProjectKey());
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
 
         FieldLayout fieldLayout = fieldLayoutManager.getFieldLayout(project, issueType.getId());
@@ -289,16 +288,6 @@ public class CopyIssueService {
         }
         return result.getIssue();
     }
-
-
-    private Project getProjectFromIssueBean(final CopyIssueBean copyIssueBean) throws ProjectNotFoundException {
-        ProjectService.GetProjectResult result = projectService.getProjectByKey(callingUser(), copyIssueBean.getTargetProjectKey());
-        if (!result.isValid()) {
-            throw new ProjectNotFoundException(result.getErrorCollection());
-        }
-        return result.getProject();
-    }
-
 
     private IssueType findIssueType(final String issueType, final Project project) {
         Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);

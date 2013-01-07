@@ -6,6 +6,7 @@ import com.atlassian.cpji.tests.pageobjects.PermissionChecksPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.security.Permissions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,8 +23,7 @@ import static org.junit.Assert.*;
 /**
  * @since v2.1
  */
-public class TestCopyIssue extends AbstractCopyIssueTest
-{
+public class TestCopyIssue extends AbstractCopyIssueTest {
     private static final String JIRA2_DATE_PICKER_CF = "customfield_10001";
     private static final String JIRA2_GROUP_PICKER_CF = "customfield_10002";
     private static final String JIRA2_MULTI_GROUP_PICKER_CF = "customfield_10004";
@@ -38,18 +38,16 @@ public class TestCopyIssue extends AbstractCopyIssueTest
     private static final String JIRA1_SELECT_LIST_CF = "customfield_10004";
     private static final String JIRA1_NUMBER_FIELD_CF = "customfield_10003";
 
-	@Rule
-	public CreateIssues createIssues = new CreateIssues(restClient1);
+    @Rule
+    public CreateIssues createIssues = new CreateIssues(restClient1);
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         login(jira1);
     }
 
     @Test
-    public void testWithCustomFields() throws Exception
-    {
+    public void testWithCustomFields() throws Exception {
         final String remoteIssueKey = remoteCopy(jira1, "TST-1", 10000L);
 
         // Query the remotely copied issue via REST
@@ -75,7 +73,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest
     }
 
     @Test
-    public void testAttachmentsCopying() throws Exception{
+    public void testAttachmentsCopying() throws Exception {
         final String remoteIssueKey = remoteCopy(jira1, "NEL-4", 10400L);
 
         final JSONObject json = getIssueJson(jira2, remoteIssueKey);
@@ -90,15 +88,14 @@ public class TestCopyIssue extends AbstractCopyIssueTest
 
     }
 
-    private void checkAttachment(JSONObject attachment, String filename, int size, String mimeType) throws Exception{
+    private void checkAttachment(JSONObject attachment, String filename, int size, String mimeType) throws Exception {
         assertEquals(filename, attachment.getString("filename"));
         assertEquals(size, attachment.getInt("size"));
         assertEquals(mimeType, attachment.getString("mimeType"));
     }
 
     @Test
-    public void testWithoutCustomFields() throws Exception
-    {
+    public void testWithoutCustomFields() throws Exception {
         final String remoteIssueKey = remoteCopy(jira1, "TST-2", 10100L);
 
         // Query the remotely copied issue via REST
@@ -119,16 +116,14 @@ public class TestCopyIssue extends AbstractCopyIssueTest
         assertEquals(JSONObject.NULL, fields.opt(JIRA2_NUMBER_FIELD_CF));
     }
 
-    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId)
-    {
+    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId) {
         return remoteCopy(jira, issueKey, issueId, "Blah");
     }
 
-    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject)
-    {
+    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject) {
         viewIssue(jira, issueKey);
         SelectTargetProjectPage selectTargetProjectPage = jira.visit(SelectTargetProjectPage.class, issueId);
-        if(destinationProject != null)
+        if (destinationProject != null)
             selectTargetProjectPage.setDestinationProject(destinationProject);
 
         final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
@@ -144,26 +139,49 @@ public class TestCopyIssue extends AbstractCopyIssueTest
         return remoteIssueKey;
     }
 
-	@Test
-	public void testCopyForProjectWithoutProjectEntityLinks() throws IOException, JSONException {
+    @Test
+    public void testCopyForProjectWithoutProjectEntityLinks() throws IOException, JSONException {
         final String remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links");
-		assertThat(remoteIssueKey, startsWith("DNEL"));
+        assertThat(remoteIssueKey, startsWith("DNEL"));
 
-		// Query the remotely copied issue via REST
-		final JSONObject json = getIssueJson(jira2, remoteIssueKey);
-		final JSONObject fields = json.getJSONObject("fields");
+        // Query the remotely copied issue via REST
+        final JSONObject json = getIssueJson(jira2, remoteIssueKey);
+        final JSONObject fields = json.getJSONObject("fields");
 
-		// System fields
-		assertEquals("Testing as admin", fields.getString("summary"));
-		assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
-		assertEquals(JSONObject.NULL, fields.opt("description"));
+        // System fields
+        assertEquals("Testing as admin", fields.getString("summary"));
+        assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
+        assertEquals(JSONObject.NULL, fields.opt("description"));
 
-		// Custom fields
-		assertEquals(JSONObject.NULL, fields.opt(JIRA2_DATE_PICKER_CF));
-		assertEquals(JSONObject.NULL, fields.opt(JIRA2_GROUP_PICKER_CF));
-		assertEquals(JSONObject.NULL, fields.opt(JIRA2_MULTI_GROUP_PICKER_CF));
-		assertEquals(JSONObject.NULL, fields.opt(JIRA2_FREE_TEXT_FIELD_CF));
-		assertEquals(JSONObject.NULL, fields.opt(JIRA2_SELECT_LIST_CF));
-		assertEquals(JSONObject.NULL, fields.opt(JIRA2_NUMBER_FIELD_CF));
-	}
+        // Custom fields
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_DATE_PICKER_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_GROUP_PICKER_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_MULTI_GROUP_PICKER_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_FREE_TEXT_FIELD_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_SELECT_LIST_CF));
+        assertEquals(JSONObject.NULL, fields.opt(JIRA2_NUMBER_FIELD_CF));
+    }
+
+    @Test
+    public void testCopyWithBrowseProjectsPermissionDisabled() throws Exception {
+
+        String remoteIssueKey = null;
+
+        try {
+            testkit2.permissionSchemes().removeProjectRolePermission(0L, Permissions.BROWSE, 10000L);
+            remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links");
+            assertThat(remoteIssueKey, startsWith("DNEL"));
+        } finally {
+            testkit2.permissionSchemes().addProjectRolePermission(0L, Permissions.BROWSE, 10000L);
+        }
+
+        assertNotNull(remoteIssueKey);
+        // Query the remotely copied issue via REST
+        final JSONObject json = getIssueJson(jira2, remoteIssueKey);
+        final JSONObject fields = json.getJSONObject("fields");
+
+        // System fields
+        assertEquals("Testing as admin", fields.getString("summary"));
+        assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
+    }
 }

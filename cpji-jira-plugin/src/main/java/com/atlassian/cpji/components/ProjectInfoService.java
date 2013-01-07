@@ -19,6 +19,7 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.BuildUtilsInfo;
+import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -29,13 +30,13 @@ import com.google.common.collect.Lists;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @since v3.0
  */
 public class ProjectInfoService {
 
-    private final ProjectService projectService;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final ApplicationProperties applicationProperties;
     private final JiraAuthenticationContext jiraAuthenticationContext;
@@ -46,7 +47,6 @@ public class ProjectInfoService {
     public ProjectInfoService(ProjectService projectService, IssueTypeSchemeManager issueTypeSchemeManager,
 			ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext,
 			PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo, FieldLayoutItemsRetriever fieldLayoutItemsRetriever) {
-        this.projectService = projectService;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.applicationProperties = applicationProperties;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
@@ -55,18 +55,13 @@ public class ProjectInfoService {
 		this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
 	}
 
-    public CopyInformationBean getIssueTypeInformation(String projectKey) throws ProjectNotFoundException {
+    public CopyInformationBean getIssueTypeInformation(final String projectKey) throws ProjectNotFoundException {
         final User user = jiraAuthenticationContext.getLoggedInUser();
-        ProjectService.GetProjectResult result = projectService.getProjectByKey(user, projectKey);
-        Project project;
-        if (result.isValid()) {
-            project = result.getProject();
-        } else {
-            throw new ProjectNotFoundException(result.getErrorCollection());
-        }
+
+        Project project = getProjectForCreateIssue(projectKey);
 
         final UserBean userBean = new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
-        final boolean hasCreateIssuePermission = permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
+        final boolean hasCreateIssuePermission = true;
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
 		final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
 		final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
@@ -96,11 +91,27 @@ public class ProjectInfoService {
 
     }
 
-    public boolean isIssueTypeASubtask(final String issueTypeName, String projectKey){
+    public Project getProjectForCreateIssue(final String projectKey) throws ProjectNotFoundException {
+        try{
+            Collection<Project> projectsWithCreatePermission = permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, jiraAuthenticationContext.getLoggedInUser());
+            return Iterables.find(projectsWithCreatePermission, new Predicate<Project>() {
+                @Override
+                public boolean apply(@Nullable Project input) {
+                    return projectKey.equals(input.getKey());
+                }
+            });
+        } catch(NoSuchElementException e){
+            final SimpleErrorCollection errorCollection = new SimpleErrorCollection();
+            errorCollection.addErrorMessage(e.getMessage());
+            throw new ProjectNotFoundException(errorCollection);
+        }
+    }
+
+    public boolean isIssueTypeASubtask(final String issueTypeName, String projectKey) throws ProjectNotFoundException {
         Preconditions.checkNotNull(issueTypeName);
 
-        ProjectService.GetProjectResult project = projectService.getProjectByKey(jiraAuthenticationContext.getLoggedInUser(), projectKey);
-        Collection<IssueType> subTaskTypes = issueTypeSchemeManager.getSubTaskIssueTypesForProject(project.getProject());
+        Project project = getProjectForCreateIssue(projectKey);
+        Collection<IssueType> subTaskTypes = issueTypeSchemeManager.getSubTaskIssueTypesForProject(project);
 
         Collection<IssueType> subTasksWithEqualName = Collections2.filter(subTaskTypes, new Predicate<IssueType>() {
             @Override

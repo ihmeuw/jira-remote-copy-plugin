@@ -4,6 +4,7 @@ import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
 import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.InputParametersService;
+import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.IssueCreatedWithErrorsException;
 import com.atlassian.cpji.components.exceptions.ValidationException;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
@@ -94,6 +95,8 @@ public class TestCopyIssueService {
     private MutableIssue createdIssue;
     @Mock
     private SubTaskManager subTaskManager;
+    @Mock
+    private ProjectInfoService projectInfoService;
 
     @Before
     public void setUp() throws Exception {
@@ -105,12 +108,12 @@ public class TestCopyIssueService {
         when(issueType.getName()).thenReturn(ISSUE_TYPE);
         when(issueTypeSchemeManager.getIssueTypesForProject(project)).thenReturn(ImmutableList.of(issueType));
         when(project.getKey()).thenReturn(PROJECT_KEY);
-        when(projectService.getProjectByKey(currentUser, PROJECT_KEY)).thenReturn( new ProjectService.GetProjectResult(project));
+        when(projectInfoService.getProjectForCreateIssue(PROJECT_KEY)).thenReturn(project);
 
         when(createdIssue.getKey()).thenReturn(ISSUE_KEY);
         when(createdIssue.getId()).thenReturn(ISSUE_ID);
 
-        copyIssueService = new CopyIssueService(issueService, authenticationContext, projectService, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, subTaskManager);
+        copyIssueService = new CopyIssueService(issueService, authenticationContext, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, subTaskManager, projectInfoService);
     }
 
 
