@@ -84,13 +84,16 @@ public class CopyIssueService {
     public IssueCreationResultBean copyIssue(final CopyIssueBean copyIssueBean)
             throws ValidationException, IssueCreatedWithErrorsException, CreationException, ProjectNotFoundException {
         final Project project = projectInfoService.getProjectForCreateIssue(copyIssueBean.getTargetProjectKey());
-
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
-
 
         //Not let's start copying values over from the original issue.
         Map<String, FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
         InputParametersService.Populator builder = inputParametersService.getFieldsPopulator(project, issueType, copyIssueBean, allSystemFieldMappers);
+
+		if (copyIssueBean.getActionParams() != null && copyIssueBean.getFieldValuesHolder() != null) {
+			builder.getInputParameters().getActionParameters().putAll(copyIssueBean.getActionParams());
+			builder.getInputParameters().setFieldValuesHolder(copyIssueBean.getFieldValuesHolder()); // populate it with map first
+		}
 
         builder.populateProjectSystemField();
 
@@ -101,7 +104,7 @@ public class CopyIssueService {
 
         IssueInputParameters inputParameters = builder.getInputParameters();
 
-        IssueService.CreateValidationResult validationResult = null;
+        IssueService.CreateValidationResult validationResult;
 
         final boolean createAsSubtask = copyIssueBean.getTargetParentId() != null;
 

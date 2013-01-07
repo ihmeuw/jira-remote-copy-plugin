@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @since v1.0
@@ -54,6 +55,10 @@ public class CopyIssueBean
     private List<CustomFieldBean> customFields;
 
     private List<UserBean> voters;
+
+	private Map<String, String[]> actionParams;
+
+	private Map<String, Object> fieldValuesHolder;
 
     @XmlJavaTypeAdapter (DateAdapter.class)
     private Date dueDate;
@@ -290,6 +295,22 @@ public class CopyIssueBean
     public void setTargetParentId(Long targetParentId) {
         this.targetParentId = targetParentId;
     }
+
+	public Map<String, String[]> getActionParams() {
+		return actionParams;
+	}
+
+	public void setActionParams(Map<String, String[]> actionParams) {
+		this.actionParams = actionParams;
+	}
+
+	public Map<String, Object> getFieldValuesHolder() {
+		return fieldValuesHolder;
+	}
+
+	public void setFieldValuesHolder(Map<String, Object> fieldValuesHolder) {
+		this.fieldValuesHolder = fieldValuesHolder;
+	}
 }
 
 

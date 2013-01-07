@@ -26,6 +26,7 @@ import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
+import com.atlassian.jira.issue.customfields.OperationContext;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
@@ -35,6 +36,8 @@ import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
+import com.atlassian.jira.issue.operation.IssueOperation;
+import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.jira.util.AttachmentUtils;
@@ -56,13 +59,12 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  */
-public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
+public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implements OperationContext {
     private String copiedIssueKey;
 	private final Map fieldValuesHolder = Maps.newHashMap();
 	private String issueType;
@@ -120,7 +122,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
     }
 
-    @Override
+	@Override
     @RequiresXsrfCheck
     public String doExecute() throws Exception {
         String permissionCheck = checkPermissions();
@@ -134,10 +136,22 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
         MutableIssue issueToCopy = getIssueObject();
         CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(linkToTargetEntity.getProjectKey(), issueToCopy,
                 issueType, copyComments);
-        Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
-        IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result, null);
+
+		if (linkToTargetEntity.getJiraLocation().isLocal()) {
+			copyIssueBean.setActionParams(ActionContext.getParameters());
+			copyIssueBean.setFieldValuesHolder(getFieldValuesHolder());
+		}
+
+		Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
+        IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result, new Function<NegativeResponseStatus, Void>() {
+			@Override
+			public Void apply(@Nullable NegativeResponseStatus input) {
+				addErrorCollection(input.getErrorCollection());
+				return null;
+			}
+		});
         if (copiedIssue == null) {
-            return getGenericResponseHandlerResult();
+            return getSelectedDestinationProject().getJiraLocation().isLocal() && getHasErrors() ? doDefault() : ERROR;
         }
 
         copiedIssueKey = copiedIssue.getIssueKey();
@@ -147,7 +161,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
                 File attachmentFile = AttachmentUtils.getAttachmentFile(attachment);
                 Either<NegativeResponseStatus, SuccessfulResponse> addResult = proxy.addAttachment(copiedIssueKey, attachmentFile, attachment.getFilename(), attachment.getMimetype());
                 if (addResult.isLeft()) {
-                    NegativeResponseStatus responseStatus = (NegativeResponseStatus) addResult.left().get();
+                    NegativeResponseStatus responseStatus = addResult.left().get();
                     ErrorCollection ec = responseStatus.getErrorCollection();
                     if (ec != null) {
                         addErrorMessages(
@@ -184,7 +198,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
         linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());
 
         return SUCCESS;
-
     }
 
 
@@ -260,6 +273,11 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
 		return fieldValuesHolder;
 	}
 
+	@Override
+	public IssueOperation getIssueOperation() {
+		return IssueOperations.CREATE_ISSUE_OPERATION;
+	}
+
 	public String getHtmlForField(FieldPermission permission)
 	{
 		if (getSelectedDestinationProject().getJiraLocation().isLocal()) {
@@ -272,15 +290,13 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction {
 				{
 					if (defaultFieldValue != null)
 					{
-						Map actionParams = new HashMap();
-						actionParams.put(orderableField.getId(), defaultFieldValue);
-						orderableField.populateFromParams(getFieldValuesHolder(), actionParams);
+						orderableField.populateFromParams(getFieldValuesHolder(), ImmutableMap.of(orderableField.getId(), defaultFieldValue));
 					}
 				}
 
 				final MutableIssue fakeIssue = issueFactory.getIssue();
 				fakeIssue.setProjectObject(projectManager.getProjectObjByKey(getSelectedDestinationProject().getProjectKey()));
-				return orderableField.getEditHtml(fieldLayoutItem, null, this, fakeIssue, RequiredFieldsAwareAction
+				return orderableField.getEditHtml(fieldLayoutItem, this, this, fakeIssue, RequiredFieldsAwareAction
 						.getDisplayParameters());
 			}
 		}
