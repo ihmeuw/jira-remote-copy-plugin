@@ -6,7 +6,6 @@ import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
@@ -14,6 +13,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.util.BuildUtilsInfo;
@@ -29,7 +29,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,7 +45,7 @@ public class TestProjectInfoService {
     private ProjectInfoService projectInfoService;
 
     @Mock
-    private ProjectService projectService;
+    private ProjectManager projectManager;
     @Mock
     private IssueTypeSchemeManager issueTypeSchemeManager;
     @Mock
@@ -64,7 +63,7 @@ public class TestProjectInfoService {
 
     @Before
     public void setUp() throws Exception {
-        projectInfoService = new ProjectInfoService(projectService, issueTypeSchemeManager, applicationProperties, jiraAuthenticationContext, permissionManager, buildUtilsInfo,
+        projectInfoService = new ProjectInfoService(projectManager, issueTypeSchemeManager, applicationProperties, jiraAuthenticationContext, permissionManager, buildUtilsInfo,
                 fieldLayoutItemsRetriever);
         when(jiraAuthenticationContext.getLoggedInUser()).thenReturn(mockedUser);
         when(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(any(Project.class), any(IssueType.class))).thenReturn(Collections.<FieldLayoutItem>emptyList());
@@ -73,7 +72,8 @@ public class TestProjectInfoService {
     @Test
     public void getIssueTypeInformationShouldCheckPermissions() throws Exception {
         Project project = new MockProject(3L, "KEY");
-        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, mockedUser)).thenReturn(ImmutableList.of(project));
+        when(projectManager.getProjectObjByKey("KEY")).thenReturn(project);
+        when(permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, mockedUser, true)).thenReturn(true);
 
         ImmutableList<IssueType> issueTypes = ImmutableList.of(mockIssueType("ISSUETYPE1"), mockIssueType("Another type"));
         ImmutableList<IssueType> subTaskIssueTypes = ImmutableList.of(mockIssueType("sub1"), mockIssueType("subtask2"));
@@ -104,10 +104,9 @@ public class TestProjectInfoService {
 
     @Test
     public void getProjectForCreateIssueShouldReturnProjectWhenItHasCreateIssuePermission() throws Exception {
-        final List<Project> projects = ImmutableList.<Project>of(new MockProject(1L, "ABC"), new MockProject(2L, "MyKey"),
-                new MockProject(3L, "CBA"), new MockProject(4L, "DDD"));
-
-        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, mockedUser)).thenReturn(projects);
+        Project project = new MockProject(2L, "MyKey");
+        when(projectManager.getProjectObjByKey("MyKey")).thenReturn(project);
+        when(permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, mockedUser, true)).thenReturn(true);
 
         final Project found = projectInfoService.getProjectForCreateIssue("MyKey");
         assertEquals(2L, found.getId().longValue());
@@ -115,12 +114,16 @@ public class TestProjectInfoService {
 
     @Test(expected = ProjectNotFoundException.class)
     public void getProjectForCreateIssueShouldThrowProjectNotFoundExceptionWhenProjectIsNotFound() throws Exception {
-        final List<Project> projects = ImmutableList.<Project>of(new MockProject(1L, "ABC"), new MockProject(3L, "CBA"), new MockProject(4L, "DDD"));
-
-        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, mockedUser)).thenReturn(projects);
-
+        when(projectManager.getProjectObjByKey("MyKey")).thenReturn(null);
         projectInfoService.getProjectForCreateIssue("MyKey");
+    }
 
+    @Test(expected = ProjectNotFoundException.class)
+    public void getProjectForCreateIssueShouldThrowProjectNotFoundExceptionWhenUserDoesntHaveCreateIssuePermission() throws Exception {
+        Project project = new MockProject(2L, "MyKey");
+        when(projectManager.getProjectObjByKey("MyKey")).thenReturn(project);
+        when(permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, mockedUser, true)).thenReturn(false);
+        projectInfoService.getProjectForCreateIssue("MyKey");
     }
 
 

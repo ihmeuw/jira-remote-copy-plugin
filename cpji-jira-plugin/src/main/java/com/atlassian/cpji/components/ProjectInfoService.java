@@ -8,18 +8,17 @@ import com.atlassian.cpji.rest.model.IssueFieldBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.util.BuildUtilsInfo;
-import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -30,7 +29,6 @@ import com.google.common.collect.Lists;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * @since v3.0
@@ -43,10 +41,12 @@ public class ProjectInfoService {
     private final PermissionManager permissionManager;
     private final BuildUtilsInfo buildUtilsInfo;
 	private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
+    private final ProjectManager projectManager;
 
-    public ProjectInfoService(ProjectService projectService, IssueTypeSchemeManager issueTypeSchemeManager,
+    public ProjectInfoService(ProjectManager projectManager, IssueTypeSchemeManager issueTypeSchemeManager,
 			ApplicationProperties applicationProperties, JiraAuthenticationContext jiraAuthenticationContext,
 			PermissionManager permissionManager, BuildUtilsInfo buildUtilsInfo, FieldLayoutItemsRetriever fieldLayoutItemsRetriever) {
+        this.projectManager = projectManager;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
         this.applicationProperties = applicationProperties;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
@@ -84,19 +84,14 @@ public class ProjectInfoService {
     }
 
     public Project getProjectForCreateIssue(final String projectKey) throws ProjectNotFoundException {
-        try{
-            Collection<Project> projectsWithCreatePermission = permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, jiraAuthenticationContext.getLoggedInUser());
-            return Iterables.find(projectsWithCreatePermission, new Predicate<Project>() {
-                @Override
-                public boolean apply(@Nullable Project input) {
-                    return projectKey.equals(input.getKey());
-                }
-            });
-        } catch(NoSuchElementException e){
-            final SimpleErrorCollection errorCollection = new SimpleErrorCollection();
-            errorCollection.addErrorMessage(e.getMessage());
-            throw new ProjectNotFoundException(errorCollection);
+        Project project = projectManager.getProjectObjByKey(projectKey);
+        if(project == null){
+            throw new ProjectNotFoundException("Cannot find specified project");
         }
+        if(!permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, jiraAuthenticationContext.getLoggedInUser(), true)){
+            throw new ProjectNotFoundException("Cannot find specified project");
+        }
+        return project;
     }
 
     public boolean isIssueTypeASubtask(final String issueTypeName, String projectKey) throws ProjectNotFoundException {
