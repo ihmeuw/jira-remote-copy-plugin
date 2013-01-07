@@ -25,17 +25,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import webwork.action.ActionContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since v1.4
  */
-public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
-{
+public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
     private UserMappingType userMappingType;
 
     private final IssueCreationHelperBean issueCreationHelperBean;
@@ -50,10 +49,9 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
 
     private List<String> configChanges = new ArrayList<String>();
     private Boolean executeFired = false;
-	private List<String> selectedGroups;
+    private List<String> selectedGroups;
 
-    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManager defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager)
-    {
+    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManager defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager) {
         super(fieldLayoutItemsRetriever, issueTypeSchemeManager, issueFactory, defaultFieldValuesManager);
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
@@ -67,8 +65,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
 
     @Override
     public String doDefault() throws Exception {
-        if (isPermissionDenied())
-        {
+        if (isPermissionDenied()) {
             return PERMISSION_VIOLATION_RESULT;
         }
 
@@ -77,19 +74,17 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
         return INPUT;
     }
 
-	protected boolean isPermissionDenied() {
-		return !getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser())
-				&& !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser());
-	}
+    protected boolean isPermissionDenied() {
+        return !getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser())
+                && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser());
+    }
 
-	public String doExecute() throws Exception
-    {
-        if (isPermissionDenied())
-        {
+    public String doExecute() throws Exception {
+        if (isPermissionDenied()) {
             return PERMISSION_VIOLATION_RESULT;
         }
 
-        if(!"POST".equals(ActionContext.getRequest().getMethod())){
+        if (!"POST".equals(ActionContext.getRequest().getMethod())) {
             return returnComplete("ConfigureCopyIssuesAdminAction!default.jspa?projectKey=TST");
         }
 
@@ -105,66 +100,54 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
 
     }
 
-    private void requireResources(){
+    private void requireResources() {
         webResourceManager.requireResource(AbstractCopyIssueAction.RESOURCES_ADMIN_JS);
     }
 
-	@Nonnull
-    public List<Group> getGroups()
-    {
+    @Nonnull
+    public List<Group> getGroups() {
         return Lists.newArrayList(groupManager.getAllGroups());
     }
 
-    public boolean isGroupSelected(Group group)
-    {
-		if (selectedGroups == null) {
-			this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(getProjectKey());
-		}
+    public boolean isGroupSelected(Group group) {
+        if (selectedGroups == null) {
+            this.selectedGroups = copyIssuePermissionManager.getConfiguredGroups(getProjectKey());
+        }
 
-        if (selectedGroups.contains(group.getName()))
-        {
+        if (selectedGroups.contains(group.getName())) {
             return true;
         }
         return false;
     }
 
-    public String getIssueFieldHtml(){
+    public String getIssueFieldHtml() {
 
         FieldLayoutItem layout = fieldLayoutItemsRetriever.getIssueTypeField(getProject());
         OrderableField field = layout.getOrderableField();
         field.populateFromParams(getFieldValuesHolder(), ActionContext.getParameters());
         return field.getEditHtml(layout, this, this, getIssue(), getDisplayParameters());
-
     }
 
-    private void saveFieldValues() throws Exception
-    {
-        for (FieldLayoutItem fieldLayoutItem : getFieldLayoutItems())
-        {
+    private void saveFieldValues() throws Exception {
+        for (FieldLayoutItem fieldLayoutItem : getFieldLayoutItems()) {
             FieldScreenRenderer fieldScreenRenderer = issueCreationHelperBean.createFieldScreenRenderer(getLoggedInUser(), getIssue());
             SimpleErrorCollection simpleErrorCollection = new SimpleErrorCollection();
             OrderableField orderableField = fieldLayoutItem.getOrderableField();
             Object fieldValue = ActionContext.getParameters().get(orderableField.getId());
-            if (containsValues(fieldValue))
-            {
+            if (containsValues(fieldValue)) {
                 orderableField.populateFromParams(getFieldValuesHolder(), ActionContext.getParameters());
                 orderableField.validateParams(this, simpleErrorCollection, getI18nHelper(), getIssue(), fieldScreenRenderer.getFieldScreenRenderLayoutItem(orderableField));
-                if (!simpleErrorCollection.hasAnyErrors())
-                {
+                if (!simpleErrorCollection.hasAnyErrors()) {
                     configChanges.add(getI18nHelper().getText("cpji.config.default.value", orderableField.getName()));
                     defaultFieldValuesManager.persistDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName(), fieldValue);
-                }
-                else
-                {
+                } else {
+                    getFieldValuesHolder().remove(orderableField.getId());
                     addErrorMessages(simpleErrorCollection.getErrorMessages());
                     addErrors(simpleErrorCollection.getErrors());
-                    log.error("Value for field '" + orderableField.getId() + "' is invalid!" + simpleErrorCollection);
+                    log.info("Value for field '" + orderableField.getId() + "' is invalid!" + simpleErrorCollection);
                 }
-            }
-            else
-            {
-                if (defaultFieldValuesManager.hasDefaultValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName()))
-                {
+            } else {
+                if (defaultFieldValuesManager.hasDefaultValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName())) {
                     configChanges.add(getI18nHelper().getText("cpji.config.default.empty.value", orderableField.getName()));
                     defaultFieldValuesManager.clearDefaultValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName());
                 }
@@ -173,75 +156,57 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
     }
 
 
-    public boolean hasConfigChanges()
-    {
+    public boolean hasConfigChanges() {
         return !configChanges.isEmpty();
     }
 
-    public List<String> getConfigChanges()
-    {
+    public List<String> getConfigChanges() {
         return configChanges;
     }
 
-    private void saveUserMapping()
-    {
+    private void saveUserMapping() {
         UserMappingType existingUserMapping = copyIssueConfigurationManager.getUserMappingType(getProject());
-        if (!existingUserMapping.equals(userMappingType))
-        {
+        if (!existingUserMapping.equals(userMappingType)) {
             copyIssueConfigurationManager.setUserMapping(userMappingType, getProject());
             configChanges.add(getI18nHelper().getText("cpji.config.user.mapping"));
         }
     }
 
-    private void saveGroupPermission()
-    {
+    private void saveGroupPermission() {
         final ImmutableList<String> configuredGroups = ImmutableList.copyOf(
-				copyIssuePermissionManager.getConfiguredGroups(getProjectKey()));
-		final Object rawGroups = ActionContext.getParameters().get("groups");
-		final ImmutableList<String> groups = rawGroups != null ? ImmutableList.copyOf((String[]) rawGroups) : ImmutableList.<String>of();
-        if (!groups.isEmpty())
-        {
+                copyIssuePermissionManager.getConfiguredGroups(getProjectKey()));
+        final Object rawGroups = ActionContext.getParameters().get("groups");
+        final ImmutableList<String> groups = rawGroups != null ? ImmutableList.copyOf((String[]) rawGroups) : ImmutableList.<String>of();
+        if (!groups.isEmpty()) {
             ImmutableList<String> selectedGroups = ImmutableList.copyOf(Iterables.filter(
-					Iterables.transform(groupManager.getAllGroups(), getGroupName()),
-					Predicates.in(groups)));
+                    Iterables.transform(groupManager.getAllGroups(), getGroupName()),
+                    Predicates.in(groups)));
 
-            if (configuredGroups.isEmpty() || !configuredGroups.equals(selectedGroups))
-            {
+            if (configuredGroups.isEmpty() || !configuredGroups.equals(selectedGroups)) {
                 copyIssuePermissionManager.restrictPermissionToGroups(getProjectKey(), selectedGroups);
                 configChanges.add(getI18nHelper().getText("cpji.config.user.group"));
             }
-        }
-        else
-        {
-            if (!configuredGroups.isEmpty())
-            {
+        } else {
+            if (!configuredGroups.isEmpty()) {
                 copyIssuePermissionManager.clearPermissionForProject(getProjectKey());
                 configChanges.add(getI18nHelper().getText("cpji.config.user.group.remove"));
             }
         }
     }
 
-    private boolean containsValues(final Object fieldValue)
-    {
-        if (fieldValue == null)
-        {
+    private boolean containsValues(final Object fieldValue) {
+        if (fieldValue == null) {
             return false;
         }
-        if (fieldValue.getClass().isArray())
-        {
+        if (fieldValue.getClass().isArray()) {
             String[] stringArray = (String[]) fieldValue;
-            for (String s : stringArray)
-            {
-                if (StringUtils.isNotEmpty(s))
-                {
+            for (String s : stringArray) {
+                if (StringUtils.isNotEmpty(s)) {
                     return true;
                 }
             }
-        }
-        else if (fieldValue instanceof String)
-        {
-            if (StringUtils.isNotEmpty((String) fieldValue))
-            {
+        } else if (fieldValue instanceof String) {
+            if (StringUtils.isNotEmpty((String) fieldValue)) {
                 return true;
             }
         }
@@ -249,18 +214,15 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
     }
 
 
-    public List<UserMappingType> getUserMappingTypes()
-    {
+    public List<UserMappingType> getUserMappingTypes() {
         return Arrays.asList(UserMappingType.values());
     }
 
-    public UserMappingType getConfiguredUserMapping()
-    {
+    public UserMappingType getConfiguredUserMapping() {
         return copyIssueConfigurationManager.getUserMappingType(getProject());
     }
 
-    public void setUserMapping(String userMapping)
-    {
+    public void setUserMapping(String userMapping) {
         userMappingType = UserMappingType.valueOf(userMapping);
     }
 
@@ -268,14 +230,14 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction
         return executeFired;
     }
 
-	public static class GroupName implements Function<Group, String> {
-		@Override
-		public String apply(@Nullable Group group) {
-			return group.getName();
-		}
-	}
+    public static class GroupName implements Function<Group, String> {
+        @Override
+        public String apply(@Nullable Group group) {
+            return group.getName();
+        }
+    }
 
-	public static GroupName getGroupName() {
-		return new GroupName();
-	}
+    public static GroupName getGroupName() {
+        return new GroupName();
+    }
 }
