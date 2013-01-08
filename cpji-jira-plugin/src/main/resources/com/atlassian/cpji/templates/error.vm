@@ -1,5 +1,5 @@
 <div class="aui-message error"><span class="aui-icon icon-error"></span>
-    <p>An error occurred.</p>
+    <p>$i18n.getText('cpji.error.occurred')</p>
     <ul>
     #foreach( $error in $action.getErrorMessages() )
         <li>$textutils.htmlEncode($error)</li>
