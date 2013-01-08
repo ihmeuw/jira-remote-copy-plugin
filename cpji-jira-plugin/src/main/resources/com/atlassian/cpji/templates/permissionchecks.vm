@@ -20,15 +20,8 @@
 					<p>$i18n.getText('cpji.cant.copy.issue')</p>
 				</div>
 			#elseif (!$action.getSystemFieldPermissions().isEmpty() || !$action.getCustomFieldPermissions().isEmpty())
-				<div class="aui-message warning"><span class="aui-icon icon-warning"></span><p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
-					<ul>
-					#foreach( $permission in $action.getSystemFieldPermissions() )
-					   <li>$textutils.htmlEncode($permission.fieldName)</li>
-					#end
-					#foreach( $permission in $action.getCustomFieldPermissions() )
-					   <li>$textutils.htmlEncode($permission.fieldName)</li>
-					#end
-					</ul>
+				<div class="aui-message warning"><span class="aui-icon icon-warning"></span>
+					<p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
 				</div>
 			#end
 
