@@ -63,8 +63,8 @@
 						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
 					</span>
-					#if ($error)
-						<div class="warning">$error</div>
+					#if ($error != "")
+						<div class="aui-message warning">$error</div>
 					#end
 				</div>
 				#end
@@ -77,8 +77,8 @@
 						<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 					</span>
 					#set ($error = $action.copyAttachmentsErrorMessage)
-					#if ($error)
-						<div class="warning">$error</div>
+					#if ($error != "")
+						<div class="aui-message warning">$error</div>
 					#end
 				</div>
 				#end
@@ -90,8 +90,8 @@
 						<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
 					</span>
-					#if ($error)
-						<div class="warning">$error</div>
+					#if ($error != "")
+						<div class="aui-message warning">$error</div>
 					#end
 				</div>
 				#end

@@ -14,7 +14,7 @@
     </div>
     <div class="content-body aui-panel">
         <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >
-			<h2>$i18n.getText('cpji.confirm.new.values')</h2>
+			<h2 class="formtitle">$i18n.getText('cpji.confirm.new.values')</h2>
 			#if(!$action.isCopyingPossible())
 				<div class="aui-message error"><span class="aui-icon icon-error"></span>
 					<p>$i18n.getText('cpji.cant.copy.issue')</p>
@@ -53,7 +53,7 @@
 				</div>
 			#end
 
-            <div class="button-container">
+            <div class="buttons-container">
                 <div class="buttons">
                    #if ($action.isCopyingPossible())
                     <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="button submit"/>
