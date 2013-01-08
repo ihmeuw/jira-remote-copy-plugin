@@ -64,6 +64,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
 		this.issueLinkTypeManager = issueLinkTypeManager;
+        webResourceManager.requireResource(PLUGIN_KEY+":copyDetailsAction");
 	}
 
 	public boolean isIssueWithComments() {
