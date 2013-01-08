@@ -1,4 +1,5 @@
-<div class="field-group" #if (!$permission.canCopyIssue()) class="status-inactive" #end>
+#* @vtlvariable name="permission" type="com.atlassian.cpji.action.FieldPermission" *#
+<div class="field-group" data-field-id="$textutils.htmlEncode($permission.fieldId)" #if (!$permission.canCopyIssue()) class="status-inactive" #end>
 	<label>$textutils.htmlEncode($permission.fieldName)</label>
-	$textutils.htmlEncode($permission.getValidationMessage())
+	<div #if (!$permission.canCopyIssue()) class="warning" #end>$textutils.htmlEncode($permission.getValidationMessage())</div>
 </div>
