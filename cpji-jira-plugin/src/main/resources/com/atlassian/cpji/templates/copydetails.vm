@@ -14,11 +14,11 @@
 	</div>
 	<div class="content-body aui-panel">
 		<form action="CopyIssueToInstanceAction!default.jspa" class="aui" method="post">
-			<h2>$i18n.getText('cpji.issue.type')</h2>
+			<h2 class="formtitle">$i18n.getText('cpji.issue.type')</h2>
 			<fieldset>
 				<div class="field-group">
 					<label for="issueType">$i18n.getText('cpji.issue.type')</label>
-					<select name="issueType" id="issueType">
+					<select class="singleSelect"  name="issueType" id="issueType">
 						#if(!$action.availableSubTaskTypes.empty)
 							<optgroup label="$i18n.getText('cpji.subtask')">
 								#foreach( $issueType in $action.availableSubTaskTypes)
@@ -40,7 +40,7 @@
 			</fieldset>
 
 			#if (!$action.targetLocal)
-			<h2>$i18n.getText('cpji.remote.user')</h2>
+			<h2 class="formtitle">$i18n.getText('cpji.remote.user')</h2>
 			<fieldset>
 				<div class="field-group">
 					<label>$i18n.getText('cpji.user.name')</label>
@@ -54,7 +54,7 @@
 			#end
 
 			#if ($action.advancedSectionVisible)
-			<h2>$i18n.getText('cpji.advanced')</h2>
+			<h2 class="formtitle">$i18n.getText('cpji.advanced')</h2>
 			<fieldset>
 				#if ($action.copyCommentsSectionVisible)
 				<div class="field-group" id="copy-comments-group">
@@ -63,8 +63,8 @@
 						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
 					</span>
-					#if ($error)
-						<div class="warning">$error</div>
+					#if ($error != "")
+						<div class="aui-message warning">$error</div>
 					#end
 				</div>
 				#end
@@ -77,8 +77,8 @@
 						<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 					</span>
 					#set ($error = $action.copyAttachmentsErrorMessage)
-					#if ($error)
-						<div class="warning">$error</div>
+					#if ($error != "")
+						<div class="aui-message warning">$error</div>
 					#end
 				</div>
 				#end
@@ -90,8 +90,8 @@
 						<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
 					</span>
-					#if ($error)
-						<div class="warning">$error</div>
+					#if ($error != "")
+						<div class="aui-message warning">$error</div>
 					#end
 				</div>
 				#end
@@ -100,7 +100,7 @@
 				<div class="field-group" id="create-issue-links-group">
 					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
 
-					<select name="remoteIssueLink" id="remoteIssueLink">
+					<select class="singleSelect" name="remoteIssueLink" id="remoteIssueLink">
 						#foreach( $issueLink in $action.getIssueLinkOptions())
 							<option value="$textutils.htmlEncode(${issueLink.value})">$textutils.htmlEncode(${issueLink.label})</option>
 						#end
@@ -110,9 +110,9 @@
 			</fieldset>
 			#end
 
-			<div class="button-container">
+			<div class="buttons-container">
 				<div class="buttons">
-					<input type="submit" value="$i18n.getText('common.forms.next')" class="button submit"/>
+					<input type="submit" value="$i18n.getText('common.forms.next')" class="aui-button submit"/>
 				</div>
 			</div>
 			<input type="hidden" name="id" value="$action.id"/>

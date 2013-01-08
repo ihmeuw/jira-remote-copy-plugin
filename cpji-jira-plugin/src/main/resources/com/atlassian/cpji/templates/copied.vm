@@ -30,7 +30,7 @@
             </div>
 		#end
         <form action="../browse/$action.getIssueKey()" class="aui" method="get">
-            <div class="button-container">
+            <div class="buttons-container">
                 <div class="buttons">
                     <input type="submit" value="Back to issue" class="button submit"/>
                 </div>

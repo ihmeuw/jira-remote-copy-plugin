@@ -160,5 +160,11 @@
 		<resource type="download" name="selectTargetProject.js" location="com/atlassian/cpji/templates/soy/selectTargetProject.soy"/>
     </web-resource>
 
+    <web-resource key="copyDetailsAction">
+        <dependency>com.atlassian.cpji.cpji-jira-plugin:global</dependency>
+
+        <resource type="download" name="copyDetailsAction.js" location="com/atlassian/cpji/javascript/copyDetailsAction.js"/>
+    </web-resource>
+
 
 </atlassian-plugin>
