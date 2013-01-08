@@ -230,7 +230,7 @@ public class IssueLinkClient
                 // Check if the response contains an ErrorCollection
                 try
                 {
-                    final String responseString = response.getResponseBodyAsString();
+                    final String responseString = ResponseUtil.getResponseAsTrimmedString(response);
                     final JSONObject json = new JSONObject(new JSONTokener(responseString));
                     errors = convertJsonToErrorCollection(json);
                 }
