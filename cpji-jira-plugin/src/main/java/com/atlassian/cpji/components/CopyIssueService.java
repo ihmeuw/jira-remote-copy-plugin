@@ -99,7 +99,7 @@ public class CopyIssueService {
 
         Iterable<FieldLayoutItem> fieldLayoutItems = fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType);
         for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems) {
-			if (fieldLayoutItem.getOrderableField() != null) {
+			if (fieldLayoutItem.getOrderableField() != null && copyIssueBean.getFieldValuesHolder() != null && copyIssueBean.getActionParams() != null) {
 				fieldLayoutItem.getOrderableField().populateFromParams(copyIssueBean.getFieldValuesHolder(), copyIssueBean.getActionParams());
 			}
             builder.injectInputParam(fieldLayoutItem);
