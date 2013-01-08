@@ -10,6 +10,7 @@ import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.RemotesResource;
 import com.atlassian.cpji.rest.model.*;
 import com.atlassian.cpji.util.IssueLinkClient;
+import com.atlassian.cpji.util.ResponseUtil;
 import com.atlassian.cpji.util.RestResponse;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
@@ -68,7 +69,7 @@ public class RemoteJiraProxy implements JiraProxy {
             @Override
             protected Projects parseResponse(Response response) throws ResponseException, JSONException {
                 return new Projects(jiraLocation, new BasicProjectsJsonParser().parse(
-                        new JSONArray(new JSONTokener(response.getResponseBodyAsString()))));
+                        new JSONArray(new JSONTokener(ResponseUtil.getResponseAsTrimmedString(response)))));
             }
         });
 
@@ -95,7 +96,7 @@ public class RemoteJiraProxy implements JiraProxy {
         return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + PluginInfoResource.RESOURCE_PATH, new AbstractJsonResponseHandler<PluginVersion>(jiraLocation) {
             @Override
             protected PluginVersion parseResponse(Response response) throws ResponseException, JSONException {
-                final String version = response.getResponseBodyAsString().trim();
+                final String version = ResponseUtil.getResponseAsTrimmedString(response).trim();
                 if (version.startsWith(PluginInfoResource.PLUGIN_INSTALLED)) {
                     log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
                     if(version.equals(PluginInfoResource.PLUGIN_INSTALLED)){
@@ -164,7 +165,7 @@ public class RemoteJiraProxy implements JiraProxy {
             public Either<NegativeResponseStatus, SuccessfulResponse> handle(Response response) throws ResponseException {
                 //api provides 404 when attachments exceeds max size
                 if(response.getStatusCode() == 404){
-                    final String responseString = response.getResponseBodyAsString();
+                    final String responseString = ResponseUtil.getResponseAsTrimmedString(response);
                     if(StringUtils.contains(responseString, "exceeds its maximum")){
                         String message = jiraAuthenticationContext.getI18nHelper().getText("cpji.attachment.is.too.big");
                         return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, message));
@@ -179,7 +180,7 @@ public class RemoteJiraProxy implements JiraProxy {
                 if (response.isSuccessful()) {
                     return SuccessfulResponse.build(jiraLocation);
                 } else {
-                    return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, response.getResponseBodyAsString()));
+                    return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, ResponseUtil.getResponseAsTrimmedString(response)));
                 }
             }
 
