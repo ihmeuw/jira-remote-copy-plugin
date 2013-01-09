@@ -1,14 +1,16 @@
 package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
+import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
-import com.atlassian.pageobjects.elements.SelectElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
+
+import java.util.List;
 
 /**
  * Step 2 for doing a Remote Copy.
@@ -37,9 +39,6 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (className = "warning", within = "copyCommentsGroup")
 	PageElement copyCommentsNotice;
 
-	@ElementBy (id = "remoteIssueLink")
-	SelectElement remoteIssueLink;
-
 	@ElementBy (id = "copy-issue-links")
 	CheckboxElement copyIssueLinks;
 
@@ -58,10 +57,18 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (className = "warning", within = "copyAttachmentsGroup")
 	PageElement copyAttachmentsNotice;
 
+    SingleSelect remoteIssueLink;
+
     public CopyDetailsPage(final Long issueId, final String targetEntityLink)
     {
         this.issueId = issueId;
         this.url = String.format(URI_TEMPLATE, issueId, targetEntityLink);
+    }
+
+    @Init
+    public void init(){
+        final PageElement remoteIssueLinkContainer = elementFinder.find(By.id("remoteIssueLink-single-select"));
+        remoteIssueLink = pageBinder.bind(SingleSelect.class, remoteIssueLinkContainer);
     }
 
     @Override
@@ -98,8 +105,10 @@ public class CopyDetailsPage extends AbstractJiraPage
 		return copyAttachmentsGroup;
 	}
 
-	public SelectElement getCreateIssueLinks() {
-		return remoteIssueLink;
+
+	public List<String> getCreateIssueLinks() {
+        remoteIssueLink.clear().triggerSuggestions();
+        return remoteIssueLink.getSuggestions();
 	}
 
 	public CheckboxElement getCopyIssueLinks() {

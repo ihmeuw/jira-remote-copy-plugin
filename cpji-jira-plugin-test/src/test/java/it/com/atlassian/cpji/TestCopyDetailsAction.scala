@@ -103,9 +103,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 				copyDetailsPage.getCopyIssueLinksGroup.timed().isVisible)
 			Poller.waitUntilFalse(copyDetailsPage.getCopyIssueLinks.timed.isEnabled)
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
-			Poller.waitUntilTrue(copyDetailsPage.getCreateIssueLinks.timed.isPresent)
-			assertThat(Collections2.transform(copyDetailsPage.getCreateIssueLinks.getAllOptions, Options.getText),
-				IsCollectionContaining.hasItems("From original to copy", "None"))
+			assertThat(copyDetailsPage.getCreateIssueLinks, IsCollectionContaining.hasItems("From original to copy", "None"))
 		} finally {
 			AbstractCopyIssueTest.testkit2.attachments().enable()
 			AbstractCopyIssueTest.testkit2.issueLinking().enable()
