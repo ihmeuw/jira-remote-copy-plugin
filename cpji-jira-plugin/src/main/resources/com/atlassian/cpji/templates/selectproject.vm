@@ -5,13 +5,8 @@
 </head>
 <body>
 <div id="stepped-process" class="content-container">
-    <div class="content-related">
-        <ol class="steps">
-            <li class="current">$i18n.getText('cpji.select.project')</li>
-            <li class="todo">$i18n.getText('cpji.select.issue.type')</li>
-            <li class="todo">$i18n.getText('cpji.confirmation')</li>
-        </ol>
-    </div>
+	#set($currentStep="selectproject")
+	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
         <form action="SelectTargetProjectAction.jspa" class="aui" method="post">
             <h2 class="formtitle">$i18n.getText('cpji.select.destination.project')</h2>

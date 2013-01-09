@@ -5,27 +5,22 @@
 </head>
 <body>
 <div id="stepped-process" class="content-container">
-	<div class="content-related">
-		<ol class="steps">
-			<li class="done">$i18n.getText('cpji.select.project')</li>
-			<li class="current">$i18n.getText('cpji.select.issue.type')</li>
-			<li class="todo">$i18n.getText('cpji.confirmation')</li>
-		</ol>
-	</div>
+	#set($currentStep="copydetails")
+	#parse("/com/atlassian/cpji/templates/steps.vm")
 	<div class="content-body aui-panel">
 		<form action="CopyIssueToInstanceAction!default.jspa" class="aui" method="post">
-			<h2 class="formtitle">$i18n.getText('cpji.issue.type')</h2>
+			<h2 class="formtitle">$i18n.getText('cpji.details')</h2>
 			<fieldset>
 				<div class="field-group">
 					<label for="issueType">$i18n.getText('cpji.issue.type')</label>
 					<select class="singleSelect"  name="issueType" id="issueType">
 						#if(!$action.availableSubTaskTypes.empty)
-							<optgroup label="$i18n.getText('cpji.subtask')">
-								#foreach( $issueType in $action.availableSubTaskTypes)
-                                    <option #if(${issueType.isSelected()}) selected #end
-                                                                           value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
-								#end
-							</optgroup>
+						<optgroup label="$i18n.getText('cpji.subtask')">
+							#foreach( $issueType in $action.availableSubTaskTypes)
+								<option #if(${issueType.isSelected()}) selected #end
+																	   value="$textutils.htmlEncode(${issueType.value})">$textutils.htmlEncode(${issueType.value})</option>
+							#end
+						</optgroup>
                         <optgroup label="$i18n.getText('cpji.issue.type')">
 						#end
 						#foreach( $issueType in $action.getAvailableIssueTypes())
@@ -40,71 +35,61 @@
 			</fieldset>
 
 			#if (!$action.targetLocal)
-			<h2 class="formtitle">$i18n.getText('cpji.remote.user')</h2>
 			<fieldset>
 				<div class="field-group">
-					<label>$i18n.getText('cpji.user.name')</label>
-					<span class="field-value">$textutils.htmlEncode($action.getRemoteUserName())</span>
-				</div>
-				<div class="field-group">
-					<label>$i18n.getText('cpji.user.full.name')</label>
-					<span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName())</span>
+					<label>$i18n.getText('cpji.remote.user')</label>
+					<span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName()) ($textutils.htmlEncode($action.getRemoteUserName()))</span>
 				</div>
 			</fieldset>
 			#end
 
 			#if ($action.advancedSectionVisible)
-			<h2 class="formtitle">$i18n.getText('cpji.advanced')</h2>
-			<fieldset>
+			<fieldset class="group">
+				<legend><span>$i18n.getText('cpji.advanced')</span></legend>
 				#if ($action.copyCommentsSectionVisible)
-				<div class="field-group" id="copy-comments-group">
-					#set ($error = $action.copyCommentsErrorMessage)
-					<span class="field-value #if ($error != "") disabled #end">
-						<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
-						<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
-					</span>
-					#if ($error != "")
-						<div class="aui-message warning">$error</div>
-					#end
+				#set ($error = $action.copyCommentsErrorMessage)
+				<div class="checkbox">
+					<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
+					<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
 				</div>
+				#if ($error != "")
+					<div class="aui-message warning">$error</div>
+				#end
 				#end
 
 				#if ($action.copyAttachmentsSectionVisible)
-				<div class="field-group" id="copy-attachments-group">
-					#set ($isEnabled = $action.copyAttachmentsEnabled)
-					<span class="field-value #if (!$isEnabled) disabled #end">
-						<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if (!$isEnabled) disabled="" #else checked="checked" #end/>
-						<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
-					</span>
-					#set ($error = $action.copyAttachmentsErrorMessage)
-					#if ($error != "")
-						<div class="aui-message warning">$error</div>
-					#end
+				#set ($isEnabled = $action.copyAttachmentsEnabled)
+				<div class="checkbox">
+					<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if (!$isEnabled) disabled="" #else checked="checked" #end/>
+					<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 				</div>
+				#set ($error = $action.copyAttachmentsErrorMessage)
+				#if ($error != "")
+					<div class="aui-message warning">$error</div>
+				#end
 				#end
 
 				#if ($action.copyIssueLinksSectionVisible)
-				<div class="field-group" id="copy-issue-links-group">
-					#set ($error = $action.copyIssueLinksErrorMessage)
-					<span class="field-value #if ($error != "") disabled #end">
-						<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
-						<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
-					</span>
-					#if ($error != "")
-						<div class="aui-message warning">$error</div>
-					#end
+				#set ($error = $action.copyIssueLinksErrorMessage)
+				<div class="checkbox">
+					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
+					<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
 				</div>
+				#if ($error != "")
+					<div class="aui-message warning">$error</div>
 				#end
-
+				#end
+			</fieldset>
+            <fieldset>
 				#if ($action.createIssueLinkSectionVisible)
 				<div class="field-group" id="create-issue-links-group">
 					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
-
 					<select class="singleSelect" name="remoteIssueLink" id="remoteIssueLink">
 						#foreach( $issueLink in $action.getIssueLinkOptions())
 							<option value="$textutils.htmlEncode(${issueLink.value})">$textutils.htmlEncode(${issueLink.label})</option>
 						#end
 					</select>
+                    <div class="description">$i18n.getText("cpji.creates.issue.link.between.issues")</div>
 				</div>
 				#end
 			</fieldset>

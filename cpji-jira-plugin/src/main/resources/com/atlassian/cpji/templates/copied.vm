@@ -3,25 +3,21 @@
 <body>
 
 <div id="stepped-process" class="content-container">
-    <div class="content-related">
-        <ol class="steps">
-            <li class="done">Select project</li>
-            <li class="done">Select Issue Type</li>
-            <li class="current">Confirmation</li>
-        </ol>
-    </div>
+	#set($currentStep="success")
+	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
         <div class="aui-message success"><span class="aui-icon icon-success"></span>
 
-            <p class="title"><strong>Copy successful</strong></p>
+            <p class="title"><strong>$i18n.getText("cpji.copy.successful")</strong></p>
 
-            <p><a href="../browse/$action.getIssueKey()">$action.getIssueKey()</a> has been copied to <a
-                    href="$action.linkToNewIssue" target="_blank">$action.copiedIssueKey</a></p>
+			#set($src = "<a href='../browse/$action.getIssueKey()'>$action.getIssueKey()</a>")
+			#set($dst = "<a href='$action.linkToNewIssue' target='_blank'>$action.copiedIssueKey</a>")
+            <p>$i18n.getText("cpji.has.been.copied.to", $src, $dst)</p>
         </div>
 		#if ($action.invalidInput())
             <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
 
-                <p>There were some problems during issue creation.</p>
+                <p>$i18n.getText("cpji.there.were.problems.during.creation")</p>
                 <ul>
 					#foreach( $error in $action.getErrorMessages() )
                         <li>$textutils.htmlEncode($error)</li>
