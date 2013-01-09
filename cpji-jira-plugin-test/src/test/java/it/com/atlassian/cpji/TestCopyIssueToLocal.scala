@@ -5,7 +5,7 @@ import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.rest.client.domain.{IssueFieldId, Issue}
 import com.atlassian.jira.rest.client.domain.input.{IssueInputBuilder, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import java.lang.String
-import com.atlassian.cpji.tests.pageobjects.{PermissionChecksPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
 import org.junit.Assert._
 import com.atlassian.jira.pageobjects.JiraTestedProduct
 import com.atlassian.jira.webtests.Permissions
@@ -34,19 +34,19 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
     )
   }
 
-  val defaultPermissionChecksInteraction: (PermissionChecksPage) => Unit = (page) => {
+  val defaultPermissionChecksInteraction: (CopyIssueToInstanceConfirmationPage) => Unit = (page) => {
     assertTrue(page.isAllSystemFieldsRetained)
     assertTrue(page.isAllCustomFieldsRetained)
   }
 
   private def remoteCopy(jira: JiraTestedProduct, issueId: Long,
                          selectTargetInteraction: (SelectTargetProjectPage) => Unit = (page) => {},
-                         permissionsChecksInteraction: (PermissionChecksPage) => Unit = defaultPermissionChecksInteraction): String = {
+                         permissionsChecksInteraction: (CopyIssueToInstanceConfirmationPage) => Unit = defaultPermissionChecksInteraction): String = {
     val selectTargetProjectPage = jira.visit(classOf[SelectTargetProjectPage], issueId: java.lang.Long)
     selectTargetInteraction(selectTargetProjectPage)
 
     val copyDetailsPage = selectTargetProjectPage.next
-    val permissionChecksPage: PermissionChecksPage = copyDetailsPage.next
+    val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
     permissionsChecksInteraction(permissionChecksPage)
 
     val copyIssueToInstancePage = permissionChecksPage.copyIssue

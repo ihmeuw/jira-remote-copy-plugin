@@ -83,10 +83,10 @@ public class CopyDetailsPage extends AbstractJiraPage
         return url;
     }
 
-    public PermissionChecksPage next()
+    public CopyIssueToInstanceConfirmationPage next()
     {
         nextButton.click();
-        return pageBinder.bind(PermissionChecksPage.class);
+        return pageBinder.bind(CopyIssueToInstanceConfirmationPage.class);
     }
 
 	public boolean isCreateIssueLinksGroupVisible() {

@@ -1,8 +1,8 @@
 package it.com.atlassian.cpji;
 
 import com.atlassian.cpji.tests.pageobjects.CopyDetailsPage;
-import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstancePage;
-import com.atlassian.cpji.tests.pageobjects.PermissionChecksPage;
+import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceConfirmationPage;
+import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceSuccessfulPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
@@ -127,15 +127,15 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
             selectTargetProjectPage.setDestinationProject(destinationProject);
 
         final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
-        final PermissionChecksPage permissionChecksPage = copyDetailsPage.next();
+        final CopyIssueToInstanceConfirmationPage copyIssueToInstanceConfirmationPage = copyDetailsPage.next();
 
-        assertTrue(permissionChecksPage.isAllSystemFieldsRetained());
-        assertTrue(permissionChecksPage.isAllCustomFieldsRetained());
+        assertTrue(copyIssueToInstanceConfirmationPage.isAllSystemFieldsRetained());
+        assertTrue(copyIssueToInstanceConfirmationPage.isAllCustomFieldsRetained());
 
-        final CopyIssueToInstancePage copyIssueToInstancePage = permissionChecksPage.copyIssue();
-        assertTrue(copyIssueToInstancePage.isSuccessful());
+        final CopyIssueToInstanceSuccessfulPage copyIssueToInstanceSuccessfulPage = copyIssueToInstanceConfirmationPage.copyIssue();
+        assertTrue(copyIssueToInstanceSuccessfulPage.isSuccessful());
 
-        final String remoteIssueKey = copyIssueToInstancePage.getRemoteIssueKey();
+        final String remoteIssueKey = copyIssueToInstanceSuccessfulPage.getRemoteIssueKey();
         return remoteIssueKey;
     }
 

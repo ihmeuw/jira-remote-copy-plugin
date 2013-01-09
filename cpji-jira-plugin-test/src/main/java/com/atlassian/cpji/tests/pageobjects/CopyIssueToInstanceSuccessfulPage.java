@@ -11,7 +11,7 @@ import org.openqa.selenium.By;
  *
  * @since v2.1
  */
-public class CopyIssueToInstancePage extends AbstractJiraPage
+public class CopyIssueToInstanceSuccessfulPage extends AbstractJiraPage
 {
     private static final String URL = "/secure/CopyIssueToInstanceAction.jspa";
 

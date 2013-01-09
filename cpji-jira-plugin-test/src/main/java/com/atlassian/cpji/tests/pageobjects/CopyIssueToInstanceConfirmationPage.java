@@ -6,6 +6,7 @@ import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.TimedElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
+import com.google.common.base.Preconditions;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
 
@@ -16,7 +17,7 @@ import java.util.Iterator;
  *
  * @since v2.1
  */
-public class PermissionChecksPage extends AbstractJiraPage
+public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
 {
     private static final String URL = "/secure/PermissionChecksAction.jspa";
 
@@ -50,10 +51,10 @@ public class PermissionChecksPage extends AbstractJiraPage
         return PageObjectHelper.isMessagePresent(message, elementFinder);
     }
 
-    public CopyIssueToInstancePage copyIssue()
+    public CopyIssueToInstanceSuccessfulPage copyIssue()
     {
         copyIssueButton.click();
-        return pageBinder.bind(CopyIssueToInstancePage.class);
+        return pageBinder.bind(CopyIssueToInstanceSuccessfulPage.class);
     }
 
 	public TimedElement getFirstFieldGroup() {
@@ -64,8 +65,30 @@ public class PermissionChecksPage extends AbstractJiraPage
 		return elementFinder.findAll(By.cssSelector(".field-group")).iterator();
 	}
 
-	public PermissionChecksPage submitWithErrors() {
+	public CopyIssueToInstanceConfirmationPage submitWithErrors() {
 		copyIssueButton.click();
-		return pageBinder.bind(PermissionChecksPage.class);
+		return pageBinder.bind(CopyIssueToInstanceConfirmationPage.class);
+	}
+
+	public CopyIssueToInstanceConfirmationPage typeToTextField(String name, CharSequence... value) {
+		Preconditions.checkNotNull(name);
+		PageElement textField = elementFinder.find(By.name(name));
+		textField.clear();
+		if (value != null) {
+			textField.type(value);
+		}
+		return this;
+	}
+
+	public CopyIssueToInstanceConfirmationPage setMultiSelect(String id, String... items) {
+		Preconditions.checkNotNull(id);
+		MultiSelectUtil.setMultiSelect(this.pageBinder, id, items);
+		return this;
+	}
+
+	public SingleSelect getSingleSelect(String containerId) {
+		Preconditions.checkNotNull(containerId);
+		final PageElement selectContainer = elementFinder.find(By.id(containerId));
+		return pageBinder.bind(SingleSelect.class, selectContainer);
 	}
 }

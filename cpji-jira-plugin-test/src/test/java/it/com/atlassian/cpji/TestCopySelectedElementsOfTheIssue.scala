@@ -5,7 +5,7 @@ import com.atlassian.jira.rest.client.domain._
 import input.{IssueInput, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.io.ByteArrayInputStream
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstancePage, CopyDetailsPage}
+import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceSuccessfulPage, CopyDetailsPage}
 import org.junit.Assert._
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.cpji.tests.rules.CreateIssues
@@ -54,7 +54,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyComments.uncheck()
 
-		val issueToInstancePage: CopyIssueToInstancePage = copyDetailsPage.next().copyIssue()
+		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
 
 		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)
@@ -73,7 +73,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyAttachments.uncheck()
 
-		val issueToInstancePage: CopyIssueToInstancePage = copyDetailsPage.next().copyIssue()
+		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
 
 		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)
@@ -92,7 +92,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyIssueLinks.uncheck()
 
-		val issueToInstancePage: CopyIssueToInstancePage = copyDetailsPage.next().copyIssue()
+		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
 
 		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)

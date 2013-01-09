@@ -1,6 +1,7 @@
 package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.pageobjects.PageBinder;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -14,6 +15,10 @@ import java.util.List;
  * @since v2.1
  */
 public class MultiSelectUtil {
+	public static void setMultiSelect(@Nonnull PageBinder pageBinder, @Nonnull String id, @Nullable String...values) {
+		setMultiSelect(pageBinder, id, values != null ? ImmutableList.copyOf(values) : null);
+	}
+
 	public static void setMultiSelect(@Nonnull PageBinder pageBinder, @Nonnull String id, @Nullable Iterable<String> values) {
 		final Context cx = Context.enter();
 		try {

@@ -1,11 +1,10 @@
 package it.com.atlassian.cpji
 
-import com.atlassian.cpji.tests.pageobjects.{PermissionChecksPage, CopyDetailsPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, CopyDetailsPage, SelectTargetProjectPage}
 import org.junit.{Before, Test}
 import org.junit.Assert._
 import com.atlassian.jira.pageobjects.JiraTestedProduct
 import org.hamcrest.collection.IsIterableContainingInOrder
-import com.atlassian.pageobjects.elements.PageElement
 import org.openqa.selenium.By
 import collection.JavaConversions._
 import com.atlassian.pageobjects.elements.query.Poller
@@ -22,7 +21,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest {
 		val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
 		selectTargetProjectPage.setDestinationProject("Some Fields Required")
 		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
-		var permissionChecksPage: PermissionChecksPage = copyDetailsPage.next
+		var permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
 		assertFalse(permissionChecksPage.isAllSystemFieldsRetained)
 		assertTrue(permissionChecksPage.isAllCustomFieldsRetained)
 
@@ -42,6 +41,27 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest {
 				.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String](
 			"Due Date is required.", "Component/s is required.", "Affects Version/s is required.", "Fix Version/s is required.",
 			"Environment is required.", "Description is required.", "Original Estimate is required.", "Labels is required."))
+	}
+
+	@Test def shouldCopyIssueWithMissingRequiredFields {
+		val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
+		selectTargetProjectPage.setDestinationProject("Some Fields Required")
+		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
+		val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+
+		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
+		permissionChecksPage.typeToTextField("duedate", "16/Jan/13")
+				.typeToTextField("environment", "Mac OS X")
+				.typeToTextField("description", "This is a description.")
+				.typeToTextField("timetracking_originalestimate", "1w")
+				.typeToTextField("timetracking_remainingestimate", "1w")
+				.setMultiSelect("components", "Core")
+				.setMultiSelect("versions", "1.0")
+				.setMultiSelect("fixVersions", "1.0")
+				.setMultiSelect("labels", "test");
+
+		val succesfulCopyPage = permissionChecksPage.copyIssue()
+		assertTrue(succesfulCopyPage.isSuccessful)
 	}
 
 }
