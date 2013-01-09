@@ -3,6 +3,7 @@ package com.atlassian.cpji.tests.pageobjects;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
+import com.atlassian.pageobjects.elements.SelectElement;
 import com.atlassian.pageobjects.elements.TimedElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
@@ -90,5 +91,10 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
 		Preconditions.checkNotNull(containerId);
 		final PageElement selectContainer = elementFinder.find(By.id(containerId));
 		return pageBinder.bind(SingleSelect.class, selectContainer);
+	}
+
+	public SelectElement getSelectElement(String name) {
+		Preconditions.checkNotNull(name);
+		return elementFinder.find(By.name(name), SelectElement.class);
 	}
 }

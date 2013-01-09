@@ -8,6 +8,7 @@ import org.hamcrest.collection.IsIterableContainingInOrder
 import org.openqa.selenium.By
 import collection.JavaConversions._
 import com.atlassian.pageobjects.elements.query.Poller
+import com.atlassian.pageobjects.elements.Options
 
 class TestProjectRequiresFields extends AbstractCopyIssueTest {
 	var jira2 : JiraTestedProduct = null
@@ -58,10 +59,27 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest {
 				.setMultiSelect("components", "Core")
 				.setMultiSelect("versions", "1.0")
 				.setMultiSelect("fixVersions", "1.0")
-				.setMultiSelect("labels", "test");
+				.setMultiSelect("labels", "test")
 
 		val succesfulCopyPage = permissionChecksPage.copyIssue()
 		assertTrue(succesfulCopyPage.isSuccessful)
 	}
 
+	@Test def shouldCopyIssueWithMissingRequiredCustomFields {
+		val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
+		selectTargetProjectPage.setDestinationProject("Custom Fields Required")
+		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
+		val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+
+		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
+		permissionChecksPage.typeToTextField("environment", "Mac OS X")
+				.setMultiSelect("versions", "2.0")
+				.typeToTextField("customfield_10004", "jira-administrators")
+				.typeToTextField("customfield_10005", "123")
+
+		permissionChecksPage.getSelectElement("customfield_10006").select(Options.text("beta"))
+
+		val succesfulCopyPage = permissionChecksPage.copyIssue()
+		assertTrue(succesfulCopyPage.isSuccessful)
+	}
 }
