@@ -4,6 +4,7 @@ import org.junit.{Ignore, Rule, Test}
 import org.junit.Assert._
 import org.hamcrest.collection.IsIterableWithSize
 import com.atlassian.cpji.tests.pageobjects._
+import admin.ListApplicationLinksPage
 import com.atlassian.pageobjects.elements.query.{TimedQuery, Poller}
 import com.atlassian.jira.security.Permissions
 import com.atlassian.cpji.tests.rules.CreateIssues
@@ -14,6 +15,7 @@ import java.lang.String
 import BackdoorHelpers._
 import org.hamcrest.{Matchers, Matcher}
 import org.apache.log4j.Logger
+import com.atlassian.cpji.tests.ScreenshotUtil
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -92,6 +94,8 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 			testkit3.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
 			login(jira3)
 
+			jira3.visit(classOf[ListApplicationLinksPage])
+			ScreenshotUtil.attemptScreenshot(jira3.getTester.getDriver.getDriver, "shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks - applicationLinks")
 
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
 			issuePage.getMoreActionsMenu.open()

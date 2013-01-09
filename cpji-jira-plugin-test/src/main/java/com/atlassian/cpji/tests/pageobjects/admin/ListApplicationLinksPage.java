@@ -100,7 +100,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 	}
 
 	public static class DeleteDialog extends AbstractJiraPage {
-		@ElementBy (id = "delete-application-link-dialog")
+		@ElementBy (id = "delete-application-link-dialog", timeoutType = TimeoutType.PAGE_LOAD)
 		private PageElement dialog;
 
 		public DeleteDialog delete() {
