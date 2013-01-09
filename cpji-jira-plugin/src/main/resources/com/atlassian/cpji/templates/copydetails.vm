@@ -8,7 +8,7 @@
 	#parse("/com/atlassian/cpji/templates/steps.vm")
 	<div class="content-body aui-panel">
 		<form action="CopyIssueToInstanceAction!default.jspa" class="aui" method="post">
-			<h2 class="formtitle">$i18n.getText('cpji.details')</h2>
+			<h2 class="formtitle">$i18n.getText('cpji.copy.details')</h2>
 			<fieldset>
 				<div class="field-group">
 					<label for="issueType">$i18n.getText('cpji.issue.type')</label>
@@ -33,54 +33,46 @@
 				</div>
 			</fieldset>
 
-			#if (!$action.targetLocal)
-			<fieldset>
-				<div class="field-group">
-					<label>$i18n.getText('cpji.remote.user')</label>
-					<span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName()) ($textutils.htmlEncode($action.getRemoteUserName()))</span>
-				</div>
-			</fieldset>
-			#end
-
 			#if ($action.advancedSectionVisible)
 			<fieldset class="group">
-				<legend><span>$i18n.getText('cpji.advanced')</span></legend>
+				<legend><span>$i18n.getText('cpji.details')</span></legend>
 				#if ($action.copyCommentsSectionVisible)
 				#set ($error = $action.copyCommentsErrorMessage)
-				<div class="checkbox">
+				<div class="checkbox" id="copy-comments-group">
 					<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 					<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
+					#if ($error != "")
+                        <div class="warning">$error</div>
+					#end
 				</div>
-				#if ($error != "")
-					<div class="aui-message warning">$error</div>
-				#end
 				#end
 
 				#if ($action.copyAttachmentsSectionVisible)
 				#set ($isEnabled = $action.copyAttachmentsEnabled)
-				<div class="checkbox">
+				<div class="checkbox" id="copy-attachments-group">
 					<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if (!$isEnabled) disabled="" #else checked="checked" #end/>
 					<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
-				</div>
-				#set ($error = $action.copyAttachmentsErrorMessage)
-				#if ($error != "")
-					<div class="aui-message warning">$error</div>
-				#end
+					#set ($error = $action.copyAttachmentsErrorMessage)
+					#if ($error != "")
+                        <div class="warning">$error</div>
+					#end
+                </div>
 				#end
 
 				#if ($action.copyIssueLinksSectionVisible)
 				#set ($error = $action.copyIssueLinksErrorMessage)
-				<div class="checkbox">
+				<div class="checkbox" id="copy-issue-links-group">
 					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 					<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
+					#if ($error != "")
+                        <div class="warning">$error</div>
+					#end
 				</div>
-				#if ($error != "")
-					<div class="aui-message warning">$error</div>
-				#end
 				#end
 			</fieldset>
+			#end
+			#if ($action.createIssueLinkSectionVisible)
             <fieldset>
-				#if ($action.createIssueLinkSectionVisible)
 				<div class="field-group" id="create-issue-links-group">
 					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
 					<select class="singleSelect" name="remoteIssueLink" id="remoteIssueLink">
@@ -88,10 +80,18 @@
 							<option value="$textutils.htmlEncode(${issueLink.value})">$textutils.htmlEncode(${issueLink.label})</option>
 						#end
 					</select>
-                    <div class="description">$i18n.getText("cpji.creates.issue.link.between.issues")</div>
+					<div class="description">$i18n.getText("cpji.creates.issue.link.between.issues")</div>
 				</div>
-				#end
-			</fieldset>
+            </fieldset>
+			#end
+
+			#if (!$action.targetLocal)
+                <fieldset>
+                    <div class="field-group">
+                        <label>$i18n.getText('cpji.remote.user')</label>
+                        <span class="field-value">$textutils.htmlEncode($action.getRemoteFullUserName()) ($textutils.htmlEncode($action.getRemoteUserName()))</span>
+                    </div>
+                </fieldset>
 			#end
 
 			<div class="buttons-container">

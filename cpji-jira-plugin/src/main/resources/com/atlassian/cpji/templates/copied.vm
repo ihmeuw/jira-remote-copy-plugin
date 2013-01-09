@@ -15,7 +15,6 @@
         </div>
 		#if ($action.invalidInput())
             <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
-
                 <p>$i18n.getText("cpji.there.were.problems.during.creation")</p>
                 <ul>
 					#foreach( $error in $action.getErrorMessages() )

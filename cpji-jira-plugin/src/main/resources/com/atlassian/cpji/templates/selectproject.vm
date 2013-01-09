@@ -22,7 +22,7 @@
 			<div class="buttons-container">
 				<div class="buttons">
 					<input id="select-project-submit" type="submit" value="$i18n.getText('common.forms.next')" class="aui-button button submit"/>
-					<a href="$req.contextPath$viewUrl" class="aui-button aui-button-link cancel">$i18n.getText("common.forms.cancel")</a>
+					<a href="$req.contextPath$viewUrl" class="aui-button-cancel">$i18n.getText("common.forms.cancel")</a>
 				</div>
 			</div>
             <input type="hidden" name="id" value="$action.getId()"/>
