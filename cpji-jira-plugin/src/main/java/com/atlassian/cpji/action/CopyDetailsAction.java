@@ -196,7 +196,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 
 	public boolean isAdvancedSectionVisible() {
 		return isCopyAttachmentsSectionVisible() || isCopyIssueLinksSectionVisible()
-				|| isCreateIssueLinkSectionVisible() || isCopyCommentsSectionVisible();
+				|| isCopyCommentsSectionVisible();
 	}
 
 	public boolean isCopyAttachmentsSectionVisible() {

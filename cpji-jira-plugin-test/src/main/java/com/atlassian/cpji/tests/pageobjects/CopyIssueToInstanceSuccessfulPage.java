@@ -18,7 +18,7 @@ public class CopyIssueToInstanceSuccessfulPage extends AbstractJiraPage
     @Override
     public TimedCondition isAt()
     {
-        return Conditions.forMatcher(elementFinder.find(By.className("current")).timed().getText(), Matchers.equalToIgnoringCase("Confirmation"));
+        return Conditions.forMatcher(elementFinder.find(By.cssSelector(".done:last-child")).timed().getText(), Matchers.equalToIgnoringCase("Confirmation"));
     }
 
     @Override

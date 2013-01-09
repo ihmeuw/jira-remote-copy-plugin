@@ -1,7 +1,7 @@
 <div class="content-related">
     <ol class="steps">
         <li class="#if($currentStep=="selectproject") current #else done #end">$i18n.getText('cpji.select.project')</li>
-        <li class="#if($currentStep=="selectproject") todo #elseif($currentStep=="copydetails") current #else done #end">$i18n.getText('cpji.details')</li>
+        <li class="#if($currentStep=="selectproject") todo #elseif($currentStep=="copydetails") current #else done #end">$i18n.getText('cpji.copy.details')</li>
         <li class="#if($currentStep=="confirmation") current #elseif($currentStep=="success") done #else todo #end">$i18n.getText('cpji.confirmation')</li>
     </ol>
 </div>
