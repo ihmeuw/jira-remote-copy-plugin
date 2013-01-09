@@ -4,6 +4,7 @@ import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkResponseHandler;
 import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.rest.model.ErrorBean;
 import com.atlassian.fugue.Either;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
@@ -38,7 +39,12 @@ abstract class AbstractJsonResponseHandler<T> implements ApplicationLinkResponse
             return Either.left(NegativeResponseStatus.pluginNotInstalled(jiraLocation));
         }
         if (!response.isSuccessful()) {
-            return Either.left(NegativeResponseStatus.communicationFailed(jiraLocation));
+			try {
+				ErrorBean error = response.getEntity(ErrorBean.class);
+				return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, error));
+			} catch (ResponseException e) {
+            	return Either.left(NegativeResponseStatus.communicationFailed(jiraLocation));
+			}
         }
         try {
             T parsedResponse = parseResponse(response);

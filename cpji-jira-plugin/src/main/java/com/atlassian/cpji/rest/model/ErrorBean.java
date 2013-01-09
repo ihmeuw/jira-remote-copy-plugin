@@ -1,11 +1,12 @@
 package com.atlassian.cpji.rest.model;
 
 import com.atlassian.jira.util.ErrorCollection;
+import com.google.common.collect.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  @since v1.0
@@ -20,6 +21,10 @@ public class ErrorBean
     public ErrorBean()
     {
     }
+
+	public ErrorBean(final String...errors) {
+		this(ImmutableList.copyOf(errors));
+	}
 
     public ErrorBean(final List<String> errors)
     {

@@ -1,10 +1,9 @@
 package com.atlassian.cpji.rest;
 
-import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.components.CopyIssueService;
+import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.ErrorBean;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.Consumes;
@@ -65,8 +64,10 @@ public class CopyIssueResource
         }
         catch (Exception ex)
         {
-            log.error("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "'", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "' Error: '" + (ex.getMessage() == null ? ex.getClass().getName() : ex.getMessage()) + "' Stacktrace: '" + ExceptionUtils.getStackTrace(ex) + "'").cacheControl(RESTException.never()).build();
+            log.error(String.format("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "': %s", ex.getMessage()));
+            return Response.serverError().entity(new ErrorBean(
+					"Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "'. Please contact your administrator."))
+					.cacheControl(RESTException.never()).build();
         }
     }
 

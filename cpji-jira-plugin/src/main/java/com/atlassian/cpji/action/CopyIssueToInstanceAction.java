@@ -334,7 +334,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			case FIELD_VALUE_NOT_MAPPED:
 				return true;
 			case FIELD_PERMISSION_MISSING:
-				return true;
+				return false;
 			case FIELD_MANDATORY_NO_PERMISSION:
 				return false;
 			case FIELD_MANDATORY_VALUE_NOT_MAPPED:
