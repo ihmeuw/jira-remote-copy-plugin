@@ -1,3 +1,4 @@
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.AbstractCopyIssueAction" *#
 <div class="content-related">
     <ol class="steps">
         <li class="#if($action.currentStep=="selectproject") current #else done #end">$i18n.getText('cpji.select.project')</li>
