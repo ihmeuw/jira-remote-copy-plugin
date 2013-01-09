@@ -74,7 +74,7 @@ public class CopyDetailsPage extends AbstractJiraPage
     @Override
     public TimedCondition isAt()
     {
-        return Conditions.forMatcher(elementFinder.find(By.className("current")).timed().getText(), Matchers.equalToIgnoringCase("Copy details"));
+        return Conditions.forMatcher(elementFinder.find(By.className("current")).timed().getText(), Matchers.equalToIgnoringCase("Details"));
     }
 
     @Override
