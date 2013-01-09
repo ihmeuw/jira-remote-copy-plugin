@@ -39,7 +39,7 @@
 				<legend><span>$i18n.getText('cpji.details')</span></legend>
 				#if ($action.copyCommentsSectionVisible)
 				#set ($error = $action.copyCommentsErrorMessage)
-				<div class="checkbox">
+				<div class="checkbox" id="copy-comments-group">
 					<input type="checkbox" class="checkbox" id="copy-comments" name="copyComments" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 					<label for="copy-comments">$i18n.getText('cpji.copy.comments')</label>
 					#if ($error != "")
@@ -50,18 +50,19 @@
 
 				#if ($action.copyAttachmentsSectionVisible)
 				#set ($isEnabled = $action.copyAttachmentsEnabled)
-				<div class="checkbox">
+				<div class="checkbox" id="copy-attachments-group">
 					<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if (!$isEnabled) disabled="" #else checked="checked" #end/>
 					<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 					#set ($error = $action.copyAttachmentsErrorMessage)
 					#if ($error != "")
                         <div class="warning">$error</div>
 					#end
+                </div>
 				#end
 
 				#if ($action.copyIssueLinksSectionVisible)
 				#set ($error = $action.copyIssueLinksErrorMessage)
-				<div class="checkbox">
+				<div class="checkbox" id="copy-issue-links-group">
 					<input type="checkbox" class="checkbox" id="copy-issue-links" name="copyIssueLinks" value="true" #if ($error != "") disabled="" #else checked="checked" #end/>
 					<label for="copy-issue-links">$i18n.getText('cpji.copy.issue.links')</label>
 					#if ($error != "")
