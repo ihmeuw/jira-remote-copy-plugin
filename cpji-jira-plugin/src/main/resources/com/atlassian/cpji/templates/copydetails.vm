@@ -5,7 +5,6 @@
 </head>
 <body>
 <div id="stepped-process" class="content-container">
-	#set($currentStep="copydetails")
 	#parse("/com/atlassian/cpji/templates/steps.vm")
 	<div class="content-body aui-panel">
 		<form action="CopyIssueToInstanceAction!default.jspa" class="aui" method="post">

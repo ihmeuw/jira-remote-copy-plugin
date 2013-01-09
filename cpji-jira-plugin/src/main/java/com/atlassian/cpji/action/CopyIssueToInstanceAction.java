@@ -2,7 +2,7 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.action.admin.RequiredFieldsAwareAction;
 import com.atlassian.cpji.components.CopyIssueBeanFactory;
 import com.atlassian.cpji.components.FieldLayoutService;
@@ -120,6 +120,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		this.issueLinkTypeManager = issueLinkTypeManager;
 		this.fieldMapperFactory = fieldMapperFactory;
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
+
+		setCurrentStep("confirmation");
 	}
 
 	@Override
@@ -203,6 +205,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
 		linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());
 
+		setCurrentStep("success");
 		return SUCCESS;
 	}
 

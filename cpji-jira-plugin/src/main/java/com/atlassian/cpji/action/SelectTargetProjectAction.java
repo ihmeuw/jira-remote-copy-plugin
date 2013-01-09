@@ -1,7 +1,7 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.PluginVersion;
 import com.atlassian.cpji.components.remote.JiraProxy;
@@ -19,9 +19,6 @@ import org.apache.log4j.Logger;
  */
 public class SelectTargetProjectAction extends AbstractCopyIssueAction
 {
-
-
-
 	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
 
 	public SelectTargetProjectAction(
@@ -36,7 +33,9 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
+
         webResourceManager.requireResource(PLUGIN_KEY + ":selectTargetProjectAction");
+		setCurrentStep("selectproject");
 	}
 
     @Override
@@ -49,7 +48,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     @RequiresXsrfCheck
     public String doExecute() throws Exception
     {
-        String permissionCheck = checkPermissions();
+		String permissionCheck = checkPermissions();
         if (!permissionCheck.equals(SUCCESS))
         {
             return permissionCheck;

@@ -5,7 +5,6 @@
 </head>
 <body>
 <div id="stepped-process" class="content-container">
-	#set($currentStep="confirmation")
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
         <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >

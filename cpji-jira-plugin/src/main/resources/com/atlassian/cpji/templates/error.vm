@@ -1,8 +1,22 @@
-<div class="aui-message error"><span class="aui-icon icon-error"></span>
-    <p>$i18n.getText('cpji.error.occurred')</p>
-    <ul>
-    #foreach( $error in $action.getErrorMessages() )
-        <li>$textutils.htmlEncode($error)</li>
-    #end
-    </ul>
+#* @vtlvariable name="action" type="com.atlassian.cpji.action.AbstractCopyIssueAction" *#
+<html>
+<head>
+    <title>$i18n.getText('cpji.there.was.an.error')</title>
+</head>
+<body>
+<div id="stepped-process" class="content-container">
+	#parse("/com/atlassian/cpji/templates/steps.vm")
+
+	<div class="content-body aui-panel">
+		<div class="aui-message error"><span class="aui-icon icon-error"></span>
+			<p>$i18n.getText('cpji.error.occurred')</p>
+			<ul>
+			#foreach( $error in $action.getErrorMessages() )
+				<li>$textutils.htmlEncode($error)</li>
+		    #end
+    		</ul>
+		</div>
+	</div>
 </div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
@@ -64,6 +64,8 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
 		this.issueLinkTypeManager = issueLinkTypeManager;
+
+		setCurrentStep("copydetails");
         webResourceManager.requireResource(PLUGIN_KEY+":copyDetailsAction");
 	}
 
@@ -122,12 +124,9 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             availableSubTaskTypes = Collections.emptyList();
         }
 
-
-
 		UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
         remoteFullUserName = copyInfo.getRemoteUser().getFullName();
-
         return SUCCESS;
     }
 

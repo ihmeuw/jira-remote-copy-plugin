@@ -1,6 +1,7 @@
 package com.atlassian.cpji.action.admin;
 
 import com.atlassian.cpji.action.AbstractCopyIssueAction;
+import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;

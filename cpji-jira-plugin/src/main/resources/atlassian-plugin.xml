@@ -66,7 +66,6 @@
 			<action name="com.atlassian.cpji.action.admin.ConfigureCopyIssuesAdminAction"
 					alias="ConfigureCopyIssuesAdminAction">
 				<view name="input">/com/atlassian/cpji/templates/admin.vm</view>
-				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
 				<view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
 			</action>
 		</actions>
@@ -76,7 +75,6 @@
 		<actions>
 			<action name="com.atlassian.cpji.action.admin.GetFieldsHtmlAction" alias="GetFieldsHtmlAction">
 				<view name="success">/com/atlassian/cpji/templates/htmlfields.vm</view>
-				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
                 <view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
 			</action>
 		</actions>
@@ -86,7 +84,7 @@
 	<component key="defaultFieldValuesManager" class="com.atlassian.cpji.fields.value.DefaultFieldValuesManager"/>
 	<component key="copyIssueConfigurationManager"
 			   class="com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager"/>
-	<component key="copyIssuePermissionManager" class="com.atlassian.cpji.action.admin.CopyIssuePermissionManager"/>
+	<component key="copyIssuePermissionManager" class="com.atlassian.cpji.components.CopyIssuePermissionManager"/>
 	<component key="fieldLayoutItemsRetriever" class="com.atlassian.cpji.fields.FieldLayoutItemsRetriever"/>
 	<component key="issueLinkClient" class="com.atlassian.cpji.util.IssueLinkClient"/>
 	<component key="userMappingManager" class="com.atlassian.cpji.fields.value.UserMappingManager"/>

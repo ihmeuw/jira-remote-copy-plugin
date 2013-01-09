@@ -1,7 +1,7 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.cpji.action.admin.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
@@ -15,6 +15,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.web.action.issue.AbstractIssueSelectAction;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -23,7 +24,7 @@ import java.net.URLDecoder;
 /**
  * @since v1.4
  */
-public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
+public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction {
     public static final String AUTHORIZE = "authorize";
 
 	public static final String PLUGIN_KEY = "com.atlassian.cpji.cpji-jira-plugin";
@@ -38,6 +39,7 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 	
 	private String genericResponseHandlerResult = ERROR;
 	private String authorizationUrl;
+	private String currentStep;
 
 	private final CopyIssuePermissionManager copyIssuePermissionManager;
 
@@ -158,5 +160,14 @@ public class AbstractCopyIssueAction extends AbstractIssueSelectAction {
 		public String getProjectKey() {
 			return projectKey;
 		}
+	}
+
+	public void setCurrentStep(String name) {
+		Preconditions.checkNotNull(name);
+		this.currentStep = name;
+	}
+
+	public String getCurrentStep() {
+		return this.currentStep;
 	}
 }

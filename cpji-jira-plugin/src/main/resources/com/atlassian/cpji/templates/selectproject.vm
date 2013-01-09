@@ -5,7 +5,6 @@
 </head>
 <body>
 <div id="stepped-process" class="content-container">
-	#set($currentStep="selectproject")
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
         <form action="SelectTargetProjectAction.jspa" class="aui" method="post">

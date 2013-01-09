@@ -1,4 +1,4 @@
-package com.atlassian.cpji.action.admin;
+package com.atlassian.cpji.components;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.security.JiraAuthenticationContext;

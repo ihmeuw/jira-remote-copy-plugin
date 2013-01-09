@@ -3,7 +3,6 @@
 <body>
 
 <div id="stepped-process" class="content-container">
-	#set($currentStep="success")
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
         <div class="aui-message success"><span class="aui-icon icon-success"></span>
