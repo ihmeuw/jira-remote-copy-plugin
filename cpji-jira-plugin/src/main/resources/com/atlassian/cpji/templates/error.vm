@@ -8,8 +8,8 @@
 	#parse("/com/atlassian/cpji/templates/steps.vm")
 
 	<div class="content-body aui-panel">
-		<div class="aui-message error"><span class="aui-icon icon-error"></span>
-			<p>$i18n.getText('cpji.error.occurred')</p>
+		<div class="aui-message error">
+			<p class="title"><span class="aui-icon icon-error"></span><strong>$i18n.getText('cpji.error.occurred', $action.issuePath, $action.issueKey)</strong></p>
 			<ul>
 			#foreach( $error in $action.getErrorMessages() )
 				<li>$textutils.htmlEncode($error)</li>
