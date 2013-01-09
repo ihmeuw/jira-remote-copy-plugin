@@ -87,7 +87,9 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		final MutableIssue issue = getIssueObject();
 		if (issueLinkManager.isLinkingEnabled()) {
 			if (issue != null) {
-				return !issueLinkManager.getOutwardLinks(issue.getId()).isEmpty();
+                final boolean hasOutwardLinks = !issueLinkManager.getOutwardLinks(issue.getId()).isEmpty();
+                final boolean hasInwardLinks = !issueLinkManager.getInwardLinks(issue.getId()).isEmpty();
+                return hasOutwardLinks || hasInwardLinks;
 			}
 		}
 		return false;
