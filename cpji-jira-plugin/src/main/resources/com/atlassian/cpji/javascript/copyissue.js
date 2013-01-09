@@ -87,6 +87,7 @@ AJS.$(function ($) {
         prepareSelect: function () {
             copyIssue.singleSelect = new AJS.SingleSelect({
                 element: copyIssue.settings.projectsSelect,
+                width: "250px",
                 showDropdownButton: true,
                 itemAttrDisplayed: "label"
             });

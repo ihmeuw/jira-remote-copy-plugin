@@ -18,9 +18,10 @@
             <fieldset>
 				<div class="field-group" id="targetEntityLink-container" data-selected-project-key="$textutils.htmlEncode($selectedIssueProjectKey)">
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
-					<span class="field-value" style="width: 250px;">
-						<select name="targetEntityLink" id="targetEntityLink" class="hidden"></select>
-						<span id="targetEntityLinkLoader" class="icon loading hidden"></span>
+					<select name="targetEntityLink" id="targetEntityLink" class="hidden"></select>
+                    <span id="targetEntityLinkLoader" class="hidden">
+						<input class="text" type="text" disabled="disabled"/>
+						<span class="icon loading"></span>
 					</span>
 				</div>
             </fieldset>
