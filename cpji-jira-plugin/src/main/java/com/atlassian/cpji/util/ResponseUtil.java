@@ -2,6 +2,7 @@ package com.atlassian.cpji.util;
 
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +38,8 @@ public class ResponseUtil {
         } catch(IOException e){
             throw new ResponseException(e);
         } finally {
-            try{
-                reader.close();
-            } catch(IOException e){
-                log.warn("Cannot close reader");
-            }
+            IOUtils.closeQuietly(reader);
         }
-
     }
 
     public static String getResponseAsTrimmedString(Response response) throws ResponseException {
