@@ -115,8 +115,8 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
 
 	@Test
-	def cloningSubtaskAsAnotherSubtask(){
-		try{
+	def cloningSubtaskAsAnotherSubtask() {
+		try {
 			testkit3.subtask().enable()
 
 			val parentIssue = createIssue("Sample parent")
@@ -135,6 +135,36 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 			val copiedIssueParent : JSONObject = copiedIssue.getField("parent").getValue.asInstanceOf[JSONObject]
 
 			assertEquals(subTaskParent.get("key"), copiedIssueParent.get("key"))
+		} finally {
+			testkit3.subtask().disable()
+		}
+
+	}
+
+
+	@Test
+	def cloningSubtaskToAnotherProject() {
+		try {
+			testkit3.subtask().enable()
+
+			val parentIssue = createIssue("Sample parent")
+			val subtaskBuilder = new IssueInputBuilder("WHEI", 5L, "Sample child").setFieldValue("parent", ComplexIssueInputFieldValue.`with`("key", parentIssue.getKey))
+			val subtask = createIssues3.newIssue(subtaskBuilder.build())
+
+			val copiedIssueKey = remoteCopy(jira3, subtask.getId, permissionsChecksInteraction = (page) => {
+				assertTrue(page.isAllCustomFieldsRetained)
+			},
+				selectTargetInteraction = (page) => page.setDestinationProject("acrobata")
+			)
+
+			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+
+			assertEquals(subtask.getSummary, copiedIssue.getSummary)
+			assertEquals("AOBA", copiedIssue.getProject.getKey)
+
+			val copiedIssueParent = copiedIssue.getField("parent")
+			assertNull(copiedIssueParent)
+
 		} finally {
 			testkit3.subtask().disable()
 		}
