@@ -15,15 +15,15 @@ import scala.collection.JavaConverters._
 import com.atlassian.pageobjects.elements.query.Poller
 import org.codehaus.jettison.json.JSONObject
 
-class TestCopyIssueToLocal extends AbstractCopyIssueTest {
+class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
   implicit def fieldInputFromVals(arg: (IssueFieldId, AnyRef)) = new FieldInput(arg._1, arg._2)
 
-  val createIssues3 = new CreateIssues(AbstractCopyIssueTest.restClient3)
+  val createIssues3 = new CreateIssues(restClient3)
 
   @Before
   def setUp() {
-    login(AbstractCopyIssueTest.jira3)
+    login(jira3)
   }
 
   val createIssue = (summary: String) => {
@@ -58,13 +58,12 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
   def copySimpleIssueToDefaultProject() {
 
     val issue = createIssue("Sample issue")
-    val copiedIssueKey = remoteCopy(AbstractCopyIssueTest.jira3, issue.getId,
-      permissionsChecksInteraction = (page) => {
+    val copiedIssueKey = remoteCopy(jira3, issue.getId,
+			permissionsChecksInteraction = (page) => {
         assertTrue(page.isAllCustomFieldsRetained)
       })
 
-    val copiedIssue = AbstractCopyIssueTest.restClient3.getIssueClient
-      .getIssue(copiedIssueKey, AbstractCopyIssueTest.NPM)
+    val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
     assertEquals(issue.getProject.getKey, copiedIssue.getProject.getKey)
     issuesEquals(issue, copiedIssue)
   }
@@ -76,23 +75,21 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
 
     {
       val issueToLink = createIssue("Issue to link")
-      AbstractCopyIssueTest.restClient3.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, issueToLink.getKey, "Duplicate"), AbstractCopyIssueTest.NPM)
+      restClient3.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, issueToLink.getKey, "Duplicate"), NPM)
     }
 
-    AbstractCopyIssueTest.restClient3.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+    restClient3.getIssueClient.addAttachment(NPM,
       issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")), this.getClass.getCanonicalName)
 
 
-    val copiedIssueKey = remoteCopy(AbstractCopyIssueTest.jira3, issue.getId,
+    val copiedIssueKey = remoteCopy(jira3, issue.getId,
       permissionsChecksInteraction = (page) => {
         assertTrue(page.isAllCustomFieldsRetained)
       })
 
-    val copiedIssue = AbstractCopyIssueTest.restClient3.getIssueClient
-      .getIssue(copiedIssueKey, AbstractCopyIssueTest.NPM)
+    val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
 
-    val issueWithExtras = AbstractCopyIssueTest.restClient3.getIssueClient
-      .getIssue(issue.getKey, AbstractCopyIssueTest.NPM)
+    val issueWithExtras = restClient3.getIssueClient.getIssue(issue.getKey, NPM)
 
     issuesEquals(issueWithExtras, copiedIssue)
   }
@@ -103,15 +100,15 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
     val issue = createIssue("Sample issue")
 
     try {
-      AbstractCopyIssueTest.testkit3.permissionSchemes().removeProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
-      viewIssue(AbstractCopyIssueTest.jira3, issue.getKey)
+      testkit3.permissionSchemes().removeProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
+      viewIssue(jira3, issue.getKey)
 
-      val selectTargetProjectPage = AbstractCopyIssueTest.jira3.visit(classOf[SelectTargetProjectPage], issue.getId)
+      val selectTargetProjectPage = jira3.visit(classOf[SelectTargetProjectPage], issue.getId)
 
 	  Poller.waitUntilTrue(selectTargetProjectPage.getTargetEntityWarningMessage.timed().isPresent)
       assertThat(selectTargetProjectPage.getTargetEntityWarningMessage.getText, Matchers.startsWith("You cannot clone issue"))
     } finally {
-      AbstractCopyIssueTest.testkit3.permissionSchemes().addProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
+      testkit3.permissionSchemes().addProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
     }
 
   }
@@ -120,18 +117,17 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
 	@Test
 	def cloningSubtaskAsAnotherSubtask(){
 		try{
-			AbstractCopyIssueTest.testkit3.subtask().enable()
+			testkit3.subtask().enable()
 
 			val parentIssue = createIssue("Sample parent")
 			val subtaskBuilder = new IssueInputBuilder("WHEI", 5L, "Sample child").setFieldValue("parent", ComplexIssueInputFieldValue.`with`("key", parentIssue.getKey))
 			val subtask = createIssues3.newIssue(subtaskBuilder.build())
 
-			val copiedIssueKey = remoteCopy(AbstractCopyIssueTest.jira3, subtask.getId, permissionsChecksInteraction = (page) => {
+			val copiedIssueKey = remoteCopy(jira3, subtask.getId, permissionsChecksInteraction = (page) => {
 				assertTrue(page.isAllCustomFieldsRetained)
 			})
 
-			val copiedIssue = AbstractCopyIssueTest.restClient3.getIssueClient
-				.getIssue(copiedIssueKey, AbstractCopyIssueTest.NPM)
+			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
 
 			issuesEquals(subtask, copiedIssue)
 
@@ -140,7 +136,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest {
 
 			assertEquals(subTaskParent.get("key"), copiedIssueParent.get("key"))
 		} finally {
-			AbstractCopyIssueTest.testkit3.subtask().disable()
+			testkit3.subtask().disable()
 		}
 
 	}
