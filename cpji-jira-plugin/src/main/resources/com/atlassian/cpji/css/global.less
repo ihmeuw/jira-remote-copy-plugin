@@ -14,23 +14,12 @@
 }
 
 form.aui {
-	.field-group {
-		.field-value {
-			label {
-				float: none;
-				display: inline;
-				margin: 0 0 0 0;
-				padding-top: 0;
-				text-align: left;
-				position: inherit;
-				font-weight: normal;
-			}
-		}
-
-		.field-value.disabled {
-			color: #999999;
-		}
-	}
+	fieldset .checkbox {
+		div.error {
+//        older JIRAs assume we have errors outside .checkbox. We need to force them to think differently
+          margin: 5px 0 0;
+        }
+    }
 }
 
 #stepped-process {
