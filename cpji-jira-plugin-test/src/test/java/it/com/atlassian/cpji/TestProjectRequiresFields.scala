@@ -10,11 +10,8 @@ import collection.JavaConversions._
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.pageobjects.elements.Options
 
-class TestProjectRequiresFields extends AbstractCopyIssueTest {
-	var jira2 : JiraTestedProduct = null
-
+class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
 	@Before def setUp {
-		jira2 = AbstractCopyIssueTest.jira2
 		login(jira2)
 	}
 
