@@ -46,6 +46,11 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects{
 			takeScreenshot("03 Confirm values")
 			confirm.copyIssue()
 			takeScreenshot("04 Successful screen")
+
+			jira1.visit(classOf[SelectTargetProjectPage], issue.getId).setDestinationProject("Some fields required").next().next()
+			takeScreenshot("03b Uneditable requilred fields - failure")
+
+
 		} finally{
 			testkit2.attachments().enable()
 		}
