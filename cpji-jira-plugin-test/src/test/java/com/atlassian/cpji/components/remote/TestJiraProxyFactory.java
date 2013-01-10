@@ -35,7 +35,7 @@ public class TestJiraProxyFactory {
 
     @Test
     public void testIsLocalLocation(){
-        Predicate<JiraLocation> predicate = JiraProxyFactory.isLocalLocation();
+        Predicate<JiraLocation> predicate = JiraLocation.isLocalLocation();
         ApplicationProperties ap = mock(ApplicationProperties.class);
         when(ap.getString(APKeys.JIRA_TITLE)).thenReturn("MyLocalJira");
         LocalJiraProxy localProxy = new LocalJiraProxy(null, null, null, null, null, null, null, null, null, ap);

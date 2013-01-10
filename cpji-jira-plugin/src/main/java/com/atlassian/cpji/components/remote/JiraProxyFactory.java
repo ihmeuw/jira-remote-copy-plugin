@@ -19,7 +19,6 @@ import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -61,7 +60,7 @@ public class JiraProxyFactory {
     }
 
     public JiraProxy createJiraProxy(JiraLocation jira) {
-        if (isLocalLocation().apply(jira))
+        if (JiraLocation.isLocalLocation().apply(jira))
             return new LocalJiraProxy(permissionManager, jiraAuthenticationContext, copyIssueService, attachmentManager, issueManager, issueLinkManager, remoteIssueLinkManager, projectInfoService, jiraBaseUrls, applicationProperties);
         else {
             try {
@@ -101,18 +100,6 @@ public class JiraProxyFactory {
                 return createJiraProxy(JiraLocation.fromAppLink(input));
             }
         });
-    }
-
-
-    public static Predicate<JiraLocation> isLocalLocation() {
-        return new Predicate<JiraLocation>() {
-            @Override
-            public boolean apply(@Nullable JiraLocation input) {
-                if (input == null)
-                    return false;
-                return LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(input.getId());
-            }
-        };
     }
 
 

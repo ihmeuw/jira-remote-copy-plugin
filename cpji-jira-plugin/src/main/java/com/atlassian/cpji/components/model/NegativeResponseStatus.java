@@ -1,6 +1,5 @@
 package com.atlassian.cpji.components.model;
 
-import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.model.ErrorBean;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.util.ErrorCollection;
@@ -77,7 +76,7 @@ public class NegativeResponseStatus extends ResultWithJiraLocation<NegativeRespo
 
     @Nonnull
     public static Predicate<Either<NegativeResponseStatus, SuccessfulResponse>> onlyRemoteJiras() {
-        final Predicate<JiraLocation> isLocal = JiraProxyFactory.isLocalLocation();
+        final Predicate<JiraLocation> isLocal = JiraLocation.isLocalLocation();
         return new Predicate<Either<NegativeResponseStatus, SuccessfulResponse>>() {
             @Override
             public boolean apply(@Nullable Either<NegativeResponseStatus, SuccessfulResponse> input) {

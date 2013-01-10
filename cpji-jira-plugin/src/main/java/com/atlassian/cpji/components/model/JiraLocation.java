@@ -4,6 +4,9 @@ import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLink;
 import com.atlassian.cpji.components.remote.LocalJiraProxy;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
+
+import javax.annotation.Nullable;
 
 /**
  * @since v3.0
@@ -14,7 +17,18 @@ public class JiraLocation {
 
     private final String name;
 
-    @Override
+	public static Predicate<JiraLocation> isLocalLocation() {
+		return new Predicate<JiraLocation>() {
+			@Override
+			public boolean apply(@Nullable JiraLocation input) {
+				if (input == null)
+					return false;
+				return input.isLocal();
+			}
+		};
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
