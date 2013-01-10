@@ -2,6 +2,7 @@ package com.atlassian.cpji.components.remote;
 
 import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.rest.model.ErrorBean;
 import com.atlassian.fugue.Either;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
@@ -14,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,8 +66,25 @@ public class TestAbstractJsonResponseHandler {
     }
 
     @Test
-    public void testCommunicationFailedOn500Response() throws Exception {
-        testStandardErrorResponse(500, NegativeResponseStatus.Status.COMMUNICATION_FAILED);
+    public void shouldTryParseErrorBeanWhenResponseIsUnsuccesfull() throws Exception {
+        Response response = mockUnsuccesfulResponse(500);
+        ErrorBean bean = new ErrorBean();
+        when(response.getEntity(ErrorBean.class)).thenReturn(bean);
+
+        Either<NegativeResponseStatus, MyResponseType> handledResponse = jsonResponseHandler.handle(response);
+
+        testNegativeResponse(NegativeResponseStatus.Status.ERROR_OCCURRED, handledResponse);
+        verify(response).getEntity(ErrorBean.class);
+    }
+
+    @Test
+    public void shouldReturnCommunicationFailedWhenCannotParseUnsuccesfulResponseToErrorBean() throws Exception{
+        Response response = mockUnsuccesfulResponse(500);
+        when(response.getEntity(ErrorBean.class)).thenThrow(new ResponseException());
+
+        Either<NegativeResponseStatus, MyResponseType> handledResponse = jsonResponseHandler.handle(response);
+
+        testNegativeResponse(NegativeResponseStatus.Status.COMMUNICATION_FAILED, handledResponse);
     }
 
     @Test
@@ -94,7 +113,7 @@ public class TestAbstractJsonResponseHandler {
 
     private void testNegativeResponse(NegativeResponseStatus.Status expectedStatus, Either<NegativeResponseStatus, ?> givenResponse){
         assertTrue(givenResponse.isLeft());
-        NegativeResponseStatus status = (NegativeResponseStatus) givenResponse.left().get();
+        NegativeResponseStatus status = givenResponse.left().get();
         assertEquals(expectedStatus, status.getResult());
         assertEquals(defaultJiraLocation, status.getJiraLocation());
     }
