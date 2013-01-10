@@ -2,8 +2,8 @@ package it.com.atlassian.cpji
 
 trait JiraObjects {
 	val jira1 = AbstractCopyIssueTest.jira1
-	val jira2 = AbstractCopyIssueTest.jira1
-	val jira3 = AbstractCopyIssueTest.jira1
+	val jira2 = AbstractCopyIssueTest.jira2
+	val jira3 = AbstractCopyIssueTest.jira3
 
 	val testkit1 = AbstractCopyIssueTest.testkit1
 	val testkit2 = AbstractCopyIssueTest.testkit2
