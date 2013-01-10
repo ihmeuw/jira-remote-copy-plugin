@@ -1,10 +1,9 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
-import com.atlassian.applinks.api.CredentialsRequiredException;
-import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.action.admin.RequiredFieldsAwareAction;
 import com.atlassian.cpji.components.CopyIssueBeanFactory;
+import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.FieldLayoutService;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
@@ -14,14 +13,10 @@ import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
-import com.atlassian.cpji.rest.model.FieldPermissionsBean;
-import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
+import com.atlassian.cpji.rest.model.*;
+import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
-import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
@@ -30,11 +25,9 @@ import com.atlassian.jira.issue.customfields.OperationContext;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
-import com.atlassian.jira.issue.link.IssueLink;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
-import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
@@ -44,7 +37,6 @@ import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraVelocityUtils;
 import com.atlassian.plugin.webresource.WebResourceManager;
-import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
@@ -183,9 +175,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		}
 
 		if (getCopyIssueLinks() && issueLinkManager.isLinkingEnabled()) {
-			copyLocalIssueLinks(proxy, issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
-			copyRemoteIssueLinks(proxy, issueToCopy, copiedIssue.getIssueKey());
-			proxy.convertRemoteIssueLinksIntoLocal(copiedIssueKey);
+            IssueLinkCopier copier = new IssueLinkCopier(issueLinkManager, remoteIssueLinkManager, proxy);
+            copier.copyLocalAndRemoteLinks(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
 		}
 
 		if (StringUtils.isNotBlank(remoteIssueLink)) {
@@ -210,27 +201,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	}
 
 
-	private void copyLocalIssueLinks(JiraProxy remoteJira, final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId)
-			throws ResponseException, CredentialsRequiredException {
-		for (final IssueLink inwardLink : issueLinkManager.getInwardLinks(localIssue.getId())) {
-			final IssueLinkType type = inwardLink.getIssueLinkType();
-			remoteJira.copyLocalIssueLink(inwardLink.getSourceObject(), copiedIssueKey, copiedIssueId, type,
-					JiraProxy.LinkCreationDirection.OUTWARD, JiraProxy.LinkCreationDirection.INWARD);
-		}
-		for (final IssueLink outwardLink : issueLinkManager.getOutwardLinks(localIssue.getId())) {
-
-			final IssueLinkType type = outwardLink.getIssueLinkType();
-			remoteJira.copyLocalIssueLink(outwardLink.getDestinationObject(), copiedIssueKey, copiedIssueId, type,
-					JiraProxy.LinkCreationDirection.INWARD, JiraProxy.LinkCreationDirection.OUTWARD);
-		}
-	}
-
-	private void copyRemoteIssueLinks(JiraProxy remoteJira, final Issue localIssue, final String copiedIssueKey)
-			throws ResponseException, CredentialsRequiredException {
-		for (final RemoteIssueLink remoteIssueLink : remoteIssueLinkManager.getRemoteIssueLinksForIssue(localIssue)) {
-			remoteJira.copyRemoteIssueLink(remoteIssueLink, copiedIssueKey);
-		}
-	}
 
 	public String getLinkToNewIssue() {
 		return linkToNewIssue;
