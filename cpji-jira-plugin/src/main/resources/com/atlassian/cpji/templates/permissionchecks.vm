@@ -28,7 +28,7 @@
 				</span>
 				<div class="fields-list">
 					#foreach( $permission in $action.getSystemFieldPermissions() )
-						$action.getHtmlForField($permission)
+						$!action.getHtmlForField($permission)
 					#end
 				</div>
 			#end
@@ -42,7 +42,7 @@
 				</span>
             	<div class="fields-list">
 					#foreach( $permission in $action.customFieldPermissions )
-						$action.getHtmlForField($permission)
+						$!action.getHtmlForField($permission)
 					#end
 				</div>
 			#end

@@ -24,7 +24,7 @@ public class CustomFieldPermissionBean extends PermissionBean
     {
     }
 
-    public CustomFieldPermissionBean(final String fieldId, final String fieldName, final String fieldType, final String validationCode, final List<String> unmappedFieldValues)
+    public CustomFieldPermissionBean(final String fieldId, final String fieldName, final String validationCode, final List<String> unmappedFieldValues)
     {
         super(validationCode, unmappedFieldValues);
 		this.fieldId = fieldId;

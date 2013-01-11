@@ -61,7 +61,6 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                     fieldPermissionBeans.add(new CustomFieldPermissionBean(
 							customField.getId(),
 							customField.getCustomFieldName(),
-							customField.getCustomFieldType(),
 							ValidationCode.FIELD_NOT_MAPPED.name(), Collections.<String>emptyList()));
                 }
             }
@@ -113,13 +112,11 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                     return new CustomFieldPermissionBean(
 							customField.getId(),
 							customField.getName(),
-							customField.getCustomFieldType().getClass().getCanonicalName(),
 							ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE.name(), Collections.<String>emptyList());
                 }
                 return new CustomFieldPermissionBean(
 						customField.getId(),
 						customField.getName(),
-						customField.getCustomFieldType().getClass().getCanonicalName(),
 						ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED.name(), Collections.<String>emptyList());
             }
             else
@@ -143,7 +140,6 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                 return new CustomFieldPermissionBean(
 						customField.getId(),
 						customField.getName(),
-						customField.getCustomFieldType().getClass().getCanonicalName(),
 						validationCode.name(), mappingResult.getUnmappedValues());
             }
         };
