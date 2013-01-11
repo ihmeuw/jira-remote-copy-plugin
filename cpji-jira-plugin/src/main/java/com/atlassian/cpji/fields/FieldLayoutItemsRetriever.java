@@ -7,6 +7,7 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.fields.screen.FieldScreenManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.google.common.base.Predicate;
@@ -20,12 +21,14 @@ public class FieldLayoutItemsRetriever
 {
     private final FieldManager fieldManager;
     private final FieldLayoutManager fieldLayoutManager;
+	private final FieldScreenManager fieldScreenManager;
 
-    public FieldLayoutItemsRetriever(final FieldManager fieldManager, FieldLayoutManager fieldLayoutManager)
+	public FieldLayoutItemsRetriever(final FieldManager fieldManager, FieldLayoutManager fieldLayoutManager, final FieldScreenManager fieldScreenManager)
     {
         this.fieldManager = fieldManager;
         this.fieldLayoutManager = fieldLayoutManager;
-    }
+		this.fieldScreenManager = fieldScreenManager;
+	}
 
     public Iterable<FieldLayoutItem> getAllVisibleFieldLayoutItems(final Issue issue)
     {
@@ -39,6 +42,11 @@ public class FieldLayoutItemsRetriever
         {
             public boolean apply(final FieldLayoutItem input)
             {
+				// field is not associated with any screen or tab, create issue will not pick up its value so hide it
+				if (fieldScreenManager.getFieldScreenTabs(input.getOrderableField().getId()).isEmpty()) {
+					return false;
+				}
+
                 if (fieldManager.isCustomField(input.getOrderableField()))
                 {
                     CustomField customField = (CustomField) input.getOrderableField();

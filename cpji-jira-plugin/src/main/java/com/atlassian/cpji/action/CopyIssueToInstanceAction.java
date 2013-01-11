@@ -13,7 +13,11 @@ import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.rest.model.*;
+import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
+import com.atlassian.cpji.rest.model.FieldPermissionsBean;
+import com.atlassian.cpji.rest.model.IssueCreationResultBean;
+import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
@@ -39,6 +43,8 @@ import com.atlassian.jira.util.JiraVelocityUtils;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -53,6 +59,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  */
@@ -141,7 +149,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				new Function<NegativeResponseStatus, Void>() {
 					@Override
 					public Void apply(@Nullable NegativeResponseStatus input) {
-						addErrorCollection(input.getErrorCollection());
+						addErrorCollection(CopyIssueToInstanceAction.this.processErrors(input.getErrorCollection()));
 						return null;
 					}
 				});
@@ -200,6 +208,23 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return SUCCESS;
 	}
 
+	protected ErrorCollection processErrors(ErrorCollection errorCollection) {
+		Preconditions.checkNotNull(errorCollection);
+		final Pattern p = Pattern.compile("(.+?): (.*)");
+
+		// transform messages like "Environment: Environment is required." -> "Environment is required."
+		errorCollection.setErrorMessages(Collections2.transform(errorCollection.getErrorMessages(), new Function<String, String>() {
+			@Override
+			public String apply(String input) {
+				Matcher m = p.matcher(input);
+				if (m.matches() && m.groupCount() == 2 && StringUtils.startsWith(m.group(2), m.group(1))) {
+					return m.group(2);
+				}
+				return input;
+			}
+		}));
+		return errorCollection;
+	}
 
 
 	public String getLinkToNewIssue() {
