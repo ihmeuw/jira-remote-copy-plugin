@@ -10,7 +10,6 @@ import com.atlassian.jira.rest.client.NullProgressMonitor;
 import com.atlassian.jira.rest.client.internal.jersey.JerseyJiraRestClientFactory;
 import com.atlassian.jira.testkit.client.Backdoor;
 import com.atlassian.jira.testkit.client.rules.EmptySystemDashboardRule;
-import com.atlassian.jira.testkit.client.rules.EnableDarkFeatureRule;
 import com.atlassian.jira.testkit.client.rules.WebSudoRule;
 import com.atlassian.jira.tests.pageobjects.DefaultProductInstance;
 import com.atlassian.jira.tests.rules.DirtyWarningTerminatorRule;
@@ -38,10 +37,6 @@ public abstract class AbstractCopyIssueTest
 	static Backdoor testkit2 = BackdoorFactory.getBackdoor(jira2);
 	static Backdoor testkit3 = BackdoorFactory.getBackdoor(jira3);
 
-	@ClassRule
-	public static EnableDarkFeatureRule pldRule = new EnableDarkFeatureRule("com.atlassian.jira.config.PDL", testkit1, testkit2, testkit3);
-	@ClassRule
-	public static EnableDarkFeatureRule commonHeaderRule = new EnableDarkFeatureRule("com.atlassian.jira.darkfeature.CommonHeader", testkit1, testkit2, testkit3);
 	@ClassRule
 	public static EmptySystemDashboardRule emptySystemDashboardRule = new EmptySystemDashboardRule(testkit1, testkit2, testkit3);
 

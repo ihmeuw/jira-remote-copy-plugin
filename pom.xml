@@ -346,7 +346,7 @@
 		<profile>
 			<id>jira-6</id>
 			<properties>
-				<jira.version>6.0-SNAPSHOT</jira.version>
+				<jira.version>6.0-breakit-SNAPSHOT</jira.version>
 				<testkit.version>6.0.5</testkit.version>
 			</properties>
 		</profile>
