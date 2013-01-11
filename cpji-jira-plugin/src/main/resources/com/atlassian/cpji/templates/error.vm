@@ -9,7 +9,8 @@
 
 	<div class="content-body aui-panel">
 		<div class="aui-message error">
-			<p class="title"><span class="aui-icon icon-error"></span><strong>$i18n.getText('cpji.error.occurred', $action.issuePath, $action.issueKey)</strong></p>
+			#set($issueUrl = $req.contextPath + $action.issuePath)
+			<p class="title"><span class="aui-icon icon-error"></span><strong>$i18n.getText('cpji.error.occurred', $issueUrl, $action.issueKey)</strong></p>
 			<ul>
 			#foreach( $error in $action.getErrorMessages() )
 				<li>$textutils.htmlEncode($error)</li>
