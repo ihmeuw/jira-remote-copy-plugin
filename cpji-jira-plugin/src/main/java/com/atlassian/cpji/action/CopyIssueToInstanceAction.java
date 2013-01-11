@@ -4,6 +4,7 @@ import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.action.admin.RequiredFieldsAwareAction;
 import com.atlassian.cpji.components.CopyIssueBeanFactory;
 import com.atlassian.cpji.components.CopyIssuePermissionManager;
+import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.FieldLayoutService;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
@@ -20,6 +21,7 @@ import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
+import com.atlassian.jira.config.IssueTypeManager;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.MutableIssue;
@@ -87,7 +89,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private final RemoteIssueLinkManager remoteIssueLinkManager;
 	private final IssueLinkTypeManager issueLinkTypeManager;
 	private final CopyIssueBeanFactory copyIssueBeanFactory;
-
+	private final CopyIssueService copyIssueService;
 
 	public CopyIssueToInstanceAction(
 			final SubTaskManager subTaskManager,
@@ -106,7 +108,9 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			IssueLinkTypeManager issueLinkTypeManager,
 			final WebResourceManager webResourceManager,
 			FieldMapperFactory fieldMapperFactory,
-			final CopyIssueBeanFactory copyIssueBeanFactory) {
+			final CopyIssueBeanFactory copyIssueBeanFactory,
+			final IssueTypeManager issueTypeManager,
+			final CopyIssueService copyIssueService) {
 		super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory,
 				webResourceManager);
@@ -120,6 +124,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		this.issueLinkTypeManager = issueLinkTypeManager;
 		this.fieldMapperFactory = fieldMapperFactory;
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
+		this.copyIssueService = copyIssueService;
 
 		setCurrentStep("confirmation");
 	}
@@ -304,6 +309,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				final MutableIssue fakeIssue = issueFactory.getIssue();
 				fakeIssue.setProjectObject(
 						projectManager.getProjectObjByKey(getSelectedDestinationProject().getProjectKey()));
+				fakeIssue.setIssueTypeObject(
+						copyIssueService.findIssueType(getIssueType(), fakeIssue.getProjectObject()));
 				return orderableField.getEditHtml(fieldLayoutItem, this, this, fakeIssue, RequiredFieldsAwareAction
 						.getDisplayParameters());
 			}

@@ -295,7 +295,7 @@ public class CopyIssueService {
         return result.getIssue();
     }
 
-    private IssueType findIssueType(final String issueType, final Project project) {
+    public IssueType findIssueType(final String issueType, final Project project) {
         Collection<IssueType> issueTypesForProject = issueTypeSchemeManager.getIssueTypesForProject(project);
         try {
             return Iterables.find(issueTypesForProject, new Predicate<IssueType>() {

@@ -50,7 +50,7 @@ public class FieldLayoutItemsRetriever
                 if (fieldManager.isCustomField(input.getOrderableField()))
                 {
                     CustomField customField = (CustomField) input.getOrderableField();
-                    boolean inScope = customField.isInScope(project, Lists.newArrayList(issueType.getName()));
+                    boolean inScope = customField.isInScope(project, Lists.newArrayList(issueType.getId()));
                     return !input.isHidden() && inScope;
                 }
                 return !input.isHidden();
