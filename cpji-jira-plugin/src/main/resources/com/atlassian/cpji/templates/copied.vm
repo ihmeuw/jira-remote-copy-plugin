@@ -1,5 +1,8 @@
 #* @vtlvariable name="action" type="com.atlassian.cpji.action.CopyIssueToInstanceAction" *#
 <html>
+<head>
+    <title>$i18n.getText('cpji.copy.successful')</title>
+</head>
 <body>
 
 <div id="stepped-process" class="content-container">
