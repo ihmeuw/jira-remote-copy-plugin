@@ -1,6 +1,15 @@
 package com.atlassian.cpji.fields;
 
-import com.atlassian.cpji.fields.custom.*;
+import com.atlassian.cpji.fields.custom.CustomFieldMapper;
+import com.atlassian.cpji.fields.custom.DateCFMapper;
+import com.atlassian.cpji.fields.custom.MultiGroupCFMapper;
+import com.atlassian.cpji.fields.custom.MultiUserCFMapper;
+import com.atlassian.cpji.fields.custom.NumberCFMapper;
+import com.atlassian.cpji.fields.custom.ProjectCFMapper;
+import com.atlassian.cpji.fields.custom.SelectListCFMapper;
+import com.atlassian.cpji.fields.custom.TextAreaCFMapper;
+import com.atlassian.cpji.fields.custom.UserCFMapper;
+import com.atlassian.cpji.fields.custom.VersionCFMapper;
 import com.atlassian.cpji.fields.system.AffectedVersionsFieldMapper;
 import com.atlassian.cpji.fields.system.AssigneeFieldMapper;
 import com.atlassian.cpji.fields.system.CommentFieldMapper;
@@ -40,12 +49,14 @@ import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.security.IssueSecurityLevelManager;
 import com.atlassian.jira.issue.security.IssueSecuritySchemeManager;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.VersionManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.util.UserManager;
+import com.google.common.collect.Maps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,10 +68,10 @@ import java.util.Map;
  */
 public class FieldMapperFactory
 {
-    private Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper> orderableFieldMapper = new HashMap<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper>();
+	private Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper> orderableFieldMapper = new HashMap<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper>();
     private List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = new ArrayList<SystemFieldPostIssueCreationFieldMapper>();
 
-    private List<CustomFieldMapper> customFieldFieldMappers = new ArrayList<CustomFieldMapper>();
+	private final Map<String, CustomFieldMapper> customFieldMappers = Maps.newHashMap();
 
     public FieldMapperFactory
             (
@@ -83,9 +94,10 @@ public class FieldMapperFactory
                     final DatePickerConverter datePickerConverter,
                     final DoubleConverter doubleConverter,
                     final UserMappingManager userMappingManager,
-                    final TimeTrackingConfiguration timeTrackingConfiguration)
+                    final TimeTrackingConfiguration timeTrackingConfiguration,
+					final ProjectManager projectManager)
     {
-        SystemFieldIssueCreationFieldMapper priorityFieldMapper = new PriorityFieldMapper(constantsManager, getOrderableField(fieldManager, IssueFieldConstants.PRIORITY));
+		SystemFieldIssueCreationFieldMapper priorityFieldMapper = new PriorityFieldMapper(constantsManager, getOrderableField(fieldManager, IssueFieldConstants.PRIORITY));
         addFieldMapper(priorityFieldMapper.getField(), priorityFieldMapper);
 
         SystemFieldIssueCreationFieldMapper affectedVersionFieldMapper = new AffectedVersionsFieldMapper(versionManager, getOrderableField(fieldManager, IssueFieldConstants.AFFECTED_VERSIONS));
@@ -142,14 +154,22 @@ public class FieldMapperFactory
         SystemFieldPostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"), voteService, permissionManager, jiraAuthenticationContext, userMappingManager);
         postIssueCreationFieldMapper.add(votersFieldMapper);
 
-        customFieldFieldMappers.add(new SelectListCFMapper());
-        customFieldFieldMappers.add(new DateCFMapper(datePickerConverter));
-        customFieldFieldMappers.add(new NumberCFMapper(doubleConverter));
-        customFieldFieldMappers.add(new TextAreaCFMapper());
-        customFieldFieldMappers.add(new MultiGroupCFMapper(groupManager));
+        addCustomFieldMapper(new SelectListCFMapper());
+		addCustomFieldMapper(new DateCFMapper(datePickerConverter));
+		addCustomFieldMapper(new NumberCFMapper(doubleConverter));
+		addCustomFieldMapper(new TextAreaCFMapper());
+		addCustomFieldMapper(new MultiGroupCFMapper(groupManager));
+		addCustomFieldMapper(new ProjectCFMapper(projectManager));
+		addCustomFieldMapper(new VersionCFMapper(versionManager));
+		addCustomFieldMapper(new UserCFMapper(userManager));
+		addCustomFieldMapper(new MultiUserCFMapper(userManager));
     }
 
-    private OrderableField getOrderableField(final FieldManager fieldManager, final String id)
+	private void addCustomFieldMapper(CustomFieldMapper mapper) {
+		customFieldMappers.put(mapper.getType(), mapper);
+	}
+
+	private OrderableField getOrderableField(final FieldManager fieldManager, final String id)
     {
         Field field = fieldManager.getField(id);
         if (!(field instanceof OrderableField))
@@ -235,13 +255,7 @@ public class FieldMapperFactory
 
     public CustomFieldMapper getCustomFieldMapper(CustomFieldType customFieldType)
     {
-        Map<String, CustomFieldMapper> fieldMappers = new HashMap<String, CustomFieldMapper>();
-        for (CustomFieldMapper customFieldFieldMapper : customFieldFieldMappers)
-        {
-            fieldMappers.put(customFieldFieldMapper.getType(), customFieldFieldMapper);
-        }
-        return fieldMappers.get(customFieldType.getClass().getCanonicalName());
+        return customFieldMappers.get(customFieldType.getClass().getCanonicalName());
     }
-
 
 }
