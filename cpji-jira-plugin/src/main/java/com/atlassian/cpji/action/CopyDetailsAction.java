@@ -117,8 +117,9 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 
         availableIssueTypes = getIssueTypeOptionsList(copyInfo.getIssueTypes());
 
-        //if we copy to the same project display also subtask types
-        if(proxy.getJiraLocation().isLocal() && getIssueObject().getProjectObject().getKey().equals(entityLink.getProjectKey())){
+        // if we copy to the same project display also subtask types
+        if(proxy.getJiraLocation().isLocal() && getIssueObject().getProjectObject().getKey().equals(entityLink.getProjectKey())
+				&& getIssueObject().getParentId() != null) {
             availableSubTaskTypes = getIssueTypeOptionsList(copyInfo.getSubtaskIssueTypes());
         } else {
             availableSubTaskTypes = Collections.emptyList();
