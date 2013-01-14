@@ -29,7 +29,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
 				.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String](
 			"Due Date\nRequired", "Component/s\nRequired",
 			"Affects Version/s\nRequired", "Fix Version/s\nRequired", "Environment\nRequired", "Description\nRequired",
-			"Original Estimate\nRequired", "Remaining Estimate\nRequired", "Labels\nRequired", "Watchers"))
+			"Original Estimate\nRequired", "Remaining Estimate\nRequired", "Labels\nRequired"))
 
 		permissionChecksPage = permissionChecksPage.submitWithErrors
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
