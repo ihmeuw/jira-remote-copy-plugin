@@ -9,6 +9,7 @@ import com.atlassian.cpji.rest.RESTException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
+import com.atlassian.jira.issue.customfields.impl.ReadOnlyCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
@@ -105,7 +106,7 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
         CustomFieldBean matchingRemoteCustomField = CustomFieldMapperUtil.findMatchingRemoteCustomField(customField, copyIssueBean.getCustomFields());
         if (matchingRemoteCustomField == null)
         {
-            if (isFieldRequired(fieldLayout, fieldId))
+            if (isFieldRequired(fieldLayout, fieldId) && !(customField.getCustomFieldType() instanceof ReadOnlyCFType))
             {
                 if (defaultValueConfigured(fieldId))
                 {
