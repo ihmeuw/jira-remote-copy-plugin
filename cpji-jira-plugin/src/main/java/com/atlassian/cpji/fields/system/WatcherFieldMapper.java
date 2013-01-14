@@ -74,9 +74,11 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
             if (watcher == null)
             {
                 unmappedValues.add(user.getUserName());
+            } else {
+                mappedValues.add(user.getUserName());
             }
         }
-        return new MappingResult(unmappedValues, !mappedValues.isEmpty(), false);
+        return new MappingResult(unmappedValues, unmappedValues.isEmpty(), false);
     }
 
     private <T>List makeSureNotNull(List<T> inputList)
