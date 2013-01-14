@@ -67,6 +67,7 @@
 					alias="ConfigureCopyIssuesAdminAction">
 				<view name="input">/com/atlassian/cpji/templates/admin.vm</view>
 				<view name="permissionviolation">/secure/views/permissionviolation.jsp</view>
+				<view name="projectnotfound">/secure/views/projectnotfound.jsp</view>
 			</action>
 		</actions>
 	</webwork1>

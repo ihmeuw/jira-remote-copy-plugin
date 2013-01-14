@@ -70,6 +70,10 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
             return PERMISSION_VIOLATION_RESULT;
         }
 
+		if (getProject() == null) {
+			return "projectnotfound";
+		}
+
         requireResources();
 
         return INPUT;
@@ -84,6 +88,10 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         if (isPermissionDenied()) {
             return PERMISSION_VIOLATION_RESULT;
         }
+
+		if (getProject() == null) {
+			return "projectnotfound";
+		}
 
         if (!"POST".equals(ActionContext.getRequest().getMethod())) {
             return returnComplete("ConfigureCopyIssuesAdminAction!default.jspa?projectKey=TST");

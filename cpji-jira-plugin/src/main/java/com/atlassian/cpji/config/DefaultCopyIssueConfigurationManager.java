@@ -11,6 +11,7 @@ import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -165,6 +166,7 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
 
     public UserMappingType getUserMappingType(final Project project)
     {
+		Preconditions.checkNotNull(project);
         PluginSettings settingsForKey = pluginSettingsFactory.createSettingsForKey(project.getKey());
         Object userMappingType = settingsForKey.get(createKeyForUserMapping(project.getKey()));
         if (userMappingType == null)
