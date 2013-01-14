@@ -31,6 +31,7 @@ import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueFieldConstants;
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
 import com.atlassian.jira.issue.customfields.converters.DoubleConverter;
 import com.atlassian.jira.issue.fields.Field;
@@ -232,14 +233,14 @@ public class FieldMapperFactory
         return nonOrderableSystemFieldMappers;
     }
 
-    public Map<String, CustomFieldMapper> getCustomFieldMapper()
+    public CustomFieldMapper getCustomFieldMapper(CustomFieldType customFieldType)
     {
         Map<String, CustomFieldMapper> fieldMappers = new HashMap<String, CustomFieldMapper>();
         for (CustomFieldMapper customFieldFieldMapper : customFieldFieldMappers)
         {
             fieldMappers.put(customFieldFieldMapper.getType(), customFieldFieldMapper);
         }
-        return fieldMappers;
+        return fieldMappers.get(customFieldType.getClass().getCanonicalName());
     }
 
 

@@ -125,7 +125,7 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
             }
         }
 
-        CustomFieldMapper fieldMapper = fieldMapperFactory.getCustomFieldMapper().get(customField.getCustomFieldType().getClass().getCanonicalName());
+        CustomFieldMapper fieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
         if (fieldMapper == null)
         {
             log.info("No mapper for custom field '" + customField.getCustomFieldType().getClass().getCanonicalName() + "' found.");

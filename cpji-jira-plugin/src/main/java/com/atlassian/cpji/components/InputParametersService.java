@@ -98,7 +98,7 @@ public class InputParametersService {
 
         private void populateCustomField(FieldLayoutItem item, OrderableField orderableField) {
             CustomField customField = fieldManager.getCustomField(orderableField.getId());
-            CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper().get(customField.getCustomFieldType().getClass().getCanonicalName());
+            CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
             if (customFieldMapper != null) {
                 CustomFieldBean matchingRemoteCustomField = CustomFieldMapperUtil.findMatchingRemoteCustomField(customField, copyIssueBean.getCustomFields());
                 if (matchingRemoteCustomField != null) {

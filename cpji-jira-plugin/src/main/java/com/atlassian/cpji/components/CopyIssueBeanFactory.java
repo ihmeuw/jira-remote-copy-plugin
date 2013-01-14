@@ -113,8 +113,7 @@ public class CopyIssueBeanFactory {
 			OrderableField orderableField = fieldLayoutItem.getOrderableField();
 			if (fieldManager.isCustomField(orderableField.getId())) {
 				CustomField customField = fieldManager.getCustomField(orderableField.getId());
-				CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper()
-						.get(customField.getCustomFieldType().getClass().getCanonicalName());
+				CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
 				if (customFieldMapper != null) {
 					CustomFieldBean fieldBean = customFieldMapper.createFieldBean(customField, issueToCopy);
 					customFieldBeans.add(fieldBean);
