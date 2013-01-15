@@ -44,6 +44,10 @@ public class ExtendedViewIssuePage extends ViewIssuePage {
         getIssueMenu().invoke(issueActionsFragment.getRICOperation());
     }
 
+    public void invokeClone(){
+        getIssueMenu().invoke(issueActionsFragment.getCloneOperation());
+    }
+
     public IssueActionsDialog openDOTSection(){
         pageElementFinder.find(By.tagName("body")).type(".");
         return pageBinder.bind(IssueActionsDialog.class);

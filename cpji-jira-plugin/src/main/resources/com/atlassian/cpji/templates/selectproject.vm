@@ -7,7 +7,7 @@
 <div id="stepped-process" class="content-container">
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
-        <form action="SelectTargetProjectAction.jspa" class="aui" method="post">
+        <form action="CloneIssueDetails.jspa" class="aui" method="post">
             <h2 class="formtitle">$i18n.getText('cpji.select.destination.project')</h2>
             <fieldset>
 				<div class="field-group" id="targetEntityLink-container" data-selected-project-key="$textutils.htmlEncode($selectedIssueProjectKey)">

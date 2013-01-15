@@ -5,23 +5,29 @@
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
 	</plugin-info>
 
-	<web-item key="clone-issue-ric" i18n-name-key="cpji.operation.name" name="Copy this issue" section="operations-operations" weight="20">
-        <label key="cpji.operation.name"/>
-        <tooltip key="cpji.admin.name"/>
-		<link linkId="copy-issue-to-other-instance">
-			/secure/SelectTargetProjectAction!default.jspa?id=${issueId}
-		</link>
+	<web-item key="clone-issue-ric" i18n-name-key="webfragments.view.issue.opsbar.operations.ops.clone" name="Copy this issue" section="operations-operations" weight="20">
+        <label key="cloneissue.operation"/>
+        <tooltip key="admin.issue.operations.plugin.clone.issue.name"/>
+        <styleClass>issueaction-clone-issue-ric</styleClass>
+        <link linkId="clone-issue-ric">
+            /secure/CloneIssueDetails!default.jspa?id=${issueId}
+        </link>
 		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
         <conditions type="OR">
             <condition class="com.atlassian.cpji.conditions.JiraApplicationLinkIsConfiguredCondition"/>
             <condition class="com.atlassian.cpji.conditions.HasCreateIssuePermissionInAnyProjectCondition"/>
         </conditions>
 		<condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
+
+        <!--We should display our action only when default one doesn't appear-->
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.HasProjectPermissionCondition" invert="true">
+            <param name="permission">create</param>
+        </condition>
 	</web-item>
 
 	<webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
 		<actions>
-			<action name="com.atlassian.cpji.action.SelectTargetProjectAction" alias="SelectTargetProjectAction">
+			<action name="com.atlassian.cpji.action.SelectTargetProjectAction" alias="CloneIssueDetails">
 				<view name="success">/com/atlassian/cpji/templates/selectproject.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
 				<view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
@@ -135,14 +141,6 @@
 		<resource type="download" name="admin.css" location="com/atlassian/cpji/css/admin.less"/>
 	</web-resource>
 
-    <!-- disabled removing "Clone" feature -->
-    <!--<web-resource key="issuepage">-->
-        <!--<context>jira.view.issue</context>-->
-        <!--<context>jira.navigator.advanced</context>-->
-        <!--<context>jira.navigator.simple</context>-->
-        <!--<resource type="download" name="admin.js" location="com/atlassian/cpji/javascript/issuepage.js"/>-->
-    <!--</web-resource>-->
-
     <web-resource key="selectTargetProjectAction">
 		<transformation extension="js">
 			<transformer key="jsI18n"/>
@@ -163,6 +161,14 @@
         <dependency>com.atlassian.cpji.cpji-jira-plugin:global</dependency>
 
         <resource type="download" name="copyDetailsAction.js" location="com/atlassian/cpji/javascript/copyDetailsAction.js"/>
+    </web-resource>
+
+    <web-resource key="disableDefaultCloneDialog">
+        <context>jira.view.issue</context>
+        <context>jira.navigator.advanced</context>
+        <context>jira.navigator.simple</context>
+
+        <resource type="download" name="overrideClone.js" location="com/atlassian/cpji/javascript/overrideClone.js"/>
     </web-resource>
 
 
