@@ -48,6 +48,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -70,8 +71,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private String copiedIssueKey;
 	private final Map fieldValuesHolder = Maps.newHashMap();
 	private String issueType;
-	private List<FieldPermission> systemFieldPermissions;
-	private List<FieldPermission> customFieldPermissions;
+	private List<MissingFieldPermissionDescription> systemMissingFieldPermissionDescriptions;
+	private List<MissingFieldPermissionDescription> customMissingFieldPermissionDescriptions;
 	private boolean canCopyIssue = true;
 	private boolean copyAttachments;
 	private boolean copyIssueLinks;
@@ -290,8 +291,12 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return IssueOperations.CREATE_ISSUE_OPERATION;
 	}
 
-	public String getHtmlForField(FieldPermission permission) {
-		if (getSelectedDestinationProject().getJiraLocation().isLocal()) {
+	public String getHtmlForField(MissingFieldPermissionDescription permission) {
+		final ImmutableSet<ValidationCode> possibleMapping = ImmutableSet.of(ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED,
+				ValidationCode.FIELD_MANDATORY_VALUE_NOT_MAPPED, ValidationCode.FIELD_VALUE_NOT_MAPPED);
+
+		if (getSelectedDestinationProject().getJiraLocation().isLocal()
+				&& possibleMapping.contains(permission.getValidationCode())) {
 			FieldLayoutItem fieldLayoutItem = fieldLayoutService
 					.createDefaultFieldLayoutItem(permission.getFieldId(), true);
 			if (fieldLayoutItem.getOrderableField() != null) {
@@ -374,7 +379,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		}
 
 		List<SystemFieldPermissionBean> fieldPermissionBeans = fieldValidationBean.getSystemFieldPermissionBeans();
-		systemFieldPermissions = new ArrayList<FieldPermission>();
+		systemMissingFieldPermissionDescriptions = new ArrayList<MissingFieldPermissionDescription>();
 		canCopyIssue = true;
 
 		final Map<String, FieldMapper> fieldMappers = fieldMapperFactory.getSystemFieldMappers();
@@ -388,8 +393,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			FieldMapper fieldMapper = fieldMappers.get(fieldPermissionBean.getFieldId());
 
 			if (fieldMapper != null && !ValidationCode.OK.equals(validationCode)) {
-				systemFieldPermissions.add(new FieldPermission(
-						fieldPermissionBean.getFieldId(),
+				systemMissingFieldPermissionDescriptions.add(new MissingFieldPermissionDescription(
+						fieldPermissionBean,
 						getI18nHelper().getText(fieldMapper.getFieldNameKey()),
 						getI18nHelper().getText(validationCode.getI18nKey()), canCopyField));
 			} else if (fieldMapper == null) {
@@ -399,7 +404,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
 		List<CustomFieldPermissionBean> customFieldPermissionBeans = fieldValidationBean
 				.getCustomFieldPermissionBeans();
-		customFieldPermissions = new ArrayList<FieldPermission>();
+		customMissingFieldPermissionDescriptions = new ArrayList<MissingFieldPermissionDescription>();
 		if (customFieldPermissionBeans != null) {
 			for (CustomFieldPermissionBean customFieldPermissionBean : customFieldPermissionBeans) {
 				ValidationCode validationCode = ValidationCode.valueOf(customFieldPermissionBean.getValidationCode());
@@ -409,8 +414,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				}
 
 				if (!ValidationCode.OK.equals(validationCode)) {
-					customFieldPermissions.add(new FieldPermission(
-							customFieldPermissionBean.getFieldId(),
+					customMissingFieldPermissionDescriptions.add(new MissingFieldPermissionDescription(
+							customFieldPermissionBean,
 							customFieldPermissionBean.getFieldName(),
 							getI18nHelper().getText(validationCode.getI18nKey()), canCopyField));
 				}
@@ -423,12 +428,12 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return canCopyIssue;
 	}
 
-	public List<FieldPermission> getSystemFieldPermissions() {
-		return systemFieldPermissions;
+	public List<MissingFieldPermissionDescription> getSystemFieldPermissions() {
+		return systemMissingFieldPermissionDescriptions;
 	}
 
-	public List<FieldPermission> getCustomFieldPermissions() {
-		return customFieldPermissions;
+	public List<MissingFieldPermissionDescription> getCustomFieldPermissions() {
+		return customMissingFieldPermissionDescriptions;
 	}
 
 	public String remoteIssueLink() {

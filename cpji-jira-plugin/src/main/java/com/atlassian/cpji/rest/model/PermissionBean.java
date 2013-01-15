@@ -1,8 +1,8 @@
 package com.atlassian.cpji.rest.model;
 
-import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  * @since v1.4
@@ -10,7 +10,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement (name = "permissionBean")
 public class PermissionBean
 {
-    @XmlElement (name = "validationCode")
+	@XmlElement (name = "fieldId")
+	protected String fieldId;
+
+	@XmlElement (name = "validationCode")
     private String validationCode;
 
     @XmlElement (name = "unmappedFieldValues")
@@ -21,11 +24,12 @@ public class PermissionBean
     {
     }
 
-    public PermissionBean(final String validationCode, final List<String> unmappedFieldValues)
+    public PermissionBean(final String validationCode, final List<String> unmappedFieldValues, final String fieldId)
     {
         this.validationCode = validationCode;
         this.unmappedFieldValues = unmappedFieldValues;
-    }
+		this.fieldId = fieldId;
+	}
 
     public String getValidationCode()
     {
@@ -36,4 +40,8 @@ public class PermissionBean
     {
         return unmappedFieldValues;
     }
+
+	public String getFieldId() {
+		return fieldId;
+	}
 }

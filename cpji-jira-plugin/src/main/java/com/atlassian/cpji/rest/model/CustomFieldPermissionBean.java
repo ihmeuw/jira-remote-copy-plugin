@@ -10,10 +10,7 @@ import java.util.List;
 @XmlRootElement (name = "customFieldPermissionBean")
 public class CustomFieldPermissionBean extends PermissionBean
 {
-	@XmlElement (name = "fieldId")
-	private String fieldId;
-
-	@XmlElement (name = "fieldName")
+ 	@XmlElement (name = "fieldName")
     private String fieldName;
 
     @XmlElement (name = "fieldType")
@@ -26,8 +23,7 @@ public class CustomFieldPermissionBean extends PermissionBean
 
     public CustomFieldPermissionBean(final String fieldId, final String fieldName, final String validationCode, final List<String> unmappedFieldValues)
     {
-        super(validationCode, unmappedFieldValues);
-		this.fieldId = fieldId;
+        super(validationCode, unmappedFieldValues, fieldId);
 		this.fieldName = fieldName;
     }
 
@@ -41,7 +37,4 @@ public class CustomFieldPermissionBean extends PermissionBean
         return fieldType;
     }
 
-	public String getFieldId() {
-		return fieldId;
-	}
 }
