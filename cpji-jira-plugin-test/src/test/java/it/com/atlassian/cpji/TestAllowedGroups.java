@@ -58,7 +58,7 @@ public class TestAllowedGroups extends AbstractCopyIssueTest {
 			for(String user : ImmutableList.of("fred")) {
 				jira1.logout();
                 final ExtendedViewIssuePage issuePage = jira1.gotoLoginPage().login(user, user, ExtendedViewIssuePage.class, "TST-1");
-                Poller.waitUntilFalse(issuePage.getIssueActionsFragment().hasRICCloneAction());
+                Poller.waitUntilFalse(issuePage.getIssueActionsFragment().hasCloneAction());
                 jira1.visit(PermissionViolationPage.class, "SelectTargetProjectAction!default.jspa?key=TST-1");
 				jira1.visit(PermissionViolationPage.class, "CopyDetailsAction.jspa?id=10000&targetEntityLink=8835b6b9-5676-3de4-ad59-bbe987416662|TST");
 				final String atl_token = (String) jira1.getTester().getDriver().executeScript("return atl_token()");

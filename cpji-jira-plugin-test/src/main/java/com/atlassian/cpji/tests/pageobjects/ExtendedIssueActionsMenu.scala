@@ -15,7 +15,10 @@ class ExtendedIssueActionsMenu(issueId: java.lang.Long) extends IssueActionsMenu
 
 	def getActionLinks(): TimedQuery[java.lang.Iterable[java.lang.String]] = {
 		makeQuery(timeouts, _ => Lists.newArrayList(getDropdown.findAll(By.className("aui-list-item-link")).asScala.map(_.getAttribute("href")).asJava))
+	}
 
+	def clickActionByName[P](name: String) {
+		getDropdown.findAll(By.className("aui-list-item-link")).asScala.find(_.getText.equalsIgnoreCase(name)).get.click()
 	}
 
 	def  makeQuery[T](timouets : Timeouts, func : Unit => T) = new AbstractTimedQuery[T](timouets.timeoutFor(TimeoutType.DEFAULT),

@@ -22,7 +22,7 @@ public class IssueActionsFragment {
         @Override
         public String id()
         {
-            return "copy-issue-to-other-instance";
+            return "clone-issue-ric";
         }
 
         @Override
@@ -34,7 +34,40 @@ public class IssueActionsFragment {
         @Override
         public String cssClass()
         {
-            return "issueaction-movie-issue";
+            return "issueaction-clone-issue ";
+        }
+
+        @Override
+        public boolean hasShortcut()
+        {
+            return false;
+        }
+
+        @Override
+        public CharSequence shortcut()
+        {
+            return null;
+        }
+    }
+
+    static class CloneOperation implements IssueOperation
+    {
+        @Override
+        public String id()
+        {
+            return "clone-issue";
+        }
+
+        @Override
+        public String uiName()
+        {
+            return "Clone";
+        }
+
+        @Override
+        public String cssClass()
+        {
+            return "issueaction-clone-issue ";
         }
 
         @Override
@@ -55,20 +88,25 @@ public class IssueActionsFragment {
     @ElementBy(className="issueaction-clone-issue")
     protected PageElement cloneIssueAction;
 
-    @ElementBy(id="copy-issue-to-other-instance")
-    protected PageElement ricCloneIssueAction;
+    @ElementBy(id="clone-issue-ric")
+    protected PageElement hasRICCloneIssueAction;
 
-    public TimedCondition hasDefaultCloneAction(){
+
+    public TimedCondition hasCloneAction(){
         return cloneIssueAction.timed().isPresent();
     }
 
     public TimedCondition hasRICCloneAction(){
-        return ricCloneIssueAction.timed().isPresent();
+        return hasRICCloneIssueAction.timed().isPresent();
     }
 
     public IssueOperation getRICOperation(){
         return new RemoteCopyOperation();
-
     }
+
+    public IssueOperation getCloneOperation(){
+        return new CloneOperation();
+    }
+
 
 }

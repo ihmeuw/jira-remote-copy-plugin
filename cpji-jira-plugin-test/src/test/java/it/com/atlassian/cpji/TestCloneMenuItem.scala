@@ -27,63 +27,30 @@ import com.atlassian.cpji.tests.ScreenshotUtil
  *
  * Check [[it.com.atlassian.cpji.TestAllowedGroups]] for a test for allowed groups.
  */
-class TestCloneMenuItem extends AbstractCopyIssueTest {
+class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 	val logger = Logger.getLogger(classOf[TestCloneMenuItem])
 
-	val createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient3)
+	val createIssues: CreateIssues = new CreateIssues(restClient3)
 
 	@Rule def createIssuesRule = createIssues
 
-	val jira1 = AbstractCopyIssueTest.jira1
-	val jira3 = AbstractCopyIssueTest.jira3
-	val testkit1 = AbstractCopyIssueTest.testkit1
-	val testkit2 = AbstractCopyIssueTest.testkit2
-	val testkit3 = AbstractCopyIssueTest.testkit3
 
-	@Ignore @Test def shouldNotDisplayDefaultCloneActionWhenPluginIsInstalled() {
-		login(jira1)
-		val adminPage: ConfigureCopyIssuesAdminActionPage = jira1.visit(classOf[ConfigureCopyIssuesAdminActionPage], "TST")
-		assertThat(adminPage.getAllowedGroups, IsIterableWithSize.iterableWithSize[String](0))
-		val viewIssue: ExtendedViewIssuePage = AbstractCopyIssueTest.jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
-		Poller.waitUntilFalse(viewIssue.getIssueActionsFragment.hasDefaultCloneAction)
-		Poller.waitUntilTrue(viewIssue.getIssueActionsFragment.hasRICCloneAction)
-	}
-
-	@Ignore @Test def shouldNotDisplayDefaultCloneActionAtDOTWindow() {
-		login(jira1)
-		val viewIssue: ExtendedViewIssuePage = AbstractCopyIssueTest.jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
-		var dialog = viewIssue.openDOTSection()
-		val actionLinks = dialog.getActionsLinksByQuery("clone")
-		assertThat(actionLinks, Matchers.contains(Matchers.containsString("SelectTargetProjectAction")));
-		assertThat(actionLinks, Matchers.not(Matchers.contains(Matchers.containsString("CloneIssueDetails"))));
-	}
-
-	@Ignore @Test def shouldNotDisplayDefaultCloneActionAtIssueNavigator() {
+	@Test def shouldRedirectToClonePageWhenCloneActionClicked() {
 		login(jira1)
 		AbstractCopyIssueTest.jira1.visit(classOf[CommonBasicSearch])
 
 		val actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
 		actionsMenu.open()
 
+		actionsMenu.clickActionByName("Clone")
 
-		val links = actionsMenu.getActionLinks()
-
-		Poller.waitUntil(
-			links.asInstanceOf[TimedQuery[Object]],
-			Matchers.hasItem(Matchers.containsString("SelectTargetProjectAction")).asInstanceOf[Matcher[Object]]
-		)
-
-
-		Poller.waitUntil(
-			links.asInstanceOf[TimedQuery[Object]],
-			Matchers.not(Matchers.hasItem(Matchers.containsString("CloneIssueDetails"))).asInstanceOf[Matcher[Object]]
-		)
-
+		assertThat(jira1.getTester.getDriver.getCurrentUrl, Matchers.containsString("CloneIssueDetails"))
 	}
 
 	@Test def shouldNotDisplayLinkIfUserIsNotLoggedIn() {
 		val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "AN-1")
-		Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
+		Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasCloneAction)
+
 	}
 
 	@Test def shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks() {
@@ -99,7 +66,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest {
 
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
 			issuePage.getMoreActionsMenu.open()
-			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasRICCloneAction)
+			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasCloneAction)
 		} catch{
 			case e: Exception => {
 				logger.error("Troubles during checking permissions", e)

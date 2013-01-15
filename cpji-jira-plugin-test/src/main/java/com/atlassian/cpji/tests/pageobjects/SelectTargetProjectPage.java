@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  */
 public class SelectTargetProjectPage extends AbstractJiraPage
 {
-    private static final String URI_TEMPLATE = "/secure/SelectTargetProjectAction!default.jspa?id=%d";
+    private static final String URI_TEMPLATE = "/secure/CloneIssueDetails!default.jspa?id=%d";
 
     private final Long issueId;
     private final String url;
