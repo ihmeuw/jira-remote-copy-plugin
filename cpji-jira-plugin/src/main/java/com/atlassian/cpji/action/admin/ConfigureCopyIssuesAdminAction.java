@@ -71,7 +71,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         }
 
 		if (getProject() == null) {
-			return "projectnotfound";
+			return reportProjectNotFound();
 		}
 
         requireResources();
@@ -79,7 +79,12 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         return INPUT;
     }
 
-    protected boolean isPermissionDenied() {
+	protected String reportProjectNotFound() {
+		request.setAttribute("administratorContactLink", getAdministratorContactLink());
+		return "projectnotfound";
+	}
+
+	protected boolean isPermissionDenied() {
         return !getPermissionManager().hasPermission(Permissions.ADMINISTER, getLoggedInUser())
                 && !getPermissionManager().hasPermission(Permissions.PROJECT_ADMIN, getProject(), getLoggedInUser());
     }
@@ -90,7 +95,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         }
 
 		if (getProject() == null) {
-			return "projectnotfound";
+			return reportProjectNotFound();
 		}
 
         if (!"POST".equals(ActionContext.getRequest().getMethod())) {
