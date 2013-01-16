@@ -3,12 +3,14 @@ package com.atlassian.cpji.components;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
+import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CommentBean;
 import com.atlassian.cpji.rest.model.ComponentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
+import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
 import com.atlassian.cpji.rest.model.TimeTrackingBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.cpji.rest.model.VersionBean;
@@ -117,6 +119,9 @@ public class CopyIssueBeanFactory {
 				if (customFieldMapper != null) {
 					CustomFieldBean fieldBean = customFieldMapper.createFieldBean(customField, issueToCopy);
 					customFieldBeans.add(fieldBean);
+				} else {
+					copyIssueBean.addUnsupportedCustomField(new CustomFieldPermissionBean(customField.getId(), customField.getName(),
+							ValidationCode.FIELD_TYPE_NOT_SUPPORTED.toString()));
 				}
 			} else {
 				if (systemFieldMappers.containsKey(orderableField.getId())) {

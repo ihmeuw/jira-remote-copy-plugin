@@ -1,5 +1,7 @@
 package com.atlassian.cpji.rest.model;
 
+import com.google.common.collect.Lists;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
@@ -59,6 +61,8 @@ public class CopyIssueBean
 	private Map<String, String[]> actionParams;
 
 	private Map<String, Object> fieldValuesHolder;
+
+	private final List<CustomFieldPermissionBean> unsupportedCustomFields = Lists.newLinkedList();
 
     @XmlJavaTypeAdapter (DateAdapter.class)
     private Date dueDate;
@@ -310,6 +314,14 @@ public class CopyIssueBean
 
 	public void setFieldValuesHolder(Map<String, Object> fieldValuesHolder) {
 		this.fieldValuesHolder = fieldValuesHolder;
+	}
+
+	public List<CustomFieldPermissionBean> getUnsupportedCustomFields() {
+		return unsupportedCustomFields;
+	}
+
+	public void addUnsupportedCustomField(CustomFieldPermissionBean unsupportedCustomField) {
+		this.unsupportedCustomFields.add(unsupportedCustomField);
 	}
 }
 

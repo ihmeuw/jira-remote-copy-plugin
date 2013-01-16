@@ -2,12 +2,12 @@ package com.atlassian.cpji.fields;
 
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.custom.DateCFMapper;
+import com.atlassian.cpji.fields.custom.GenericTextCFMapper;
 import com.atlassian.cpji.fields.custom.MultiGroupCFMapper;
 import com.atlassian.cpji.fields.custom.MultiUserCFMapper;
 import com.atlassian.cpji.fields.custom.NumberCFMapper;
 import com.atlassian.cpji.fields.custom.ProjectCFMapper;
 import com.atlassian.cpji.fields.custom.SelectListCFMapper;
-import com.atlassian.cpji.fields.custom.TextAreaCFMapper;
 import com.atlassian.cpji.fields.custom.UserCFMapper;
 import com.atlassian.cpji.fields.custom.VersionCFMapper;
 import com.atlassian.cpji.fields.system.AffectedVersionsFieldMapper;
@@ -157,7 +157,7 @@ public class FieldMapperFactory
         addCustomFieldMapper(new SelectListCFMapper());
 		addCustomFieldMapper(new DateCFMapper(datePickerConverter));
 		addCustomFieldMapper(new NumberCFMapper(doubleConverter));
-		addCustomFieldMapper(new TextAreaCFMapper());
+		addCustomFieldMapper(new GenericTextCFMapper());
 		addCustomFieldMapper(new MultiGroupCFMapper(groupManager));
 		addCustomFieldMapper(new ProjectCFMapper(projectManager));
 		addCustomFieldMapper(new VersionCFMapper(versionManager));

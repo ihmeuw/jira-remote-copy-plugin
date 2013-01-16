@@ -17,7 +17,6 @@ import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -47,7 +46,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
         {
             if (!containsSystemFieldWithId(remoteFieldId, fieldLayoutItems))
             {
-                fieldPermissionBeans.add(new SystemFieldPermissionBean(remoteFieldId, ValidationCode.FIELD_NOT_MAPPED.name(), Collections.<String>emptyList()));
+                fieldPermissionBeans.add(new SystemFieldPermissionBean(remoteFieldId, ValidationCode.FIELD_NOT_MAPPED.name()));
             }
         }
         return fieldPermissionBeans;
@@ -64,9 +63,9 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
             {
                 if (defaultValueConfigured(fieldId))
                 {
-                    return new SystemFieldPermissionBean(fieldId, ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE.name(), Collections.<String>emptyList());
+                    return new SystemFieldPermissionBean(fieldId, ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE.name());
                 }
-                return new SystemFieldPermissionBean(fieldId, ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED.name(), Collections.<String>emptyList());
+                return new SystemFieldPermissionBean(fieldId, ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED.name());
             }
             else
             {
@@ -81,7 +80,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
             {
                 public SystemFieldPermissionBean createPermissionBean(final ValidationCode validationCode)
                 {
-                    return new SystemFieldPermissionBean(fieldId, validationCode.name(), mappingResult.getUnmappedValues());
+                    return new SystemFieldPermissionBean(fieldId, validationCode.name());
                 }
             };
             return checkField(mappingResult, fieldId, hasPermission, permissionBeanCreator);

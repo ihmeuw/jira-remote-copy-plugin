@@ -18,7 +18,9 @@ public enum ValidationCode
 
     FIELD_MANDATORY_BUT_NOT_SUPPLIED("cpji.field.validation.field.mandatory.but.not.supplied"),
 
-    FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE("cpji.field.validation.field.mandatory.but.not.supplied.using.default");
+    FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE("cpji.field.validation.field.mandatory.but.not.supplied.using.default"),
+
+	FIELD_TYPE_NOT_SUPPORTED("cpji.field.validation.field.type.not.supplied");
 
     private final String i18nKey;
 

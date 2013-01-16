@@ -1,7 +1,6 @@
 package com.atlassian.cpji.rest.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 /**
  * @since v1.0
@@ -14,9 +13,9 @@ public class SystemFieldPermissionBean extends PermissionBean
     {
     }
 
-    public SystemFieldPermissionBean(final String fieldId, final String validationCode, final List<String> unmappedFieldValues)
+    public SystemFieldPermissionBean(final String fieldId, final String validationCode)
     {
-        super(validationCode, unmappedFieldValues, fieldId);
+        super(validationCode, fieldId);
         this.fieldId = fieldId;
     }
 }

@@ -346,6 +346,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		switch (validationCode) {
 			case OK:
 				return true;
+			case FIELD_TYPE_NOT_SUPPORTED:
+				return false;
 			case FIELD_NOT_MAPPED:
 				return true;
 			case FIELD_VALUE_NOT_MAPPED:
@@ -430,6 +432,19 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 							getI18nHelper().getText(validationCode.getI18nKey()), canCopyField));
 				}
 			}
+		}
+		if (!copyIssueBean.getUnsupportedCustomFields().isEmpty()) {
+			customMissingFieldPermissionDescriptions.addAll(Collections2.transform(copyIssueBean.getUnsupportedCustomFields(), new Function<CustomFieldPermissionBean, MissingFieldPermissionDescription>() {
+				@Override
+				public MissingFieldPermissionDescription apply(@Nullable CustomFieldPermissionBean customFieldPermissionBean) {
+					ValidationCode validationCode = ValidationCode
+							.valueOf(customFieldPermissionBean.getValidationCode());
+					return new MissingFieldPermissionDescription(
+							customFieldPermissionBean,
+							customFieldPermissionBean.getFieldName(),
+							getI18nHelper().getText(validationCode.getI18nKey()), canCopyField(validationCode));
+				}
+			}));
 		}
 		return INPUT;
 	}
