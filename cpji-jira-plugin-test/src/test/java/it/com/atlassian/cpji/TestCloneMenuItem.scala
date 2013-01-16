@@ -41,8 +41,8 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 
 		val actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
 		actionsMenu.open()
-
 		actionsMenu.clickActionByName("Clone")
+		jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], new java.lang.Long(10100L))
 
 		assertThat(jira1.getTester.getDriver.getCurrentUrl, Matchers.containsString("CloneIssueDetails"))
 	}
