@@ -44,7 +44,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
     public SelectTargetProjectPage(final Long issueId)
     {
         this.issueId = issueId;
-        this.url = String.format(URI_TEMPLATE, issueId);
+        this.url = buildUrl(issueId);
     }
 
 	@SuppressWarnings("unused")
@@ -77,6 +77,10 @@ public class SelectTargetProjectPage extends AbstractJiraPage
     public String getUrl()
     {
         return url;
+    }
+
+    public static String buildUrl(Long issueId){
+        return String.format(URI_TEMPLATE, issueId);
     }
 
 	public boolean hasOAuthApproval(String applicationId) {
