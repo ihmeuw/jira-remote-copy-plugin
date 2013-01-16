@@ -35,18 +35,6 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 	@Rule def createIssuesRule = createIssues
 
 
-	@Test def shouldRedirectToClonePageWhenCloneActionClicked() {
-		login(jira1)
-		AbstractCopyIssueTest.jira1.visit(classOf[CommonBasicSearch])
-
-		val actionsMenu = jira1.getPageBinder.bind(classOf[ExtendedIssueActionsMenu], java.lang.Long.valueOf(10100L))
-		actionsMenu.open()
-		actionsMenu.clickActionByName("Clone")
-		jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], new java.lang.Long(10100L))
-
-		assertThat(jira1.getTester.getDriver.getCurrentUrl, Matchers.containsString("CloneIssueDetails"))
-	}
-
 	@Test def shouldNotDisplayLinkIfUserIsNotLoggedIn() {
 		val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "AN-1")
 		Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasCloneAction)
