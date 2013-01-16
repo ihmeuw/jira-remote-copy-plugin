@@ -34,7 +34,7 @@ public class RemotesResource {
 	@Nullable
 	public static String generateAuthorizationUrl(@Nonnull InternalHostApplication hostApplication, @Nonnull AuthorisationURIGenerator uriGenerator, @Nonnull String issueId)
 	{
-		final String url = hostApplication.getBaseUrl() + "/secure/SelectTargetProjectAction!default.jspa?id=" + issueId;
+		final String url = hostApplication.getBaseUrl() + "/secure/CloneIssueDetails!default.jspa?id=" + issueId;
 		final URI authorisationUri = uriGenerator.getAuthorisationURI(URI.create(url));
 		return authorisationUri != null ? authorisationUri.toString() : null;
 	}
