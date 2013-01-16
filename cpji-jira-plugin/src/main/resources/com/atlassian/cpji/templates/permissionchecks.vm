@@ -1,23 +1,25 @@
 #* @vtlvariable name="action" type="com.atlassian.cpji.action.CopyIssueToInstanceAction" *#
 <html>
 <head>
-    <title>$i18n.getText('cpji.confirm.new.values')</title>
+    <title>$i18n.getText('cpji.confirmation')</title>
 </head>
 <body>
 <div id="stepped-process" class="content-container">
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
         <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >
-			<h2 class="formtitle">$i18n.getText('cpji.confirm.new.values')</h2>
-			#if(!$action.isCopyingPossible())
-				<div class="aui-message error"><span class="aui-icon icon-error"></span>
-					<p>$i18n.getText('cpji.cant.copy.issue')</p>
-				</div>
-			#elseif (!$action.getSystemFieldPermissions().isEmpty() || !$action.getCustomFieldPermissions().isEmpty())
-				<div class="aui-message warning"><span class="aui-icon icon-warning"></span>
-					<p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
-				</div>
-			#end
+            #if($action.isCopyingPossible())
+                <h2 class="formtitle">$i18n.getText('cpji.confirm.new.values')</h2>
+                #if(!$action.getSystemFieldPermissions().isEmpty() || !$action.getCustomFieldPermissions().isEmpty())
+                    <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
+                        <p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
+                    </div>
+                #end
+            #else
+                <div class="aui-message error"><span class="aui-icon icon-error"></span>
+                    <p>$i18n.getText('cpji.cant.copy.issue')</p>
+                </div>
+            #end
 
 			<h4 class="sub-heading">$i18n.getText('cpji.system.fields')</h4>
 			#if ($action.getSystemFieldPermissions().isEmpty())
