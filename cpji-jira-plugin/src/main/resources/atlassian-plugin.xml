@@ -5,12 +5,14 @@
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
 	</plugin-info>
 
+    <!-- we have two web items due to different behaviour between JIRAs with bundled RIC and without it-->
+    <!-- when RIC is bundled we just display Clone, when it's not RIC is still named "Remote Copy"-->
 	<web-item key="clone-issue-ric" i18n-name-key="webfragments.view.issue.opsbar.operations.ops.clone" name="Copy this issue" section="operations-operations" weight="20">
         <label key="cloneissue.operation"/>
         <tooltip key="admin.issue.operations.plugin.clone.issue.name"/>
         <styleClass>issueaction-clone-issue-ric</styleClass>
         <link linkId="clone-issue-ric">
-            /secure/CloneIssueDetails!default.jspa?id=${issueId}
+            /secure/SelectTargetProject!default.jspa?id=${issueId}
         </link>
 		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
         <conditions type="OR">
@@ -18,16 +20,29 @@
             <condition class="com.atlassian.cpji.conditions.HasCreateIssuePermissionInAnyProjectCondition"/>
         </conditions>
 		<condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
-
-        <!--We should display our action only when default one doesn't appear-->
-        <condition class="com.atlassian.jira.plugin.webfragment.conditions.HasProjectPermissionCondition" invert="true">
-            <param name="permission">create</param>
-        </condition>
+		<condition class="com.atlassian.cpji.conditions.HasRICBundledCondition"/>
 	</web-item>
 
-	<webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
+    <web-item key="remote-copy" i18n-name-key="cpji.operation.name" name="Copy this issue" section="operations-operations" weight="20">
+        <label key="cpji.operation.name"/>
+        <tooltip key="cpji.operation.name"/>
+        <styleClass>issueaction-clone-issue-ric</styleClass>
+        <link linkId="clone-issue-ric">
+            /secure/SelectTargetProject!default.jspa?id=${issueId}
+        </link>
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
+        <conditions type="OR">
+            <condition class="com.atlassian.cpji.conditions.JiraApplicationLinkIsConfiguredCondition"/>
+            <condition class="com.atlassian.cpji.conditions.HasCreateIssuePermissionInAnyProjectCondition"/>
+        </conditions>
+        <condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
+        <condition class="com.atlassian.cpji.conditions.HasRICBundledCondition" invert="true"/>
+    </web-item>
+
+
+    <webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
 		<actions>
-			<action name="com.atlassian.cpji.action.SelectTargetProjectAction" alias="CloneIssueDetails">
+			<action name="com.atlassian.cpji.action.SelectTargetProjectAction" alias="SelectTargetProject">
 				<view name="success">/com/atlassian/cpji/templates/selectproject.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
 				<view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
@@ -162,14 +177,5 @@
 
         <resource type="download" name="copyDetailsAction.js" location="com/atlassian/cpji/javascript/copyDetailsAction.js"/>
     </web-resource>
-
-    <web-resource key="disableDefaultCloneDialog">
-        <context>jira.view.issue</context>
-        <context>jira.navigator.advanced</context>
-        <context>jira.navigator.simple</context>
-
-        <resource type="download" name="overrideClone.js" location="com/atlassian/cpji/javascript/overrideClone.js"/>
-    </web-resource>
-
 
 </atlassian-plugin>
