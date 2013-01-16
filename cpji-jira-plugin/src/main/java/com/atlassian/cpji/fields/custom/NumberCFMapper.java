@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.converters.DoubleConverter;
 import com.atlassian.jira.issue.customfields.impl.NumberCFType;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -21,9 +22,9 @@ public class NumberCFMapper extends AbstractSingleValueCFMapper<Double>
     }
 
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return NumberCFType.class.getCanonicalName();
+        return type instanceof NumberCFType;
     }
 
     @Override

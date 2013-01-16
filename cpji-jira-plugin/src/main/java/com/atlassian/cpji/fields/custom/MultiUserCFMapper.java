@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.MultiUserCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
@@ -23,9 +24,9 @@ public class MultiUserCFMapper extends AbstractMultiValueCFMapper<User>
 	}
 
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return MultiUserCFType.class.getCanonicalName();
+        return type instanceof MultiUserCFType;
     }
 
     @Override

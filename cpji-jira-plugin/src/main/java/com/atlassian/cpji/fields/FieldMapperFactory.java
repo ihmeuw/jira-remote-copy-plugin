@@ -56,7 +56,7 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.jira.user.util.UserManager;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class FieldMapperFactory
 	private Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper> orderableFieldMapper = new HashMap<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper>();
     private List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = new ArrayList<SystemFieldPostIssueCreationFieldMapper>();
 
-	private final Map<String, CustomFieldMapper> customFieldMappers = Maps.newHashMap();
+	private final List<CustomFieldMapper> customFieldMappers = Lists.newArrayList();
 
     public FieldMapperFactory
             (
@@ -166,7 +166,7 @@ public class FieldMapperFactory
     }
 
 	private void addCustomFieldMapper(CustomFieldMapper mapper) {
-		customFieldMappers.put(mapper.getType(), mapper);
+		customFieldMappers.add(mapper);
 	}
 
 	private OrderableField getOrderableField(final FieldManager fieldManager, final String id)
@@ -255,7 +255,12 @@ public class FieldMapperFactory
 
     public CustomFieldMapper getCustomFieldMapper(CustomFieldType customFieldType)
     {
-        return customFieldMappers.get(customFieldType.getClass().getCanonicalName());
+		for(CustomFieldMapper mapper : customFieldMappers) {
+			if (mapper.acceptsType(customFieldType)) {
+				return mapper;
+			}
+		}
+        return null;
     }
 
 }

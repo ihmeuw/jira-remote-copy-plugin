@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.crowd.embedded.api.Group;
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.MultiGroupCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
@@ -22,9 +23,9 @@ public class MultiGroupCFMapper extends AbstractMultiValueCFMapper<Group>
     }
 
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return MultiGroupCFType.class.getCanonicalName();
+        return type instanceof MultiGroupCFType;
     }
 
     @Override

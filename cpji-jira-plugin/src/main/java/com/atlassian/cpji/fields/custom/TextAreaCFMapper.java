@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.TextAreaCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
@@ -13,9 +14,9 @@ import com.atlassian.jira.project.Project;
 public class TextAreaCFMapper extends AbstractSingleValueCFMapper<String>
 {
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return TextAreaCFType.class.getCanonicalName();
+        return type instanceof TextAreaCFType;
     }
 
     @Override

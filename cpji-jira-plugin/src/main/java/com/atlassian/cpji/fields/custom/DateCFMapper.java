@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.cpji.util.DateUtil;
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
 import com.atlassian.jira.issue.customfields.impl.DateCFType;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -24,9 +25,9 @@ public class DateCFMapper extends AbstractSingleValueCFMapper<Date>
     }
 
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return DateCFType.class.getCanonicalName();
+        return type instanceof DateCFType;
     }
 
     @Override

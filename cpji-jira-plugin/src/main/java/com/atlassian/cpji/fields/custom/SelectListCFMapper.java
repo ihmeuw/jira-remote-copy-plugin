@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.jira.issue.context.IssueContextImpl;
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.SelectCFType;
 import com.atlassian.jira.issue.customfields.option.Option;
 import com.atlassian.jira.issue.customfields.option.Options;
@@ -15,9 +16,9 @@ import com.atlassian.jira.project.Project;
 public class SelectListCFMapper extends AbstractSingleValueCFMapper<Option>
 {
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return SelectCFType.class.getCanonicalName();
+        return type instanceof SelectCFType;
     }
 
     @Override

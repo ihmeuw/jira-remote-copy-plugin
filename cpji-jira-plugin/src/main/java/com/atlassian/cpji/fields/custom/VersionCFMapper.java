@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.VersionCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
@@ -22,9 +23,9 @@ public class VersionCFMapper extends AbstractMultiValueCFMapper<Version>
     }
 
     @Override
-    public String getType()
+    public boolean acceptsType(CustomFieldType<?, ?> type)
     {
-        return VersionCFType.class.getCanonicalName();
+        return type instanceof VersionCFType;
     }
 
     @Override
