@@ -168,23 +168,33 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		if (getCopyAttachments() && !attachments.isEmpty()) {
 			for (final Attachment attachment : attachments) {
 				File attachmentFile = AttachmentUtils.getAttachmentFile(attachment);
-				Either<NegativeResponseStatus, SuccessfulResponse> addResult = proxy
-						.addAttachment(copiedIssueKey, attachmentFile, attachment.getFilename(),
-								attachment.getMimetype());
-				if (addResult.isLeft()) {
-					NegativeResponseStatus responseStatus = addResult.left().get();
-					ErrorCollection ec = responseStatus.getErrorCollection();
-					if (ec != null) {
-						addErrorMessages(
-								Lists.newArrayList(
-										Iterables.transform(ec.getErrorMessages(), new Function<String, String>() {
-											@Override
-											public String apply(@Nullable String input) {
-												return attachment.getFilename() + ": " + input;
-											}
-										})));
-					}
-				}
+                // Check if the attachment actually exists
+                if (attachmentFile != null && attachmentFile.exists())
+                {
+                    Either<NegativeResponseStatus, SuccessfulResponse> addResult = proxy
+                            .addAttachment(copiedIssueKey, attachmentFile, attachment.getFilename(),
+                                    attachment.getMimetype());
+                    if (addResult.isLeft()) {
+                        NegativeResponseStatus responseStatus = addResult.left().get();
+                        ErrorCollection ec = responseStatus.getErrorCollection();
+                        if (ec != null) {
+                            addErrorMessages(
+                                    Lists.newArrayList(
+                                            Iterables.transform(ec.getErrorMessages(), new Function<String, String>() {
+                                                @Override
+                                                public String apply(@Nullable String input) {
+                                                    return attachment.getFilename() + ": " + input;
+                                                }
+                                            })));
+                        }
+                    }
+                }
+                else
+                {
+                    // File not found
+                    addErrorMessage(getText("cpji.attachment.file.not.found", attachment.getFilename()));
+                }
+
 			}
 		}
 
