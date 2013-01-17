@@ -26,7 +26,7 @@
                 <div class="field-group">
                     <label for="summary">$i18n.getText('common.words.summary')</label>
 					#if(!$summaryValidation.empty)
-                        <input type="text" value="$textutils.htmlEncode($summary)" name="summary" id="summary" class="text"/>
+                        <input type="text" value="$textutils.htmlEncode($summary)" name="summary" id="summary" class="text long-field"/>
                         <div class="error">$summaryValidation</div>
 					#else
                         <input type="hidden" value="$textutils.htmlEncode($summary)" name="summary"/>
