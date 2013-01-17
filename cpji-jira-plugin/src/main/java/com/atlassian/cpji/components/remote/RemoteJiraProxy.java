@@ -210,6 +210,11 @@ public class RemoteJiraProxy implements JiraProxy {
 
     @Override
     public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
+        return copyLocalIssueLink(localIssue, remoteIssueKey, remoteIssueId, new SimplifiedIssueLinkType(issueLinkType), localDirection, remoteDirection);
+    }
+
+    @Override
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, SimplifiedIssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
         try {
             // Create link from the copied issue
             String remoteRelationship = remoteDirection.getNameFromIssueLinkType(issueLinkType);

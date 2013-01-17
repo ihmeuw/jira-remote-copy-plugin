@@ -7,6 +7,7 @@ import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.FieldLayoutService;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.components.model.SimplifiedIssueLinkType;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
@@ -204,16 +205,34 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		}
 
 		if (StringUtils.isNotBlank(remoteIssueLink)) {
+            // Try to find a defined Issue Link type for Clone
 			final Collection<IssueLinkType> copiedTypeCollection = issueLinkTypeManager
-					.getIssueLinkTypesByName("Copied");
-			if (copiedTypeCollection.size() > 0) {
+					.getIssueLinkTypesByName(CLONE_LINK_TYPE);
+            SimplifiedIssueLinkType linkType = null;
+            if (copiedTypeCollection.isEmpty())
+            {
+                // No Cloners link type exists
+                if (!proxy.getJiraLocation().isLocal())
+                {
+                    // This is a remote copy, lets fake up a Link Type because remote issue links can use any old text
+                    linkType = new SimplifiedIssueLinkType("clones", "is cloned by");
+                }
+            }
+            else
+            {
+                // Use the real Cloners link type
+                linkType = new SimplifiedIssueLinkType(Iterables.get(copiedTypeCollection, 0));
+            }
+
+            if (linkType != null)
+            {
 				final RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
 
 				proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
-						Iterables.get(copiedTypeCollection, 0),
-						remoteIssueLinkType.hasLocalIssueLinkToRemote() ? JiraProxy.LinkCreationDirection.OUTWARD
-								: JiraProxy.LinkCreationDirection.IGNORE,
+                        linkType,
 						remoteIssueLinkType.hasLocalIssueLinkToRemote() ? JiraProxy.LinkCreationDirection.INWARD
+								: JiraProxy.LinkCreationDirection.IGNORE,
+						remoteIssueLinkType.hasLocalIssueLinkToRemote() ? JiraProxy.LinkCreationDirection.OUTWARD
 								: JiraProxy.LinkCreationDirection.IGNORE);
 			}
 		}
