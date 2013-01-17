@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields;
 
+import com.atlassian.cpji.fields.custom.CascadingSelectListCFMapper;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.custom.DateCFMapper;
 import com.atlassian.cpji.fields.custom.GenericTextCFMapper;
@@ -169,6 +170,7 @@ public class FieldMapperFactory
 		addCustomFieldMapper(new MultiUserCFMapper(userManager));
 		addCustomFieldMapper(new LabelsCFMapper());
 		addCustomFieldMapper(new MultiSelectListCFMapper());
+		addCustomFieldMapper(new CascadingSelectListCFMapper());
     }
 
 	private void addCustomFieldMapper(CustomFieldMapper mapper) {
