@@ -1,4 +1,4 @@
 <div class="aui-message info"><span class="aui-icon icon-info"></span>
-    <p>You have to <a href="$action.getAuthorizationUrl()">authorize</a> this operation. </p>
+	<p>$i18n.getText("cpji.you.have.to.authorize.this.operation", $action.getAuthorizationUrl())</p>
 </div>
 

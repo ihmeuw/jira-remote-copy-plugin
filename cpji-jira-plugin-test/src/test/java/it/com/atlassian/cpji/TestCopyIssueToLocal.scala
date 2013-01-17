@@ -181,7 +181,11 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
     eq(_.getAssignee)
 		eq(_.getIssueType)
     eq(_.getAttachments.asScala.map(x => (x.getSize, x.getFilename, x.getMimeType)))
-    eq(_.getIssueLinks.asScala.map(x => (x.getIssueLinkType, x.getTargetIssueId, x.getTargetIssueKey)))
+		//issue links should equals (of course without links between theese two issues)
+    eq(_.getIssueLinks.asScala
+			.filter(x => (x.getTargetIssueId != a.getId && x.getTargetIssueId != b.getId))
+			.map(x => (x.getIssueLinkType, x.getTargetIssueId, x.getTargetIssueKey))
+		)
   }
 
 }

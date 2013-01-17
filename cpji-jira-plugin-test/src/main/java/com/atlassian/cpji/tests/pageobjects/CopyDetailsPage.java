@@ -57,6 +57,9 @@ public class CopyDetailsPage extends AbstractJiraPage
 	@ElementBy (className = "error", within = "copyAttachmentsGroup")
 	PageElement copyAttachmentsNotice;
 
+    @ElementBy (id = "summary")
+    PageElement summary;
+
     SingleSelect remoteIssueLink;
 
     public CopyDetailsPage(final Long issueId, final String targetEntityLink)
@@ -134,4 +137,9 @@ public class CopyDetailsPage extends AbstractJiraPage
 	public PageElement getCopyAttachmentsNotice() {
 		return copyAttachmentsNotice;
 	}
+
+    public CopyDetailsPage enterNewSummary(String summary){
+        this.summary.clear().type(summary);
+        return this;
+    }
 }

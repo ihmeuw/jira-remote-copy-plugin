@@ -41,6 +41,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 {
     private String remoteUserName;
     private String remoteFullUserName;
+    private String summary;
 
     private Collection<Option> availableIssueTypes;
     private Collection<Option> availableSubTaskTypes;
@@ -128,6 +129,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
         remoteFullUserName = copyInfo.getRemoteUser().getFullName();
+        summary = getIssueObject().getSummary();
         return SUCCESS;
     }
 
@@ -139,6 +141,14 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     public String getRemoteFullUserName()
     {
         return remoteFullUserName;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 
     public boolean attachmentsEnabled()

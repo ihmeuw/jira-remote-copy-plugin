@@ -93,14 +93,14 @@ public class CopyIssueBeanFactory {
 		this.voteService = voteService;
 	}
 
-	public CopyIssueBean create(final String targetProjectKey, final MutableIssue issueToCopy, final String targetIssueType,
+	public CopyIssueBean create(final String targetProjectKey, final MutableIssue issueToCopy, final String targetIssueType, final String newSummary,
 			boolean copyComments) {
 		Preconditions.checkNotNull(targetProjectKey);
 		Preconditions.checkNotNull(issueToCopy);
 		Preconditions.checkNotNull(targetIssueType);
 
 		CopyIssueBean copyIssueBean = new CopyIssueBean();
-		copyIssueBean.setSummary(issueToCopy.getSummary());
+		copyIssueBean.setSummary(newSummary);
 		copyIssueBean.setOriginalKey(issueToCopy.getKey());
 		copyIssueBean.setBaseUrl(applicationProperties.getString(APKeys.JIRA_BASEURL));
 		copyIssueBean.setTargetIssueType(targetIssueType);

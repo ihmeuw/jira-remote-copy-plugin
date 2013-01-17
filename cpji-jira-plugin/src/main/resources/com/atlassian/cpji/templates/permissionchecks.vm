@@ -22,6 +22,19 @@
             #end
 
 			<h4 class="sub-heading">$i18n.getText('cpji.system.fields')</h4>
+            <div class="fields-list">
+                <div class="field-group">
+                    <label for="summary">$i18n.getText('common.words.summary')</label>
+					#if(!$summaryValidation.empty)
+                        <input type="text" value="$textutils.htmlEncode($summary)" name="summary" id="summary" class="text long-field"/>
+                        <div class="error">$summaryValidation</div>
+					#else
+                        <input type="hidden" value="$textutils.htmlEncode($summary)" name="summary"/>
+						<div class="field-value">$textutils.htmlEncode($summary)</div>
+					#end
+
+                </div>
+            </div>
 			#if ($action.getSystemFieldPermissions().isEmpty())
 				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.all.system.fields.retained')</p></div>
 			#else
