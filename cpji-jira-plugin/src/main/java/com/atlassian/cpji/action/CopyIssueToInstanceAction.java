@@ -15,11 +15,7 @@ import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
-import com.atlassian.cpji.rest.model.FieldPermissionsBean;
-import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
+import com.atlassian.cpji.rest.model.*;
 import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.IssueTypeManager;
@@ -29,6 +25,7 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.customfields.OperationContext;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
@@ -43,16 +40,12 @@ import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraVelocityUtils;
+import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.exception.VelocityException;
 import webwork.action.ActionContext;
@@ -80,6 +73,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private boolean copyComments;
 	private String remoteIssueLink;
 	private String linkToNewIssue;
+    private String summary;
+    private String summaryValidation;
 
 	private final FieldMapperFactory fieldMapperFactory;
 	private final DefaultFieldValuesManager defaultFieldValuesManager;
@@ -92,6 +87,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private final IssueLinkTypeManager issueLinkTypeManager;
 	private final CopyIssueBeanFactory copyIssueBeanFactory;
 	private final CopyIssueService copyIssueService;
+    private final FieldManager fieldManager;
 
 	public CopyIssueToInstanceAction(
 			final SubTaskManager subTaskManager,
@@ -112,7 +108,9 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			FieldMapperFactory fieldMapperFactory,
 			final CopyIssueBeanFactory copyIssueBeanFactory,
 			final IssueTypeManager issueTypeManager,
-			final CopyIssueService copyIssueService) {
+			final CopyIssueService copyIssueService,
+            final FieldManager fieldManager
+            ) {
 		super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory,
 				webResourceManager);
@@ -127,6 +125,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		this.fieldMapperFactory = fieldMapperFactory;
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
 		this.copyIssueService = copyIssueService;
+        this.fieldManager = fieldManager;
 
 		setCurrentStep("confirmation");
 	}
@@ -144,12 +143,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
 		MutableIssue issueToCopy = getIssueObject();
 		CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(linkToTargetEntity.getProjectKey(), issueToCopy,
-				issueType, copyComments);
+				issueType, summary, copyComments);
 
 		if (linkToTargetEntity.getJiraLocation().isLocal()) {
 			copyIssueBean.setActionParams(ActionContext.getParameters());
 			copyIssueBean.setFieldValuesHolder(getFieldValuesHolder());
 		}
+
+        summaryValidation = validateSummary();
 
 		Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
 		IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result,
@@ -161,7 +162,9 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 					}
 				});
 		if (copiedIssue == null) {
-			return getSelectedDestinationProject().getJiraLocation().isLocal() && getHasErrors() ? doDefault() : ERROR;
+            final boolean canWeEnterValues = getSelectedDestinationProject().getJiraLocation().isLocal() && getHasErrors();
+            final boolean beanHasInvalidSummary = !summaryValidation.isEmpty();
+            return canWeEnterValues || beanHasInvalidSummary ? doDefault() : ERROR;
 		}
 
 		copiedIssueKey = copiedIssue.getIssueKey();
@@ -320,6 +323,29 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return IssueOperations.CREATE_ISSUE_OPERATION;
 	}
 
+    private String validateSummary(){
+        final OrderableField summaryField = fieldManager.getOrderableField("summary");
+        final Map<String, String> values = ImmutableMap.of(summaryField.getId(), summary);
+        final SimpleErrorCollection ec = new SimpleErrorCollection();
+        OperationContext isolatedContext = new OperationContext(){
+
+            @Override
+            public Map getFieldValuesHolder() {
+                return values;
+            }
+
+            @Override
+            public IssueOperation getIssueOperation() {
+                return IssueOperations.CREATE_ISSUE_OPERATION;
+            }
+        };
+        summaryField.validateParams(isolatedContext, ec, getI18nHelper(), null, null);
+        if(ec.getErrors().containsKey(summaryField.getId())){
+            return ec.getErrors().get(summaryField.getId());
+        }
+        return "";
+    }
+
 	public String getHtmlForField(MissingFieldPermissionDescription permission) {
 		final ImmutableSet<ValidationCode> possibleMapping = ImmutableSet.of(ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED,
 				ValidationCode.FIELD_MANDATORY_VALUE_NOT_MAPPED, ValidationCode.FIELD_VALUE_NOT_MAPPED);
@@ -402,12 +428,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		final JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
 
 		CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(entityLink.getProjectKey(), getIssueObject(),
-				issueType, copyComments);
+				issueType, summary,copyComments);
 		Either<NegativeResponseStatus, FieldPermissionsBean> result = proxy.checkPermissions(copyIssueBean);
 		FieldPermissionsBean fieldValidationBean = handleGenericResponseStatus(proxy, result, null);
 		if (fieldValidationBean == null) {
 			return getGenericResponseHandlerResult();
 		}
+
+        summaryValidation = validateSummary();
 
 		List<SystemFieldPermissionBean> fieldPermissionBeans = fieldValidationBean.getSystemFieldPermissionBeans();
 		systemMissingFieldPermissionDescriptions = new ArrayList<MissingFieldPermissionDescription>();
@@ -484,4 +512,19 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return remoteIssueLink;
 	}
 
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getSummaryValidation() {
+        return summaryValidation;
+    }
+
+    public void setSummaryValidation(String summaryValidation) {
+        this.summaryValidation = summaryValidation;
+    }
 }

@@ -96,14 +96,14 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
     @Test
     public void testWithoutCustomFields() throws Exception {
-        final String remoteIssueKey = remoteCopy(jira1, "TST-2", 10100L);
+        final String remoteIssueKey = remoteCopy(jira1, "TST-2", 10100L, "Blah", "A test task with changed name");
 
         // Query the remotely copied issue via REST
         final JSONObject json = getIssueJson(jira2, remoteIssueKey);
         final JSONObject fields = json.getJSONObject("fields");
 
         // System fields
-        assertEquals("A test task", fields.getString("summary"));
+        assertEquals("A test task with changed name", fields.getString("summary"));
         assertEquals("Task", fields.getJSONObject("issuetype").getString("name"));
         assertEquals(JSONObject.NULL, fields.opt("description"));
 
@@ -117,16 +117,19 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     }
 
     private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId) {
-        return remoteCopy(jira, issueKey, issueId, "Blah");
+        return remoteCopy(jira, issueKey, issueId, "Blah", null);
     }
 
-    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject) {
+    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject, final String summary) {
         viewIssue(jira, issueKey);
         SelectTargetProjectPage selectTargetProjectPage = jira.visit(SelectTargetProjectPage.class, issueId);
         if (destinationProject != null)
             selectTargetProjectPage.setDestinationProject(destinationProject);
 
         final CopyDetailsPage copyDetailsPage = selectTargetProjectPage.next();
+        if(summary != null)
+            copyDetailsPage.enterNewSummary(summary);
+
         final CopyIssueToInstanceConfirmationPage copyIssueToInstanceConfirmationPage = copyDetailsPage.next();
 
         assertTrue(copyIssueToInstanceConfirmationPage.isAllSystemFieldsRetained());
@@ -141,7 +144,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
     @Test
     public void testCopyForProjectWithoutProjectEntityLinks() throws IOException, JSONException {
-        final String remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links");
+        final String remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links", null);
         assertThat(remoteIssueKey, startsWith("DNEL"));
 
         // Query the remotely copied issue via REST
@@ -169,7 +172,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
         try {
             testkit2.permissionSchemes().removeProjectRolePermission(0L, Permissions.BROWSE, 10000L);
-            remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links");
+            remoteIssueKey = remoteCopy(jira1, "NEL-3", 10301L, "Destination not entity links", null);
             assertThat(remoteIssueKey, startsWith("DNEL"));
         } finally {
             testkit2.permissionSchemes().addProjectRolePermission(0L, Permissions.BROWSE, 10000L);

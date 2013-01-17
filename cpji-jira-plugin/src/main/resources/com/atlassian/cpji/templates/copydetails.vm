@@ -33,6 +33,13 @@
 				</div>
 			</fieldset>
 
+			<fieldset>
+				<div class="field-group">
+					<label for="summary">$i18n.getText('common.words.summary')</label>
+					<input type="text" class="text" name="summary" id="summary" value="$textutils.htmlEncode($summary)"/>
+				</div>
+			</fieldset>
+
 			#if ($action.advancedSectionVisible)
 			<fieldset class="group">
 				<legend><span>$i18n.getText('cpji.details')</span></legend>
