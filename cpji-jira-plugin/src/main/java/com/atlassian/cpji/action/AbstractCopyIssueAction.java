@@ -25,6 +25,7 @@ import java.net.URLDecoder;
  * @since v1.4
  */
 public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction {
+    static final String CLONE_LINK_TYPE = "Cloners";
     public static final String AUTHORIZE = "authorize";
 
 	public static final String PLUGIN_KEY = "com.atlassian.cpji.cpji-jira-plugin";

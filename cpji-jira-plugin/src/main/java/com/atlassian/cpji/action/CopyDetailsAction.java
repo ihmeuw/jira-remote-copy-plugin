@@ -208,7 +208,9 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	}
 
 	public boolean isCreateIssueLinkSectionVisible() {
-		return (linksEnabled() || copyInfo.getIssueLinkingEnabled()) && !issueLinkTypeManager.getIssueLinkTypesByName("Copied").isEmpty();
+		return (linksEnabled() || copyInfo.getIssueLinkingEnabled()) &&
+                // For a local link we require the "Cloners" link type to exist
+                (!getSelectedDestinationProject().getJiraLocation().isLocal() || !issueLinkTypeManager.getIssueLinkTypesByName(CLONE_LINK_TYPE).isEmpty());
 	}
 
 	public boolean isCopyCommentsSectionVisible() {

@@ -32,6 +32,8 @@ public interface JiraProxy {
 
     public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
 
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, SimplifiedIssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
+
     public Either<NegativeResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey);
 
     public Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey);
@@ -43,7 +45,7 @@ public interface JiraProxy {
     public static enum LinkCreationDirection {
         OUTWARD, INWARD, IGNORE;
 
-        public String getNameFromIssueLinkType(IssueLinkType linkType) {
+        public String getNameFromIssueLinkType(SimplifiedIssueLinkType linkType) {
             switch (this) {
                 case OUTWARD:
                     return linkType.getOutward();
