@@ -3,7 +3,9 @@ package com.atlassian.cpji.fields;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.custom.DateCFMapper;
 import com.atlassian.cpji.fields.custom.GenericTextCFMapper;
+import com.atlassian.cpji.fields.custom.LabelsCFMapper;
 import com.atlassian.cpji.fields.custom.MultiGroupCFMapper;
+import com.atlassian.cpji.fields.custom.MultiSelectListCFMapper;
 import com.atlassian.cpji.fields.custom.MultiUserCFMapper;
 import com.atlassian.cpji.fields.custom.NumberCFMapper;
 import com.atlassian.cpji.fields.custom.ProjectCFMapper;
@@ -42,6 +44,7 @@ import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
+import com.atlassian.jira.issue.customfields.converters.DateTimeConverter;
 import com.atlassian.jira.issue.customfields.converters.DoubleConverter;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -92,6 +95,7 @@ public class FieldMapperFactory
                     final FieldManager fieldManager,
                     final VoteService voteService,
                     final DatePickerConverter datePickerConverter,
+					final DateTimeConverter dateTimeConverter,
                     final DoubleConverter doubleConverter,
                     final UserMappingManager userMappingManager,
                     final TimeTrackingConfiguration timeTrackingConfiguration,
@@ -155,7 +159,7 @@ public class FieldMapperFactory
         postIssueCreationFieldMapper.add(votersFieldMapper);
 
         addCustomFieldMapper(new SelectListCFMapper());
-		addCustomFieldMapper(new DateCFMapper(datePickerConverter));
+		addCustomFieldMapper(new DateCFMapper(datePickerConverter, dateTimeConverter));
 		addCustomFieldMapper(new NumberCFMapper(doubleConverter));
 		addCustomFieldMapper(new GenericTextCFMapper());
 		addCustomFieldMapper(new MultiGroupCFMapper(groupManager));
@@ -163,6 +167,8 @@ public class FieldMapperFactory
 		addCustomFieldMapper(new VersionCFMapper(versionManager));
 		addCustomFieldMapper(new UserCFMapper(userManager));
 		addCustomFieldMapper(new MultiUserCFMapper(userManager));
+		addCustomFieldMapper(new LabelsCFMapper());
+		addCustomFieldMapper(new MultiSelectListCFMapper());
     }
 
 	private void addCustomFieldMapper(CustomFieldMapper mapper) {

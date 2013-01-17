@@ -1,7 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
-import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -35,10 +34,12 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
      * generated on the source JIRA instance. On the destination instance, we may need to format the value differently,
      * e.g. if the value is a Date, each JIRA instance may have a different format for representing dates as strings.
      *
-     * @param value a String representing the custom field value
-     * @return a formatted String recognisable by the current JIRA instance
+     *
+	 * @param value a String representing the custom field value
+	 * @param issueType
+	 * @return a formatted String recognisable by the current JIRA instance
      */
-    protected abstract String formatString(String value);
+    protected abstract String formatStringForInputParams(String value, CustomField customField, Project project, IssueType issueType);
 
     /**
      * Determines if the given value is value for the given custom field. The value will not be null.
@@ -155,7 +156,7 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
         final List<String> formattedValues = new ArrayList<String>(mappingResult.getValidValues().size());
         for (final String value : mappingResult.getValidValues())
         {
-            formattedValues.add(formatString(value));
+            formattedValues.add(formatStringForInputParams(value, customField, project, issueType));
         }
 
         final String[] array = new String[formattedValues.size()];

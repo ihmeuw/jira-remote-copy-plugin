@@ -35,9 +35,9 @@ public class VersionCFMapper extends AbstractMultiValueCFMapper<Version>
     }
 
     @Override
-    protected String formatString(final String value)
+    protected String formatStringForInputParams(final String value, final CustomField customField, final Project project, IssueType issueType)
     {
-        return value;
+		return versionManager.getVersion(project.getId(), value).getId().toString();
     }
 
     @Override

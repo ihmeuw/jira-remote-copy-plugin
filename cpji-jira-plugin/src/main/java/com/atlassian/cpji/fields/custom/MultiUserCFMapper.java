@@ -36,7 +36,7 @@ public class MultiUserCFMapper extends AbstractMultiValueCFMapper<User>
     }
 
     @Override
-    protected String formatString(final String value)
+	protected String formatStringForInputParams(String value, CustomField customField, Project project, IssueType issueType)
     {
         return value;
     }
