@@ -1,7 +1,7 @@
 #* @vtlvariable name="action" type="com.atlassian.cpji.action.SelectTargetProjectAction" *#
 <html>
 <head>
-    <title>Select a target remote project</title>
+    <title>$i18n.getText("cpji.select.destination.project")</title>
 </head>
 <body>
 <div id="stepped-process" class="content-container">

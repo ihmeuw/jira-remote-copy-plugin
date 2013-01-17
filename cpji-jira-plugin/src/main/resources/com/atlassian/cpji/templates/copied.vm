@@ -29,7 +29,7 @@
         <form action="../browse/$action.getIssueKey()" class="aui" method="get">
             <div class="buttons-container">
                 <div class="buttons">
-                    <input type="submit" value="Back to issue" class="button submit"/>
+                    <input type="submit" value="$i18n.getText('cpji.back.to.the.issue')" class="button submit"/>
                 </div>
             </div>
         </form>
