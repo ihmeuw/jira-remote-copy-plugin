@@ -8,6 +8,7 @@ import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
@@ -90,9 +91,9 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		final MutableIssue issue = getIssueObject();
 		if (issueLinkManager.isLinkingEnabled()) {
 			if (issue != null) {
-                final boolean hasOutwardLinks = !issueLinkManager.getOutwardLinks(issue.getId()).isEmpty();
-                final boolean hasInwardLinks = !issueLinkManager.getInwardLinks(issue.getId()).isEmpty();
-                return hasOutwardLinks || hasInwardLinks;
+                //checking if there are any not-subtask issue links (inward or outward)
+                return Iterables.any(issueLinkManager.getOutwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink)
+                        || Iterables.any(issueLinkManager.getInwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink);
 			}
 		}
 		return false;

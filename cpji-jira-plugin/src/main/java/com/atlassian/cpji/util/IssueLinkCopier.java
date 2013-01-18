@@ -19,7 +19,7 @@ public class IssueLinkCopier {
     private final RemoteIssueLinkManager remoteIssueLinkManager;
 
 
-    public Predicate<IssueLink> isNotSubtaskIssueLink = new Predicate<IssueLink>() {
+    public static final Predicate<IssueLink> isNotSubtaskIssueLink = new Predicate<IssueLink>() {
         @Override
         public boolean apply(@Nullable IssueLink input) {
             return !input.getIssueLinkType().isSubTaskLinkType();
