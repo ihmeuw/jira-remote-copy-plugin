@@ -58,7 +58,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		assertTrue(issueToInstancePage.isSuccessful)
 
 		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)
-		assertEquals(issueRest.getSummary, "Issue with comments and attachments")
+		assertEquals("CLONE - Issue with comments and attachments", issueRest.getSummary)
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](0))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
@@ -77,7 +77,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		assertTrue(issueToInstancePage.isSuccessful)
 
 		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)
-		assertEquals(issueRest.getSummary, "Issue with comments and attachments")
+		assertEquals("CLONE - Issue with comments and attachments", issueRest.getSummary)
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](1))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](0))
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
@@ -96,7 +96,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest {
 		assertTrue(issueToInstancePage.isSuccessful)
 
 		val issueRest: Issue = AbstractCopyIssueTest.restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, AbstractCopyIssueTest.NPM)
-		assertEquals(issueRest.getSummary, "Issue with comments and attachments")
+		assertEquals("CLONE - Issue with comments and attachments", issueRest.getSummary)
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](1))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
