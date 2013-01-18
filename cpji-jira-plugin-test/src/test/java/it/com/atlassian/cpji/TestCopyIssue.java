@@ -6,7 +6,12 @@ import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceSuccessfulPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.rest.client.domain.Field;
+import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.security.Permissions;
+import com.google.common.collect.Iterables;
+import org.hamcrest.Matcher;
+import org.hamcrest.core.IsCollectionContaining;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +23,10 @@ import java.io.IOException;
 
 import static com.atlassian.cpji.tests.RawRestUtil.getIssueJson;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @since v2.1
@@ -187,4 +195,19 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         assertEquals("CLONE - Testing as admin", fields.getString("summary"));
         assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
     }
+
+	@Test
+	public void testCopyLocally1() {
+		SelectTargetProjectPage selectTargetPage = jira2.visit(SelectTargetProjectPage.class, new java.lang.Long(10200));
+		CopyIssueToInstanceSuccessfulPage copiedIssuePage = selectTargetPage.next().next().copyIssue();
+		assertTrue(copiedIssuePage.isSuccessful());
+
+		Issue i1 = restClient2.getIssueClient().getIssue("BLA-9", NPM);
+		Issue i2 = restClient2.getIssueClient().getIssue(copiedIssuePage.getRemoteIssueKey(), NPM);
+
+		Field[] fields = Iterables.toArray(i1.getFields(), Field.class);
+		Matcher<Iterable<Field>> matcher = IsCollectionContaining.<Field>hasItems(fields);
+		assertThat(i2.getFields(), matcher);
+
+	}
 }
