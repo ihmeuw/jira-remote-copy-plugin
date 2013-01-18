@@ -1,6 +1,7 @@
 package com.atlassian.cpji.components.exceptions;
 
 import com.atlassian.jira.util.ErrorCollection;
+import com.atlassian.jira.util.SimpleErrorCollection;
 
 /**
  * @since v3.0
@@ -11,6 +12,11 @@ abstract public class CopyIssueException extends Exception {
 
     public CopyIssueException(final ErrorCollection errorCollection) {
         this.errorCollection = errorCollection;
+    }
+
+
+    public CopyIssueException(final String message) {
+        this(createErrrorCollectionWithMessage(message));
     }
 
 
@@ -26,5 +32,12 @@ abstract public class CopyIssueException extends Exception {
         } else {
             return super.getMessage();
         }
+    }
+
+
+    private static ErrorCollection createErrrorCollectionWithMessage(String message){
+        final SimpleErrorCollection ec = new SimpleErrorCollection();
+        ec.addErrorMessage(message);
+        return ec;
     }
 }

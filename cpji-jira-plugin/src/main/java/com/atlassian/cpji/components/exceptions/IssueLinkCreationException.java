@@ -9,4 +9,8 @@ public class IssueLinkCreationException extends CopyIssueException {
     public IssueLinkCreationException(final ErrorCollection errorCollection) {
         super(errorCollection);
     }
+
+    public IssueLinkCreationException(String message) {
+        super(message);
+    }
 }

@@ -204,7 +204,13 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
 		if (getCopyIssueLinks() && issueLinkManager.isLinkingEnabled()) {
             IssueLinkCopier copier = new IssueLinkCopier(issueLinkManager, remoteIssueLinkManager, proxy);
-            copier.copyLocalAndRemoteLinks(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
+            Either<NegativeResponseStatus, SuccessfulResponse> copierResult = copier.copyLocalAndRemoteLinks(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
+            if(copierResult.isLeft()){
+                ErrorCollection ec = copierResult.left().get().getErrorCollection();
+                if(ec != null && ec.hasAnyErrors()){
+                    addErrorCollection(ec);
+                }
+            }
 		}
 
 		if (StringUtils.isNotBlank(remoteIssueLink)) {

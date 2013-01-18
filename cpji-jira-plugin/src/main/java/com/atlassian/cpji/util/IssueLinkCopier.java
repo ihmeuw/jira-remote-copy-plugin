@@ -1,6 +1,9 @@
 package com.atlassian.cpji.util;
 
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
+import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.link.*;
 import com.google.common.base.Predicate;
@@ -32,10 +35,10 @@ public class IssueLinkCopier {
         this.remoteIssueLinkManager = remoteIssueLinkManager;
     }
 
-    public void copyLocalAndRemoteLinks(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId) {
+    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalAndRemoteLinks(final Issue localIssue, final String copiedIssueKey, final Long copiedIssueId) {
         copyLocalIssueLinks(localIssue, copiedIssueKey, copiedIssueId);
         copyRemoteIssueLinks(localIssue, copiedIssueKey);
-        remoteJira.convertRemoteIssueLinksIntoLocal(copiedIssueKey);
+        return remoteJira.convertRemoteIssueLinksIntoLocal(copiedIssueKey);
     }
 
 

@@ -26,6 +26,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
+import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.plugin.viewissue.issuelink.GlobalIdFactory;
 import com.atlassian.jira.project.Project;
@@ -257,13 +258,14 @@ public class CopyIssueService {
                     final Issue issueToLinkTo = getIssue(user, Long.parseLong(values.get("issueId")));
                     try{
                         createIssueLink(user, issue, issueToLinkTo, remoteIssueLink.getRelationship());
+                    } catch(IssueLinkCreationException e){
+                        errors.addErrorCollection(e.getErrorCollection());
+                    } finally {
                         // Delete the remote issue link, it is no longer needed
                         final RemoteIssueLinkService.DeleteValidationResult deleteValidationResult = remoteIssueLinkService.validateDelete(user, remoteIssueLink.getId());
                         if (deleteValidationResult.isValid()) {
                             remoteIssueLinkService.delete(user, deleteValidationResult);
                         }
-                    } catch(IssueLinkCreationException e){
-                        errors.addError(remoteIssueLink.getGlobalId(), e.toString());
                     }
                 }
             }
@@ -276,6 +278,14 @@ public class CopyIssueService {
 
 
     private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship) throws IssueLinkCreationException {
+
+        IssueLinkType issueLinkType = findIssueLinkTypeByNames(relationship);
+
+        if(issueLinkType == null){
+            String message = authenticationContext.getI18nHelper().getText("cpji.link.type.doesnt.exist.link.wasnt.copied", relationship, fromIssue, toIssue);
+            throw new CannotFindIssueLinkTypeException(message);
+        }
+
         final IssueLinkService.AddIssueLinkValidationResult addIssueLinkValidationResult = issueLinkService.validateAddIssueLinks(
                 user, fromIssue, relationship, ImmutableList.<String>of(toIssue.getKey()));
 
@@ -305,6 +315,19 @@ public class CopyIssueService {
             });
         } catch (NoSuchElementException ex) {
             throw new RESTException(Response.Status.NOT_FOUND, "No issue type with name '" + issueType + "' found!");
+        }
+    }
+
+    private IssueLinkType findIssueLinkTypeByNames(final String issueLinkType){
+        try{
+            return Iterables.find(issueLinkService.getIssueLinkTypes(), new Predicate<IssueLinkType>() {
+                @Override
+                public boolean apply(@Nullable IssueLinkType input) {
+                    return issueLinkType.equals(input.getInward()) || issueLinkType.equals(input.getOutward());
+                }
+            });
+        } catch(NoSuchElementException e){
+            return null;
         }
     }
 
