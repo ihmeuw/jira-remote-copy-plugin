@@ -159,7 +159,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
 			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
 
-			assertEquals(subtask.getSummary, copiedIssue.getSummary)
+			assertEquals("CLONE - " + subtask.getSummary, copiedIssue.getSummary)
 			assertEquals("AOBA", copiedIssue.getProject.getKey)
 
 			val copiedIssueParent = copiedIssue.getField("parent")
@@ -172,18 +172,18 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 	}
 
 
-  def issuesEquals(a: Issue, b: Issue) {
+  def issuesEquals(issue: Issue, copiedIssue: Issue) {
     val eq = (field: (Issue => AnyRef)) => {
-      assertEquals(field(a), field(b))
+      assertEquals(field(issue), field(copiedIssue))
     }
 
-    eq(_.getSummary)
+		assertEquals("CLONE - " + issue.getSummary, copiedIssue.getSummary)
     eq(_.getAssignee)
 		eq(_.getIssueType)
     eq(_.getAttachments.asScala.map(x => (x.getSize, x.getFilename, x.getMimeType)))
 		//issue links should equals (of course without links between theese two issues)
     eq(_.getIssueLinks.asScala
-			.filter(x => (x.getTargetIssueId != a.getId && x.getTargetIssueId != b.getId))
+			.filter(x => (x.getTargetIssueId != issue.getId && x.getTargetIssueId != copiedIssue.getId))
 			.map(x => (x.getIssueLinkType, x.getTargetIssueId, x.getTargetIssueKey))
 		)
   }

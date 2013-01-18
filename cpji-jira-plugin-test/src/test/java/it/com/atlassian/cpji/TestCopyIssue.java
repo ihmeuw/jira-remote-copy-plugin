@@ -55,7 +55,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         final JSONObject fields = json.getJSONObject("fields");
 
         // System fields
-        assertEquals("A test bug", fields.getString("summary"));
+        assertEquals("CLONE - A test bug", fields.getString("summary"));
         assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
         assertEquals("Blah blah blah", fields.getString("description"));
 
@@ -152,7 +152,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         final JSONObject fields = json.getJSONObject("fields");
 
         // System fields
-        assertEquals("Testing as admin", fields.getString("summary"));
+        assertEquals("CLONE - Testing as admin", fields.getString("summary"));
         assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
         assertEquals(JSONObject.NULL, fields.opt("description"));
 
@@ -184,7 +184,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         final JSONObject fields = json.getJSONObject("fields");
 
         // System fields
-        assertEquals("Testing as admin", fields.getString("summary"));
+        assertEquals("CLONE - Testing as admin", fields.getString("summary"));
         assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
     }
 }

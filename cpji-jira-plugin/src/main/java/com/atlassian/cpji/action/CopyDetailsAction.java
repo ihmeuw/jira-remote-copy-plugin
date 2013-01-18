@@ -12,6 +12,7 @@ import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
+import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
@@ -23,6 +24,7 @@ import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -48,26 +50,29 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     private Collection<Option> availableSubTaskTypes;
 	private final IssueLinkManager issueLinkManager;
 	private final IssueLinkTypeManager issueLinkTypeManager;
+    private final ApplicationProperties applicationProperties;
 
 	private CopyInformationBean copyInfo;
 
 	public CopyDetailsAction(
-			final SubTaskManager subTaskManager,
-			final FieldLayoutManager fieldLayoutManager,
-			final CommentManager commentManager,
-			final CopyIssuePermissionManager copyIssuePermissionManager,
-			final ApplicationLinkService applicationLinkService,
-			final JiraProxyFactory jiraProxyFactory,
-			final WebResourceManager webResourceManager,
-			final IssueLinkManager issueLinkManager,
-			final IssueLinkTypeManager issueLinkTypeManager)
+            final SubTaskManager subTaskManager,
+            final FieldLayoutManager fieldLayoutManager,
+            final CommentManager commentManager,
+            final CopyIssuePermissionManager copyIssuePermissionManager,
+            final ApplicationLinkService applicationLinkService,
+            final JiraProxyFactory jiraProxyFactory,
+            final WebResourceManager webResourceManager,
+            final IssueLinkManager issueLinkManager,
+            final IssueLinkTypeManager issueLinkTypeManager,
+            final ApplicationProperties applicationProperties)
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
 		this.issueLinkTypeManager = issueLinkTypeManager;
+        this.applicationProperties = applicationProperties;
 
-		setCurrentStep("copydetails");
+        setCurrentStep("copydetails");
         webResourceManager.requireResource(PLUGIN_KEY+":copyDetailsAction");
 	}
 
@@ -130,7 +135,12 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
         remoteFullUserName = copyInfo.getRemoteUser().getFullName();
-        summary = getIssueObject().getSummary();
+
+        //setting new issue object's summary
+        String clonePrefixProperties = applicationProperties.getDefaultBackedString(APKeys.JIRA_CLONE_PREFIX);
+        final String clonePrefix = clonePrefixProperties + (Strings.isNullOrEmpty(clonePrefixProperties) ? "" : " ");
+        summary = clonePrefix + getIssueObject().getSummary();
+
         return SUCCESS;
     }
 
