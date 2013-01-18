@@ -392,7 +392,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			case OK:
 				return true;
 			case FIELD_TYPE_NOT_SUPPORTED:
-				return false;
+				return true;
 			case FIELD_NOT_MAPPED:
 				return true;
 			case FIELD_VALUE_NOT_MAPPED:
