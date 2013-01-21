@@ -115,14 +115,16 @@ public class CopyIssueBeanFactory {
 			OrderableField orderableField = fieldLayoutItem.getOrderableField();
 			if (fieldManager.isCustomField(orderableField.getId())) {
 				CustomField customField = fieldManager.getCustomField(orderableField.getId());
-				CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
-				if (customFieldMapper != null) {
-					CustomFieldBean fieldBean = customFieldMapper.createFieldBean(customField, issueToCopy);
-					customFieldBeans.add(fieldBean);
-				} else {
-					copyIssueBean.addUnsupportedCustomField(new CustomFieldPermissionBean(customField.getId(), customField.getName(),
-							ValidationCode.FIELD_TYPE_NOT_SUPPORTED.toString()));
-				}
+                if(customField.hasValue(issueToCopy)){
+                    CustomFieldMapper customFieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
+                    if (customFieldMapper != null) {
+                        CustomFieldBean fieldBean = customFieldMapper.createFieldBean(customField, issueToCopy);
+                        customFieldBeans.add(fieldBean);
+                    } else {
+                        copyIssueBean.addUnsupportedCustomField(new CustomFieldPermissionBean(customField.getId(), customField.getName(),
+                                ValidationCode.FIELD_TYPE_NOT_SUPPORTED.toString()));
+                    }
+                }
 			} else {
 				if (systemFieldMappers.containsKey(orderableField.getId())) {
 					visibleFieldIds.add(orderableField.getId());
