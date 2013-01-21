@@ -25,7 +25,6 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.customfields.OperationContext;
-import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
@@ -40,7 +39,6 @@ import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraVelocityUtils;
-import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
@@ -74,7 +72,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private String remoteIssueLink;
 	private String linkToNewIssue;
     private String summary;
-    private String summaryValidation;
 
 	private final FieldMapperFactory fieldMapperFactory;
 	private final DefaultFieldValuesManager defaultFieldValuesManager;
@@ -87,7 +84,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private final IssueLinkTypeManager issueLinkTypeManager;
 	private final CopyIssueBeanFactory copyIssueBeanFactory;
 	private final CopyIssueService copyIssueService;
-    private final FieldManager fieldManager;
 
 	public CopyIssueToInstanceAction(
 			final SubTaskManager subTaskManager,
@@ -108,8 +104,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			FieldMapperFactory fieldMapperFactory,
 			final CopyIssueBeanFactory copyIssueBeanFactory,
 			final IssueTypeManager issueTypeManager,
-			final CopyIssueService copyIssueService,
-            final FieldManager fieldManager
+			final CopyIssueService copyIssueService
             ) {
 		super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory,
@@ -125,7 +120,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		this.fieldMapperFactory = fieldMapperFactory;
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
 		this.copyIssueService = copyIssueService;
-        this.fieldManager = fieldManager;
 
 		setCurrentStep("confirmation");
 	}
@@ -150,8 +144,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			copyIssueBean.setFieldValuesHolder(getFieldValuesHolder());
 		}
 
-        summaryValidation = validateSummary();
-
 		Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
 		IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result,
 				new Function<NegativeResponseStatus, Void>() {
@@ -163,8 +155,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				});
 		if (copiedIssue == null) {
             final boolean canWeEnterValues = getSelectedDestinationProject().getJiraLocation().isLocal() && getHasErrors();
-            final boolean beanHasInvalidSummary = !summaryValidation.isEmpty();
-            return canWeEnterValues || beanHasInvalidSummary ? doDefault() : ERROR;
+            return canWeEnterValues  ? doDefault() : ERROR;
 		}
 
 		copiedIssueKey = copiedIssue.getIssueKey();
@@ -329,28 +320,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return IssueOperations.CREATE_ISSUE_OPERATION;
 	}
 
-    private String validateSummary(){
-        final OrderableField summaryField = fieldManager.getOrderableField("summary");
-        final Map<String, String> values = ImmutableMap.of(summaryField.getId(), summary);
-        final SimpleErrorCollection ec = new SimpleErrorCollection();
-        OperationContext isolatedContext = new OperationContext(){
-
-            @Override
-            public Map getFieldValuesHolder() {
-                return values;
-            }
-
-            @Override
-            public IssueOperation getIssueOperation() {
-                return IssueOperations.CREATE_ISSUE_OPERATION;
-            }
-        };
-        summaryField.validateParams(isolatedContext, ec, getI18nHelper(), null, null);
-        if(ec.getErrors().containsKey(summaryField.getId())){
-            return ec.getErrors().get(summaryField.getId());
-        }
-        return "";
-    }
 
 	public String getHtmlForField(MissingFieldPermissionDescription permission) {
 		final ImmutableSet<ValidationCode> possibleMapping = ImmutableSet.of(ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED,
@@ -441,8 +410,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			return getGenericResponseHandlerResult();
 		}
 
-        summaryValidation = validateSummary();
-
 		List<SystemFieldPermissionBean> fieldPermissionBeans = fieldValidationBean.getSystemFieldPermissionBeans();
 		systemMissingFieldPermissionDescriptions = new ArrayList<MissingFieldPermissionDescription>();
 		canCopyIssue = true;
@@ -526,11 +493,4 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
         this.summary = summary;
     }
 
-    public String getSummaryValidation() {
-        return summaryValidation;
-    }
-
-    public void setSummaryValidation(String summaryValidation) {
-        this.summaryValidation = summaryValidation;
-    }
 }

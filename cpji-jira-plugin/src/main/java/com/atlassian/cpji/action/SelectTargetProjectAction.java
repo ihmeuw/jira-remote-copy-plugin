@@ -61,7 +61,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             return getGenericResponseHandlerResult();
         }
 
-        return getRedirect("/secure/CopyDetailsAction.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);
+        return getRedirect("/secure/CopyDetailsAction!default.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);
     }
 
     @SuppressWarnings("unused")

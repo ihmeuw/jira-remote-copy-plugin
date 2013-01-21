@@ -55,7 +55,7 @@
 	<webwork1 key="copydetails-action" name="Copy Issue to another JIRA instance" class="java.lang.Object">
 		<actions>
 			<action name="com.atlassian.cpji.action.CopyDetailsAction" alias="CopyDetailsAction">
-				<view name="success">/com/atlassian/cpji/templates/copydetails.vm</view>
+				<view name="input">/com/atlassian/cpji/templates/copydetails.vm</view>
 				<view name="error">/com/atlassian/cpji/templates/error.vm</view>
 				<view name="authorize">/com/atlassian/cpji/templates/authorize.vm</view>
 				<view name="permissionviolation">/secure/views/permissionviolation.jsp</view>

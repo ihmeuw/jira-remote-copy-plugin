@@ -17,14 +17,19 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.customfields.OperationContext;
+import com.atlassian.jira.issue.fields.FieldManager;
+import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
+import com.atlassian.jira.util.SimpleErrorCollection;
+import com.atlassian.jira.util.UrlBuilder;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -46,11 +51,18 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     private String remoteFullUserName;
     private String summary;
 
+    private String issueType;
+    private boolean copyComments;
+    private boolean copyAttachments;
+    private boolean copyIssueLinks;
+    private String remoteIssueLink;
+
     private Collection<Option> availableIssueTypes;
     private Collection<Option> availableSubTaskTypes;
 	private final IssueLinkManager issueLinkManager;
 	private final IssueLinkTypeManager issueLinkTypeManager;
     private final ApplicationProperties applicationProperties;
+    private final FieldManager fieldManager;
 
 	private CopyInformationBean copyInfo;
 
@@ -64,13 +76,15 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             final WebResourceManager webResourceManager,
             final IssueLinkManager issueLinkManager,
             final IssueLinkTypeManager issueLinkTypeManager,
-            final ApplicationProperties applicationProperties)
+            final ApplicationProperties applicationProperties,
+            final FieldManager fieldManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
 		this.issueLinkManager = issueLinkManager;
 		this.issueLinkTypeManager = issueLinkTypeManager;
         this.applicationProperties = applicationProperties;
+        this.fieldManager = fieldManager;
 
         setCurrentStep("copydetails");
         webResourceManager.requireResource(PLUGIN_KEY+":copyDetailsAction");
@@ -104,14 +118,77 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		return false;
 	}
 
+    private void validateSummary() {
+        final OrderableField summaryField = fieldManager.getOrderableField("summary");
+        final Map<String, String> values = ImmutableMap.of(summaryField.getId(), summary);
+        final SimpleErrorCollection ec = new SimpleErrorCollection();
+        OperationContext isolatedContext = new OperationContext(){
+            @Override
+            public Map getFieldValuesHolder() {
+                return values;
+            }
+
+            @Override
+            public IssueOperation getIssueOperation() {
+                return IssueOperations.CREATE_ISSUE_OPERATION;
+            }
+        };
+        summaryField.validateParams(isolatedContext, ec, getI18nHelper(), null, null);
+        if(ec.getErrors().containsKey(summaryField.getId())){
+            addError("summary", ec.getErrors().get(summaryField.getId()));
+        }
+    }
+
+    protected String doExecute() throws Exception {
+        validateSummary();
+        if(hasAnyErrors()) {
+            if (!initParams()) {
+                return getGenericResponseHandlerResult();
+            }
+            return INPUT;
+        } else {
+
+            UrlBuilder builder = new UrlBuilder("CopyIssueToInstanceAction!default.jspa")
+                    .addParameter("id", getId())
+                    .addParameter("issueType", issueType)
+                    .addParameter("summary", summary)
+                    .addParameter("copyComments", copyComments)
+                    .addParameter("copyAttachments", copyAttachments)
+                    .addParameter("copyIssueLinks", copyIssueLinks)
+                    .addParameter("remoteIssueLink", remoteIssueLink)
+                    .addParameter("targetEntityLink", targetEntityLink)
+                    .addParameter("atl_token", getXsrfToken());
+            return getRedirect(builder.asUrlString());
+        }
+
+    }
+
     @Override
-    protected String doExecute() throws Exception
+    public String doDefault() throws Exception
     {
         String permissionCheck = checkPermissions();
         if (!permissionCheck.equals(SUCCESS))
         {
             return permissionCheck;
         }
+
+        if (!initParams()) {
+            return getGenericResponseHandlerResult();
+        }
+
+        //setting new issue object's summary
+        String clonePrefixProperties = applicationProperties.getDefaultBackedString(APKeys.JIRA_CLONE_PREFIX);
+        final String clonePrefix = clonePrefixProperties + (Strings.isNullOrEmpty(clonePrefixProperties) ? "" : " ");
+        summary = clonePrefix + getIssueObject().getSummary();
+
+        copyComments = true;
+        copyAttachments = true;
+        copyIssueLinks = true;
+
+        return INPUT;
+    }
+
+    private boolean initParams() {
         SelectedProject entityLink = getSelectedDestinationProject();
 
         JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
@@ -119,7 +196,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 				entityLink.getProjectKey());
         copyInfo = handleGenericResponseStatus(proxy, response, null);
         if(copyInfo == null){
-            return getGenericResponseHandlerResult();
+            return false;
         }
 
         availableIssueTypes = getIssueTypeOptionsList(copyInfo.getIssueTypes());
@@ -132,16 +209,10 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             availableSubTaskTypes = Collections.emptyList();
         }
 
-		UserBean user = copyInfo.getRemoteUser();
+        UserBean user = copyInfo.getRemoteUser();
         remoteUserName = user.getUserName();
         remoteFullUserName = copyInfo.getRemoteUser().getFullName();
-
-        //setting new issue object's summary
-        String clonePrefixProperties = applicationProperties.getDefaultBackedString(APKeys.JIRA_CLONE_PREFIX);
-        final String clonePrefix = clonePrefixProperties + (Strings.isNullOrEmpty(clonePrefixProperties) ? "" : " ");
-        summary = clonePrefix + getIssueObject().getSummary();
-
-        return SUCCESS;
+        return true;
     }
 
     public String getRemoteUserName()
@@ -162,6 +233,46 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
         this.summary = summary;
     }
 
+    public boolean isCopyComments() {
+        return copyComments;
+    }
+
+    public void setCopyComments(boolean copyComments) {
+        this.copyComments = copyComments;
+    }
+
+    public boolean isCopyAttachments() {
+        return copyAttachments;
+    }
+
+    public void setCopyAttachments(boolean copyAttachments) {
+        this.copyAttachments = copyAttachments;
+    }
+
+    public boolean isCopyIssueLinks() {
+        return copyIssueLinks;
+    }
+
+    public void setCopyIssueLinks(boolean copyIssueLinks) {
+        this.copyIssueLinks = copyIssueLinks;
+    }
+
+    public String getRemoteIssueLink() {
+        return remoteIssueLink;
+    }
+
+    public void setRemoteIssueLink(String remoteIssueLink) {
+        this.remoteIssueLink = remoteIssueLink;
+    }
+
+    public String getIssueType() {
+        return issueType;
+    }
+
+    public void setIssueType(String issueType) {
+        this.issueType = issueType;
+    }
+
     public boolean attachmentsEnabled()
     {
         return getApplicationProperties().getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS);
@@ -179,14 +290,10 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
         if(values != null){
         for (IssueTypeBean value : values)
             {
-                if (StringUtils.equalsIgnoreCase(value.getName(), issue.getIssueTypeObject().getName()))
-                {
-                    result.add(new Option(value.getName(), true));
-                }
-                else
-                {
-                    result.add(new Option(value.getName(), false));
-                }
+                final boolean isSelected = StringUtils.isNotEmpty(issueType) ?
+                        StringUtils.equalsIgnoreCase(issueType, value.getName()) :
+                        StringUtils.equalsIgnoreCase(value.getName(), issue.getIssueTypeObject().getName());
+                result.add(new Option(value.getName(), isSelected));
             }
         }
         return result;
