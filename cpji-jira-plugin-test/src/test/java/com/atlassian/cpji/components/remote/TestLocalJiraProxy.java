@@ -44,6 +44,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertSame;
@@ -203,12 +206,14 @@ public class TestLocalJiraProxy {
 
         verifySuccess(localJiraProxy.addAttachment("key", file, "filename", "type"));
 
-        verify(attachmentManager).createAttachment(file, "filename", "type", currentUser, issue);
+        verify(attachmentManager).createAttachmentCopySourceFile(eq(file), eq("filename"), eq("type"), Matchers.<String>eq(null), eq(issue), eq(Collections.<String, Object>emptyMap()), Matchers.<Date>any());
     }
 
     @Test
     public void addAttachmentShouldReturnResponseStatusOnException() throws Exception {
-        when(attachmentManager.createAttachment(null, null, null, currentUser, (Issue) null)).thenThrow(new AttachmentException("message"));
+        when(attachmentManager.createAttachmentCopySourceFile(Matchers.<File>any(), Matchers.<String>any(), Matchers.<String>any(),
+                Matchers.<String>any(), Matchers.<Issue>any(), Matchers.<Map<String,Object>> any(), Matchers.<Date>any()))
+                .thenThrow(new AttachmentException("message"));
 
         verifyFailure(localJiraProxy.addAttachment(null, null, null, null));
     }
