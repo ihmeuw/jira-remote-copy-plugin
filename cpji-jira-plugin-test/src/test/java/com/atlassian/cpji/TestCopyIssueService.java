@@ -30,6 +30,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
+import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.mock.issue.MockIssue;
@@ -234,6 +235,11 @@ public class TestCopyIssueService {
         when(linksResult.getRemoteIssueLinks()).thenReturn(ImmutableList.of(firstLink, secondLink));
 
         when(internalHostApplication.getId()).thenReturn(new ApplicationId(applicationId));
+
+        IssueLinkType linkType = mock(IssueLinkType.class);
+        when(linkType.getInward()).thenReturn("strangerRelationShip");
+        when(linkType.getOutward()).thenReturn("strangeRelationship");
+        when(issueLinkService.getIssueLinkTypes()).thenReturn(ImmutableList.of(linkType));
 
         //preparing issue link adding validation results
         IssueLinkService.AddIssueLinkValidationResult add123Result = mock(IssueLinkService.AddIssueLinkValidationResult.class);
