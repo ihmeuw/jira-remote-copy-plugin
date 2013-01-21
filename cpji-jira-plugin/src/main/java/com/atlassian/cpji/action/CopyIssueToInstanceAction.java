@@ -15,7 +15,11 @@ import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.rest.model.*;
+import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
+import com.atlassian.cpji.rest.model.FieldPermissionsBean;
+import com.atlassian.cpji.rest.model.IssueCreationResultBean;
+import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.IssueTypeManager;
@@ -43,7 +47,14 @@ import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.exception.VelocityException;
 import webwork.action.ActionContext;
@@ -473,12 +484,18 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return canCopyIssue;
 	}
 
-	public List<MissingFieldPermissionDescription> getSystemFieldPermissions() {
-		return systemMissingFieldPermissionDescriptions;
+	public List<MissingFieldPermissionDescription> getIssueFieldsThatCannotBeCopied() {
+		return ImmutableList.copyOf(
+				Iterables.filter(
+				Iterables.concat(systemMissingFieldPermissionDescriptions, customMissingFieldPermissionDescriptions),
+						Predicates.not(MissingFieldPermissionDescription.isDestinationFieldRequired())));
 	}
 
-	public List<MissingFieldPermissionDescription> getCustomFieldPermissions() {
-		return customMissingFieldPermissionDescriptions;
+	public List<MissingFieldPermissionDescription> getDestinationIssueFieldsThatAreRequired() {
+		return ImmutableList.copyOf(
+				Iterables.filter(
+				Iterables.concat(systemMissingFieldPermissionDescriptions, customMissingFieldPermissionDescriptions),
+						MissingFieldPermissionDescription.isDestinationFieldRequired()));
 	}
 
 	public String remoteIssueLink() {

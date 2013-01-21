@@ -10,7 +10,7 @@
         <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >
             #if($action.isCopyingPossible())
                 <h2 class="formtitle">$i18n.getText('cpji.confirm.new.values')</h2>
-                #if(!$action.getSystemFieldPermissions().isEmpty() || !$action.getCustomFieldPermissions().isEmpty())
+                #if(!$action.getSystemFieldsThatCannotBeCopied().isEmpty() || !$action.getDestinationCustomFieldsThatAreRequired().isEmpty())
                     <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
                         <p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
                     </div>
@@ -21,29 +21,29 @@
                 </div>
             #end
 
-			<h4 class="sub-heading">$i18n.getText('cpji.system.fields')</h4>
-			#if ($action.getSystemFieldPermissions().isEmpty())
+			<h4 class="sub-heading">$i18n.getText('cpji.source.issue.fields')</h4>
+			#if ($action.issueFieldsThatCannotBeCopied.isEmpty())
 				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.all.system.fields.retained')</p></div>
 			#else
-				<span>
-					$i18n.getText('cpji.some.fields.are.missing') #if ($action.selectedDestinationProject.jiraLocation.local) $i18n.getText('cpji.please.set.values') #end
-				</span>
-				<div class="fields-list">
-					#foreach( $permission in $action.getSystemFieldPermissions() )
+                <span>
+					$i18n.getText('cpji.some.values.cannot.be.copied')
+                </span>
+                <div class="fields-list">
+					#foreach( $permission in $action.issueFieldsThatCannotBeCopied)
 						$!action.getHtmlForField($permission)
 					#end
-				</div>
+                </div>
 			#end
 
-			<h4 class="sub-heading">$i18n.getText('cpji.custom.fields')</h4>
-			#if ($action.getCustomFieldPermissions().isEmpty())
-				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.all.custom.fields.retained')</p></div>
+			<h4 class="sub-heading">$i18n.getText('cpji.destination.issue.fields')</h4>
+			#if ($action.destinationIssueFieldsThatAreRequired.isEmpty())
+				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.no.missing.required.fields')</p></div>
 			#else
 				<span>
-					$i18n.getText('cpji.some.fields.are.missing') #if ($action.selectedDestinationProject.jiraLocation.local) $i18n.getText('cpji.please.set.values') #end
+					$i18n.getText('cpji.some.fields.are.missing')
 				</span>
             	<div class="fields-list">
-					#foreach( $permission in $action.customFieldPermissions )
+					#foreach( $permission in $action.destinationIssueFieldsThatAreRequired)
 						$!action.getHtmlForField($permission)
 					#end
 				</div>
@@ -66,7 +66,7 @@
             <input type="hidden" name="copyIssueLinks" value="$action.copyIssueLinks"/>
 			<input type="hidden" name="copyComments" value="$action.copyComments"/>
             <input type="hidden" name="remoteIssueLink" value="$textutils.htmlEncode($action.remoteIssueLink())"/>
-            <input type="hidden" name="summary" value="$textutils.htmlEncode($summary)"/>
+            <input type="hidden" name="summary" value="$textutils.htmlEncode($action.summary)"/>
         </form>
     </div>
 </div>
