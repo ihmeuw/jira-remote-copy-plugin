@@ -28,7 +28,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
 		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups()
 			.map(element => element.find(By.tagName("label")))
 			.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String](
-			"Summary", "Due Date\nRequired", "Component/s\nRequired",
+			"Due Date\nRequired", "Component/s\nRequired",
 			"Affects Version/s\nRequired", "Fix Version/s\nRequired", "Environment\nRequired", "Description\nRequired",
 			"Original Estimate\nRequired", "Remaining Estimate\nRequired", "Labels\nRequired"))
 
