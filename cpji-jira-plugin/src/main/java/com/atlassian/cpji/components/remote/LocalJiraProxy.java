@@ -31,7 +31,9 @@ import com.google.common.collect.Iterables;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @since v3.0
@@ -126,7 +128,9 @@ public class LocalJiraProxy implements JiraProxy {
     public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType) {
         Issue issue = issueManager.getIssueObject(issueKey);
         try {
-            attachmentManager.createAttachment(attachmentFile, filename, contentType, jiraAuthenticationContext.getLoggedInUser(), issue);
+            final String name = jiraAuthenticationContext.getLoggedInUser() != null ? jiraAuthenticationContext.getLoggedInUser().getName() : null;
+            attachmentManager.createAttachmentCopySourceFile(attachmentFile, filename, contentType, name, issue,
+                    Collections.<String, Object>emptyMap(), new Timestamp(System.currentTimeMillis()));
             return Either.right(SuccessfulResponse.build(jiraLocation));
         } catch (AttachmentException e) {
             return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
