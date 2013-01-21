@@ -140,6 +140,13 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     }
 
     protected String doExecute() throws Exception {
+
+        String permissionCheck = checkPermissions();
+        if (!permissionCheck.equals(SUCCESS))
+        {
+            return permissionCheck;
+        }
+
         validateSummary();
         if(hasAnyErrors()) {
             if (!initParams()) {
