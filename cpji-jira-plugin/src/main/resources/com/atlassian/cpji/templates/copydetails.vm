@@ -87,7 +87,7 @@
 					<label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
 					<select class="singleSelect" name="remoteIssueLink" id="remoteIssueLink">
 						#foreach( $issueLink in $action.getIssueLinkOptions())
-							<option value="$textutils.htmlEncode(${issueLink.value})"  #if($remoteIssueLink == $issueLink.value) selected="selected" #end >$textutils.htmlEncode(${issueLink.label})</option>
+							<option value="$textutils.htmlEncode(${issueLink.value})"  #if($action.remoteIssueLink && $action.remoteIssueLink == $issueLink.value) selected="selected" #end >$textutils.htmlEncode(${issueLink.label})</option>
 						#end
 					</select>
 					<div class="description">$i18n.getText("cpji.creates.issue.link.between.issues")</div>

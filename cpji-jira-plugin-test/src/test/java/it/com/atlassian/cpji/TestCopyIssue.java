@@ -135,8 +135,8 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
         final CopyIssueToInstanceConfirmationPage copyIssueToInstanceConfirmationPage = copyDetailsPage.next();
 
-        assertTrue(copyIssueToInstanceConfirmationPage.isAllSystemFieldsRetained());
-        assertTrue(copyIssueToInstanceConfirmationPage.isAllCustomFieldsRetained());
+        assertTrue(copyIssueToInstanceConfirmationPage.areAllIssueFieldsRetained());
+        assertTrue(copyIssueToInstanceConfirmationPage.areAllRequiredFieldsFilledIn());
 
         final CopyIssueToInstanceSuccessfulPage copyIssueToInstanceSuccessfulPage = copyIssueToInstanceConfirmationPage.copyIssue();
         assertTrue(copyIssueToInstanceSuccessfulPage.isSuccessful());

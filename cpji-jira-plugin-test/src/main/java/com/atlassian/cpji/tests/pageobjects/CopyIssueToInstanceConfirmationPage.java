@@ -37,14 +37,14 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
         return URL;
     }
 
-    public boolean isAllSystemFieldsRetained()
+    public boolean areAllIssueFieldsRetained()
     {
-        return isMessagePresent("All system field values will be retained");
+        return isMessagePresent("All issue field values will be retained.");
     }
 
-    public boolean isAllCustomFieldsRetained()
+    public boolean areAllRequiredFieldsFilledIn()
     {
-        return isMessagePresent("All custom field values will be retained");
+        return isMessagePresent("There are no missing required fields for the destination issue.");
     }
 
     private boolean isMessagePresent(final String message)

@@ -10,7 +10,7 @@
         <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >
             #if($action.isCopyingPossible())
                 <h2 class="formtitle">$i18n.getText('cpji.confirm.new.values')</h2>
-                #if(!$action.getSystemFieldsThatCannotBeCopied().isEmpty() || !$action.getDestinationCustomFieldsThatAreRequired().isEmpty())
+                #if(!$action.issueFieldsThatCannotBeCopied.isEmpty() || !$action.destinationIssueFieldsThatAreRequired.isEmpty())
                     <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
                         <p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
                     </div>
@@ -23,7 +23,7 @@
 
 			<h4 class="sub-heading">$i18n.getText('cpji.source.issue.fields')</h4>
 			#if ($action.issueFieldsThatCannotBeCopied.isEmpty())
-				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.all.system.fields.retained')</p></div>
+				<div class="aui-message info"><span class="aui-icon icon-info"></span><p>$i18n.getText('cpji.issue.fields.retained')</p></div>
 			#else
                 <span>
 					$i18n.getText('cpji.some.values.cannot.be.copied')
