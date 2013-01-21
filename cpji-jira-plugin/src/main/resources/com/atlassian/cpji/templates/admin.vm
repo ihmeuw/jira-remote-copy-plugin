@@ -6,7 +6,7 @@
     <title>$i18n.getText("cpji.admin.title")</title>
 </head>
 <body>
-<div class="content-body aui-panel">
+<div class="content-body">
     <form action="ConfigureCopyIssuesAdminAction.jspa?projectKey=$projectKey" method="post" class="aui">
         <h2>$i18n.getText("cpji.admin.title")</h2>
         <div class="form-body">
@@ -57,9 +57,9 @@
             <h3>$i18n.getText("cpji.admin.default.values.header")</h3>
             <p>$i18n.getText("cpji.admin.default.values")</p>
             <div id="cpji-required-fields">
-                <div id="cpji-issuetype-field">
+                <fieldset id="cpji-issuetype-field">
                     $action.issueFieldHtml
-                </div>
+                </fieldset>
                 <div id="cpji-fields">
                     #parse("/com/atlassian/cpji/templates/htmlfields.vm")
                 </div>
