@@ -192,11 +192,6 @@ public class CopyIssueBeanFactory {
 			}
 		}
 
-		boolean watchingEnabled = applicationProperties.getOption(APKeys.JIRA_OPTION_WATCHING);
-		if (watchingEnabled) {
-			setWachers(copyIssueBean, issueToCopy, visibleFieldIds);
-		}
-
 		setVoters(copyIssueBean, issueToCopy, visibleFieldIds);
 
 		copyIssueBean.setVisibleSystemFieldIds(visibleFieldIds);
