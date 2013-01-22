@@ -44,6 +44,7 @@ import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraVelocityUtils;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.util.concurrent.LazyReference;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -95,6 +96,26 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private final IssueLinkTypeManager issueLinkTypeManager;
 	private final CopyIssueBeanFactory copyIssueBeanFactory;
 	private final CopyIssueService copyIssueService;
+
+	private final LazyReference<List<MissingFieldPermissionDescription>> issueFieldsThatCannotBeCopied = new LazyReference<List<MissingFieldPermissionDescription>>() {
+		@Override
+		protected List<MissingFieldPermissionDescription> create() throws Exception {
+			return ImmutableList.copyOf(
+					Iterables.filter(
+							Iterables.concat(systemMissingFieldPermissionDescriptions, customMissingFieldPermissionDescriptions),
+							Predicates.not(MissingFieldPermissionDescription.isDestinationFieldRequired())));
+		}
+	};
+
+	private final LazyReference<List<MissingFieldPermissionDescription>> destinationIssueFieldsThatAreRequired = new LazyReference<List<MissingFieldPermissionDescription>>() {
+		@Override
+		protected List<MissingFieldPermissionDescription> create() throws Exception {
+			return ImmutableList.copyOf(
+					Iterables.filter(
+							Iterables.concat(systemMissingFieldPermissionDescriptions, customMissingFieldPermissionDescriptions),
+							MissingFieldPermissionDescription.isDestinationFieldRequired()));
+		}
+	};
 
 	public CopyIssueToInstanceAction(
 			final SubTaskManager subTaskManager,
@@ -485,17 +506,11 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	}
 
 	public List<MissingFieldPermissionDescription> getIssueFieldsThatCannotBeCopied() {
-		return ImmutableList.copyOf(
-				Iterables.filter(
-				Iterables.concat(systemMissingFieldPermissionDescriptions, customMissingFieldPermissionDescriptions),
-						Predicates.not(MissingFieldPermissionDescription.isDestinationFieldRequired())));
+		return issueFieldsThatCannotBeCopied.get();
 	}
 
 	public List<MissingFieldPermissionDescription> getDestinationIssueFieldsThatAreRequired() {
-		return ImmutableList.copyOf(
-				Iterables.filter(
-				Iterables.concat(systemMissingFieldPermissionDescriptions, customMissingFieldPermissionDescriptions),
-						MissingFieldPermissionDescription.isDestinationFieldRequired()));
+		return destinationIssueFieldsThatAreRequired.get();
 	}
 
 	public String remoteIssueLink() {
