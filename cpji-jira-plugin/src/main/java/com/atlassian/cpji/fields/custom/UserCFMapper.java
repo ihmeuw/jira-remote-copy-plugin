@@ -31,7 +31,6 @@ public class UserCFMapper extends AbstractSingleValueCFMapper<User>
     @Override
     protected String convertToString(final User value)
     {
-        // TODO use a number formatter, or make a hex string
         return value.getName();
     }
 
