@@ -234,18 +234,6 @@ public class CopyIssueBeanFactory {
 		}
 	}
 
-	private void setWachers(CopyIssueBean copyIssueBean, MutableIssue issueToCopy, List<String> visibleFieldIds) {
-		List<String> currentWatcherUsernames = watcherManager.getCurrentWatcherUsernames(issueToCopy);
-		Iterable<UserBean> userBeans = Iterables
-				.transform(currentWatcherUsernames, new Function<String, UserBean>() {
-					public UserBean apply(final String from) {
-						return userMappingManager.createUserBean(from);
-					}
-				});
-		copyIssueBean.setWatchers(Lists.<UserBean>newArrayList(userBeans));
-		visibleFieldIds.add(IssueFieldConstants.WATCHERS);
-	}
-
 	private boolean isTimeTrackingEnabled() {
 		return timeTrackingConfiguration.enabled();
 	}
