@@ -70,6 +70,7 @@ public class NegativeResponseStatus extends ResultWithJiraLocation<NegativeRespo
         return new NegativeResponseStatus(jiraLocation, Status.AUTHORIZATION_REQUIRED);
     }
 
+	@Nullable
     public ErrorCollection getErrorCollection() {
         return errors;
     }

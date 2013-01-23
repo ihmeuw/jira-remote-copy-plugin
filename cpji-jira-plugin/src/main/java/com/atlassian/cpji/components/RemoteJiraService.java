@@ -1,5 +1,6 @@
 package com.atlassian.cpji.components;
 
+import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.PluginVersion;
 import com.atlassian.cpji.components.model.Projects;
@@ -17,7 +18,6 @@ import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -51,11 +51,11 @@ public class RemoteJiraService {
             @Override
             public Either<NegativeResponseStatus, PluginVersion> onInvocationException(Exception e) {
                 log.warn("Failed to execute Application Links request", e);
-                return Either.left(NegativeResponseStatus.communicationFailed(null));
+                return Either.left(NegativeResponseStatus.communicationFailed(JiraLocation.LOCAL));
             }
 
             @Override
-            public Either<NegativeResponseStatus, PluginVersion> apply(@Nullable JiraProxy input) {
+            public Either<NegativeResponseStatus, PluginVersion> apply(JiraProxy input) {
                 return input.isPluginInstalled();
             }
         });
@@ -113,7 +113,7 @@ public class RemoteJiraService {
         return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, Projects>>() {
             @Override
             public Either<NegativeResponseStatus, Projects> onInvocationException(Exception e) {
-                return Either.left(NegativeResponseStatus.communicationFailed(null));
+                return Either.left(NegativeResponseStatus.communicationFailed(JiraLocation.LOCAL));
             }
 
             @Override

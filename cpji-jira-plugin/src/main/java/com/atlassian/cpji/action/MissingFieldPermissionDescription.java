@@ -2,9 +2,8 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.rest.model.PermissionBean;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-
-import javax.annotation.Nullable;
 
 /**
 * TODO: Document this class / interface here
@@ -54,7 +53,8 @@ public class MissingFieldPermissionDescription
 	public static Predicate<MissingFieldPermissionDescription> isDestinationFieldRequired() {
 		return new Predicate<MissingFieldPermissionDescription>() {
 			@Override
-			public boolean apply(@Nullable MissingFieldPermissionDescription input) {
+			public boolean apply(MissingFieldPermissionDescription input) {
+				Preconditions.checkNotNull(input);
 				switch(input.getValidationCode()) {
 					case FIELD_MANDATORY_NO_PERMISSION:
 					case FIELD_MANDATORY_VALUE_NOT_MAPPED:

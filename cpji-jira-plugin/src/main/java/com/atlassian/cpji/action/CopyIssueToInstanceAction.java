@@ -180,8 +180,11 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result,
 				new Function<NegativeResponseStatus, Void>() {
 					@Override
-					public Void apply(@Nullable NegativeResponseStatus input) {
-						addErrorCollection(CopyIssueToInstanceAction.this.processErrors(input.getErrorCollection()));
+					public Void apply(NegativeResponseStatus input) {
+						Preconditions.checkNotNull(input);
+						if (input.getErrorCollection() != null) {
+							addErrorCollection(CopyIssueToInstanceAction.this.processErrors(input.getErrorCollection()));
+						}
 						return null;
 					}
 				});
@@ -510,7 +513,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		if (!copyIssueBean.getUnsupportedCustomFields().isEmpty()) {
 			customMissingFieldPermissionDescriptions.addAll(Collections2.transform(copyIssueBean.getUnsupportedCustomFields(), new Function<CustomFieldPermissionBean, MissingFieldPermissionDescription>() {
 				@Override
-				public MissingFieldPermissionDescription apply(@Nullable CustomFieldPermissionBean customFieldPermissionBean) {
+				public MissingFieldPermissionDescription apply(CustomFieldPermissionBean customFieldPermissionBean) {
+					Preconditions.checkNotNull(customFieldPermissionBean);
 					ValidationCode validationCode = ValidationCode
 							.valueOf(customFieldPermissionBean.getValidationCode());
 					return new MissingFieldPermissionDescription(

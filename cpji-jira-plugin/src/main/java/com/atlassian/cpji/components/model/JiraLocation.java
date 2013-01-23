@@ -13,6 +13,9 @@ import javax.annotation.Nullable;
  */
 public class JiraLocation {
 
+	public static final String LOCAL_ID = new String("LOCAL");
+	public static final JiraLocation LOCAL = new JiraLocation(LOCAL_ID, LOCAL_ID);
+
 	private final String id;
 
     private final String name;
@@ -59,7 +62,7 @@ public class JiraLocation {
 	}
 
 	public boolean isLocal() {
-		return id.equalsIgnoreCase(LocalJiraProxy.LOCAL_ID);
+		return id.equalsIgnoreCase(JiraLocation.LOCAL_ID);
 	}
 
     public ApplicationId toApplicationId() {

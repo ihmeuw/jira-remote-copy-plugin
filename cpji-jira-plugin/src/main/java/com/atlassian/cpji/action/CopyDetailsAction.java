@@ -89,29 +89,19 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	}
 
 	public boolean isIssueWithComments() {
-		final MutableIssue issue = getIssueObject();
-		if (issue != null) {
-			return !commentManager.getComments(issue).isEmpty();
-		}
-		return false;
+		return !commentManager.getComments(getIssueObject()).isEmpty();
 	}
 
 	public boolean isIssueWithAttachments() {
-		final MutableIssue issue = getIssueObject();
-		if (issue != null) {
-			return !issue.getAttachments().isEmpty();
-		}
-		return false;
+		return !getIssueObject().getAttachments().isEmpty();
 	}
 
 	public boolean isIssueWithLinks() {
 		final MutableIssue issue = getIssueObject();
 		if (issueLinkManager.isLinkingEnabled()) {
-			if (issue != null) {
-                //checking if there are any not-subtask issue links (inward or outward)
-                return Iterables.any(issueLinkManager.getOutwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink)
-                        || Iterables.any(issueLinkManager.getInwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink);
-			}
+			//checking if there are any not-subtask issue links (inward or outward)
+			return Iterables.any(issueLinkManager.getOutwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink)
+					|| Iterables.any(issueLinkManager.getInwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink);
 		}
 		return false;
 	}
@@ -354,7 +344,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
         return Iterables.size(
             Iterables.filter(getIssueObject().getAttachments(), new Predicate<Attachment>() {
                 @Override
-                public boolean apply(@Nullable Attachment input) {
+                public boolean apply(Attachment input) {
                     return input.getFilesize() > copyInfo.getMaxAttachmentSize();
                 }
             })

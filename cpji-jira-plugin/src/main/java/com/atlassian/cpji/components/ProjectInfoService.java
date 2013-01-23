@@ -26,7 +26,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 
@@ -112,7 +111,8 @@ public class ProjectInfoService {
     protected Function<IssueType, IssueTypeBean> convertIssueType(final Project project) {
         return new Function<IssueType, IssueTypeBean>() {
             @Override
-            public IssueTypeBean apply(@Nullable IssueType input) {
+            public IssueTypeBean apply(IssueType input) {
+				Preconditions.checkNotNull(input);
                 return new IssueTypeBean(input.getName(), getRequiredFields(project, input));
             }
         };

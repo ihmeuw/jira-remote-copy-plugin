@@ -5,11 +5,14 @@ import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.link.*;
+import com.atlassian.jira.issue.link.IssueLink;
+import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.IssueLinkType;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-
-import javax.annotation.Nullable;
 
 /**
  * Orchestrates copying local and remote links
@@ -24,7 +27,8 @@ public class IssueLinkCopier {
 
     public static final Predicate<IssueLink> isNotSubtaskIssueLink = new Predicate<IssueLink>() {
         @Override
-        public boolean apply(@Nullable IssueLink input) {
+        public boolean apply(IssueLink input) {
+			Preconditions.checkNotNull(input);
             return !input.getIssueLinkType().isSubTaskLinkType();
         }
     };

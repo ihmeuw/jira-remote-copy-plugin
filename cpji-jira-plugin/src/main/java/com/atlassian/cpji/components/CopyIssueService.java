@@ -1,7 +1,14 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.cpji.components.exceptions.*;
+import com.atlassian.cpji.components.exceptions.CannotFindIssueLinkTypeException;
+import com.atlassian.cpji.components.exceptions.CreationException;
+import com.atlassian.cpji.components.exceptions.IssueCreatedWithErrorsException;
+import com.atlassian.cpji.components.exceptions.IssueLinkCreationException;
+import com.atlassian.cpji.components.exceptions.IssueNotFoundException;
+import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
+import com.atlassian.cpji.components.exceptions.RemoteLinksNotFoundException;
+import com.atlassian.cpji.components.exceptions.ValidationException;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
@@ -11,7 +18,11 @@ import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
 import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
 import com.atlassian.cpji.rest.RESTException;
-import com.atlassian.cpji.rest.model.*;
+import com.atlassian.cpji.rest.model.CopyIssueBean;
+import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
+import com.atlassian.cpji.rest.model.FieldPermissionsBean;
+import com.atlassian.cpji.rest.model.IssueCreationResultBean;
+import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
@@ -34,14 +45,18 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * @since v3.0
@@ -167,14 +182,16 @@ public class CopyIssueService {
 
     private static class OnlyVisible implements Predicate<NonOrderableSystemFieldMapper>{
         @Override
-        public boolean apply(@Nullable NonOrderableSystemFieldMapper input) {
+        public boolean apply(NonOrderableSystemFieldMapper input) {
+			Preconditions.checkNotNull(input);
             return input.isVisible();
         }
     }
 
     private static class GetFieldIdFromLayoutItem implements Function<FieldLayoutItem, String>{
         @Override
-        public String apply(@Nullable FieldLayoutItem input) {
+        public String apply(FieldLayoutItem input) {
+			Preconditions.checkNotNull(input);
             return input.getOrderableField().getId();
         }
     }
@@ -182,7 +199,8 @@ public class CopyIssueService {
     private static class GetIdFromNonOrderableMapper implements Function<NonOrderableSystemFieldMapper, String>{
 
         @Override
-        public String apply(@Nullable NonOrderableSystemFieldMapper input) {
+        public String apply(NonOrderableSystemFieldMapper input) {
+			Preconditions.checkNotNull(input);
             return input.getFieldId();
         }
     }
@@ -322,7 +340,8 @@ public class CopyIssueService {
         try{
             return Iterables.find(issueLinkService.getIssueLinkTypes(), new Predicate<IssueLinkType>() {
                 @Override
-                public boolean apply(@Nullable IssueLinkType input) {
+                public boolean apply(IssueLinkType input) {
+					Preconditions.checkNotNull(input);
                     return issueLinkType.equals(input.getInward()) || issueLinkType.equals(input.getOutward());
                 }
             });

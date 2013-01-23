@@ -18,6 +18,7 @@ import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -246,7 +247,8 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
 
     public static class GroupName implements Function<Group, String> {
         @Override
-        public String apply(@Nullable Group group) {
+        public String apply(Group group) {
+			Preconditions.checkNotNull(group);
             return group.getName();
         }
     }

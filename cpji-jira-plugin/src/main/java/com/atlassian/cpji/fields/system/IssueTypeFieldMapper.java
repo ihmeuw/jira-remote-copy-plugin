@@ -59,7 +59,7 @@ public class IssueTypeFieldMapper extends AbstractFieldMapper  implements System
         final IssueType issueType = findIssueType(bean, project);
         if (issueType == null)
         {
-            return new MappingResult(Lists.newArrayList(issueType.getName()), false, false);
+            return new MappingResult(Lists.newArrayList(bean.getTargetIssueType()), false, false);
         }
         return new MappingResult(Collections.<String>emptyList(), true, false);
     }

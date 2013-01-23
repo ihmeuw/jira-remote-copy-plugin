@@ -74,8 +74,8 @@ public class JiraProxyFactory {
     }
 
     public JiraLocation getLocationById(String id) {
-        if (LocalJiraProxy.LOCAL_JIRA_LOCATION.getId().equals(id)) {
-            return LocalJiraProxy.LOCAL_JIRA_LOCATION;
+        if (JiraLocation.LOCAL.getId().equals(id)) {
+            return JiraLocation.LOCAL;
         } else {
             try {
                 ApplicationLink link = applicationLinkService.getApplicationLink(new ApplicationId(id));
@@ -89,7 +89,7 @@ public class JiraProxyFactory {
 
 
     public Iterable<JiraProxy> getAllJiraProxies() {
-        return Iterables.concat(ImmutableList.of(createJiraProxy(LocalJiraProxy.LOCAL_JIRA_LOCATION)), getRemoteProxies());
+        return Iterables.concat(ImmutableList.of(createJiraProxy(JiraLocation.LOCAL)), getRemoteProxies());
     }
 
     public Iterable<JiraProxy> getRemoteProxies() {

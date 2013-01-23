@@ -4,7 +4,12 @@ import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.CopyIssueException;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
-import com.atlassian.cpji.components.model.*;
+import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.components.model.PluginVersion;
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.SimplifiedIssueLinkType;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -19,7 +24,11 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
-import com.atlassian.jira.issue.link.*;
+import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.IssueLinkType;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
+import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -27,9 +36,9 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.web.util.AttachmentException;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -40,10 +49,7 @@ import java.util.Collections;
  */
 public class LocalJiraProxy implements JiraProxy {
 
-	public static final String LOCAL_ID = "LOCAL";
-	static final JiraLocation LOCAL_JIRA_LOCATION = new JiraLocation(LOCAL_ID, LOCAL_ID);
-
-    private final JiraLocation jiraLocation;
+	private final JiraLocation jiraLocation;
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final CopyIssueService copyIssueService;
@@ -65,7 +71,7 @@ public class LocalJiraProxy implements JiraProxy {
         this.remoteIssueLinkManager = remoteIssueLinkManager;
         this.projectInfoService = projectInfoService;
         this.jiraBaseUrls = jiraBaseUrls;
-        jiraLocation = new JiraLocation(LOCAL_JIRA_LOCATION.getId(), applicationProperties.getString(APKeys.JIRA_TITLE));
+        jiraLocation = new JiraLocation(JiraLocation.LOCAL.getId(), applicationProperties.getString(APKeys.JIRA_TITLE));
 
     }
 
@@ -80,7 +86,8 @@ public class LocalJiraProxy implements JiraProxy {
 
         Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>() {
             @Override
-            public BasicProject apply(@Nullable final Project input) {
+            public BasicProject apply(final Project input) {
+				Preconditions.checkNotNull(input);
                 return new BasicProject(null, input.getKey(), input.getName(), null);
             }
         });

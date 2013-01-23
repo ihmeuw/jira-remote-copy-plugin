@@ -15,6 +15,7 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -100,10 +101,12 @@ public class CascadingSelectListCFMapper implements CustomFieldMapper {
 			if (parent != null)
 			{
 				final Option parentOption = getOption(parent, null, customField, project, issueType);
-				final Option childOption = child != null ? getOption(child, parentOption.getOptionId(), customField, project, issueType) : null;
-				inputParameters.addCustomFieldValue(customField.getId(), parentOption.getOptionId().toString());
-				if (childOption != null) {
-					inputParameters.addCustomFieldValue(customField.getId() + ":1", childOption.getOptionId().toString());
+				final Option childOption = child != null && parentOption != null ? getOption(child, parentOption.getOptionId(), customField, project, issueType) : null;
+				if (parentOption != null) {
+					inputParameters.addCustomFieldValue(customField.getId(), parentOption.getOptionId().toString());
+					if (childOption != null) {
+						inputParameters.addCustomFieldValue(customField.getId() + ":1", childOption.getOptionId().toString());
+					}
 				}
 			}
 		}
@@ -115,14 +118,15 @@ public class CascadingSelectListCFMapper implements CustomFieldMapper {
 			return true;
 		}
         final Option parentOption = getOption(parentAndChild.get(0), null, customField, project, issueType);
-		if (parentAndChild.size() > 1) {
+		if (parentAndChild.size() > 1 && parentOption != null) {
 			final Option childOption = getOption(parentAndChild.get(1), parentOption.getOptionId(), customField, project, issueType);
-			return parentOption != null && childOption != null;
+			return childOption != null;
 		} else {
 			return parentOption != null;
 		}
     }
 
+	@Nullable
     private Option getOption(final String value, final Long parentId, final CustomField customField, final Project project, final IssueType issueType)
     {
         final FieldConfig fieldConfig = customField.getRelevantConfig(new IssueContextImpl(project.getId(), issueType.getId()));

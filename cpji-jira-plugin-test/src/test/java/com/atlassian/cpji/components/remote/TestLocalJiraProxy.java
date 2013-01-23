@@ -91,7 +91,7 @@ public class TestLocalJiraProxy {
     @Test
     public void jiraLocationContainsKeyAndAppTitle(){
         JiraLocation location = localJiraProxy.getJiraLocation();
-        assertEquals(LocalJiraProxy.LOCAL_JIRA_LOCATION.getId(), location.getId());
+        assertEquals(JiraLocation.LOCAL.getId(), location.getId());
         assertEquals(LOCAL_JIRA_NAME, location.getName());
     }
 
@@ -109,7 +109,7 @@ public class TestLocalJiraProxy {
 
         Iterable<Pair<String, String>> keysAndNames = Iterables.transform(projects.getResult(), new Function<BasicProject, Pair<String, String>>() {
             @Override
-            public Pair<String, String> apply(@Nullable BasicProject input) {
+            public Pair<String, String> apply(BasicProject input) {
                 return Pair.pair(input.getKey(), input.getName());
             }
         });
