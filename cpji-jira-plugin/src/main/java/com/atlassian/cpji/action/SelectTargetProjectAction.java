@@ -10,17 +10,15 @@ import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.plugin.webresource.WebResourceManager;
-import org.apache.log4j.Logger;
 
 /**
  * @since v1.2
  */
 public class SelectTargetProjectAction extends AbstractCopyIssueAction
 {
-	private static final Logger log = Logger.getLogger(SelectTargetProjectAction.class);
-
 	public SelectTargetProjectAction(
             final SubTaskManager subTaskManager,
             final FieldLayoutManager fieldLayoutManager,
@@ -28,11 +26,12 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
             final CopyIssuePermissionManager copyIssuePermissionManager,
 			final ApplicationLinkService applicationLinkService,
             final WebResourceManager webResourceManager,
-            final JiraProxyFactory jiraProxyFactory
+            final JiraProxyFactory jiraProxyFactory,
+            final IssueLinkTypeManager issueLinkTypeManager
             )
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
-				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
+				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager, issueLinkTypeManager);
 
         webResourceManager.requireResource(PLUGIN_KEY + ":selectTargetProjectAction");
 		setCurrentStep("selectproject");

@@ -8,10 +8,13 @@ import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
+import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.exception.IssueNotFoundException;
 import com.atlassian.jira.exception.IssuePermissionException;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
+import com.atlassian.jira.issue.link.IssueLinkType;
+import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.web.action.issue.AbstractIssueSelectAction;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
@@ -20,12 +23,12 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Collection;
 
 /**
  * @since v1.4
  */
 public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction {
-    static final String CLONE_LINK_TYPE = "Cloners";
     public static final String AUTHORIZE = "authorize";
 
 	public static final String PLUGIN_KEY = "com.atlassian.cpji.cpji-jira-plugin";
@@ -43,22 +46,25 @@ public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction 
 	private String currentStep;
 
 	private final CopyIssuePermissionManager copyIssuePermissionManager;
+    private final IssueLinkTypeManager issueLinkTypeManager;
 
-	public AbstractCopyIssueAction(final SubTaskManager subTaskManager,
-			final FieldLayoutManager fieldLayoutManager,
-			final CommentManager commentManager,
-			final CopyIssuePermissionManager copyIssuePermissionManager,
-			final ApplicationLinkService applicationLinkService,
-			final JiraProxyFactory jiraProxyFactory,
-			final WebResourceManager webResourceManager) {
+    public AbstractCopyIssueAction(final SubTaskManager subTaskManager,
+                                   final FieldLayoutManager fieldLayoutManager,
+                                   final CommentManager commentManager,
+                                   final CopyIssuePermissionManager copyIssuePermissionManager,
+                                   final ApplicationLinkService applicationLinkService,
+                                   final JiraProxyFactory jiraProxyFactory,
+                                   final WebResourceManager webResourceManager,
+                                   final IssueLinkTypeManager issueLinkTypeManager) {
 		super(subTaskManager);
 		this.fieldLayoutManager = fieldLayoutManager;
 		this.commentManager = commentManager;
 		this.copyIssuePermissionManager = copyIssuePermissionManager;
 		this.applicationLinkService = applicationLinkService;
 		this.jiraProxyFactory = jiraProxyFactory;
+        this.issueLinkTypeManager = issueLinkTypeManager;
 
-		webResourceManager.requireResourcesForContext("com.atlassian.cpji.cpji-jira-plugin.copy-context");
+        webResourceManager.requireResourcesForContext("com.atlassian.cpji.cpji-jira-plugin.copy-context");
 	}
 
 	public SelectedProject getSelectedDestinationProject() {
@@ -171,4 +177,27 @@ public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction 
 	public String getCurrentStep() {
 		return this.currentStep;
 	}
+
+    /**
+     * Returns the issue link type specified by the clone link name in the properties file or null for none.
+     *
+     * @return the issue link type specified by the clone link name in the properties file or null for none.
+     */
+    IssueLinkType getCloneIssueLinkType()
+    {
+        String cloneIssueLinkTypeName = getApplicationProperties().getDefaultBackedString(APKeys.JIRA_CLONE_LINKTYPE_NAME);
+        if (cloneIssueLinkTypeName == null)
+            return null;
+        final Collection<IssueLinkType> cloneIssueLinkTypes = issueLinkTypeManager.getIssueLinkTypesByName(cloneIssueLinkTypeName);
+
+        if (cloneIssueLinkTypes.isEmpty())
+        {
+            return null;
+        }
+        else
+        {
+            return cloneIssueLinkTypes.iterator().next();
+        }
+    }
+
 }

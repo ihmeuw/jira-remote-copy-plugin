@@ -60,7 +60,6 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     private Collection<Option> availableIssueTypes;
     private Collection<Option> availableSubTaskTypes;
 	private final IssueLinkManager issueLinkManager;
-	private final IssueLinkTypeManager issueLinkTypeManager;
     private final ApplicationProperties applicationProperties;
     private final FieldManager fieldManager;
 
@@ -80,9 +79,8 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             final FieldManager fieldManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
-				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager);
+				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager, issueLinkTypeManager);
 		this.issueLinkManager = issueLinkManager;
-		this.issueLinkTypeManager = issueLinkTypeManager;
         this.applicationProperties = applicationProperties;
         this.fieldManager = fieldManager;
 
@@ -345,7 +343,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	public boolean isCreateIssueLinkSectionVisible() {
 		return (linksEnabled() || copyInfo.getIssueLinkingEnabled()) &&
                 // For a local link we require the "Cloners" link type to exist
-                (!getSelectedDestinationProject().getJiraLocation().isLocal() || !issueLinkTypeManager.getIssueLinkTypesByName(CLONE_LINK_TYPE).isEmpty());
+                (!getSelectedDestinationProject().getJiraLocation().isLocal() || getCloneIssueLinkType() != null);
 	}
 
 	public boolean isCopyCommentsSectionVisible() {
