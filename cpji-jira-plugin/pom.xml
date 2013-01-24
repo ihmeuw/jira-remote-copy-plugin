@@ -119,6 +119,10 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-view-issue-plugin</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.atlassian.usercompatibility</groupId>
+            <artifactId>usercompatibility-jira</artifactId>
+        </dependency>
 	</dependencies>
 
     <build>

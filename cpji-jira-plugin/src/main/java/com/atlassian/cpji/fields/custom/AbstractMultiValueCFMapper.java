@@ -64,7 +64,7 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
             values = new ArrayList<String>(collection.size());
             for (final Object element : collection)
             {
-                final T t = castToGenericType(element);
+                final T t = convertToGenericType(element);
                 // If element is null or unrecognised type, ignore it
                 if (t != null)
                 {
@@ -100,7 +100,7 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
         }
     }
 
-    private T castToGenericType(final Object value)
+    protected T convertToGenericType(final Object value)
     {
         if (value == null)
         {

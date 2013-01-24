@@ -247,6 +247,11 @@
 				<version>1.9.0</version>
 				<scope>test</scope>
 			</dependency>
+            <dependency>
+                <groupId>com.atlassian.usercompatibility</groupId>
+                <artifactId>usercompatibility-jira</artifactId>
+                <version>0.09</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 

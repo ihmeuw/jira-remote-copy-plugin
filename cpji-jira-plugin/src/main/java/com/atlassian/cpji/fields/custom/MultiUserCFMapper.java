@@ -7,6 +7,7 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.usercompatibility.UserCompatibilityHelper;
 
 /**
  * Maps the {@link com.atlassian.jira.issue.customfields.impl.MultiGroupCFType} custom field type.
@@ -46,4 +47,14 @@ public class MultiUserCFMapper extends AbstractMultiValueCFMapper<User>
     {
         return userManager.getUser(value) != null;
     }
+
+    @Override
+    protected User convertToGenericType(final Object value)
+    {
+        if(value == null)
+            return null;
+
+        return UserCompatibilityHelper.convertUserObject(value).getUser();
+    }
+
 }
