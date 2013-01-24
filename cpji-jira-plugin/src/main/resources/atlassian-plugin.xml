@@ -5,24 +5,6 @@
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
 	</plugin-info>
 
-    <!-- we have two web items due to different behaviour between JIRAs with bundled RIC and without it-->
-    <!-- when RIC is bundled we just display Clone, when it's not RIC is still named "Remote Copy"-->
-	<web-item key="clone-issue-ric" i18n-name-key="webfragments.view.issue.opsbar.operations.ops.clone" name="Copy this issue" section="operations-operations" weight="20">
-        <label key="cloneissue.operation"/>
-        <tooltip key="admin.issue.operations.plugin.clone.issue.name"/>
-        <styleClass>issueaction-clone-issue-ric</styleClass>
-        <link linkId="clone-issue-ric">
-            /secure/SelectTargetProject!default.jspa?id=${issueId}
-        </link>
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition"/>
-        <conditions type="OR">
-            <condition class="com.atlassian.cpji.conditions.JiraApplicationLinkIsConfiguredCondition"/>
-            <condition class="com.atlassian.cpji.conditions.HasCreateIssuePermissionInAnyProjectCondition"/>
-        </conditions>
-		<condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
-		<condition class="com.atlassian.cpji.conditions.HasRICBundledCondition"/>
-	</web-item>
-
     <web-item key="remote-copy" i18n-name-key="cpji.operation.name" name="Copy this issue" section="operations-operations" weight="20">
         <label key="cpji.operation.name"/>
         <tooltip key="cpji.operation.name"/>
@@ -36,9 +18,7 @@
             <condition class="com.atlassian.cpji.conditions.HasCreateIssuePermissionInAnyProjectCondition"/>
         </conditions>
         <condition class="com.atlassian.cpji.conditions.HasCopyPermissionCondition"/>
-        <condition class="com.atlassian.cpji.conditions.HasRICBundledCondition" invert="true"/>
     </web-item>
-
 
     <webwork1 key="select-project-action" name="Select Target JIRA Project" class="java.lang.Object">
 		<actions>
