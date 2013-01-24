@@ -7,6 +7,7 @@ import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +22,9 @@ import java.util.List;
  */
 public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
 {
+
+    private static final Logger log = Logger.getLogger(AbstractMultiValueCFMapper.class);
+
     /**
      * Convert the value stored by the custom field to a String. The value will not be null.
      *
@@ -64,12 +68,19 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
             values = new ArrayList<String>(collection.size());
             for (final Object element : collection)
             {
-                final T t = convertToGenericType(element);
-                // If element is null or unrecognised type, ignore it
-                if (t != null)
+                try
                 {
-                    final String stringValue = convertToString(t);
-                    values.add(stringValue);
+                    final T t = convertToGenericType(element);
+                    // If element is null or unrecognised type, ignore it
+                    if (t != null)
+                    {
+                        final String stringValue = convertToString(t);
+                        values.add(stringValue);
+                    }
+                }
+                catch (final ClassCastException e)
+                {
+                    log.warn(this.getClass().getName() + " cannot cast CustomField value to specified type", e);
                 }
             }
         }
@@ -106,15 +117,7 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
         {
             return null;
         }
-
-        try
-        {
-            return (T) value;
-        }
-        catch (final ClassCastException e)
-        {
-            return null;
-        }
+        return (T) value;
     }
 
     @Override

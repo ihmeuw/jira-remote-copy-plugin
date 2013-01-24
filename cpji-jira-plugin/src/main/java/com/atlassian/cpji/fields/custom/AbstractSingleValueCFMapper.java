@@ -1,7 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
-import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -9,6 +8,7 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.google.common.collect.Lists;
+import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +22,9 @@ import java.util.List;
  */
 public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMapper
 {
+
+    private static final Logger log = Logger.getLogger(AbstractSingleValueCFMapper.class);
+
     /**
      * Convert the value stored by the custom field to a String. The value will not be null.
      *
@@ -58,25 +61,22 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
     public CustomFieldBean createFieldBean(final CustomField customField, final Issue issue)
     {
         final Object value = customField.getValue(issue);
-        List<String> values;
+        final T typedValue = convertToGenericType(value);
 
-        if (value != null)
+        //if something will go wrong - we have empty value
+        List<String> values = Collections.emptyList();
+
+        if (typedValue != null)
         {
             try
             {
-                final String stringValue = convertToString((T) value);
+                final String stringValue = convertToString(typedValue);
                 values = Lists.newArrayList(stringValue);
             }
             catch (final ClassCastException e)
             {
-                // Value is unrecognised type, ignore it
-                values = Collections.emptyList();
+                log.warn(this.getClass().getName() + " cannot cast CustomField value to specified type", e);
             }
-        }
-        else
-        {
-            // Value is null, ignore it
-            values = Collections.emptyList();
         }
 
         final String customFieldType = customField.getCustomFieldType().getClass().getCanonicalName();
@@ -128,5 +128,16 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
         }
 
         return values.get(0);
+    }
+
+
+    protected T convertToGenericType(final Object value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+
+        return (T) value;
     }
 }
