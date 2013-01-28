@@ -93,7 +93,15 @@
 					<div class="description">$i18n.getText("cpji.creates.issue.link.between.issues")</div>
 				</div>
             </fieldset>
-			#end
+            #elseif($action.createIssueLinkWarningMessage)
+                <div class="field-group">
+                    <label for="remoteIssueLink">$i18n.getText('cpji.create.issue.link')</label>
+                    <div class="aui-message warning">
+                        <span class="aui-icon icon-warning"></span>
+                        $action.createIssueLinkWarningMessage
+                    </div>
+                </div>
+            #end
 
 			#if (!$action.targetLocal)
                 <fieldset>

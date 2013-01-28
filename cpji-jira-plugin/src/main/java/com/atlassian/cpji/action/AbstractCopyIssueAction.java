@@ -185,7 +185,7 @@ public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction 
      */
     IssueLinkType getCloneIssueLinkType()
     {
-        String cloneIssueLinkTypeName = getApplicationProperties().getDefaultBackedString(APKeys.JIRA_CLONE_LINKTYPE_NAME);
+        String cloneIssueLinkTypeName = getCloneIssueLinkTypeName();
         if (cloneIssueLinkTypeName == null)
             return null;
         final Collection<IssueLinkType> cloneIssueLinkTypes = issueLinkTypeManager.getIssueLinkTypesByName(cloneIssueLinkTypeName);
@@ -199,5 +199,11 @@ public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction 
             return cloneIssueLinkTypes.iterator().next();
         }
     }
+
+    String getCloneIssueLinkTypeName()
+    {
+        return getApplicationProperties().getDefaultBackedString(APKeys.JIRA_CLONE_LINKTYPE_NAME);
+    }
+
 
 }

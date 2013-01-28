@@ -385,6 +385,12 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		return "";
 	}
 
+    public String getCreateIssueLinkWarningMessage() {
+        if (getCloneIssueLinkType() == null)
+            return getText("cloneissue.linktype.does.not.exist", getCloneIssueLinkTypeName());
+        return null;
+    }
+
 	public String getCopyCommentsErrorMessage() {
 		if (!copyInfo.getHasCreateCommentPermission()) {
 			return getText("cpji.not.permitted.to.create.comments");
