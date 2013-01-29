@@ -3,7 +3,12 @@ package com.atlassian.cpji.components.remote;
 import com.atlassian.cpji.components.CopyIssueService;
 import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
-import com.atlassian.cpji.components.model.*;
+import com.atlassian.cpji.components.model.JiraLocation;
+import com.atlassian.cpji.components.model.NegativeResponseStatus;
+import com.atlassian.cpji.components.model.PluginVersion;
+import com.atlassian.cpji.components.model.Projects;
+import com.atlassian.cpji.components.model.ResultWithJiraLocation;
+import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -19,7 +24,11 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
-import com.atlassian.jira.issue.link.*;
+import com.atlassian.jira.issue.link.IssueLinkManager;
+import com.atlassian.jira.issue.link.IssueLinkType;
+import com.atlassian.jira.issue.link.RemoteIssueLink;
+import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.mock.issue.MockIssue;
 import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.project.Project;
@@ -42,7 +51,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
@@ -51,6 +59,7 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertSame;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -122,9 +131,9 @@ public class TestLocalJiraProxy {
         assertEquals(PluginInfoResource.PLUGIN_VERSION, pluginInstalled.right().get().getResult());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void urlGenerationIsUnsupported(){
-        localJiraProxy.generateAuthenticationUrl(null);
+    @Test
+    public void urlGenerationReturnsNull() {
+        assertNull(localJiraProxy.generateAuthenticationUrl(null));
     }
 
     @Test
