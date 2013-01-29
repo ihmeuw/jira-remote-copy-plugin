@@ -103,7 +103,7 @@ public class LocalJiraProxy implements JiraProxy {
 
     @Override
     public String generateAuthenticationUrl(String issueId) {
-        throw new UnsupportedOperationException("Cannot generate authentication URL for local project");
+        return null;
     }
 
     @Override
