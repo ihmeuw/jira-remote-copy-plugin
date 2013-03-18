@@ -272,6 +272,13 @@
 				</executions>
                 <version>2.13.1</version>
 			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<preparationGoals>clean test</preparationGoals>
+					<releaseProfiles>releaseProfile</releaseProfiles>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
     <properties>

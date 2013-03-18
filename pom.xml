@@ -270,7 +270,6 @@
 				<configuration>
 					<preparationGoals>clean test</preparationGoals>
 					<releaseProfiles>releaseProfile</releaseProfiles>
-					<!--allowTimestampedSnapshots>true</allowTimestampedSnapshots-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -351,8 +350,8 @@
 		<profile>
 			<id>jira-6</id>
 			<properties>
-				<jira.version>6.0-breakit-SNAPSHOT</jira.version>
-				<testkit.version>6.0.5</testkit.version>
+				<jira.version>6.0-SNAPSHOT</jira.version>
+				<testkit.version>6.0.15</testkit.version>
 			</properties>
 		</profile>
 		<profile>
