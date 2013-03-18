@@ -143,6 +143,11 @@
                     <systemPropertyVariables>
                         <xvfb.enable>${xvfb.enable}</xvfb.enable>
 						<atlassian.test.target.dir>target</atlassian.test.target.dir>
+						<atlassian.dev.mode>false</atlassian.dev.mode>
+						<jira.websudo.is.disabled>true</jira.websudo.is.disabled>
+						<enable.fastdev>false</enable.fastdev>
+						<atlassian.mail.senddisabled>true</atlassian.mail.senddisabled>
+						<atlassian.mail.fetchdisabled>true</atlassian.mail.fetchdisabled>
                     </systemPropertyVariables>
                     <products>
                         <product>
