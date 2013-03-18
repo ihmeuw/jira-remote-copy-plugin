@@ -378,7 +378,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	}
 
 
-	public String getHtmlForField(MissingFieldPermissionDescription permission) {
+	public String getFieldHtml(MissingFieldPermissionDescription permission) {
 		final ImmutableSet<ValidationCode> possibleMapping = ImmutableSet.of(ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED,
 				ValidationCode.FIELD_MANDATORY_VALUE_NOT_MAPPED, ValidationCode.FIELD_VALUE_NOT_MAPPED);
 

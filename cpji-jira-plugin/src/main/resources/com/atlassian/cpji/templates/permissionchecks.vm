@@ -30,7 +30,7 @@
                 </span>
                 <div class="fields-list">
 					#foreach( $permission in $action.issueFieldsThatCannotBeCopied)
-						$!action.getHtmlForField($permission)
+						$!action.getFieldHtml($permission)
 					#end
                 </div>
 			#end
@@ -44,7 +44,7 @@
 				</span>
             	<div class="fields-list">
 					#foreach( $permission in $action.destinationIssueFieldsThatAreRequired)
-						$!action.getHtmlForField($permission)
+						$!action.getFieldHtml($permission)
 					#end
 				</div>
 			#end

@@ -49,7 +49,7 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
         this.fieldValuesHolder = new HashMap();
     }
 
-    public String getHtmlForField(FieldLayoutItem fieldLayoutItem)
+    public String getFieldHtml(FieldLayoutItem fieldLayoutItem)
     {
         OrderableField orderableField = fieldLayoutItem.getOrderableField();
         Object defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(getProject().getKey(), orderableField.getId(), getIssueTypeObject().getName());

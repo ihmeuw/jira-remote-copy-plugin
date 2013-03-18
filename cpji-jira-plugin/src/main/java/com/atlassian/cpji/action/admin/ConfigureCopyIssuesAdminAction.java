@@ -7,6 +7,7 @@ import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.crowd.embedded.api.Group;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
@@ -14,6 +15,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.fields.screen.FieldScreenRenderer;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
+import com.atlassian.jira.util.BuildUtilsInfo;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
 import com.atlassian.plugin.webresource.WebResourceManager;
@@ -28,7 +30,6 @@ import org.apache.log4j.Logger;
 import webwork.action.ActionContext;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -256,4 +257,8 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
     public static GroupName getGroupName() {
         return new GroupName();
     }
+
+	public boolean isJira6() {
+		return ComponentAccessor.getComponent(BuildUtilsInfo.class).getApplicationBuildNumber() > 6000;
+	}
 }

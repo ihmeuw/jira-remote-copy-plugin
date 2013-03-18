@@ -6,7 +6,9 @@
     <title>$i18n.getText("cpji.admin.title")</title>
 </head>
 <body>
+#if (!$action.jira6)
 <div class="content-body">
+#end
     <form action="ConfigureCopyIssuesAdminAction.jspa?projectKey=$projectKey" method="post" class="aui">
         <h2>$i18n.getText("cpji.admin.title")</h2>
         <div class="form-body">
@@ -75,6 +77,8 @@
             </div>
         </div>
     </form>
+#if (!$action.jira6)
 </div>
+#end
 </body>
 </html>

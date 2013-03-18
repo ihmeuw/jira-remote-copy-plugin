@@ -351,7 +351,7 @@
 			<id>jira-6</id>
 			<properties>
 				<jira.version>6.0-SNAPSHOT</jira.version>
-				<testkit.version>6.0.15</testkit.version>
+				<testkit.version>6.0.8</testkit.version>
 			</properties>
 		</profile>
 		<profile>
