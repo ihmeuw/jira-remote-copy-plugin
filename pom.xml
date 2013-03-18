@@ -366,6 +366,12 @@
 				<jira.version>5.1.8</jira.version>
 			</properties>
 		</profile>
+		<profile>
+			<id>testing</id>
+			<properties>
+				<jira.compile.version>${jira.version}</jira.compile.version>
+			</properties>
+		</profile>
 	</profiles>
 
     <scm>
