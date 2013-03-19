@@ -9,9 +9,9 @@ public class CustomFieldMappingResult extends MappingResult
 {
     private final List<String> validValues;
 
-    public CustomFieldMappingResult(final List<String> validValues, final List<String> invalidValues)
+    public CustomFieldMappingResult(final List<String> validValues, final List<String> invalidValues, final boolean hasDefault)
     {
-        super(invalidValues, !validValues.isEmpty(), validValues.isEmpty() && invalidValues.isEmpty());
+        super(invalidValues, !validValues.isEmpty(), validValues.isEmpty() && invalidValues.isEmpty(), hasDefault);
         this.validValues = validValues;
     }
 

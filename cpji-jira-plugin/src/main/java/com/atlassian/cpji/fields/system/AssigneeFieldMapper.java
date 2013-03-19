@@ -66,15 +66,15 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
         InternalMappingResult mapResult = mapUser(bean.getAssignee(), project);
         switch(mapResult.decision){
             case FOUND:
-                return new MappingResult(ImmutableList.<String>of(), true, false);
+                return new MappingResult(ImmutableList.<String>of(), true, false, defaultValueConfigured(project, bean));
             case NOT_FOUND:
                 List<String> unmapped = bean.getAssignee() != null?
                         ImmutableList.of(bean.getAssignee().getUserName()):
                         ImmutableList.<String>of();
                 if(unassignedAllowed){
-                    return new MappingResult(unmapped, true, unmapped.isEmpty());
+                    return new MappingResult(unmapped, true, unmapped.isEmpty(), defaultValueConfigured(project, bean));
                 } else {
-                    return new MappingResult(unmapped, false, unmapped.isEmpty());
+                    return new MappingResult(unmapped, false, unmapped.isEmpty(), defaultValueConfigured(project, bean));
                 }
             default:
                 return null;

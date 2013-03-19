@@ -67,7 +67,7 @@ public class ComponentFieldMapper extends AbstractFieldMapper implements SystemF
         List<ComponentBean> components = makeSureNotNull(bean.getComponents());
         if (components.isEmpty())
         {
-             return new MappingResult(unmappedFieldValues, false, true);
+             return new MappingResult(unmappedFieldValues, false, true, defaultValueConfigured(project, bean));
         }
         boolean hasValidValue = false;
         for (ComponentBean component : components)
@@ -82,7 +82,7 @@ public class ComponentFieldMapper extends AbstractFieldMapper implements SystemF
                 hasValidValue = true;
             }
         }
-        return new MappingResult(unmappedFieldValues, hasValidValue, false);
+        return new MappingResult(unmappedFieldValues, hasValidValue, false, defaultValueConfigured(project, bean));
     }
 
     private Long findProjectComponent(final String name, final long projectId)

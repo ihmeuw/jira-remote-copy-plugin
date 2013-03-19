@@ -33,7 +33,7 @@ public abstract class AbstractFieldMappingChecker<T extends PermissionBean> impl
         {
             if (isFieldRequired(fieldLayout, fieldId))
             {
-                if (defaultValueConfigured(fieldId))
+                if (mappingResult.hasDefault())
                 {
                     return permissionBeanCreator.createPermissionBean(ValidationCode.FIELD_MANDATORY_VALUE_NOT_MAPPED_USING_DEFAULT_VALUE);
                 }
@@ -52,7 +52,7 @@ public abstract class AbstractFieldMappingChecker<T extends PermissionBean> impl
         {
             if (isFieldRequired(fieldLayout, fieldId))
             {
-                if (defaultValueConfigured(fieldId))
+                if (mappingResult.hasDefault())
                 {
                     return permissionBeanCreator.createPermissionBean(ValidationCode.FIELD_MANDATORY_NO_PERMISSION_MAPPED_USING_DEFAULT_VALUE);
                 }

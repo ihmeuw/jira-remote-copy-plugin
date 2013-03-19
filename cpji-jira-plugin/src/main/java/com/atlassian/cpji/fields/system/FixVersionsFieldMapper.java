@@ -90,7 +90,7 @@ public class FixVersionsFieldMapper extends AbstractFieldMapper implements Syste
         List<String> unmappedValues = new ArrayList<String>();
         if (fixforVersions.isEmpty())
         {
-         return new MappingResult(unmappedValues, false, true);
+         return new MappingResult(unmappedValues, false, true, defaultValueConfigured(project, bean));
         }
         boolean hasValidValue = false;
         for (VersionBean fixedForVersion : fixforVersions)
@@ -105,7 +105,7 @@ public class FixVersionsFieldMapper extends AbstractFieldMapper implements Syste
                 hasValidValue = true;
             }
         }
-        return new MappingResult(unmappedValues, hasValidValue, false);
+        return new MappingResult(unmappedValues, hasValidValue, false, defaultValueConfigured(project, bean));
     }
 
     private <T> List makeSureNotNull(List<T> inputList)

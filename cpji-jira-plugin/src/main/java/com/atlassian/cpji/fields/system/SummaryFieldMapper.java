@@ -41,9 +41,9 @@ public class SummaryFieldMapper extends AbstractFieldMapper implements SystemFie
     {
         if (bean.getSummary() != null)
         {
-            return new MappingResult(Collections.<String>emptyList(), true, false);
+            return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
         }
-        return new MappingResult(Collections.<String>emptyList(), false, true);
+        return new MappingResult(Collections.<String>emptyList(), false, true, defaultValueConfigured(project, bean));
     }
 
 }

@@ -66,7 +66,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
         List<UserBean> watchers = makeSureNotNull(bean.getWatchers());
         if (watchers.isEmpty())
         {
-            return new MappingResult(unmappedValues, true, true);
+            return new MappingResult(unmappedValues, true, true, defaultValueConfigured(project, bean));
         }
         for (UserBean user : watchers)
         {
@@ -78,7 +78,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
                 mappedValues.add(user.getUserName());
             }
         }
-        return new MappingResult(unmappedValues, unmappedValues.isEmpty(), false);
+        return new MappingResult(unmappedValues, unmappedValues.isEmpty(), false, defaultValueConfigured(project, bean));
     }
 
     private <T>List makeSureNotNull(List<T> inputList)

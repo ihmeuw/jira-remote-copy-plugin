@@ -1,7 +1,9 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -150,7 +152,7 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
             invalidValues = Collections.emptyList();
         }
 
-        return new CustomFieldMappingResult(validValues, invalidValues);
+        return new CustomFieldMappingResult(validValues, invalidValues, defaultValueConfigured(project, customField, issueType));
     }
 
     @Override
@@ -166,4 +168,20 @@ public abstract class AbstractMultiValueCFMapper<T> implements CustomFieldMapper
         formattedValues.toArray(array);
         inputParameters.addCustomFieldValue(customField.getId(), array);
     }
+
+	/**
+	 * It will return true if the mapper detects there's a default value configured in the destination server. Either the value is configured
+	 * manually in project configuration or it can be detected based on JIRA configuration.
+	 *
+	 * @return true if we can guess the default value
+	 */
+	boolean defaultValueConfigured(Project project, CustomField customField, IssueType issueType)
+	{
+		return (getDefaultFieldValuesManager().getDefaultFieldValue(project.getKey(), customField.getId(),
+				issueType.getName()) != null);
+	}
+
+	protected DefaultFieldValuesManager getDefaultFieldValuesManager() {
+		return ComponentAccessor.getComponent(DefaultFieldValuesManager.class);
+	}
 }

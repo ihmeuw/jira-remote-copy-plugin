@@ -50,7 +50,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         final List<UserBean> voters = bean.getVoters();
         if (voters == null)
         {
-            return new MappingResult(Collections.<String>emptyList(), true, true);
+            return new MappingResult(Collections.<String>emptyList(), true, true, defaultValueConfigured(project, bean));
         }
         if (!voteService.isVotingEnabled())
         {
@@ -61,7 +61,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
                     return from.getUserName();
                 }
             }));
-            return new MappingResult(unMappedUsers, false, false);
+            return new MappingResult(unMappedUsers, false, false, defaultValueConfigured(project, bean));
         }
         final List<String> unmappedUsers = new ArrayList<String>();
         final List<String> mappedUsers = new ArrayList<String>();
@@ -86,9 +86,9 @@ public class VoterFieldMapper extends AbstractFieldMapper
         }
         if (unmappedUsers.isEmpty())
         {
-            return new MappingResult(unmappedUsers, true, false);
+            return new MappingResult(unmappedUsers, true, false, defaultValueConfigured(project, bean));
         }
-        return new MappingResult(unmappedUsers, !mappedUsers.isEmpty(), false);
+        return new MappingResult(unmappedUsers, !mappedUsers.isEmpty(), false, defaultValueConfigured(project, bean));
     }
 
     public void process(final Issue issue, final CopyIssueBean bean) throws FieldCreationException

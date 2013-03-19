@@ -41,11 +41,11 @@ public class DescriptionFieldMapper extends AbstractFieldMapper implements Syste
     {
         if (bean.getDescription() != null)
         {
-            return new MappingResult(Collections.<String>emptyList(), true, false);
+            return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
         }
         else
         {
-            return new MappingResult(Collections.<String>emptyList(), false, true);
+            return new MappingResult(Collections.<String>emptyList(), false, true, defaultValueConfigured(project, bean));
         }
     }
 }

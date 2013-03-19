@@ -52,14 +52,14 @@ public class PriorityFieldMapper extends AbstractFieldMapper implements SystemFi
     {
         if (StringUtils.isEmpty(bean.getPriority()))
         {
-           return new MappingResult(Collections.<String>emptyList(), false, true);
+           return new MappingResult(Collections.<String>emptyList(), false, true, defaultValueConfigured(project, bean));
         }
         Priority priority = findPriority(bean.getPriority());
         if (priority == null)
         {
-           return new MappingResult(Lists.newArrayList(bean.getPriority()), false, false);
+           return new MappingResult(Lists.newArrayList(bean.getPriority()), false, false, defaultValueConfigured(project, bean));
         }
-        return new MappingResult(Collections.<String>emptyList(), true, false);
+        return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
     }
 
     private Priority findPriority(final String priority)

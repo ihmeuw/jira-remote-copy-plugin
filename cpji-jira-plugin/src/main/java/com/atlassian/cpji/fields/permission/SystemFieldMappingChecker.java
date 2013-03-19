@@ -56,7 +56,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
     {
         final Map<String, FieldMapper> fieldMappers = fieldMapperFactory.getSystemFieldMappers();
         final List<String> remoteFieldIds = copyIssueBean.getVisibleSystemFieldIds();
-        FieldMapper fieldMapper = fieldMappers.get(fieldId);
+
         if (!remoteFieldIds.contains(fieldId))
         {
             if (isFieldRequired(fieldLayout, fieldId))
@@ -72,6 +72,8 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
                  return null;
             }
         }
+
+		final FieldMapper fieldMapper = fieldMappers.get(fieldId);
         if (fieldMapper != null)
         {
             final boolean hasPermission = fieldMapper.userHasRequiredPermission(project, authenticationContext.getLoggedInUser());

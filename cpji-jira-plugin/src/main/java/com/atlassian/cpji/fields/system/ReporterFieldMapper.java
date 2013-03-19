@@ -64,14 +64,14 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
     {
         if (bean.getReporter() == null)
         {
-           return new MappingResult(Collections.<String>emptyList(), true, true);
+           return new MappingResult(Collections.<String>emptyList(), true, true, defaultValueConfigured(project, bean));
         }
         final User reporter = findUser(bean.getReporter(), project);
         if (reporter == null)
         {
-            return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false);
+            return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false, defaultValueConfigured(project, bean));
         }
-        return new MappingResult(Collections.<String>emptyList(), true, false);
+        return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
     }
 
     private User findUser(final UserBean user, final Project project)

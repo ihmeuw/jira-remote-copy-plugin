@@ -90,9 +90,9 @@ public class CommentFieldMapper extends AbstractFieldMapper implements SystemFie
                     unmappedFieldValues.add("Project Role " + comment.getRoleLevel() + "not found.");
                 }
             }
-            return new MappingResult(unmappedFieldValues, unmappedFieldValues.isEmpty(), false);
+            return new MappingResult(unmappedFieldValues, unmappedFieldValues.isEmpty(), false, defaultValueConfigured(project, bean));
         }
-        return new MappingResult(unmappedFieldValues, unmappedFieldValues.isEmpty(), true);
+        return new MappingResult(unmappedFieldValues, unmappedFieldValues.isEmpty(), true, defaultValueConfigured(project, bean));
     }
 
     private class ResultHolder<T>
