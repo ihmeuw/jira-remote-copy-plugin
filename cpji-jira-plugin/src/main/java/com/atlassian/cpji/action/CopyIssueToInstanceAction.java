@@ -228,52 +228,61 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			}
 		}
 
-		if (getCopyIssueLinks() && issueLinkManager.isLinkingEnabled()) {
-            IssueLinkCopier copier = new IssueLinkCopier(issueLinkManager, remoteIssueLinkManager, proxy);
+
+        copyAndCreateIssueLinks(proxy, issueToCopy, copiedIssue);
+
+		linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());
+
+		setCurrentStep("success");
+		return SUCCESS;
+	}
+
+
+    private void copyAndCreateIssueLinks(JiraProxy proxy, MutableIssue issueToCopy, IssueCreationResultBean copiedIssue) {
+        SimplifiedIssueLinkType linkType = null;
+        // Try to find a defined Issue Link type for Clone
+        final IssueLinkType cloneIssueLinkType = getCloneIssueLinkType();
+        if (cloneIssueLinkType == null) {
+            // No Cloners link type exists, fake up one
+            linkType = new SimplifiedIssueLinkType("clones", "is cloned by");
+        } else {
+            // Use the real Cloners link type
+            linkType = new SimplifiedIssueLinkType(cloneIssueLinkType);
+        }
+
+        if (getCopyIssueLinks() && issueLinkManager.isLinkingEnabled()) {
+            IssueLinkCopier copier = new IssueLinkCopier(issueLinkManager, remoteIssueLinkManager, proxy, linkType);
             Either<NegativeResponseStatus, SuccessfulResponse> copierResult = copier.copyLocalAndRemoteLinks(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId());
-            if(copierResult.isLeft()){
+            if (copierResult.isLeft()) {
                 ErrorCollection ec = copierResult.left().get().getErrorCollection();
-                if(ec != null && ec.hasAnyErrors()){
+                if (ec != null && ec.hasAnyErrors()) {
                     addErrorCollection(ec);
                 }
             }
-		}
+        }
 
-		if (StringUtils.isNotBlank(remoteIssueLink)) {
-            // Try to find a defined Issue Link type for Clone
-            final IssueLinkType cloneIssueLinkType = getCloneIssueLinkType();
-            SimplifiedIssueLinkType linkType = null;
+        if (StringUtils.isNotBlank(remoteIssueLink)) {
+
             final boolean shouldReverseCloneLink;
-            if (cloneIssueLinkType == null)
-            {
-                // No Cloners link type exists
-                if (!proxy.getJiraLocation().isLocal())
-                {
-                    // This is a remote copy, lets fake up a Link Type because remote issue links can use any old text
-                    linkType = new SimplifiedIssueLinkType("clones", "is cloned by");
+            if (cloneIssueLinkType == null) {
+                //if we faked up link type - we can't use it in local clone
+                if (proxy.getJiraLocation().isLocal()) {
+                    linkType = null;
                 }
                 shouldReverseCloneLink = false;
-            }
-            else
-            {
-                // Use the real Cloners link type
-                linkType = new SimplifiedIssueLinkType(cloneIssueLinkType);
+            } else {
                 // JRA-24563: Check on legacy link direction
                 shouldReverseCloneLink = shouldReverseCloneLink(cloneIssueLinkType);
             }
 
-            if (linkType != null)
-            {
-				final RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
+            if (linkType != null) {
+                final RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
                 final JiraProxy.LinkCreationDirection localDirection, remoteDirection;
-                if (remoteIssueLinkType.hasLocalIssueLinkToRemote())
-                {
+                if (remoteIssueLinkType.hasLocalIssueLinkToRemote()) {
                     // JRA-24563: Consider legacy reversed link direction
                     localDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.OUTWARD : JiraProxy.LinkCreationDirection.INWARD;
                     remoteDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.INWARD : JiraProxy.LinkCreationDirection.OUTWARD;
-                }
-                else
-                {
+                } else {
                     localDirection = JiraProxy.LinkCreationDirection.IGNORE;
                     remoteDirection = JiraProxy.LinkCreationDirection.IGNORE;
                 }
@@ -281,14 +290,9 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
                         linkType,
                         localDirection,
                         remoteDirection);
-			}
-		}
-
-		linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());
-
-		setCurrentStep("success");
-		return SUCCESS;
-	}
+            }
+        }
+    }
 
     private boolean shouldReverseCloneLink(IssueLinkType cloneIssueLinkType)
     {
