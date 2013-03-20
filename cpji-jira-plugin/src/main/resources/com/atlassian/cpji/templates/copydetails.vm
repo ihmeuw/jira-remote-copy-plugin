@@ -114,7 +114,7 @@
 
 			<div class="buttons-container">
 				<div class="buttons">
-					<input type="submit" value="$i18n.getText('common.forms.next')" class="aui-button submit"/>
+					<input type="submit" value="$i18n.getText('common.forms.next')" class="aui-button aui-button-primary submit"/>
 				</div>
 			</div>
 			<input type="hidden" name="id" value="$action.id"/>

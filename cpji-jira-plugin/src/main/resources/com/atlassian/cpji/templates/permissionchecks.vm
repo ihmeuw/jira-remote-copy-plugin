@@ -51,7 +51,7 @@
 
             <p>
                 #if ($action.isCopyingPossible())
-                <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="aui-button submit"/>
+                <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="aui-button aui-button-primary submit"/>
                 #else
                 <input type="submit" value="$i18n.getText('common.forms.cancel')" class="aui-button submit"/>
                 #end
