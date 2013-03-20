@@ -132,7 +132,9 @@ public class CopyIssueBeanFactory {
 			}
 
 			if (orderableField instanceof PrioritySystemField) {
-				copyIssueBean.setPriority(issueToCopy.getPriorityObject().getName());
+				if (issueToCopy.getPriorityObject() != null) {
+					copyIssueBean.setPriority(issueToCopy.getPriorityObject().getName());
+				}
 			} else if (orderableField instanceof ReporterSystemField && StringUtils
 					.isNotBlank(issueToCopy.getReporterId())) {
 				copyIssueBean.setReporter(userMappingManager.createUserBean(issueToCopy.getReporterId()));
