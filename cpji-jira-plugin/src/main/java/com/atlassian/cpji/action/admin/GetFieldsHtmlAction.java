@@ -1,7 +1,7 @@
 package com.atlassian.cpji.action.admin;
 
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.security.Permissions;
@@ -12,7 +12,7 @@ import com.atlassian.jira.security.Permissions;
 public class GetFieldsHtmlAction extends RequiredFieldsAwareAction
 {
 
-    public GetFieldsHtmlAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager)
+    public GetFieldsHtmlAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManagerImpl defaultFieldValuesManager)
     {
         super(fieldLayoutItemsRetriever, issueTypeSchemeManager, issueFactory, defaultFieldValuesManager);
     }

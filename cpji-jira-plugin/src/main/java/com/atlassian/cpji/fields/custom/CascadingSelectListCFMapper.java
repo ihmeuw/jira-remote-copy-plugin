@@ -3,7 +3,6 @@ package com.atlassian.cpji.fields.custom;
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.context.IssueContextImpl;
@@ -26,6 +25,12 @@ import java.util.Map;
  * @since v1.4
  */
 public class CascadingSelectListCFMapper implements CustomFieldMapper {
+	private final DefaultFieldValuesManager defaultFieldValuesManager;
+
+	public CascadingSelectListCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
+		this.defaultFieldValuesManager = defaultFieldValuesManager;
+	}
+
 	@Override
 	public boolean acceptsType(CustomFieldType<?, ?> type) {
 		return type instanceof CascadingSelectCFType;
@@ -144,11 +149,7 @@ public class CascadingSelectListCFMapper implements CustomFieldMapper {
 	 */
 	boolean defaultValueConfigured(Project project, CustomField customField, IssueType issueType)
 	{
-		return (getDefaultFieldValuesManager().getDefaultFieldValue(project.getKey(), customField.getId(),
+		return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), customField.getId(),
 				issueType.getName()) != null);
-	}
-
-	protected DefaultFieldValuesManager getDefaultFieldValuesManager() {
-		return ComponentAccessor.getComponent(DefaultFieldValuesManager.class);
 	}
 }

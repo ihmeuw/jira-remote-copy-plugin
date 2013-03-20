@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CommentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -33,9 +34,11 @@ public class CommentFieldMapper extends AbstractFieldMapper implements SystemFie
     private final PermissionManager permissionsManager;
     private final UserMappingManager userMappingManager;
 
-    public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, GroupManager groupManager, final PermissionManager permissionManager, final OrderableField field, final UserMappingManager userMappingManager)
+    public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, GroupManager groupManager, 
+			final PermissionManager permissionManager, final OrderableField field, final UserMappingManager userMappingManager,
+			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(field, defaultFieldValuesManager);
         this.commentService = commentService;
         this.projectRoleManager = projectRoleManager;
         this.groupManager = groupManager;

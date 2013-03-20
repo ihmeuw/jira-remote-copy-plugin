@@ -3,7 +3,6 @@ package com.atlassian.cpji.fields.system;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.project.Project;
 
@@ -12,12 +11,15 @@ import com.atlassian.jira.project.Project;
  */
 public abstract class AbstractFieldMapper implements FieldMapper
 {
+	private final DefaultFieldValuesManager defaultFieldValuesManager;
+
     final String nameKey;
     final String id;
 
-    public AbstractFieldMapper(Field field)
+    public AbstractFieldMapper(Field field, DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        this.nameKey = field.getNameKey();
+		this.defaultFieldValuesManager = defaultFieldValuesManager;
+		this.nameKey = field.getNameKey();
         this.id = field.getId();
     }
 
@@ -39,13 +41,8 @@ public abstract class AbstractFieldMapper implements FieldMapper
 	 */
 	boolean defaultValueConfigured(Project project, CopyIssueBean copyIssueBean)
 	{
-		return (getDefaultFieldValuesManager().getDefaultFieldValue(project.getKey(), getFieldId(),
+		return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(),
 				copyIssueBean.getTargetIssueType()) != null);
 	}
-
-	protected DefaultFieldValuesManager getDefaultFieldValuesManager() {
-		return ComponentAccessor.getComponent(DefaultFieldValuesManager.class);
-	}
-
 
 }

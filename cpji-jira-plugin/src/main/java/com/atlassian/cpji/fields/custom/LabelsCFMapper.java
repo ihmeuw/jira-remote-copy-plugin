@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.LabelsCFType;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -14,7 +15,11 @@ import com.atlassian.jira.project.Project;
  */
 public class LabelsCFMapper extends AbstractMultiValueCFMapper<Label>
 {
-    @Override
+	public LabelsCFMapper(final DefaultFieldValuesManager defaultFieldValuesManager) {
+		super(defaultFieldValuesManager);
+	}
+
+	@Override
     public boolean acceptsType(CustomFieldType<?, ?> type)
     {
         return type instanceof LabelsCFType;

@@ -1,19 +1,22 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.TimeTrackingBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
-import com.atlassian.jira.issue.fields.Field;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.TimeTrackingSystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.project.Project;
 
 import java.util.Collections;
+
+import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 
 /**
  * @since v2.1
@@ -22,9 +25,9 @@ public class TimeTrackingFieldMapper extends AbstractFieldMapper implements Syst
 {
     private final TimeTrackingConfiguration timeTrackingConfiguration;
 
-    public TimeTrackingFieldMapper(Field field, final TimeTrackingConfiguration timeTrackingConfiguration)
+    public TimeTrackingFieldMapper(FieldManager fieldManager, final TimeTrackingConfiguration timeTrackingConfiguration, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(getOrderableField(fieldManager, IssueFieldConstants.TIMETRACKING), defaultFieldValuesManager);
         this.timeTrackingConfiguration = timeTrackingConfiguration;
     }
 

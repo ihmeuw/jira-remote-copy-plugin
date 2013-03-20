@@ -5,7 +5,7 @@ import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -20,6 +20,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.google.common.base.Preconditions;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
@@ -33,11 +34,11 @@ public class InputParametersService {
 
     private final FieldMapperFactory fieldMapperFactory;
     private final FieldManager fieldManager;
-    private final DefaultFieldValuesManager defaultFieldValuesManager;
+    private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
     private final JiraAuthenticationContext authenticationContext;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
 
-    public InputParametersService(FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager, JiraAuthenticationContext authenticationContext, IssueTypeSchemeManager issueTypeSchemeManager) {
+    public InputParametersService(FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManagerImpl defaultFieldValuesManager, JiraAuthenticationContext authenticationContext, IssueTypeSchemeManager issueTypeSchemeManager) {
         this.fieldMapperFactory = fieldMapperFactory;
         this.fieldManager = fieldManager;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
@@ -62,7 +63,7 @@ public class InputParametersService {
 
         private final FieldMapperFactory fieldMapperFactory;
         private final FieldManager fieldManager;
-        private final DefaultFieldValuesManager defaultFieldValuesManager;
+        private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
 
         private final Project project;
         private final IssueType issueType;
@@ -70,7 +71,7 @@ public class InputParametersService {
         private final IssueInputParameters inputParameters;
         private final CopyIssueBean copyIssueBean;
 
-        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager) {
+        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManagerImpl defaultFieldValuesManager) {
             this.project = project;
             this.issueType = issueType;
             this.allSystemFieldMappers = allSystemFieldMappers;
@@ -93,6 +94,7 @@ public class InputParametersService {
 
         public void populateProjectSystemField() {
             IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
+			Preconditions.checkNotNull("There should be projectMapper defined.", projectFieldMapper);
             projectFieldMapper.populateInputParameters(inputParameters, copyIssueBean, null, project);
         }
 

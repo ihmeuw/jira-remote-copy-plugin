@@ -1,10 +1,12 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
-import com.atlassian.jira.issue.fields.Field;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.ProjectSystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
@@ -12,14 +14,16 @@ import com.atlassian.jira.project.Project;
 
 import java.util.Collections;
 
+import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
+
 /**
  * @since v1.4
  */
 public class ProjectSystemFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
 {
-    public ProjectSystemFieldMapper(final Field field)
+    public ProjectSystemFieldMapper(final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(getOrderableField(fieldManager, IssueFieldConstants.PROJECT), defaultFieldValuesManager);
     }
 
     public Class<? extends OrderableField> getField()

@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.converters.DoubleConverter;
 import com.atlassian.jira.issue.customfields.impl.NumberCFType;
@@ -16,9 +17,10 @@ public class NumberCFMapper extends AbstractSingleValueCFMapper<Double>
 {
     private final DoubleConverter doubleConverter;
 
-    public NumberCFMapper(final DoubleConverter doubleConverter)
+    public NumberCFMapper(final DoubleConverter doubleConverter, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        this.doubleConverter = doubleConverter;
+		super(defaultFieldValuesManager);
+		this.doubleConverter = doubleConverter;
     }
 
     @Override

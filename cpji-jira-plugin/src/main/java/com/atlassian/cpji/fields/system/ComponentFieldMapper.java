@@ -1,14 +1,16 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.ComponentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.bc.project.component.ProjectComponentManager;
+import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.ComponentsSystemField;
-import com.atlassian.jira.issue.fields.Field;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.project.Project;
@@ -21,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
+
 /**
  * @since v1.4
  */
@@ -28,9 +32,10 @@ public class ComponentFieldMapper extends AbstractFieldMapper implements SystemF
 {
     private final ProjectComponentManager projectComponentManager;
 
-    public ComponentFieldMapper(ProjectComponentManager projectComponentManager, final Field field)
+    public ComponentFieldMapper(ProjectComponentManager projectComponentManager, final FieldManager fieldManager,
+			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(getOrderableField(fieldManager, IssueFieldConstants.COMPONENTS), defaultFieldValuesManager);
         this.projectComponentManager = projectComponentManager;
     }
 

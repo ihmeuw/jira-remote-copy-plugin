@@ -14,7 +14,7 @@ import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
@@ -86,7 +86,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
     private String summary;
 
 	private final FieldMapperFactory fieldMapperFactory;
-	private final DefaultFieldValuesManager defaultFieldValuesManager;
+	private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
 	private final FieldLayoutService fieldLayoutService;
 	private final IssueFactory issueFactory;
 	private final VelocityManager velocityManager;
@@ -126,7 +126,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			final RemoteIssueLinkManager remoteIssueLinkManager,
 			final ApplicationLinkService applicationLinkService,
 			final JiraProxyFactory jiraProxyFactory,
-			DefaultFieldValuesManager defaultFieldValuesManager,
+			DefaultFieldValuesManagerImpl defaultFieldValuesManager,
 			FieldLayoutService fieldLayoutService,
 			IssueFactory issueFactory,
 			VelocityManager velocityManager,

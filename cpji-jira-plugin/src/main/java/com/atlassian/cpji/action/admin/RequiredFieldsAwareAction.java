@@ -1,7 +1,7 @@
 package com.atlassian.cpji.action.admin;
 
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.MutableIssue;
@@ -33,14 +33,14 @@ public abstract class RequiredFieldsAwareAction extends JiraWebActionSupport imp
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
     private final IssueFactory issueFactory;
-    private final DefaultFieldValuesManager defaultFieldValuesManager;
+    private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
 
     private String projectKey;
     private String issuetype;
     private MutableIssue issue;
     private Map fieldValuesHolder;
 
-    public RequiredFieldsAwareAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager)
+    public RequiredFieldsAwareAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManagerImpl defaultFieldValuesManager)
     {
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.issueTypeSchemeManager = issueTypeSchemeManager;

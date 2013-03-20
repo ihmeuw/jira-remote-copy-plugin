@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.MultiGroupCFType;
@@ -17,9 +18,10 @@ public class MultiGroupCFMapper extends AbstractMultiValueCFMapper<Group>
 {
     private final GroupManager groupManager;
 
-    public MultiGroupCFMapper(final GroupManager groupManager)
+    public MultiGroupCFMapper(final GroupManager groupManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        this.groupManager = groupManager;
+		super(defaultFieldValuesManager);
+		this.groupManager = groupManager;
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.RESTException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
@@ -38,7 +38,7 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
 
     private static final Logger log = Logger.getLogger(CustomFieldMappingChecker.class);
 
-    public CustomFieldMappingChecker(final DefaultFieldValuesManager defaultFieldValuesManager, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout, final FieldManager fieldManager, final FieldMapperFactory fieldMapperFactory, final IssueTypeSchemeManager issueTypeSchemeManager)
+    public CustomFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout, final FieldManager fieldManager, final FieldMapperFactory fieldMapperFactory, final IssueTypeSchemeManager issueTypeSchemeManager)
     {
         super(defaultFieldValuesManager, copyIssueBean, project, fieldLayout);
         this.fieldManager = fieldManager;

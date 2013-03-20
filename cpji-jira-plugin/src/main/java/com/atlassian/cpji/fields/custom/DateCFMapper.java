@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.util.DateUtil;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.converters.DatePickerConverter;
@@ -22,9 +23,11 @@ public class DateCFMapper extends AbstractSingleValueCFMapper<Date>
     private final DatePickerConverter datePickerConverter;
 	private final DateTimeConverter dateTimePickerConverter;
 
-	public DateCFMapper(final DatePickerConverter datePickerConverter, final DateTimeConverter dateTimeConverter)
+	public DateCFMapper(final DatePickerConverter datePickerConverter, final DateTimeConverter dateTimeConverter,
+			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        this.datePickerConverter = datePickerConverter;
+		super(defaultFieldValuesManager);
+		this.datePickerConverter = datePickerConverter;
 		this.dateTimePickerConverter = dateTimeConverter;
 	}
 

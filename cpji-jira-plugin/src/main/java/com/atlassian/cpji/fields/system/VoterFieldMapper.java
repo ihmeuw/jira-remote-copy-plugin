@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
@@ -31,9 +32,11 @@ public class VoterFieldMapper extends AbstractFieldMapper
     private final UserMappingManager userMappingManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, final UserMappingManager userMappingManager)
+    public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager, 
+			final JiraAuthenticationContext jiraAuthenticationContext, final UserMappingManager userMappingManager,
+			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(field, defaultFieldValuesManager);
         this.voteService = voteService;
         this.permissionManager = permissionManager;
         this.userMappingManager = userMappingManager;

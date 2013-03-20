@@ -5,7 +5,7 @@ import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.IssueFactory;
@@ -42,7 +42,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
 
     private final IssueCreationHelperBean issueCreationHelperBean;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
-    private final DefaultFieldValuesManager defaultFieldValuesManager;
+    private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
     private final CopyIssueConfigurationManager copyIssueConfigurationManager;
@@ -54,7 +54,7 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
     private Boolean executeFired = false;
     private List<String> selectedGroups;
 
-    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManager defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManager defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager) {
+    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManagerImpl defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager) {
         super(fieldLayoutItemsRetriever, issueTypeSchemeManager, issueFactory, defaultFieldValuesManager);
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.defaultFieldValuesManager = defaultFieldValuesManager;

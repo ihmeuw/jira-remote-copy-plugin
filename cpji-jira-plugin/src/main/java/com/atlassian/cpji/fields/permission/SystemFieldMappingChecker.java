@@ -5,7 +5,7 @@ import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
@@ -31,7 +31,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
 
     private static final Logger log = Logger.getLogger(SystemFieldMappingChecker.class);
 
-    public SystemFieldMappingChecker(final DefaultFieldValuesManager defaultFieldValuesManager, final FieldMapperFactory fieldMapperFactory, final JiraAuthenticationContext authenticationContext, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout)
+    public SystemFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final FieldMapperFactory fieldMapperFactory, final JiraAuthenticationContext authenticationContext, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout)
     {
         super(defaultFieldValuesManager, copyIssueBean, project, fieldLayout);
         this.fieldMapperFactory = fieldMapperFactory;

@@ -3,7 +3,6 @@ package com.atlassian.cpji.fields.custom;
 import com.atlassian.cpji.fields.CustomFieldMappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
-import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -26,8 +25,13 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
 {
 
     private static final Logger log = Logger.getLogger(AbstractSingleValueCFMapper.class);
+	private final DefaultFieldValuesManager defaultFieldValuesManager;
 
-    /**
+	protected AbstractSingleValueCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
+		this.defaultFieldValuesManager = defaultFieldValuesManager;
+	}
+
+	/**
      * Convert the value stored by the custom field to a String. The value will not be null.
      *
      * @param value the value given by the custom field, see {@link CustomField#getValue(com.atlassian.jira.issue.Issue)}
@@ -151,11 +155,7 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
 	 */
 	boolean defaultValueConfigured(Project project, CustomField customField, IssueType issueType)
 	{
-		return (getDefaultFieldValuesManager().getDefaultFieldValue(project.getKey(), customField.getId(),
+		return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), customField.getId(),
 				issueType.getName()) != null);
-	}
-
-	protected DefaultFieldValuesManager getDefaultFieldValuesManager() {
-		return ComponentAccessor.getComponent(DefaultFieldValuesManager.class);
 	}
 }

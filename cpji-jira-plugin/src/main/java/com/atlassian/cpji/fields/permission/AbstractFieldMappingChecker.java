@@ -3,7 +3,7 @@ package com.atlassian.cpji.fields.permission;
 import com.atlassian.cpji.fields.MappingConstants;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.ValidationCode;
-import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.PermissionBean;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
@@ -14,12 +14,12 @@ import com.atlassian.jira.project.Project;
  */
 public abstract class AbstractFieldMappingChecker<T extends PermissionBean> implements MappingChecker<T>
 {
-    private final DefaultFieldValuesManager defaultFieldValuesManager;
+    private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
     protected final CopyIssueBean copyIssueBean;
     protected final Project project;
     protected final FieldLayout fieldLayout;
 
-    protected AbstractFieldMappingChecker(final DefaultFieldValuesManager defaultFieldValuesManager, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout)
+    protected AbstractFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout)
     {
         this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.copyIssueBean = copyIssueBean;

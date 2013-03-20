@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.MultiUserCFType;
@@ -19,8 +20,9 @@ public class MultiUserCFMapper extends AbstractMultiValueCFMapper<User>
 
 	private final UserManager userManager;
 
-	public MultiUserCFMapper(final UserManager userManager)
+	public MultiUserCFMapper(final UserManager userManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
+		super(defaultFieldValuesManager);
 		this.userManager = userManager;
 	}
 

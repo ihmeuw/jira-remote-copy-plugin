@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.ProjectCFType;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -17,8 +18,9 @@ public class ProjectCFMapper extends AbstractSingleValueCFMapper<GenericValue>
 {
 	private final ProjectManager projectManager;
 
-	public ProjectCFMapper(final ProjectManager projectManager)
+	public ProjectCFMapper(final ProjectManager projectManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
+		super(defaultFieldValuesManager);
 		this.projectManager = projectManager;
 	}
 

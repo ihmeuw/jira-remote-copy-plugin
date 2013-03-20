@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.VersionCFType;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -17,8 +18,9 @@ public class VersionCFMapper extends AbstractMultiValueCFMapper<Version>
 {
 	private final VersionManager versionManager;
 
-	public VersionCFMapper(final VersionManager versionManager)
+	public VersionCFMapper(final VersionManager versionManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
+		super(defaultFieldValuesManager);
 		this.versionManager = versionManager;
     }
 

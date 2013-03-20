@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.custom;
 
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.GenericTextCFType;
 import com.atlassian.jira.issue.customfields.impl.StringCFType;
@@ -16,7 +17,11 @@ import com.atlassian.jira.project.Project;
  */
 public class GenericTextCFMapper extends AbstractSingleValueCFMapper<String>
 {
-    @Override
+	public GenericTextCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
+		super(defaultFieldValuesManager);
+	}
+
+	@Override
     public boolean acceptsType(CustomFieldType<?, ?> type)
     {
         return type instanceof StringCFType	|| type instanceof GenericTextCFType || type instanceof TextCFType;

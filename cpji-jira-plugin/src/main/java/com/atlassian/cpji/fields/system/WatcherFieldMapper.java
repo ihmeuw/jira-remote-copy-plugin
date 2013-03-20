@@ -1,6 +1,7 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
@@ -28,9 +29,11 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFie
     private final JiraAuthenticationContext jiraAuthenticationContext;
     private final UserMappingManager userMappingManager;
 
-    public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager, final JiraAuthenticationContext jiraAuthenticationContext, final Field field, final UserMappingManager userMappingManager)
+    public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager, 
+			final JiraAuthenticationContext jiraAuthenticationContext, final Field field, final UserMappingManager userMappingManager,
+			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(field, defaultFieldValuesManager);
         this.watcherService = watcherService;
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;

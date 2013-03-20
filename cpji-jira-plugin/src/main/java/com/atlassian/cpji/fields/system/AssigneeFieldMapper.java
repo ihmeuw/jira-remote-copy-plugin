@@ -1,15 +1,17 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.AssigneeSystemField;
-import com.atlassian.jira.issue.fields.Field;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.project.Project;
@@ -18,6 +20,8 @@ import com.atlassian.jira.security.Permissions;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+
+import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 
 /**
  * @since v1.4
@@ -41,9 +45,10 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
         }
     }
 
-    public AssigneeFieldMapper(PermissionManager permissionManager, final ApplicationProperties applicationProperties, Field field, final UserMappingManager userMappingManager)
+    public AssigneeFieldMapper(PermissionManager permissionManager, final ApplicationProperties applicationProperties, 
+			FieldManager fieldManager, final UserMappingManager userMappingManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(getOrderableField(fieldManager, IssueFieldConstants.ASSIGNEE), defaultFieldValuesManager);
         this.permissionManager = permissionManager;
         this.applicationProperties = applicationProperties;
         this.userMappingManager = userMappingManager;

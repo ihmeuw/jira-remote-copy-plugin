@@ -1,13 +1,14 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
-import com.atlassian.jira.issue.fields.Field;
+import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.ReporterSystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
@@ -18,6 +19,8 @@ import com.google.common.collect.Lists;
 
 import java.util.Collections;
 
+import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
+
 /**
  *
  * @since v1.4
@@ -27,12 +30,13 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
     private final PermissionManager permissionManager;
     private final UserMappingManager userMappingManager;
 
-    public ReporterFieldMapper(final PermissionManager permissionManager, final Field field, final UserMappingManager userMappingManager)
+	public ReporterFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager, 
+			final UserMappingManager userMappingManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-        super(field);
+        super(getOrderableField(fieldManager, IssueFieldConstants.REPORTER), defaultFieldValuesManager);
         this.permissionManager = permissionManager;
         this.userMappingManager = userMappingManager;
-    }
+	}
 
     public Class<? extends OrderableField> getField()
     {
@@ -64,14 +68,14 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
     {
         if (bean.getReporter() == null)
         {
-           return new MappingResult(Collections.<String>emptyList(), true, true, defaultValueConfigured(project, bean));
+           return new MappingResult(Collections.<String>emptyList(), true, true, true);
         }
         final User reporter = findUser(bean.getReporter(), project);
         if (reporter == null)
         {
-            return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false, defaultValueConfigured(project, bean));
+            return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false, true);
         }
-        return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+        return new MappingResult(Collections.<String>emptyList(), true, false, true);
     }
 
     private User findUser(final UserBean user, final Project project)

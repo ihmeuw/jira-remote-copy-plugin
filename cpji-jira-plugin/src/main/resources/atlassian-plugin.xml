@@ -83,7 +83,9 @@
 	</webwork1>
 
 	<component key="fieldMapperFactory" class="com.atlassian.cpji.fields.FieldMapperFactory"/>
-	<component key="defaultFieldValuesManager" class="com.atlassian.cpji.fields.value.DefaultFieldValuesManager"/>
+	<component key="defaultFieldValuesManager" class="com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl">
+		<interface>com.atlassian.cpji.fields.value.DefaultFieldValuesManager</interface>
+	</component>
 	<component key="copyIssueConfigurationManager"
 			   class="com.atlassian.cpji.config.DefaultCopyIssueConfigurationManager"/>
 	<component key="copyIssuePermissionManager" class="com.atlassian.cpji.components.CopyIssuePermissionManager"/>
@@ -157,5 +159,42 @@
 
         <resource type="download" name="copyDetailsAction.js" location="com/atlassian/cpji/javascript/copyDetailsAction.js"/>
     </web-resource>
+
+	<module-type key="system-field-mapper"
+				 class="com.atlassian.cpji.fields.SystemFieldMapperModuleDescriptor">
+	</module-type>
+
+	<module-type key="custom-field-mapper"
+				 class="com.atlassian.cpji.fields.CustomFieldMapperModuleDescriptor">
+	</module-type>
+
+	<system-field-mapper key="reporterFieldMapper" class="com.atlassian.cpji.fields.system.ReporterFieldMapper"/>
+	<system-field-mapper key="summaryFieldMapper" class="com.atlassian.cpji.fields.system.SummaryFieldMapper"/>
+	<system-field-mapper key="priorityFieldMapper" class="com.atlassian.cpji.fields.system.PriorityFieldMapper"/>
+	<system-field-mapper key="affectedVersionFieldMapper" class="com.atlassian.cpji.fields.system.AffectedVersionsFieldMapper"/>
+	<system-field-mapper key="assigneeFieldMapper" class="com.atlassian.cpji.fields.system.AssigneeFieldMapper"/>
+	<system-field-mapper key="componentFieldMapper" class="com.atlassian.cpji.fields.system.ComponentFieldMapper"/>
+	<system-field-mapper key="descriptionFieldMapper" class="com.atlassian.cpji.fields.system.DescriptionFieldMapper"/>
+	<system-field-mapper key="dueDateFieldMapper" class="com.atlassian.cpji.fields.system.DueDateFieldMapper"/>
+	<system-field-mapper key="environmentFieldMapper" class="com.atlassian.cpji.fields.system.EnvironmentFieldMapper"/>
+	<system-field-mapper key="fixVersionFieldMapper" class="com.atlassian.cpji.fields.system.FixVersionsFieldMapper"/>
+	<system-field-mapper key="issueSecurityFieldMapper" class="com.atlassian.cpji.fields.system.IssueSecurityFieldMapper"/>
+	<system-field-mapper key="issueTypeFieldMapper" class="com.atlassian.cpji.fields.system.IssueTypeFieldMapper"/>
+	<system-field-mapper key="projectFieldMapper" class="com.atlassian.cpji.fields.system.ProjectSystemFieldMapper"/>
+	<system-field-mapper key="labelFieldMapper" class="com.atlassian.cpji.fields.system.LabelSystemFieldMapper"/>
+	<system-field-mapper key="timeTrackingFieldMapper" class="com.atlassian.cpji.fields.system.TimeTrackingFieldMapper"/>
+
+	<custom-field-mapper key="selectCfMapper" class="com.atlassian.cpji.fields.custom.SelectListCFMapper"/>
+	<custom-field-mapper key="dateCfMapper" class="com.atlassian.cpji.fields.custom.DateCFMapper"/>
+	<custom-field-mapper key="numberCfMapper" class="com.atlassian.cpji.fields.custom.NumberCFMapper"/>
+	<custom-field-mapper key="genericTextCfMapper" class="com.atlassian.cpji.fields.custom.GenericTextCFMapper"/>
+	<custom-field-mapper key="multiGroupCfMapper" class="com.atlassian.cpji.fields.custom.MultiGroupCFMapper"/>
+	<custom-field-mapper key="projectCfMapper" class="com.atlassian.cpji.fields.custom.ProjectCFMapper"/>
+	<custom-field-mapper key="versionCfMapper" class="com.atlassian.cpji.fields.custom.VersionCFMapper"/>
+	<custom-field-mapper key="userCfMapper" class="com.atlassian.cpji.fields.custom.UserCFMapper"/>
+	<custom-field-mapper key="multiUserCfMapper" class="com.atlassian.cpji.fields.custom.MultiUserCFMapper"/>
+	<custom-field-mapper key="labelsCfMapper" class="com.atlassian.cpji.fields.custom.LabelsCFMapper"/>
+	<custom-field-mapper key="multiSelectListCfMapper" class="com.atlassian.cpji.fields.custom.MultiSelectListCFMapper"/>
+	<custom-field-mapper key="cascadingSelectListCfMapper" class="com.atlassian.cpji.fields.custom.CascadingSelectListCFMapper"/>
 
 </atlassian-plugin>
