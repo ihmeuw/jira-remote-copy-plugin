@@ -43,7 +43,7 @@ public class ProjectSystemFieldMapper extends AbstractFieldMapper implements Sys
 
     public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
     {
-        return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+        return new MappingResult(Collections.<String>emptyList(), true, false, hasDefaultValue(project, bean));
     }
 
 }

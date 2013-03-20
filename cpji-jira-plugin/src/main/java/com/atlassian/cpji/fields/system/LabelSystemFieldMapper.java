@@ -37,9 +37,9 @@ public class LabelSystemFieldMapper extends AbstractFieldMapper implements Syste
         List<String> labels = bean.getLabels();
         if (labels != null && !labels.isEmpty())
         {
-            return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+            return new MappingResult(Collections.<String>emptyList(), true, false, hasDefaultValue(project, bean));
         }
-        return new MappingResult(Collections.<String>emptyList(), false, true, defaultValueConfigured(project, bean));
+        return new MappingResult(Collections.<String>emptyList(), false, true, hasDefaultValue(project, bean));
     }
 
     public Class<? extends OrderableField> getField()

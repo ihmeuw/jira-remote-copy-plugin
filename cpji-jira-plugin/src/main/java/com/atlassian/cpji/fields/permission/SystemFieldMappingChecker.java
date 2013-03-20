@@ -61,7 +61,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
         {
             if (isFieldRequired(fieldLayout, fieldId))
             {
-                if (defaultValueConfigured(fieldId))
+                if (hasDefaultValue(fieldId))
                 {
                     return new SystemFieldPermissionBean(fieldId, ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE.name());
                 }

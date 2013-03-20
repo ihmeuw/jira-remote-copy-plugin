@@ -11,7 +11,7 @@ import com.atlassian.jira.project.Project;
  */
 public abstract class AbstractFieldMapper implements FieldMapper
 {
-	private final DefaultFieldValuesManager defaultFieldValuesManager;
+	protected final DefaultFieldValuesManager defaultFieldValuesManager;
 
     final String nameKey;
     final String id;
@@ -39,10 +39,10 @@ public abstract class AbstractFieldMapper implements FieldMapper
 	 *
 	 * @return true if we can guess the default value
 	 */
-	boolean defaultValueConfigured(Project project, CopyIssueBean copyIssueBean)
+	boolean hasDefaultValue(Project project, CopyIssueBean copyIssueBean)
 	{
-		return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(),
-				copyIssueBean.getTargetIssueType()) != null);
+		return defaultFieldValuesManager.hasDefaultValue(project.getKey(), getFieldId(),
+				copyIssueBean.getTargetIssueType());
 	}
 
 }

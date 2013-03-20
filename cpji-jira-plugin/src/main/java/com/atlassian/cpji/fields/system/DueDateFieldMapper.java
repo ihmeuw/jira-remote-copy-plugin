@@ -59,11 +59,11 @@ public class DueDateFieldMapper extends AbstractFieldMapper implements SystemFie
         Date issueDueDate = bean.getIssueDueDate();
         if (issueDueDate != null)
         {
-            return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+            return new MappingResult(Collections.<String>emptyList(), true, false, hasDefaultValue(project, bean));
         }
         else
         {
-            return new MappingResult(Collections.<String>emptyList(), false, true, defaultValueConfigured(project, bean));
+            return new MappingResult(Collections.<String>emptyList(), false, true, hasDefaultValue(project, bean));
         }
     }
 

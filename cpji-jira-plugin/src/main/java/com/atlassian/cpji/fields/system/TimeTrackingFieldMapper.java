@@ -43,9 +43,10 @@ public class TimeTrackingFieldMapper extends AbstractFieldMapper implements Syst
         TimeTrackingBean timeTracking = bean.getTimeTracking();
         if (!timeTrackingConfiguration.enabled())
         {
-            return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+            return new MappingResult(Collections.<String>emptyList(), true, false, hasDefaultValue(project, bean));
         }
-        return new MappingResult(Collections.<String>emptyList(), timeTracking != null, timeTracking == null, defaultValueConfigured(project, bean));
+        return new MappingResult(Collections.<String>emptyList(), timeTracking != null, timeTracking == null, hasDefaultValue(
+				project, bean));
     }
 
     @Override

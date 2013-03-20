@@ -107,7 +107,7 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
         {
             if (isFieldRequired(fieldLayout, fieldId) && !(customField.getCustomFieldType() instanceof ReadOnlyCFType))
             {
-                if (defaultValueConfigured(fieldId))
+                if (hasDefaultValue(fieldId))
                 {
                     return new CustomFieldPermissionBean(
 							customField.getId(),

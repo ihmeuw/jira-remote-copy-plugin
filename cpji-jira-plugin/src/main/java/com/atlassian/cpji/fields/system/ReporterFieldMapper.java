@@ -16,6 +16,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 
@@ -52,11 +53,12 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
             {
                 inputParameters.setReporterId(reporter.getName());
             }
-        }
-        else if(fieldLayoutItem.isRequired())
-        {
-            inputParameters.setReporterId(project.getLeadUserName());
-        }
+        } else if (fieldLayoutItem.isRequired() && hasDefaultValue(project, bean)) {
+			String[] defaults = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), fieldLayoutItem.getOrderableField().getId(), bean.getTargetIssueType());
+			if (StringUtils.isNotBlank(defaults[0])) {
+				inputParameters.setReporterId(defaults[0]);
+			}
+		}
     }
 
     public boolean userHasRequiredPermission(final Project project, final User user)

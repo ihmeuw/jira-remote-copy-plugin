@@ -77,14 +77,14 @@ public class IssueSecurityFieldMapper extends AbstractFieldMapper implements Sys
             if (issueSecurityLevelId == null)
             {
                 unmappedValues.add(issueSecurityLevel);
-                return new MappingResult(unmappedValues, false, false, defaultValueConfigured(project, bean));
+                return new MappingResult(unmappedValues, false, false, hasDefaultValue(project, bean));
             }
             else
             {
-               return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+               return new MappingResult(Collections.<String>emptyList(), true, false, hasDefaultValue(project, bean));
             }
         }
-        return new MappingResult(unmappedValues, false, true, defaultValueConfigured(project, bean));
+        return new MappingResult(unmappedValues, false, true, hasDefaultValue(project, bean));
     }
 
     private Long findIssueSecurityLevel(final String issueSecurityLevel, final Project project)

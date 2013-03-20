@@ -70,7 +70,7 @@ public class AffectedVersionsFieldMapper extends AbstractFieldMapper implements 
         List<String> unmappedValues = new ArrayList<String>();
         if (affectedVersions.isEmpty())
         {
-           return new MappingResult(unmappedValues, false, true, defaultValueConfigured(project, bean));
+           return new MappingResult(unmappedValues, false, true, hasDefaultValue(project, bean));
         }
         boolean hasValidValue = false;
         for (VersionBean affectedVersion : affectedVersions)
@@ -85,7 +85,7 @@ public class AffectedVersionsFieldMapper extends AbstractFieldMapper implements 
                 hasValidValue = true;
             }
         }
-        return new MappingResult(unmappedValues, hasValidValue, false, defaultValueConfigured(project, bean));
+        return new MappingResult(unmappedValues, hasValidValue, false, hasDefaultValue(project, bean));
     }
 
     private Long findVersion(final String name, final Long projectId)

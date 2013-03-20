@@ -45,11 +45,11 @@ public class EnvironmentFieldMapper extends AbstractFieldMapper implements Syste
     {
         if (bean.getEnvironment() != null)
         {
-            return new MappingResult(Collections.<String>emptyList(), true, false, defaultValueConfigured(project, bean));
+            return new MappingResult(Collections.<String>emptyList(), true, false, hasDefaultValue(project, bean));
         }
         else
         {
-            return new MappingResult(Collections.<String>emptyList(), false, true, defaultValueConfigured(project, bean));
+            return new MappingResult(Collections.<String>emptyList(), false, true, hasDefaultValue(project, bean));
         }
     }
 }

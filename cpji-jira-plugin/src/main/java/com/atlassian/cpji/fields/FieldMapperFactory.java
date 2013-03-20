@@ -23,10 +23,8 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.util.concurrent.LazyReference;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.netbeans.lib.cvsclient.commandLine.command.add;
 
 import java.util.ArrayList;
 import java.util.HashMap;

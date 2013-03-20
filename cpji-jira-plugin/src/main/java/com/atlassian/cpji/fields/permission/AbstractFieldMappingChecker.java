@@ -64,7 +64,11 @@ public abstract class AbstractFieldMappingChecker<T extends PermissionBean> impl
             }
             else
             {
-                 return permissionBeanCreator.createPermissionBean(ValidationCode.FIELD_PERMISSION_MISSING);
+				if (mappingResult.hasDefault()) {
+					return permissionBeanCreator.createPermissionBean(ValidationCode.FIELD_PERMISSION_MISSING_USING_DEFAULT_VALUE);
+				} else {
+                	return permissionBeanCreator.createPermissionBean(ValidationCode.FIELD_PERMISSION_MISSING);
+				}
             }
         }
         else if (hasPermission && !mappingResult.getUnmappedValues().isEmpty())
@@ -77,9 +81,9 @@ public abstract class AbstractFieldMappingChecker<T extends PermissionBean> impl
         }
     }
 
-    protected boolean defaultValueConfigured(final String fieldId)
+    protected boolean hasDefaultValue(final String fieldId)
     {
-        return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), fieldId, copyIssueBean.getTargetIssueType()) != null);
+        return defaultFieldValuesManager.hasDefaultValue(project.getKey(), fieldId, copyIssueBean.getTargetIssueType());
     }
 
     protected boolean isFieldRequired(FieldLayout fieldLayout, String fieldId)

@@ -447,6 +447,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				return false || getSelectedDestinationProject().getJiraLocation().isLocal(); // for local copies we provide a way to fill missing values
 			case FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE:
 				return true;
+			case FIELD_PERMISSION_MISSING_USING_DEFAULT_VALUE:
+				return true;
 			default:
 				throw new UnsupportedOperationException(
 						String.format("Unknown validation code: %s", validationCode.toString()));
