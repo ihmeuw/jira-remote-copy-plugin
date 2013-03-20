@@ -4,6 +4,12 @@
     <title>$i18n.getText("cpji.select.destination.project")</title>
 </head>
 <body>
+<header class="aui-page-header"><div class="aui-page-header-inner">
+        <div class="aui-page-header-main">
+            <h1>$i18n.getText("cpji.operation.name")</h1>
+        </div>
+    </div>
+</header>
 <div id="stepped-process" class="content-container">
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
