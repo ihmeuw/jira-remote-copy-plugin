@@ -49,15 +49,13 @@
 				</div>
 			#end
 
-            <div class="buttons-container">
-                <div class="buttons">
-                   #if ($action.isCopyingPossible())
-                    <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="button submit"/>
-                   #else
-                    <input type="submit" value="$i18n.getText('common.forms.cancel')" class="button submit"/>
-                   #end
-                </div>
-            </div>
+            <p>
+                #if ($action.isCopyingPossible())
+                <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="button submit"/>
+                #else
+                <input type="submit" value="$i18n.getText('common.forms.cancel')" class="button submit"/>
+                #end
+            </p>
             <input type="hidden" name="atl_token" value="$action.xsrfToken"/>
             <input type="hidden" name="id" value="$action.id"/>
             <input type="hidden" name="targetEntityLink" value="$textutils.htmlEncode($action.targetEntityLink)"/>
