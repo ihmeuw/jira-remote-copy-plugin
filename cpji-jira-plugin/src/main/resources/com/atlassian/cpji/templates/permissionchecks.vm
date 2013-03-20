@@ -51,9 +51,9 @@
 
             <p>
                 #if ($action.isCopyingPossible())
-                <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="button submit"/>
+                <input type="submit" value="$i18n.getText('cpji.copy.issue')" class="aui-button submit"/>
                 #else
-                <input type="submit" value="$i18n.getText('common.forms.cancel')" class="button submit"/>
+                <input type="submit" value="$i18n.getText('common.forms.cancel')" class="aui-button submit"/>
                 #end
             </p>
             <input type="hidden" name="atl_token" value="$action.xsrfToken"/>
