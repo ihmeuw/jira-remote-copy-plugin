@@ -7,6 +7,7 @@ import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.pageobjects.elements.query.Poller;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -135,8 +136,8 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
         final CopyIssueToInstanceConfirmationPage copyIssueToInstanceConfirmationPage = copyDetailsPage.next();
 
-        assertTrue(copyIssueToInstanceConfirmationPage.areAllIssueFieldsRetained());
-        assertTrue(copyIssueToInstanceConfirmationPage.areAllRequiredFieldsFilledIn());
+        Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllIssueFieldsRetained());
+        Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllRequiredFieldsFilledIn());
 
         final CopyIssueToInstanceSuccessfulPage copyIssueToInstanceSuccessfulPage = copyIssueToInstanceConfirmationPage.copyIssue();
         assertTrue(copyIssueToInstanceSuccessfulPage.isSuccessful());

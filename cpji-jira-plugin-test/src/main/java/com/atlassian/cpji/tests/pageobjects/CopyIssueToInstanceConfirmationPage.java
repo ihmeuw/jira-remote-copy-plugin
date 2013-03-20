@@ -37,20 +37,15 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
         return URL;
     }
 
-    public boolean areAllIssueFieldsRetained()
-    {
-        return isMessagePresent("All issue field values will be retained.");
+    public TimedCondition areAllIssueFieldsRetained(){
+        return elementFinder.find(By.id("issue-fields-retained")).timed().isVisible();
     }
 
-    public boolean areAllRequiredFieldsFilledIn()
+    public TimedCondition areAllRequiredFieldsFilledIn()
     {
-        return isMessagePresent("There are no missing required fields for the destination issue.");
+        return elementFinder.find(By.id("no-missing-required")).timed().isVisible();
     }
 
-    private boolean isMessagePresent(final String message)
-    {
-        return PageObjectHelper.isMessagePresent(message, elementFinder);
-    }
 
     public CopyIssueToInstanceSuccessfulPage copyIssue()
     {

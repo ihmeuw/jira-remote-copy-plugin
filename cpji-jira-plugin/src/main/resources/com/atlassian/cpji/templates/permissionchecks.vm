@@ -30,7 +30,7 @@
 
 			<h4 class="sub-heading">$i18n.getText('cpji.source.issue.fields')</h4>
 			#if ($action.issueFieldsThatCannotBeCopied.isEmpty())
-				$i18n.getText('cpji.issue.fields.retained')
+                <span id="issue-fields-retained">$i18n.getText('cpji.issue.fields.retained')</span>
 			#else
                 <span>
 					$i18n.getText('cpji.some.values.cannot.be.copied')
@@ -44,7 +44,7 @@
 
 			<h4 class="sub-heading">$i18n.getText('cpji.destination.issue.fields')</h4>
 			#if ($action.destinationIssueFieldsThatAreRequired.isEmpty())
-				$i18n.getText('cpji.no.missing.required.fields')
+				<span id="no-missing-required">$i18n.getText('cpji.no.missing.required.fields')</span>
 			#else
 				<span>
 					$i18n.getText('cpji.some.fields.are.missing')

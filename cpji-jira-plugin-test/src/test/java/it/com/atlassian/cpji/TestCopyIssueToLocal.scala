@@ -35,8 +35,8 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
   }
 
   val defaultPermissionChecksInteraction: (CopyIssueToInstanceConfirmationPage) => Unit = (page) => {
-    assertTrue(page.areAllIssueFieldsRetained)
-    assertTrue(page.areAllRequiredFieldsFilledIn)
+    Poller.waitUntilTrue(page.areAllIssueFieldsRetained)
+    Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
   }
 
   private def remoteCopy(jira: JiraTestedProduct, issueId: Long,
@@ -60,7 +60,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
     val issue = createIssue("Sample issue")
     val copiedIssueKey = remoteCopy(jira3, issue.getId,
 			permissionsChecksInteraction = (page) => {
-        assertTrue(page.areAllRequiredFieldsFilledIn)
+        Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
       })
 
     val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
@@ -84,7 +84,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
     val copiedIssueKey = remoteCopy(jira3, issue.getId,
       permissionsChecksInteraction = (page) => {
-        assertTrue(page.areAllRequiredFieldsFilledIn)
+        Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
       })
 
     val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
@@ -124,7 +124,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 			val subtask = createIssues3.newIssue(subtaskBuilder.build())
 
 			val copiedIssueKey = remoteCopy(jira3, subtask.getId, permissionsChecksInteraction = (page) => {
-				assertTrue(page.areAllRequiredFieldsFilledIn)
+        Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
 			})
 
 			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
@@ -152,7 +152,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 			val subtask = createIssues3.newIssue(subtaskBuilder.build())
 
 			val copiedIssueKey = remoteCopy(jira3, subtask.getId, permissionsChecksInteraction = (page) => {
-				assertTrue(page.areAllRequiredFieldsFilledIn)
+        Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
 			},
 				selectTargetInteraction = (page) => page.setDestinationProject("acrobata")
 			)
