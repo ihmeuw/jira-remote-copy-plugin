@@ -84,7 +84,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
 
 		permissionChecksPage.getSelectElement("customfield_10006").select(Options.text("beta"))
 
-		val succesfulCopyPage = permissionChecksPage.copyIssue()
-		assertTrue(succesfulCopyPage.isSuccessful)
+		val successfulPage = permissionChecksPage.copyIssue()
+		assertTrue(successfulPage.isSuccessful)
 	}
 }
