@@ -343,7 +343,7 @@
 		<profile>
 			<id>jira-5.2.x</id>
 			<properties>
-				<jira.version>5.2.4.1</jira.version>
+				<jira.version>5.2.9</jira.version>
 				<testkit.version>6.0.5</testkit.version>
 			</properties>
 		</profile>
