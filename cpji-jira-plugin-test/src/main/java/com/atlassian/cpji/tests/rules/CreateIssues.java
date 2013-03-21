@@ -20,9 +20,15 @@ public class CreateIssues extends ExternalResource {
 	private static final ProgressMonitor NPM = new NullProgressMonitor();
 	private final JiraRestClient restClient;
 	private final List<BasicIssue> issues = Lists.newArrayList();
+	private final boolean cleanUp;
 
 	public CreateIssues(JiraRestClient restClient) {
+		this(restClient, true);
+	}
+
+	public CreateIssues(JiraRestClient restClient, boolean cleanUp) {
 		this.restClient = restClient;
+		this.cleanUp = cleanUp;
 	}
 
 	@Override
@@ -46,11 +52,13 @@ public class CreateIssues extends ExternalResource {
 	protected void after() {
 		super.after();
 
-		for(BasicIssue issue : issues) {
-			try {
-				restClient.getIssueClient().removeIssue(issue, true, NPM);
-			} catch (Exception e) {
-				logger.error(String.format("Unable to delete issue %s", issue.getKey()), e);
+		if (cleanUp) {
+			for(BasicIssue issue : issues) {
+				try {
+					restClient.getIssueClient().removeIssue(issue, true, NPM);
+				} catch (Exception e) {
+					logger.error(String.format("Unable to delete issue %s", issue.getKey()), e);
+				}
 			}
 		}
 	}
