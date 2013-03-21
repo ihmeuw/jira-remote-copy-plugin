@@ -67,26 +67,22 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
   @Test
   def copySimpleIssueWithTimeEstimationToDefaultProject() {
     testkit3.timeTracking().enable("8", "5", TimeTracking.Format.PRETTY, TimeTracking.Unit.MINUTE, TimeTracking.Mode.MODERN)
-    try{
-      val trackingParams : java.util.Map[String, AnyRef] = ImmutableMap.of("originalEstimate", "100", "remainingEstimate", "40")
-      val issue = createIssueAdvanced("Sample issue", List(
-        (IssueFieldId.TIMETRACKING_FIELD, new ComplexIssueInputFieldValue(trackingParams))
-      ))
+    val trackingParams : java.util.Map[String, AnyRef] = ImmutableMap.of("originalEstimate", "100", "remainingEstimate", "40")
+    val issue = createIssueAdvanced("Sample issue", List(
+      (IssueFieldId.TIMETRACKING_FIELD, new ComplexIssueInputFieldValue(trackingParams))
+    ))
 
-      val copiedIssueKey = remoteCopy(jira3, issue.getId,
-        permissionsChecksInteraction = (page) => {
-          Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
-        })
+    val copiedIssueKey = remoteCopy(jira3, issue.getId,
+      permissionsChecksInteraction = (page) => {
+        Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
+      })
 
-      val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
-      assertEquals(issue.getProject.getKey, copiedIssue.getProject.getKey)
-      issuesEquals(issue, copiedIssue)
-      assertEquals(100, copiedIssue.getTimeTracking.getOriginalEstimateMinutes)
-      assertEquals(100, copiedIssue.getTimeTracking.getRemainingEstimateMinutes)
-      assertNull(copiedIssue.getTimeTracking.getTimeSpentMinutes)
-    } finally {
-      testkit3.applicationProperties().setOption(APKeys.JIRA_OPTION_TIMETRACKING, false)
-    }
+    val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+    assertEquals(issue.getProject.getKey, copiedIssue.getProject.getKey)
+    issuesEquals(issue, copiedIssue)
+    assertEquals(100, copiedIssue.getTimeTracking.getOriginalEstimateMinutes)
+    assertEquals(100, copiedIssue.getTimeTracking.getRemainingEstimateMinutes)
+    assertNull(copiedIssue.getTimeTracking.getTimeSpentMinutes)
   }
 
   @Test
