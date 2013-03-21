@@ -14,6 +14,9 @@ import java.io.ByteArrayInputStream
 import scala.collection.JavaConverters._
 import com.atlassian.pageobjects.elements.query.Poller
 import org.codehaus.jettison.json.JSONObject
+import com.atlassian.jira.testkit.client.restclient.TimeTracking
+import com.google.common.collect.ImmutableMap
+import com.atlassian.jira.config.properties.APKeys
 
 class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
@@ -26,13 +29,20 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
     login(jira3)
   }
 
-  val createIssue = (summary: String) => {
-    createIssues3.newIssue(
+  val createIssueAdvanced : ((String, List[FieldInput] ) => Issue) = (summary, additionalFields) => {
+    val fieldInputs : List[FieldInput] = List(
       (IssueFieldId.SUMMARY_FIELD, summary),
       (IssueFieldId.PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "WHEI")),
       (IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3"))
     )
+
+    createIssues3.newIssue((fieldInputs ++ additionalFields):_*)
   }
+
+  val createIssue = (summary : String)=>{
+    createIssueAdvanced(summary, List())
+  }
+
 
   val defaultPermissionChecksInteraction: (CopyIssueToInstanceConfirmationPage) => Unit = (page) => {
     Poller.waitUntilTrue(page.areAllIssueFieldsRetained)
@@ -55,17 +65,28 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
   }
 
   @Test
-  def copySimpleIssueToDefaultProject() {
+  def copySimpleIssueWithTimeEstimationToDefaultProject() {
+    testkit3.timeTracking().enable("8", "5", TimeTracking.Format.PRETTY, TimeTracking.Unit.MINUTE, TimeTracking.Mode.MODERN)
+    try{
+      val trackingParams : java.util.Map[String, AnyRef] = ImmutableMap.of("originalEstimate", "100", "remainingEstimate", "40")
+      val issue = createIssueAdvanced("Sample issue", List(
+        (IssueFieldId.TIMETRACKING_FIELD, new ComplexIssueInputFieldValue(trackingParams))
+      ))
 
-    val issue = createIssue("Sample issue")
-    val copiedIssueKey = remoteCopy(jira3, issue.getId,
-			permissionsChecksInteraction = (page) => {
-        Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
-      })
+      val copiedIssueKey = remoteCopy(jira3, issue.getId,
+        permissionsChecksInteraction = (page) => {
+          Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
+        })
 
-    val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
-    assertEquals(issue.getProject.getKey, copiedIssue.getProject.getKey)
-    issuesEquals(issue, copiedIssue)
+      val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+      assertEquals(issue.getProject.getKey, copiedIssue.getProject.getKey)
+      issuesEquals(issue, copiedIssue)
+      assertEquals(100, copiedIssue.getTimeTracking.getOriginalEstimateMinutes)
+      assertEquals(100, copiedIssue.getTimeTracking.getRemainingEstimateMinutes)
+      assertNull(copiedIssue.getTimeTracking.getTimeSpentMinutes)
+    } finally {
+      testkit3.applicationProperties().setOption(APKeys.JIRA_OPTION_TIMETRACKING, false)
+    }
   }
 
   @Test
