@@ -22,7 +22,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
 		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
 		var permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
     Poller.waitUntilTrue(permissionChecksPage.areAllIssueFieldsRetained)
-    Poller.waitUntilTrue(permissionChecksPage.areAllRequiredFieldsFilledIn)
+    Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
 		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups()
