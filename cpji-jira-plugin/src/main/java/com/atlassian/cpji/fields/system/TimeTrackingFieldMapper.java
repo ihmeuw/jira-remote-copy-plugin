@@ -61,25 +61,16 @@ public class TimeTrackingFieldMapper extends AbstractFieldMapper implements Syst
         TimeTrackingBean timeTracking = bean.getTimeTracking();
         if (timeTrackingConfiguration.enabled() && timeTracking != null)
         {
-            if (timeTrackingConfiguration.getMode().equals(TimeTrackingConfiguration.Mode.LEGACY))
-            {
-                Long remainingEstimate = timeTracking.getEstimate();
-                if (remainingEstimate != null)
+            final Long originalEstimate = timeTracking.getOriginalEstimate();
+            if(originalEstimate != null){
+                if (timeTrackingConfiguration.getMode().equals(TimeTrackingConfiguration.Mode.LEGACY))
                 {
-                    inputParameters.getActionParameters().put(IssueFieldConstants.TIMETRACKING, toArr(String.valueOf(remainingEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
+                    inputParameters.getActionParameters().put(IssueFieldConstants.TIMETRACKING, toArr(String.valueOf(originalEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
                 }
-            }
-            else
-            {
-                Long originalEstimate = timeTracking.getOriginalEstimate();
-                if (originalEstimate != null)
+                else
                 {
                     inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE, toArr(String.valueOf(originalEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
-                }
-                Long remainingEstimate = timeTracking.getEstimate();
-                if (remainingEstimate != null)
-                {
-                    inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE, toArr(String.valueOf(remainingEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
+                    inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE, toArr(String.valueOf(originalEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
                 }
             }
         }
