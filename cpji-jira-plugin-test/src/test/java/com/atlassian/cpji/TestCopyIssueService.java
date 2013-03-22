@@ -23,6 +23,7 @@ import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.changehistory.ChangeHistoryManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
@@ -98,6 +99,8 @@ public class TestCopyIssueService {
     private SubTaskManager subTaskManager;
     @Mock
     private ProjectInfoService projectInfoService;
+    @Mock
+    private ChangeHistoryManager changeHistoryManager;
 
     @Before
     public void setUp() throws Exception {
@@ -114,7 +117,7 @@ public class TestCopyIssueService {
         when(createdIssue.getKey()).thenReturn(ISSUE_KEY);
         when(createdIssue.getId()).thenReturn(ISSUE_ID);
 
-        copyIssueService = new CopyIssueService(issueService, authenticationContext, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, subTaskManager, projectInfoService);
+        copyIssueService = new CopyIssueService(issueService, authenticationContext, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, subTaskManager, projectInfoService, changeHistoryManager);
     }
 
 

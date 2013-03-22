@@ -31,6 +31,7 @@ import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
+import com.atlassian.jira.issue.changehistory.ChangeHistoryManager;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayout;
@@ -78,9 +79,10 @@ public class CopyIssueService {
     private final InputParametersService inputParametersService;
     private final SubTaskManager subTaskManager;
     private final ProjectInfoService projectInfoService;
+    private final ChangeHistoryManager changeHistoryManager;
 
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, SubTaskManager subTaskManager, ProjectInfoService projectInfoService) {
+    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, SubTaskManager subTaskManager, ProjectInfoService projectInfoService, ChangeHistoryManager changeHistoryManager) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
@@ -94,6 +96,7 @@ public class CopyIssueService {
         this.inputParametersService = inputParametersService;
         this.subTaskManager = subTaskManager;
         this.projectInfoService = projectInfoService;
+        this.changeHistoryManager = changeHistoryManager;
     }
 
 
@@ -334,6 +337,14 @@ public class CopyIssueService {
         } catch (NoSuchElementException ex) {
             throw new RESTException(Response.Status.NOT_FOUND, "No issue type with name '" + issueType + "' found!");
         }
+    }
+
+    public void clearChangeHistory(String issueKey) throws IssueNotFoundException{
+        IssueService.IssueResult result = issueService.getIssue(callingUser(), issueKey);
+        if (!result.isValid()) {
+            throw new IssueNotFoundException(result.getErrorCollection());
+        }
+        changeHistoryManager.removeAllChangeItems(result.getIssue());
     }
 
     private IssueLinkType findIssueLinkTypeByNames(final String issueLinkType){

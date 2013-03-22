@@ -40,6 +40,7 @@ public class RemoteJiraProxy implements JiraProxy {
     public static final String PROJECT_RESOURCE_PATH = "project";
     public static final String COPY_ISSUE_RESOURCE_PATH = "copyissue";
     public static final String CONVERT_ISSUE_LINKS_RESOURCE_PATH = COPY_ISSUE_RESOURCE_PATH + "/convertIssueLinks";
+    public static final String CLEAR_ISSUE_HISTORY_RESOURCE_PATH = COPY_ISSUE_RESOURCE_PATH + "/clearIssueHistory";
 
     public static final int CONNECTION_TIMEOUTS = 100000;
     private static final Logger log = Logger.getLogger(RemoteJiraProxy.class);
@@ -270,6 +271,22 @@ public class RemoteJiraProxy implements JiraProxy {
         return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + CONVERT_ISSUE_LINKS_RESOURCE_PATH + "/" + remoteIssueKey, handler);
 
 
+    }
+
+    @Override
+    public Either<NegativeResponseStatus, SuccessfulResponse> clearChangeHistory(String issueKey) {
+        AbstractJsonResponseHandler<SuccessfulResponse> handler = new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
+            @Override
+            protected void modifyRequest(ApplicationLinkRequest request) {
+                request.setSoTimeout(CONNECTION_TIMEOUTS);
+                request.setConnectionTimeout(CONNECTION_TIMEOUTS);
+            }
+            @Override
+            protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
+                return SuccessfulResponse.build(jiraLocation);
+            }
+        };
+        return callRestService(Request.MethodType.GET, REST_URL_COPY_ISSUE + CLEAR_ISSUE_HISTORY_RESOURCE_PATH + "/" + issueKey, handler);
     }
 
     @Override

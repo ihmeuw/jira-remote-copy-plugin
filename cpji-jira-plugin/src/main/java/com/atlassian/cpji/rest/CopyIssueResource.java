@@ -88,4 +88,15 @@ public class CopyIssueResource
             return Response.serverError().entity(ErrorBean.convertErrorCollection(e.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
     }
+
+    @GET
+    @Path ("clearIssueHistory/{issueKey}")
+    public Response clearIssueHistory(@PathParam("issueKey") String issueKey){
+        try{
+            copyIssueService.clearChangeHistory(issueKey);
+            return Response.noContent().cacheControl(RESTException.never()).build();
+        } catch (CopyIssueException e){
+            return Response.serverError().entity(ErrorBean.convertErrorCollection(e.getErrorCollection())).cacheControl(RESTException.never()).build();
+        }
+    }
 }

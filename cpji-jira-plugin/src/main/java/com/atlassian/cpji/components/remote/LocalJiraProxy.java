@@ -196,6 +196,16 @@ public class LocalJiraProxy implements JiraProxy {
     }
 
     @Override
+    public Either<NegativeResponseStatus, SuccessfulResponse> clearChangeHistory(String issueKey) {
+        try{
+            copyIssueService.clearChangeHistory(issueKey);
+            return SuccessfulResponse.buildEither(jiraLocation);
+        } catch (CopyIssueException e){
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getErrorCollection()));
+        }
+    }
+
+    @Override
     public String getIssueUrl(String issueKey) {
         String baseUrl = jiraBaseUrls.baseUrl();
         return baseUrl + "/browse/" + issueKey;

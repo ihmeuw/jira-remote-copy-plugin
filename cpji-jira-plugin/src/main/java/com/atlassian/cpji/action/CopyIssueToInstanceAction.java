@@ -231,6 +231,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
         copyAndCreateIssueLinks(proxy, issueToCopy, copiedIssue);
 
+        proxy.clearChangeHistory(copiedIssue.getIssueKey());
+
 		linkToNewIssue = proxy.getIssueUrl(copiedIssue.getIssueKey());
 
 		setCurrentStep("success");

@@ -38,6 +38,8 @@ public interface JiraProxy {
 
     public Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey);
 
+    public Either<NegativeResponseStatus, SuccessfulResponse> clearChangeHistory(String issueKey);
+
     public String generateAuthenticationUrl(String issueId);
 
     public String getIssueUrl(String issueKey);
