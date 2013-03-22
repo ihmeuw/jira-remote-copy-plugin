@@ -280,12 +280,17 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
                 final JiraProxy.LinkCreationDirection localDirection, remoteDirection;
                 if (remoteIssueLinkType.hasLocalIssueLinkToRemote()) {
                     // JRA-24563: Consider legacy reversed link direction
-                    localDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.OUTWARD : JiraProxy.LinkCreationDirection.INWARD;
-                    remoteDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.INWARD : JiraProxy.LinkCreationDirection.OUTWARD;
+                    localDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.OUTWARD : JiraProxy.LinkCreationDirection.INWARD ;
                 } else {
                     localDirection = JiraProxy.LinkCreationDirection.IGNORE;
+                }
+
+                if(remoteIssueLinkType.hasRemoteIssueLinkToLocal()){
+                    remoteDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.INWARD : JiraProxy.LinkCreationDirection.OUTWARD;
+                } else {
                     remoteDirection = JiraProxy.LinkCreationDirection.IGNORE;
                 }
+
                 proxy.copyLocalIssueLink(issueToCopy, copiedIssue.getIssueKey(), copiedIssue.getIssueId(),
                         linkType,
                         localDirection,

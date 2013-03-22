@@ -162,7 +162,8 @@ public class LocalJiraProxy implements JiraProxy {
     @Override
     public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, SimplifiedIssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection) {
         try {
-
+            //In contrary to remote links, local are always created in both directions so is is not possible to create only one-way local link.
+            //So here we care only local direction (ie creating link from source issue)
             if (localDirection == LinkCreationDirection.OUTWARD) {
                 issueLinkManager.createIssueLink(localIssue.getId(), remoteIssueId, issueLinkType.getId(), null, jiraAuthenticationContext.getLoggedInUser());
             } else if (localDirection == LinkCreationDirection.INWARD) {

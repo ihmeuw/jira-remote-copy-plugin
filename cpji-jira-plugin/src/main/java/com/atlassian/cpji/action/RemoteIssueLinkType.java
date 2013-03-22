@@ -5,8 +5,17 @@ package com.atlassian.cpji.action;
  */
 public enum RemoteIssueLinkType
 {
+    /**
+     * Both directions
+     */
     RECIPROCAL("cpji.remote.link.reciprocal"),
+    /**
+     * From copy to original issue
+     */
     INCOMING("cpji.remote.link.incoming"),
+    /**
+     * From original to copy
+     */
     OUTGOING("cpji.remote.link.outgoing"),
     NONE("cpji.remote.link.nolink");
 
@@ -23,11 +32,11 @@ public enum RemoteIssueLinkType
     }
 
     public boolean hasRemoteIssueLinkToLocal(){
-        return equals(RECIPROCAL) || equals(OUTGOING);
+        return equals(RECIPROCAL) || equals(INCOMING);
     }
 
 
     public boolean hasLocalIssueLinkToRemote(){
-        return equals(RECIPROCAL) || equals(INCOMING);
+        return equals(RECIPROCAL) || equals(OUTGOING);
     }
 }
