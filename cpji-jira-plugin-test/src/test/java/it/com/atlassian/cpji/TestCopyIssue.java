@@ -6,8 +6,13 @@ import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceSuccessfulPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.rest.client.IssueRestClient;
+import com.atlassian.jira.rest.client.domain.Attachment;
+import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.pageobjects.elements.query.Poller;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,13 +21,11 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static com.atlassian.cpji.tests.RawRestUtil.getIssueJson;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @since v2.1
@@ -80,22 +83,19 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     public void testAttachmentsCopying() throws Exception {
         final String remoteIssueKey = remoteCopy(jira1, "NEL-4", 10400L);
 
-        final JSONObject json = getIssueJson(jira2, remoteIssueKey);
-        final JSONObject fields = json.getJSONObject("fields");
-        final JSONArray attachments = fields.getJSONArray("attachment");
+        Issue restIssue = restClient2.getIssueClient().getIssue(remoteIssueKey, ImmutableList.of(IssueRestClient.Expandos.CHANGELOG), NPM);
+        List<Attachment> attachments = ImmutableList.copyOf(restIssue.getAttachments());
+        checkAttachment(attachments.get(0), "document.doc", 9216, "application/msword; charset=ISO-8859-1");
+        checkAttachment(attachments.get(1), "screenshot.png", 36743, "image/png; charset=ISO-8859-1");
 
-        final JSONObject document = attachments.getJSONObject(0);
-        checkAttachment(document, "document.doc", 9216, "application/msword; charset=ISO-8859-1");
-
-        final JSONObject screenshot = attachments.getJSONObject(1);
-        checkAttachment(screenshot, "screenshot.png", 36743, "image/png; charset=ISO-8859-1");
-
+        //after copying attachments, change history should be empty
+        assertEquals("Change history should be empty as we clear it", 0, Iterables.size(restIssue.getChangelog()));
     }
 
-    private void checkAttachment(JSONObject attachment, String filename, int size, String mimeType) throws Exception {
-        assertEquals(filename, attachment.getString("filename"));
-        assertEquals(size, attachment.getInt("size"));
-        assertEquals(mimeType, attachment.getString("mimeType"));
+    private void checkAttachment(Attachment attachment, String filename, int size, String mimeType) throws Exception {
+        assertEquals(filename, attachment.getFilename());
+        assertEquals(size, attachment.getSize());
+        assertEquals(mimeType, attachment.getMimeType());
     }
 
     @Test
