@@ -1,5 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects;
 
+import com.atlassian.cpji.action.RemoteIssueLinkType;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
@@ -113,6 +114,29 @@ public class CopyDetailsPage extends AbstractJiraPage
         remoteIssueLink.clear().triggerSuggestions();
         return remoteIssueLink.getSuggestions();
 	}
+
+    public CopyDetailsPage setCreateIssueLink(RemoteIssueLinkType value){
+        final String selectedValue;
+        switch(value){
+            case RECIPROCAL:
+                selectedValue = "Both";
+                break;
+            case INCOMING:
+                selectedValue = "From copy";
+                break;
+            case OUTGOING:
+                selectedValue = "From original";
+                break;
+            case NONE:
+                selectedValue = "None";
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        remoteIssueLink.type(selectedValue).clickSuggestion();
+        return this;
+    }
 
 	public CheckboxElement getCopyIssueLinks() {
 		return copyIssueLinks;

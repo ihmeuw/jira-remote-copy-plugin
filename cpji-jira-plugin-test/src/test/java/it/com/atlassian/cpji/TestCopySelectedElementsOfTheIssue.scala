@@ -16,6 +16,7 @@ import org.json.{JSONObject, JSONArray}
 import com.atlassian.cpji.CopyIssueProcess
 import com.atlassian.jira.rest.api.issue.RemoteIssueLinkCreateOrUpdateRequest
 import collection.JavaConverters._
+import com.atlassian.cpji.action.RemoteIssueLinkType
 
 class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with JiraObjects {
 
@@ -68,12 +69,13 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 		assertEquals(2, remoteLinks.length())
 	}
 
-	@Test def testNotCopyingAttachments() {
+	@Test def testNotCopyingAttachmentsAndCreateLinkOnlyFromCopiedToOriginal() {
     	val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyAttachments.uncheck()
+    copyDetailsPage.setCreateIssueLink(RemoteIssueLinkType.INCOMING)
 
 		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
@@ -85,14 +87,19 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
 		val remoteLinks: JSONArray = getIssueRemoteLinksJson(jira2, issueRest.getKey)
 		assertEquals(2, remoteLinks.length())
+    compareRemoteLink("clones", issue.getKey, remoteLinks.getJSONObject(1))
+
+    val links = getIssueRemoteLinksJson(jira1, issue.getKey)
+    assertEquals(0, links.length())
 	}
 
-	@Test def testNotCopyingLinks() {
+	@Test def testNotCopyingLinksAndCreateLinkOnlyFromOriginal() {
     val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachmentsGroup.timed().isVisible)
 		Poller.waitUntilTrue(copyDetailsPage.getCopyAttachments.timed.isEnabled)
 		copyDetailsPage.getCopyIssueLinks.uncheck()
+    copyDetailsPage.setCreateIssueLink(RemoteIssueLinkType.OUTGOING)
 
 		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
@@ -103,7 +110,10 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
 		assertThat(issueRest.getIssueLinks, IsIterableWithSize.iterableWithSize[IssueLink](0))
 		val remoteLinks: JSONArray = getIssueRemoteLinksJson(jira2, issueRest.getKey)
-		assertEquals(1, remoteLinks.length())
+		assertEquals(0, remoteLinks.length())
+
+    val link = getIssueRemoteLinksJson(jira1, issue.getKey).getJSONObject(0)
+    compareRemoteLink("is cloned by", issueRest.getKey, link)
 	}
 
 
