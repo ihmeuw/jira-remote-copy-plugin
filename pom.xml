@@ -252,6 +252,12 @@
                 <artifactId>usercompatibility-jira</artifactId>
                 <version>0.09</version>
             </dependency>
+			<dependency>
+				<groupId>com.atlassian.util.concurrent</groupId>
+				<artifactId>atlassian-util-concurrent</artifactId>
+				<version>2.4.1</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

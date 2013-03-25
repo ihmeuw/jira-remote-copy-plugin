@@ -12,87 +12,95 @@ import org.junit.runner.RunWith
 import org.mockito.runners.MockitoJUnitRunner
 import java.lang.Long
 import com.atlassian.core.util.DateUtils
+import com.atlassian.jira.mock.component.MockComponentWorker
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.util.JiraDurationUtils
 
 @RunWith(classOf[MockitoJUnitRunner]) class TestTimeTrackingFieldMapper {
 
-  @Mock var fieldManager: FieldManager = null
-  @Mock var timeTrackingConfiguration: TimeTrackingConfiguration  = null
-  @Mock var issueInputParameters: IssueInputParameters = null
-  @Mock var actionParams : java.util.Map[String, Array[String]] = null
+	@Mock var fieldManager: FieldManager = null
+	@Mock var timeTrackingConfiguration: TimeTrackingConfiguration = null
+	@Mock var issueInputParameters: IssueInputParameters = null
+	@Mock var actionParams: java.util.Map[String, Array[String]] = null
+	@Mock var jiraDurationUtils: JiraDurationUtils = null
+
+	var timeTrackingFieldMapper: TimeTrackingFieldMapper = null
+	var testCopyIssueBean: CopyIssueBean = null
+
+	val worker = new MockComponentWorker()
+
+	@Before def setUp {
+		val of: OrderableField = mock(classOf[OrderableField])
+		when(fieldManager.getField(IssueFieldConstants.TIMETRACKING)) thenReturn (of)
+
+		timeTrackingFieldMapper = new TimeTrackingFieldMapper(fieldManager, timeTrackingConfiguration, null)
+
+		testCopyIssueBean = new CopyIssueBean
+
+		when(issueInputParameters.getActionParameters).thenReturn(actionParams)
+
+		when(timeTrackingConfiguration.enabled()).thenReturn(true)
+		when(timeTrackingConfiguration.getDefaultUnit).thenReturn(DateUtils.Duration.SECOND)
+
+		ComponentAccessor.initialiseWorker(worker)
+		worker.addMock(classOf[JiraDurationUtils], jiraDurationUtils)
+	}
+
+	@Test def shouldDoNothingWhenTimeTrackingIsOff() {
+		when(timeTrackingConfiguration.enabled()).thenReturn(false)
+
+		fire()
+
+		verify(actionParams, never()).put(anyString, any())
+	}
+
+	@Test def shouldDoNothingWhenTimeTrackingBeanIsEmpty() {
+
+		testCopyIssueBean.setTimeTracking(null)
+		fire()
+		verify(actionParams, never()).put(anyString, any())
+
+		prepareTimeTrackingBean(null, null, null)
+		fire()
+		verify(actionParams, never()).put(anyString, any())
+	}
 
 
-  var timeTrackingFieldMapper: TimeTrackingFieldMapper = null
-  var testCopyIssueBean: CopyIssueBean = null
+	@Test def shouldSetTimeTrackingToOrignalEstimateWhenLegacyModeIsEnabled() {
+		prepareTimeTrackingBean()
+		when(timeTrackingConfiguration.getMode).thenReturn(TimeTrackingConfiguration.Mode.LEGACY)
+		when(jiraDurationUtils.getShortFormattedDuration(anyLong())).thenReturn("100")
 
-  @Before def setUp {
-    val of: OrderableField = mock(classOf[OrderableField])
-    when(fieldManager.getField(IssueFieldConstants.TIMETRACKING)) thenReturn(of)
+		fire()
 
-    timeTrackingFieldMapper = new TimeTrackingFieldMapper(fieldManager, timeTrackingConfiguration, null)
+		verify(actionParams).put(IssueFieldConstants.TIMETRACKING, Array("100"))
+		verify(actionParams, never).put(Matchers.eq(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE), any())
+		verify(actionParams, never).put(Matchers.eq(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE), any())
+	}
 
-    testCopyIssueBean = new CopyIssueBean
+	@Test def shouldSetOriginalAndRemainingToOrignalEstimateWhenLegacyModeIsDisabled() {
+		prepareTimeTrackingBean()
+		when(timeTrackingConfiguration.getMode).thenReturn(TimeTrackingConfiguration.Mode.MODERN)
+		when(jiraDurationUtils.getShortFormattedDuration(anyLong())).thenReturn("100")
 
-    when(issueInputParameters.getActionParameters).thenReturn(actionParams)
+		fire()
 
-    when(timeTrackingConfiguration.enabled()).thenReturn(true)
-    when(timeTrackingConfiguration.getDefaultUnit).thenReturn(DateUtils.Duration.SECOND)
-  }
-
-  @Test def shouldDoNothingWhenTimeTrackingIsOff() {
-    when(timeTrackingConfiguration.enabled()).thenReturn(false)
-
-    fire()
-
-    verify(actionParams, never()).put(anyString,  any())
-  }
-
-  @Test def shouldDoNothingWhenTimeTrackingBeanIsEmpty() {
-
-    testCopyIssueBean.setTimeTracking(null)
-    fire()
-    verify(actionParams, never()).put(anyString,  any())
-
-    prepareTimeTrackingBean(null, null, null)
-    fire()
-    verify(actionParams, never()).put(anyString,  any())
-  }
+		verify(actionParams).put(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE, Array("100"))
+		verify(actionParams).put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE, Array("100"))
+		verify(actionParams, never).put(Matchers.eq(IssueFieldConstants.TIMETRACKING), any())
+	}
 
 
-  @Test def shouldSetTimeTrackingToOrignalEstimateWhenLegacyModeIsEnabled() {
-    prepareTimeTrackingBean()
-    when(timeTrackingConfiguration.getMode).thenReturn(TimeTrackingConfiguration.Mode.LEGACY)
-
-    fire()
-
-    verify(actionParams).put(IssueFieldConstants.TIMETRACKING, Array("100"))
-    verify(actionParams, never).put(Matchers.eq(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE), any())
-    verify(actionParams, never).put(Matchers.eq(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE), any())
-  }
-
-  @Test def shouldSetOriginalAndRemainingToOrignalEstimateWhenLegacyModeIsDisabled() {
-    prepareTimeTrackingBean()
-    when(timeTrackingConfiguration.getMode).thenReturn(TimeTrackingConfiguration.Mode.MODERN)
-
-    fire()
-
-    verify(actionParams).put(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE,  Array("100"))
-    verify(actionParams).put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE,  Array("100"))
-    verify(actionParams, never).put(Matchers.eq(IssueFieldConstants.TIMETRACKING), any())
-  }
+	def fire() {
+		timeTrackingFieldMapper.populateInputParameters(issueInputParameters, testCopyIssueBean, null, null)
+	}
 
 
-  def fire() {
-    timeTrackingFieldMapper.populateInputParameters(issueInputParameters, testCopyIssueBean, null, null)
-  }
-
-
-  def prepareTimeTrackingBean(original: Long = 100L, estimate : Long = 60L, spent : Long = 40L) : TimeTrackingBean = {
-    val tt = new TimeTrackingBean(original, spent, estimate)
-    testCopyIssueBean.setTimeTracking(tt)
-    return tt
-  }
-
-
+	def prepareTimeTrackingBean(original: Long = 100L, estimate: Long = 60L, spent: Long = 40L): TimeTrackingBean = {
+		val tt = new TimeTrackingBean(original, spent, estimate)
+		testCopyIssueBean.setTimeTracking(tt)
+		return tt
+	}
 
 
 }
