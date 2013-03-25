@@ -6,6 +6,7 @@ import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.TimeTrackingBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.FieldManager;
@@ -13,6 +14,7 @@ import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.TimeTrackingSystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.util.JiraDurationUtils;
 
 import java.util.Collections;
 
@@ -58,19 +60,22 @@ public class TimeTrackingFieldMapper extends AbstractFieldMapper implements Syst
     @Override
     public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
+
         TimeTrackingBean timeTracking = bean.getTimeTracking();
         if (timeTrackingConfiguration.enabled() && timeTracking != null)
         {
             final Long originalEstimate = timeTracking.getOriginalEstimate();
             if(originalEstimate != null){
+                final JiraDurationUtils durutil = ComponentAccessor.getComponent(JiraDurationUtils.class);
+                final String formattedValue = durutil.getShortFormattedDuration(originalEstimate);
                 if (timeTrackingConfiguration.getMode().equals(TimeTrackingConfiguration.Mode.LEGACY))
                 {
-                    inputParameters.getActionParameters().put(IssueFieldConstants.TIMETRACKING, toArr(String.valueOf(originalEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
+                    inputParameters.getActionParameters().put(IssueFieldConstants.TIMETRACKING, toArr(formattedValue));
                 }
                 else
                 {
-                    inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE, toArr(String.valueOf(originalEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
-                    inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE, toArr(String.valueOf(originalEstimate / timeTrackingConfiguration.getDefaultUnit().getSeconds())));
+                    inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE, toArr(formattedValue));
+                    inputParameters.getActionParameters().put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE, toArr(formattedValue));
                 }
             }
         }
