@@ -301,12 +301,17 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		if (linksEnabled() && copyInfo.getIssueLinkingEnabled()) {
 			issueLinkOptions.add(new Option(RemoteIssueLinkType.RECIPROCAL.name(), false, getText(RemoteIssueLinkType.RECIPROCAL.getI18nKey())));
 		}
-		if (copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {
-			issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
-		}
-		if (linksEnabled()) {
-			issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
-		}
+
+        // JRADEV-18180 we can create one-way links only for non-local destinations
+        if(!getSelectedDestinationProject().getJiraLocation().isLocal()){
+            if (copyInfo.getIssueLinkingEnabled() && copyInfo.getHasCreateLinksPermission()) {
+                issueLinkOptions.add(new Option(RemoteIssueLinkType.INCOMING.name(), false, getText(RemoteIssueLinkType.INCOMING.getI18nKey())));
+            }
+            if (linksEnabled()) {
+                issueLinkOptions.add(new Option(RemoteIssueLinkType.OUTGOING.name(), false, getText(RemoteIssueLinkType.OUTGOING.getI18nKey())));
+            }
+        }
+
 		issueLinkOptions.add(new Option(RemoteIssueLinkType.NONE.name(), false, getText(RemoteIssueLinkType.NONE.getI18nKey())));
 
         return issueLinkOptions;
