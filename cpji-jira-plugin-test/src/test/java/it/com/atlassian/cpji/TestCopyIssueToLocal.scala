@@ -5,7 +5,7 @@ import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.rest.client.domain.{IssueFieldId, Issue}
 import com.atlassian.jira.rest.client.domain.input.{IssueInputBuilder, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import java.lang.String
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
 import org.junit.Assert._
 import com.atlassian.jira.pageobjects.JiraTestedProduct
 import com.atlassian.jira.webtests.Permissions
@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONObject
 import com.atlassian.jira.testkit.client.restclient.TimeTracking
 import com.google.common.collect.ImmutableMap
 import com.atlassian.jira.config.properties.APKeys
+import org.hamcrest.collection.IsIterableContainingInAnyOrder
 
 class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
@@ -51,11 +52,13 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
   private def remoteCopy(jira: JiraTestedProduct, issueId: Long,
                          selectTargetInteraction: (SelectTargetProjectPage) => Unit = (page) => {},
+                         copyDetailsPageInteraction: (CopyDetailsPage) => Unit = (page) => {},
                          permissionsChecksInteraction: (CopyIssueToInstanceConfirmationPage) => Unit = defaultPermissionChecksInteraction): String = {
     val selectTargetProjectPage = jira.visit(classOf[SelectTargetProjectPage], issueId: java.lang.Long)
     selectTargetInteraction(selectTargetProjectPage)
 
     val copyDetailsPage = selectTargetProjectPage.next
+    copyDetailsPageInteraction(copyDetailsPage)
     val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
     permissionsChecksInteraction(permissionChecksPage)
 
@@ -102,7 +105,12 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
     val copiedIssueKey = remoteCopy(jira3, issue.getId,
       permissionsChecksInteraction = (page) => {
         Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
-      })
+      },
+      copyDetailsPageInteraction = (page) => {
+        //local clone cannot create unidirectional link
+        assertThat(page.getCreateIssueLinks, IsIterableContainingInAnyOrder.containsInAnyOrder("Both directions", "None"))
+      }
+    )
 
     val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
 
