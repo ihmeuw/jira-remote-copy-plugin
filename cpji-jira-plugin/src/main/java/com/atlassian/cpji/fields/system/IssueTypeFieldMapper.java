@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -26,8 +27,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v1.4
  */
-public class IssueTypeFieldMapper extends AbstractFieldMapper  implements SystemFieldIssueCreationFieldMapper
-{
+public class IssueTypeFieldMapper extends AbstractSystemFieldMapper  implements IssueCreationFieldMapper {
     private final IssueTypeSchemeManager issueTypeSchemeManager;
 
     public IssueTypeFieldMapper(IssueTypeSchemeManager issueTypeSchemeManager, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
@@ -41,7 +41,7 @@ public class IssueTypeFieldMapper extends AbstractFieldMapper  implements System
         return IssueTypeSystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         final IssueType issueType = findIssueType(bean, project);
         inputParameters.setIssueTypeId(issueType.getId());

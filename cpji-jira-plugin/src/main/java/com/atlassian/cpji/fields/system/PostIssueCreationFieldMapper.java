@@ -7,11 +7,7 @@ import com.atlassian.jira.issue.Issue;
 /**
  * @since v1.4
  */
-public interface SystemFieldPostIssueCreationFieldMapper extends FieldMapper
+public interface PostIssueCreationFieldMapper extends FieldMapper
 {
     void process(Issue issue, final CopyIssueBean bean) throws FieldCreationException;
-
-    String getFieldId();
-
-
 }

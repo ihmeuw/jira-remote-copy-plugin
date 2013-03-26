@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -20,8 +21,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v1.4
  */
-public class LabelSystemFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class LabelSystemFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     public LabelSystemFieldMapper(final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(getOrderableField(fieldManager, IssueFieldConstants.LABELS), defaultFieldValuesManager);
@@ -47,7 +47,7 @@ public class LabelSystemFieldMapper extends AbstractFieldMapper implements Syste
         return LabelsSystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         List<String> labels = bean.getLabels();
         if (labels != null && !labels.isEmpty())

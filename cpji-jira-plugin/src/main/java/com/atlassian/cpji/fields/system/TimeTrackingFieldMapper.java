@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -23,8 +24,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v2.1
  */
-public class TimeTrackingFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class TimeTrackingFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final TimeTrackingConfiguration timeTrackingConfiguration;
 
     public TimeTrackingFieldMapper(FieldManager fieldManager, final TimeTrackingConfiguration timeTrackingConfiguration, final DefaultFieldValuesManager defaultFieldValuesManager)
@@ -58,7 +58,7 @@ public class TimeTrackingFieldMapper extends AbstractFieldMapper implements Syst
     }
 
     @Override
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
 
         TimeTrackingBean timeTracking = bean.getTimeTracking();

@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
@@ -12,6 +13,7 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.ReporterSystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
@@ -26,8 +28,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
  *
  * @since v1.4
  */
-public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class ReporterFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final PermissionManager permissionManager;
     private final UserMappingManager userMappingManager;
 
@@ -44,7 +45,7 @@ public class ReporterFieldMapper extends AbstractFieldMapper implements SystemFi
         return ReporterSystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         if (bean.getReporter() != null)
         {

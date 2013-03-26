@@ -16,7 +16,7 @@ import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
-import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
+import com.atlassian.cpji.fields.system.PostIssueCreationFieldMapper;
 import com.atlassian.cpji.rest.RESTException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
@@ -156,9 +156,9 @@ public class CopyIssueService {
             }
 
 
-            final List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = fieldMapperFactory.getPostIssueCreationFieldMapper();
+            final List<PostIssueCreationFieldMapper> postIssueCreationFieldMapper = fieldMapperFactory.getPostIssueCreationFieldMapper();
 
-            for (SystemFieldPostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper) {
+            for (PostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper) {
                 try {
                     issueCreationFieldMapper.process(createIssueResult.getIssue(), copyIssueBean);
                 } catch (FieldCreationException e) {

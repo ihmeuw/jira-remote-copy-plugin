@@ -95,7 +95,7 @@ public class InputParametersService {
         public void populateProjectSystemField() {
             IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
 			Preconditions.checkNotNull("There should be projectMapper defined.", projectFieldMapper);
-            projectFieldMapper.populateInputParameters(inputParameters, copyIssueBean, null, project);
+            projectFieldMapper.populateInputParams(inputParameters, copyIssueBean, null, project, issueType);
         }
 
         private void populateCustomField(FieldLayoutItem item, OrderableField orderableField) {
@@ -128,15 +128,7 @@ public class InputParametersService {
         private void populateSystemField(FieldLayoutItem item, OrderableField orderableField) {
             IssueCreationFieldMapper fieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(orderableField.getClass());
             if (fieldMapper != null) {
-                MappingResult mappingResult = fieldMapper.getMappingResult(copyIssueBean, project);
-                if (!mappingResult.hasOneValidValue() && item.isRequired()) {
-                    String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-                    if (defaultFieldValue != null) {
-                        inputParameters.getActionParameters().put(orderableField.getId(), defaultFieldValue);
-                    }
-                } else {
-                    fieldMapper.populateInputParameters(inputParameters, copyIssueBean, item, project);
-                }
+				fieldMapper.populateInputParams(inputParameters, copyIssueBean, item, project, issueType);
             } else {
                 if (!allSystemFieldMappers.containsKey(orderableField.getId())) {
                     log.warn("No support for field '" + orderableField.getName() + "'");

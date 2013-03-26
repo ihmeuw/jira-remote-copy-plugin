@@ -3,8 +3,7 @@ package com.atlassian.cpji.fields;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.system.CommentFieldMapper;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
-import com.atlassian.cpji.fields.system.SystemFieldIssueCreationFieldMapper;
-import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
+import com.atlassian.cpji.fields.system.PostIssueCreationFieldMapper;
 import com.atlassian.cpji.fields.system.VoterFieldMapper;
 import com.atlassian.cpji.fields.system.WatcherFieldMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
@@ -36,14 +35,13 @@ import java.util.Map;
  */
 public class FieldMapperFactory
 {
-	private final LazyReference<Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper>> orderableFieldMapper;
+	private final LazyReference<Map<Class<? extends OrderableField>, IssueCreationFieldMapper>> orderableFieldMapper;
 
-	private List<SystemFieldPostIssueCreationFieldMapper> postIssueCreationFieldMapper = new ArrayList<SystemFieldPostIssueCreationFieldMapper>();
+	private List<PostIssueCreationFieldMapper> postIssueCreationFieldMapper = new ArrayList<PostIssueCreationFieldMapper>();
 
 	private final LazyReference<List<CustomFieldMapper>> customFieldMappers;
 
-    public FieldMapperFactory
-            (
+    public FieldMapperFactory(
 					final PluginAccessor pluginAccessor,
                     final PermissionManager permissionManager,
                     final CommentService commentService,
@@ -56,12 +54,12 @@ public class FieldMapperFactory
                     final UserMappingManager userMappingManager,
 					final DefaultFieldValuesManager defaultFieldValuesManager)
     {
-		orderableFieldMapper = new LazyReference<Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper>>() {
+		orderableFieldMapper = new LazyReference<Map<Class<? extends OrderableField>, IssueCreationFieldMapper>>() {
 			@Override
-			protected Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper> create()
+			protected Map<Class<? extends OrderableField>, IssueCreationFieldMapper> create()
 					throws Exception {
 				final List<SystemFieldMapperModuleDescriptor> systemFieldsMappers = pluginAccessor.getEnabledModuleDescriptorsByClass(SystemFieldMapperModuleDescriptor.class);
-				final Map<Class<? extends OrderableField>, SystemFieldIssueCreationFieldMapper> mappers = Maps.newHashMapWithExpectedSize(systemFieldsMappers.size());
+				final Map<Class<? extends OrderableField>, IssueCreationFieldMapper> mappers = Maps.newHashMapWithExpectedSize(systemFieldsMappers.size());
 				for (SystemFieldMapperModuleDescriptor mapper : systemFieldsMappers) {
 					final Class<? extends OrderableField> field = mapper.getModule().getField();
 
@@ -77,15 +75,15 @@ public class FieldMapperFactory
         /**
          * SystemFieldPostIssueCreationFieldMapper
          */
-        SystemFieldPostIssueCreationFieldMapper commentFieldMapper = new CommentFieldMapper(commentService, projectRoleManager,
+        PostIssueCreationFieldMapper commentFieldMapper = new CommentFieldMapper(commentService, projectRoleManager,
 				groupManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.COMMENT), userMappingManager, defaultFieldValuesManager);
 		postIssueCreationFieldMapper.add(commentFieldMapper);
 
-        SystemFieldPostIssueCreationFieldMapper watcherFieldMapper = new WatcherFieldMapper(watcherService, permissionManager,
+        PostIssueCreationFieldMapper watcherFieldMapper = new WatcherFieldMapper(watcherService, permissionManager,
 				jiraAuthenticationContext, createField(IssueFieldConstants.WATCHERS, "cpji.field.names.watchers"), userMappingManager, defaultFieldValuesManager);
 		postIssueCreationFieldMapper.add(watcherFieldMapper);
 
-        SystemFieldPostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"),
+        PostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"),
 				voteService, permissionManager, jiraAuthenticationContext, userMappingManager, defaultFieldValuesManager);
 		postIssueCreationFieldMapper.add(votersFieldMapper);
 
@@ -147,18 +145,18 @@ public class FieldMapperFactory
     public Map<String, FieldMapper> getSystemFieldMappers()
     {
         Map<String, FieldMapper> fieldMappers = new HashMap<String, FieldMapper>();
-        for (SystemFieldIssueCreationFieldMapper fieldMapper : orderableFieldMapper.get().values())
+        for (IssueCreationFieldMapper fieldMapper : orderableFieldMapper.get().values())
         {
             fieldMappers.put(fieldMapper.getFieldId(), fieldMapper);
         }
-        for (SystemFieldPostIssueCreationFieldMapper fieldMapper : postIssueCreationFieldMapper)
+        for (PostIssueCreationFieldMapper fieldMapper : postIssueCreationFieldMapper)
         {
             fieldMappers.put(fieldMapper.getFieldId(), fieldMapper);
         }
         return fieldMappers;
     }
 
-    public List<SystemFieldPostIssueCreationFieldMapper> getPostIssueCreationFieldMapper()
+    public List<PostIssueCreationFieldMapper> getPostIssueCreationFieldMapper()
     {
         return postIssueCreationFieldMapper;
     }

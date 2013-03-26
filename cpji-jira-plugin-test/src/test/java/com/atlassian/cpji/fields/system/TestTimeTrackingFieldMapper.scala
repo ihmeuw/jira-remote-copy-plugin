@@ -92,7 +92,7 @@ import com.atlassian.jira.util.JiraDurationUtils
 
 
 	def fire() {
-		timeTrackingFieldMapper.populateInputParameters(issueInputParameters, testCopyIssueBean, null, null)
+		timeTrackingFieldMapper.populateCurrentValue(issueInputParameters, testCopyIssueBean, null, null)
 	}
 
 

@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -20,8 +21,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
  *
  * @since v1.4
  */
-public class SummaryFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class SummaryFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     public SummaryFieldMapper(FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(getOrderableField(fieldManager, IssueFieldConstants.SUMMARY), defaultFieldValuesManager);
@@ -32,7 +32,7 @@ public class SummaryFieldMapper extends AbstractFieldMapper implements SystemFie
         return SummarySystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         inputParameters.setSummary(bean.getSummary());
     }

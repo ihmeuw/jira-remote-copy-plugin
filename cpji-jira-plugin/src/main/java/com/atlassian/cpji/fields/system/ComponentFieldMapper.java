@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.ComponentBean;
@@ -28,8 +29,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v1.4
  */
-public class ComponentFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class ComponentFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final ProjectComponentManager projectComponentManager;
 
     public ComponentFieldMapper(ProjectComponentManager projectComponentManager, final FieldManager fieldManager,
@@ -44,7 +44,7 @@ public class ComponentFieldMapper extends AbstractFieldMapper implements SystemF
         return ComponentsSystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         List<ComponentBean> components = makeSureNotNull(bean.getComponents());
         List<Long> componentIds = new ArrayList<Long>();

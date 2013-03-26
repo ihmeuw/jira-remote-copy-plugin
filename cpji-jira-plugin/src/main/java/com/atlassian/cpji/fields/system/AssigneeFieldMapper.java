@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.fields.value.UserMappingManager;
@@ -27,7 +28,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v1.4
  */
-public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper {
+public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
 	private final PermissionManager permissionManager;
 	private final ApplicationProperties applicationProperties;
 	private final UserMappingManager userMappingManager;
@@ -99,7 +100,7 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
 		}
 	}
 
-	public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project) {
+	public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project) {
 		InternalMappingResult assignee = mapUser(bean.getAssignee(), project);
 		boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
 		switch (assignee.decision) {

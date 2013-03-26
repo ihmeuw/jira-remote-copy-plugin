@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @since v1.4
  */
-public class WatcherFieldMapper extends AbstractFieldMapper implements SystemFieldPostIssueCreationFieldMapper, NonOrderableSystemFieldMapper
+public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssueCreationFieldMapper, NonOrderableSystemFieldMapper
 {
     private final WatcherService watcherService;
     private final PermissionManager permissionManager;

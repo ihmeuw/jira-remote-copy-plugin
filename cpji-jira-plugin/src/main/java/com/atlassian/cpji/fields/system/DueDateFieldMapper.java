@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -23,8 +24,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v1.4
  */
-public class DueDateFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class DueDateFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final PermissionManager permissionManager;
 
     public DueDateFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
@@ -38,7 +38,7 @@ public class DueDateFieldMapper extends AbstractFieldMapper implements SystemFie
         return DueDateSystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         Date issueDueDate = bean.getIssueDueDate();
         if (issueDueDate != null)

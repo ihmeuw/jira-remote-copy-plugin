@@ -2,7 +2,9 @@ package com.atlassian.cpji.fields;
 
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.jira.issue.IssueInputParameters;
+import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 
 /**
@@ -10,6 +12,8 @@ import com.atlassian.jira.project.Project;
  */
 public interface IssueCreationFieldMapper extends FieldMapper
 {
-    void populateInputParameters(IssueInputParameters inputParameters, CopyIssueBean bean, FieldLayoutItem fieldLayoutItem, final Project project);
+	Class<? extends OrderableField>  getField();
 
+    void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean bean, FieldLayoutItem fieldLayoutItem,
+			final Project project, IssueType issueType);
 }

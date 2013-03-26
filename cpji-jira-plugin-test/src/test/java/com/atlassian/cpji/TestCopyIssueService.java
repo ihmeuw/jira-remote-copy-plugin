@@ -13,7 +13,7 @@ import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.system.FieldCreationException;
-import com.atlassian.cpji.fields.system.SystemFieldPostIssueCreationFieldMapper;
+import com.atlassian.cpji.fields.system.PostIssueCreationFieldMapper;
 import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Pair;
@@ -161,8 +161,8 @@ public class TestCopyIssueService {
         CopyRequirements reqs = new CopyRequirements();
         prepareIssueService();
 
-        SystemFieldPostIssueCreationFieldMapper mapperWithException = mock(SystemFieldPostIssueCreationFieldMapper.class);
-        SystemFieldPostIssueCreationFieldMapper mapper = mock(SystemFieldPostIssueCreationFieldMapper.class);
+        PostIssueCreationFieldMapper mapperWithException = mock(PostIssueCreationFieldMapper.class);
+        PostIssueCreationFieldMapper mapper = mock(PostIssueCreationFieldMapper.class);
         when(mapperWithException.getFieldId()).thenReturn("fieldWithExceptionId");
         doThrow(new FieldCreationException("field creation message", "fieldId")).when(mapperWithException).process(createdIssue, reqs.copyBean);
 

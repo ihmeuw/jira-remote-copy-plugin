@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
+import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -26,8 +27,7 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 /**
  * @since v1.4
  */
-public class PriorityFieldMapper extends AbstractFieldMapper implements SystemFieldIssueCreationFieldMapper
-{
+public class PriorityFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final ConstantsManager constantsManager;
 
     public PriorityFieldMapper(ConstantsManager constantsManager, FieldManager fieldManager, DefaultFieldValuesManager defaultFieldValuesManager)
@@ -41,7 +41,7 @@ public class PriorityFieldMapper extends AbstractFieldMapper implements SystemFi
         return PrioritySystemField.class;
     }
 
-    public void populateInputParameters(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
+    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
         Priority priority = findPriority(bean.getPriority());
         inputParameters.setPriorityId(priority.getId());

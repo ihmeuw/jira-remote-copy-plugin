@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @since v1.4
  */
-public class CommentFieldMapper extends AbstractFieldMapper implements SystemFieldPostIssueCreationFieldMapper
+public class CommentFieldMapper extends AbstractFieldMapper implements PostIssueCreationFieldMapper
 {
     private final CommentService commentService;
     private final ProjectRoleManager projectRoleManager;

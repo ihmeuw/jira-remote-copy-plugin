@@ -25,7 +25,7 @@ import java.util.List;
  * @since v2.0
  */
 public class VoterFieldMapper extends AbstractFieldMapper
-        implements SystemFieldPostIssueCreationFieldMapper, NonOrderableSystemFieldMapper
+        implements PostIssueCreationFieldMapper, NonOrderableSystemFieldMapper
 {
     private final VoteService voteService;
     private final PermissionManager permissionManager;
