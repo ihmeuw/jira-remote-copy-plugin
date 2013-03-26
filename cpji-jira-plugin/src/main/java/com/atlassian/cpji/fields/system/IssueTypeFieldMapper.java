@@ -41,11 +41,20 @@ public class IssueTypeFieldMapper extends AbstractSystemFieldMapper  implements 
         return IssueTypeSystemField.class;
     }
 
-    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
-    {
-        final IssueType issueType = findIssueType(bean, project);
-        inputParameters.setIssueTypeId(issueType.getId());
-    }
+	@Override
+	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
+		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
+			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
+			if (defaultFieldValue != null) {
+				inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
+			}
+		} else {
+			final IssueType mappedIssueType = findIssueType(copyIssueBean, project);
+			inputParameters.setIssueTypeId(mappedIssueType.getId());
+		}
+	}
 
     public String getFieldId()
     {

@@ -15,6 +15,7 @@ import com.atlassian.jira.issue.fields.AssigneeSystemField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
@@ -112,6 +113,20 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
 				    return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
                 }
 			}
+		}
+	}
+
+	@Override
+	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
+		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
+			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
+			if (defaultFieldValue != null) {
+				inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
+			}
+		} else {
+			populateCurrentValue(inputParameters, copyIssueBean, fieldLayoutItem, project);
 		}
 	}
 

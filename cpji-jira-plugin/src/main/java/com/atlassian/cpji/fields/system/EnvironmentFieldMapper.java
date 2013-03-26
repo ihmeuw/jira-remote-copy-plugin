@@ -11,6 +11,7 @@ import com.atlassian.jira.issue.fields.EnvironmentSystemField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 
 import java.util.Collections;
@@ -31,10 +32,19 @@ public class EnvironmentFieldMapper extends AbstractSystemFieldMapper implements
         return EnvironmentSystemField.class;
     }
 
-    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
-    {
-        inputParameters.setEnvironment(bean.getEnvironment());
-    }
+	@Override
+	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
+		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
+			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
+			if (defaultFieldValue != null) {
+				inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
+			}
+		} else {
+			inputParameters.setEnvironment(copyIssueBean.getEnvironment());
+		}
+	}
 
     public boolean userHasRequiredPermission(final Project project, final User user)
     {

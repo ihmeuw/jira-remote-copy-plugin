@@ -12,6 +12,7 @@ import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.PrioritySystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.priority.Priority;
 import com.atlassian.jira.project.Project;
 import com.google.common.base.Predicate;
@@ -41,11 +42,20 @@ public class PriorityFieldMapper extends AbstractSystemFieldMapper implements Is
         return PrioritySystemField.class;
     }
 
-    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
-    {
-        Priority priority = findPriority(bean.getPriority());
-        inputParameters.setPriorityId(priority.getId());
-    }
+	@Override
+	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
+		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
+			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
+			if (defaultFieldValue != null) {
+				inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
+			}
+		} else {
+			Priority priority = findPriority(copyIssueBean.getPriority());
+			inputParameters.setPriorityId(priority.getId());
+		}
+	}
 
     public boolean userHasRequiredPermission(final Project project, final User user)
     {

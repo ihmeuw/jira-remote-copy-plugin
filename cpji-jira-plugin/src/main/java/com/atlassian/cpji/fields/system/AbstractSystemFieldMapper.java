@@ -2,7 +2,6 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
-import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -50,19 +49,7 @@ public abstract class AbstractSystemFieldMapper implements FieldMapper, IssueCre
 	}
 
 	@Override
-	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
-			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
-		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
-			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
-			if (defaultFieldValue != null) {
-				inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
-			}
-		} else {
-			populateCurrentValue(inputParameters, copyIssueBean, fieldLayoutItem, project);
-		}
-	}
-
-	abstract void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project);
+	public abstract void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType);
 
 }
