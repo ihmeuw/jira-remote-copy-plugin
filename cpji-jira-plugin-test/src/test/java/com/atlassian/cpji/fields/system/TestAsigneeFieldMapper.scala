@@ -112,12 +112,12 @@ import com.atlassian.jira.config.properties.{APKeys, ApplicationProperties}
 
     when(mappedUser.getName).thenReturn("fred")
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.FOUND))
-    asigneeFieldMapper.populateInputParameters(inputParams, bean, null, null)
+    asigneeFieldMapper.populateCurrentValue(inputParams, bean, null, null)
     verify(inputParams).setAssigneeId("fred")
 
     when(mappedUser.getName).thenReturn("fred2")
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED))
-    asigneeFieldMapper.populateInputParameters(inputParams, bean, null, null)
+    asigneeFieldMapper.populateCurrentValue(inputParams, bean, null, null)
     verify(inputParams).setAssigneeId("fred2")
   }
 
@@ -129,7 +129,7 @@ import com.atlassian.jira.config.properties.{APKeys, ApplicationProperties}
     plugMapMethod(new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND))
     when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED)).thenReturn(true)
 
-    asigneeFieldMapper.populateInputParameters(inputParams, bean, null, project)
+    asigneeFieldMapper.populateCurrentValue(inputParams, bean, null, project)
     verify(inputParams, never()).setAssigneeId(Matchers.any())
   }
 
