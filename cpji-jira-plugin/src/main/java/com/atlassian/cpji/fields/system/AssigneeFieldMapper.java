@@ -14,6 +14,7 @@ import com.atlassian.jira.issue.fields.AssigneeSystemField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
+import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
@@ -32,12 +33,12 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
 	private final ApplicationProperties applicationProperties;
 	private final UserMappingManager userMappingManager;
 
-	private static class InternalMappingResult {
-		private final User mappedUser;
-		private final MappingResultDecision decision;
+	static class InternalMappingResult {
+		final User mappedUser;
+		final MappingResultDecision decision;
 
 		public enum MappingResultDecision {
-			FOUND, NOT_FOUND
+			FOUND, NOT_FOUND, DEFAULT_ASSIGNEE_USED
 		}
 
 		private InternalMappingResult(User mappedUser, MappingResultDecision decision) {
@@ -69,6 +70,11 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
 		switch (mapResult.decision) {
 			case FOUND:
 				return new MappingResult(ImmutableList.<String>of(), true, false, true);
+            case DEFAULT_ASSIGNEE_USED:
+                List<String> unmappedUser = bean.getAssignee() != null ?
+                        ImmutableList.of(bean.getAssignee().getUserName()) :
+                        ImmutableList.<String>of();
+                return new MappingResult(unmappedUser, true, false, true);
 			case NOT_FOUND:
 				List<String> unmapped = bean.getAssignee() != null ?
 						ImmutableList.of(bean.getAssignee().getUserName()) :
@@ -83,18 +89,27 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
 		}
 	}
 
-	private InternalMappingResult mapUser(UserBean user, final Project project) {
+	InternalMappingResult mapUser(UserBean user, final Project project) {
 		if (user == null) {
 			return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
 		}
+        final boolean projectLeadIsDefaultAsignee = project.getAssigneeType() == AssigneeTypes.PROJECT_LEAD;
 		User assignee = findUser(user, project);
 		if (assignee == null) {
-			return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+            if(projectLeadIsDefaultAsignee){
+                return new InternalMappingResult(project.getLead(), InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED);
+            } else {
+			    return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+            }
 		} else {
 			if (permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, assignee)) {
 				return new InternalMappingResult(assignee, InternalMappingResult.MappingResultDecision.FOUND);
 			} else {
-				return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+                if(projectLeadIsDefaultAsignee){
+                    return new InternalMappingResult(project.getLead(), InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED);
+                } else {
+				    return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
+                }
 			}
 		}
 	}
@@ -104,7 +119,9 @@ public class AssigneeFieldMapper extends AbstractFieldMapper implements SystemFi
 		boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
 		switch (assignee.decision) {
 			case FOUND:
-				inputParameters.setAssigneeId(assignee.mappedUser.getName());
+			case DEFAULT_ASSIGNEE_USED:
+                if(!unassignedAllowed)
+				    inputParameters.setAssigneeId(assignee.mappedUser.getName());
 				break;
 			case NOT_FOUND:
 				if (!unassignedAllowed && hasDefaultValue(project, bean)) {
