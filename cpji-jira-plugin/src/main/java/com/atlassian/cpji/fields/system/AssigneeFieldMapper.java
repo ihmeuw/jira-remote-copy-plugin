@@ -43,7 +43,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
 			FOUND, NOT_FOUND, DEFAULT_ASSIGNEE_USED
 		}
 
-		private InternalMappingResult(User mappedUser, MappingResultDecision decision) {
+		InternalMappingResult(User mappedUser, MappingResultDecision decision) {
 			this.mappedUser = mappedUser;
 			this.decision = decision;
 		}
@@ -132,14 +132,13 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
 
 	public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project) {
 		InternalMappingResult assignee = mapUser(bean.getAssignee(), project);
-		boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
 		switch (assignee.decision) {
 			case FOUND:
 			case DEFAULT_ASSIGNEE_USED:
-                if(!unassignedAllowed)
-				    inputParameters.setAssigneeId(assignee.mappedUser.getName());
+			    inputParameters.setAssigneeId(assignee.mappedUser.getName());
 				break;
 			case NOT_FOUND:
+                boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
 				if (!unassignedAllowed && hasDefaultValue(project, bean)) {
 					String[] defaults = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(),
 							fieldLayoutItem.getOrderableField().getId(), bean.getTargetIssueType());
