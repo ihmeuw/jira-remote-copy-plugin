@@ -46,16 +46,7 @@
                 </select>
                 <div class="description">$i18n.getText("cpji.admin.fields.group.description")</div>
             </div>
-            <div class="field-group">
-                <label for="userMapping">$i18n.getText("cpji.admin.fields.usermapping.name")</label>
-                <select class="select" name="userMapping" id="userMapping">
-                    #foreach( $userMapping in $action.getUserMappingTypes() )
-                        <option value="$userMapping"  #if($action.getConfiguredUserMapping() == $userMapping)
-                                selected="" #end>$i18n.getText($userMapping.getI18nKey())</option>
-                    #end
-                </select>
-                <div class="description">$i18n.getText("cpji.admin.fields.usermapping.description")</div>
-            </div>
+
             <h3>$i18n.getText("cpji.admin.default.values.header")</h3>
             <p>$i18n.getText("cpji.admin.default.values")</p>
             <div id="cpji-required-fields">

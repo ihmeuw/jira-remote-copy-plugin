@@ -11,7 +11,6 @@ import com.atlassian.jira.util.dbc.Assertions;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -25,7 +24,7 @@ import java.util.NoSuchElementException;
 /**
  * @since v2.0
  */
-public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurationManager
+public class DefaultCopyIssueConfigurationManager
 {
     private PluginSettingsFactory pluginSettingsFactory;
     private GroupManager groupManager;
@@ -38,10 +37,8 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
 
     public static final String CPJI = "cpji.";
     public static final String CPJI_SECURITY_LEVEL_KEY = CPJI + "security.level.%s";
-    private static final String CPJI_USER_MAPPING_KEY = CPJI + "user.mapping.%s";
 
-    public DefaultCopyIssueConfigurationManager
-            (
+    public DefaultCopyIssueConfigurationManager(
                     final PluginSettingsFactory pluginSettingsFactory,
                     final JiraAuthenticationContext jiraAuthenticationContext,
                     final GroupManager groupManager,
@@ -103,11 +100,6 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
         return String.format(CPJI_SECURITY_LEVEL_KEY, projectKey);
     }
 
-    private String createKeyForUserMapping(final String projectKey)
-    {
-        return String.format(CPJI_USER_MAPPING_KEY, projectKey);
-    }
-
     public List<CommentSecurityLevel> getSecurityLevels(Project project)
     {
         final List<CommentSecurityLevel> commentSecurityLevels = new ArrayList<CommentSecurityLevel>();
@@ -163,36 +155,6 @@ public class DefaultCopyIssueConfigurationManager implements CopyIssueConfigurat
             return findCommentSecurityLevel(new CommentSecurityLevel(commentSecurityLevelId, "", commentSecurityType), project);
         }
     }
-
-    public UserMappingType getUserMappingType(final Project project)
-    {
-		Preconditions.checkNotNull(project);
-        PluginSettings settingsForKey = pluginSettingsFactory.createSettingsForKey(project.getKey());
-        Object userMappingType = settingsForKey.get(createKeyForUserMapping(project.getKey()));
-        if (userMappingType == null)
-        {
-            return UserMappingType.BY_USERNAME;
-        }
-        else
-        {
-            try
-            {
-                return UserMappingType.valueOf((String) userMappingType);
-            }
-            catch (Exception ex)
-            {
-                log.error("Failed to read user mapping type. Value '" + userMappingType + "' not a valid user mapping type. Using default '" + UserMappingType.BY_USERNAME + "'", ex);
-                return UserMappingType.BY_USERNAME;
-            }
-        }
-    }
-
-    public void setUserMapping(final UserMappingType userMapping, final Project project)
-    {
-        PluginSettings settingsForKey = pluginSettingsFactory.createSettingsForKey(project.getKey());
-        settingsForKey.put(createKeyForUserMapping(project.getKey()), userMapping.name());
-    }
-
 
 }
 

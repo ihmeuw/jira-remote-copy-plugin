@@ -2,8 +2,6 @@ package com.atlassian.cpji.action.admin;
 
 import com.atlassian.cpji.action.AbstractCopyIssueAction;
 import com.atlassian.cpji.components.CopyIssuePermissionManager;
-import com.atlassian.cpji.config.CopyIssueConfigurationManager;
-import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.crowd.embedded.api.Group;
@@ -31,21 +29,17 @@ import webwork.action.ActionContext;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * @since v1.4
  */
 public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
-    private UserMappingType userMappingType;
-
     private final IssueCreationHelperBean issueCreationHelperBean;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
     private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
     private final GroupManager groupManager;
     private final CopyIssuePermissionManager copyIssuePermissionManager;
-    private final CopyIssueConfigurationManager copyIssueConfigurationManager;
     private final WebResourceManager webResourceManager;
 
     private static final Logger log = Logger.getLogger(ConfigureCopyIssuesAdminAction.class);
@@ -54,14 +48,17 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
     private Boolean executeFired = false;
     private List<String> selectedGroups;
 
-    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager, final IssueFactory issueFactory, final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final IssueTypeSchemeManager issueTypeSchemeManager1, final IssueCreationHelperBean issueCreationHelperBean, final DefaultFieldValuesManagerImpl defaultFieldValuesManager1, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever1, final GroupManager groupManager, final CopyIssuePermissionManager copyIssuePermissionManager, final CopyIssueConfigurationManager copyIssueConfigurationManager, final WebResourceManager webResourceManager) {
+    public ConfigureCopyIssuesAdminAction(FieldLayoutItemsRetriever fieldLayoutItemsRetriever, IssueTypeSchemeManager issueTypeSchemeManager,
+			final IssueFactory issueFactory, final DefaultFieldValuesManagerImpl defaultFieldValuesManager,
+			final IssueCreationHelperBean issueCreationHelperBean, final GroupManager groupManager,
+			final CopyIssuePermissionManager copyIssuePermissionManager,
+			final WebResourceManager webResourceManager) {
         super(fieldLayoutItemsRetriever, issueTypeSchemeManager, issueFactory, defaultFieldValuesManager);
         this.fieldLayoutItemsRetriever = fieldLayoutItemsRetriever;
         this.defaultFieldValuesManager = defaultFieldValuesManager;
         this.issueCreationHelperBean = issueCreationHelperBean;
         this.groupManager = groupManager;
         this.copyIssuePermissionManager = copyIssuePermissionManager;
-        this.copyIssueConfigurationManager = copyIssueConfigurationManager;
         this.webResourceManager = webResourceManager;
     }
 
@@ -107,7 +104,6 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         executeFired = true;
         saveFieldValues();
         saveGroupPermission();
-        saveUserMapping();
 
         requireResources();
 
@@ -180,14 +176,6 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         return configChanges;
     }
 
-    private void saveUserMapping() {
-        UserMappingType existingUserMapping = copyIssueConfigurationManager.getUserMappingType(getProject());
-        if (!existingUserMapping.equals(userMappingType)) {
-            copyIssueConfigurationManager.setUserMapping(userMappingType, getProject());
-            configChanges.add(getI18nHelper().getText("cpji.config.user.mapping"));
-        }
-    }
-
     private void saveGroupPermission() {
         final ImmutableList<String> configuredGroups = ImmutableList.copyOf(
                 copyIssuePermissionManager.getConfiguredGroups(getProjectKey()));
@@ -229,18 +217,6 @@ public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
         return false;
     }
 
-
-    public List<UserMappingType> getUserMappingTypes() {
-        return Arrays.asList(UserMappingType.values());
-    }
-
-    public UserMappingType getConfiguredUserMapping() {
-        return copyIssueConfigurationManager.getUserMappingType(getProject());
-    }
-
-    public void setUserMapping(String userMapping) {
-        userMappingType = UserMappingType.valueOf(userMapping);
-    }
 
     public Boolean getExecuteFired() {
         return executeFired;

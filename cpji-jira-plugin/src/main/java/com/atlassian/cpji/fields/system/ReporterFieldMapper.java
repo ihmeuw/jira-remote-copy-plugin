@@ -19,7 +19,6 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 
@@ -53,37 +52,22 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
 	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
 
-		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
-		User loggedIn = authenticationContext.getLoggedInUser();
+		final User loggedIn = authenticationContext.getLoggedInUser();
+		final User reporter = copyIssueBean.getReporter() != null ? findUser(copyIssueBean.getReporter(), project) : null;
 
-		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
-			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
-			if (defaultFieldValue != null && defaultFieldValue.length > 0) {
-				inputParameters.setReporterId(defaultFieldValue[0]);
-			} else if (loggedIn != null) {
-				inputParameters.setReporterId(loggedIn.getName());
+		if (!fieldLayoutItem.isHidden()) {
+			if (reporter != null) {
+				inputParameters.setReporterId(reporter.getName());
+			} else if (fieldLayoutItem.isRequired()) {
+				String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
+				if (defaultFieldValue != null && defaultFieldValue.length > 0) {
+					inputParameters.setReporterId(defaultFieldValue[0]);
+				} else if (loggedIn != null) {
+					inputParameters.setReporterId(loggedIn.getName());
+				}
 			}
-		} else {
-			populateCurrentValue(inputParameters, copyIssueBean, fieldLayoutItem, project);
 		}
 	}
-
-    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
-    {
-        if (bean.getReporter() != null)
-        {
-            final User reporter = findUser(bean.getReporter(), project);
-            if (reporter != null)
-            {
-                inputParameters.setReporterId(reporter.getName());
-            }
-        } else if (fieldLayoutItem.isRequired() && hasDefaultValue(project, bean)) {
-			String[] defaults = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), fieldLayoutItem.getOrderableField().getId(), bean.getTargetIssueType());
-			if (StringUtils.isNotBlank(defaults[0])) {
-				inputParameters.setReporterId(defaults[0]);
-			}
-		}
-    }
 
     public boolean userHasRequiredPermission(final Project project, final User user)
     {

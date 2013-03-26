@@ -1,6 +1,5 @@
 package com.atlassian.cpji.fields.value;
 
-import com.atlassian.cpji.config.CopyIssueConfigurationManager;
 import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -19,18 +18,16 @@ import java.util.List;
 public class UserMappingManager
 {
     private final UserManager userManager;
-    private CopyIssueConfigurationManager copyIssueConfigurationManager;
     private static final Logger log = Logger.getLogger(UserMappingManager.class);
 
-    public UserMappingManager(final UserManager userManager, final CopyIssueConfigurationManager copyIssueConfigurationManager)
+    public UserMappingManager(final UserManager userManager)
     {
         this.userManager = userManager;
-        this.copyIssueConfigurationManager = copyIssueConfigurationManager;
     }
 
     public User mapUser(UserBean userBean, final Project project)
     {
-        UserMappingType userMappingType = copyIssueConfigurationManager.getUserMappingType(project);
+        UserMappingType userMappingType = UserMappingType.BY_EMAIL_AND_USERNAME;
         switch (userMappingType)
         {
             case BY_E_MAIL:
