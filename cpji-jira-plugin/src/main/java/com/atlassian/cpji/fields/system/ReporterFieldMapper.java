@@ -90,7 +90,7 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
 
     private User findUser(final UserBean user, final Project project)
     {
-        return userMappingManager.mapUser(user, project);
+        return userMappingManager.mapUser(user);
     }
 
     public String getFieldId()

@@ -113,8 +113,8 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
 
   def leaveIssuesUnassigned = when(project.getAssigneeType).thenReturn(AssigneeTypes.UNASSIGNED)
   def projectLeadIsDefaultAssignee = when(project.getAssigneeType).thenReturn(AssigneeTypes.PROJECT_LEAD)
-  def userIsNotMapped =  when(userMappingManager.mapUser(userBean, project)).thenReturn(null)
-  def userIsWellMapped = when(userMappingManager.mapUser(userBean, project)).thenReturn(mappedUser)
+  def userIsNotMapped =  when(userMappingManager.mapUser(userBean)).thenReturn(null)
+  def userIsWellMapped = when(userMappingManager.mapUser(userBean)).thenReturn(mappedUser)
   def userCanBeAssigned = when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, mappedUser)).thenReturn(true)
   def userCannotBeAssigned = when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, mappedUser)).thenReturn(false)
 

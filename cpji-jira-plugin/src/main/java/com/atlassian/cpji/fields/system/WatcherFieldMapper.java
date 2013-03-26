@@ -6,7 +6,6 @@ import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.bc.ServiceOutcome;
 import com.atlassian.jira.bc.issue.watcher.WatcherService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.fields.Field;
@@ -48,10 +47,10 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
             List<UserBean> watchers = makeSureNotNull(bean.getWatchers());
             for (UserBean user : watchers)
             {
-                User watcher = findUser(user, issue.getProjectObject());
+                User watcher = findUser(user);
                 if (watcher != null)
                 {
-                    ServiceOutcome<List<User>> serviceOutcome = watcherService.addWatcher(issue, jiraAuthenticationContext.getLoggedInUser(), watcher);
+                    watcherService.addWatcher(issue, jiraAuthenticationContext.getLoggedInUser(), watcher);
                 }
             }
         }
@@ -73,7 +72,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
         }
         for (UserBean user : watchers)
         {
-            User watcher = findUser(user, project);
+            User watcher = findUser(user);
             if (watcher == null)
             {
                 unmappedValues.add(user.getUserName());
@@ -89,9 +88,9 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
         return (inputList == null) ? Lists.newArrayList() : inputList;
     }
 
-    private User findUser(final UserBean user, final Project project)
+    private User findUser(final UserBean user)
     {
-        return userMappingManager.mapUser(user, project);
+        return userMappingManager.mapUser(user);
     }
 
     public boolean isVisible()

@@ -147,7 +147,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
 
     private ResultHolder<User> findUser(final UserBean userBean, final Project project)
     {
-        User user = userMappingManager.mapUser(userBean, project);
+        User user = userMappingManager.mapUser(userBean);
         if (user == null)
         {
             return new ResultHolder<User>(false);

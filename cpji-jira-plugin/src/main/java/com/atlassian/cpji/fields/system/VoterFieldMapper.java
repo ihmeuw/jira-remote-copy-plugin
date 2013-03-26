@@ -70,7 +70,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         final List<String> mappedUsers = new ArrayList<String>();
         for (UserBean voter : voters)
         {
-            User user = userMappingManager.mapUser(voter, project);
+            User user = userMappingManager.mapUser(voter);
             if (user == null)
             {
                 unmappedUsers.add(voter.getUserName());
@@ -104,7 +104,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
             {
                 for (UserBean voter : voters)
                 {
-                    User user = userMappingManager.mapUser(voter, issue.getProjectObject());
+                    User user = userMappingManager.mapUser(voter);
                     if (user != null)
                     {
                         VoteService.VoteValidationResult voteValidationResult = voteService.validateAddVote(jiraAuthenticationContext.getLoggedInUser(), user, issue);

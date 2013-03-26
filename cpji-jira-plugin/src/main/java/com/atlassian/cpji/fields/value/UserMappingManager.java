@@ -3,7 +3,6 @@ package com.atlassian.cpji.fields.value;
 import com.atlassian.cpji.config.UserMappingType;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.dbc.Assertions;
 import org.apache.commons.lang.StringUtils;
@@ -25,7 +24,7 @@ public class UserMappingManager
         this.userManager = userManager;
     }
 
-    public User mapUser(UserBean userBean, final Project project)
+    public User mapUser(UserBean userBean)
     {
         UserMappingType userMappingType = UserMappingType.BY_EMAIL_AND_USERNAME;
         switch (userMappingType)
