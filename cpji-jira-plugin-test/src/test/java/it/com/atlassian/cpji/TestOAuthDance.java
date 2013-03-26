@@ -64,13 +64,9 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 
 			try {
                 ListApplicationLinksPage page = jira1.visit(ListApplicationLinksPage.class);
-                ScreenshotUtil.attemptScreenshot(jira3.getTester().getDriver().getDriver(), "TestOAuthDance - applicationLinks");
                 ListApplicationLinksPage.DeleteDialog deleteDialog = page.clickDelete("http://localhost:2992/jira");
-                ScreenshotUtil.attemptScreenshot(jira3.getTester().getDriver().getDriver(), "TestOAuthDance - deleting - 1");
                 deleteDialog = deleteDialog.delete();
-                ScreenshotUtil.attemptScreenshot(jira3.getTester().getDriver().getDriver(), "TestOAuthDance - deleting - 2");
                 deleteDialog.deleteAndReturn();
-                ScreenshotUtil.attemptScreenshot(jira3.getTester().getDriver().getDriver(), "TestOAuthDance - deleting - 3");
 			} catch (Exception e) {
 				logger.error("Unable to delete Application Link", e);
 			}
