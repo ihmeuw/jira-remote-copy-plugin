@@ -100,7 +100,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         final boolean projectLeadIsDefaultAsignee = (project.getAssigneeType() == AssigneeTypes.PROJECT_LEAD)
                 && permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, project.getLead());
 
-        User assignee = findUser(user, project);
+        User assignee = findUser(user);
         if (assignee == null) {
             if (projectLeadIsDefaultAsignee) {
                 return new InternalMappingResult(project.getLead(), InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED);
@@ -123,19 +123,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     @Override
     public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
                                     FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-        MappingResult mappingResult = getMappingResult(copyIssueBean, project);
-        if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
-            String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
-            if (defaultFieldValue != null) {
-                inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
-            }
-        } else {
-            populateCurrentValue(inputParameters, copyIssueBean, fieldLayoutItem, project);
-        }
-    }
-
-    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project) {
-        InternalMappingResult assignee = mapUser(bean.getAssignee(), project);
+        InternalMappingResult assignee = mapUser(copyIssueBean.getAssignee(), project);
         switch (assignee.decision) {
             case FOUND:
             case DEFAULT_ASSIGNEE_USED:
@@ -143,9 +131,9 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
                 break;
             case NOT_FOUND:
                 boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
-                if (!unassignedAllowed && hasDefaultValue(project, bean)) {
+                if (!unassignedAllowed && hasDefaultValue(project, copyIssueBean)) {
                     String[] defaults = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(),
-                            fieldLayoutItem.getOrderableField().getId(), bean.getTargetIssueType());
+                            fieldLayoutItem.getOrderableField().getId(), copyIssueBean.getTargetIssueType());
                     if (StringUtils.isNotBlank(defaults[0])) {
                         inputParameters.setAssigneeId(defaults[0]);
                     }
@@ -154,7 +142,8 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         }
     }
 
-    private User findUser(final UserBean user, final Project project) {
+
+    private User findUser(final UserBean user) {
         return userMappingManager.mapUser(user);
     }
 }

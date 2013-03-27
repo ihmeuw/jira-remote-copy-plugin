@@ -110,7 +110,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
   def mapAndTest(desiredUser: User, desiredDecision: InternalMappingResult.MappingResultDecision, userBean: UserBean = this.userBean) {
     val result = asigneeFieldMapper.mapUser(userBean, project)
     result.mappedUser should equal(desiredUser)
-    result.decision should  equal(result.decision)
+    result.decision should equal(result.decision)
   }
 
   def leaveIssuesUnassigned = when(project.getAssigneeType).thenReturn(AssigneeTypes.UNASSIGNED)
@@ -138,12 +138,12 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
     when(mappedUser.getName).thenReturn("fred")
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.FOUND))
-    asigneeFieldMapper.populateCurrentValue(inputParams, bean, null, null)
+    asigneeFieldMapper.populateInputParams(inputParams, bean, null, null, null)
     verify(inputParams).setAssigneeId("fred")
 
     when(mappedUser.getName).thenReturn("fred2")
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED))
-    asigneeFieldMapper.populateCurrentValue(inputParams, bean, null, null)
+    asigneeFieldMapper.populateInputParams(inputParams, bean, null, null, null)
     verify(inputParams).setAssigneeId("fred2")
   }
 
@@ -155,7 +155,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     plugMapMethod(new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND))
     when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED)).thenReturn(true)
 
-    asigneeFieldMapper.populateCurrentValue(inputParams, bean, null, project)
+    asigneeFieldMapper.populateInputParams(inputParams, bean, null, project, null)
     verify(inputParams, never()).setAssigneeId(Matchers.any())
   }
 
@@ -171,7 +171,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(true)
     when(defaultValuesManager.getDefaultFieldValue(any(), any(), any())).thenReturn(Array("defaultAsgn"))
 
-    asigneeFieldMapper.populateCurrentValue(inputParams, bean, fieldLayoutItem, project)
+    asigneeFieldMapper.populateInputParams(inputParams, bean, fieldLayoutItem, project, null)
     verify(inputParams).setAssigneeId("defaultAsgn")
   }
 
@@ -187,7 +187,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     when(fieldLayoutItem.getOrderableField).thenReturn(asigneeField)
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(false)
 
-    asigneeFieldMapper.populateCurrentValue(inputParams, bean, fieldLayoutItem, project)
+    asigneeFieldMapper.populateInputParams(inputParams, bean, fieldLayoutItem, project, null)
     verify(inputParams, never()).setAssigneeId(any())
   }
 
