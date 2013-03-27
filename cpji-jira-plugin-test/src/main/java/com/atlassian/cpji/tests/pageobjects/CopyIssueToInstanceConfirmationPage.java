@@ -7,6 +7,7 @@ import com.atlassian.pageobjects.elements.SelectElement;
 import com.atlassian.pageobjects.elements.TimedElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
+import com.atlassian.pageobjects.elements.query.TimedQuery;
 import com.google.common.base.Preconditions;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
@@ -37,13 +38,13 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
         return URL;
     }
 
-    public TimedCondition areAllIssueFieldsRetained(){
-        return elementFinder.find(By.id("issue-fields-retained")).timed().isVisible();
+    public TimedQuery<Boolean> areAllIssueFieldsRetained(){
+        return Conditions.not(elementFinder.find(By.id("fields-cannot-be-copied-header")).timed().isVisible());
     }
 
-    public TimedCondition areAllRequiredFieldsFilledIn()
+    public TimedQuery<Boolean> areAllRequiredFieldsFilledIn()
     {
-        return elementFinder.find(By.id("no-missing-required")).timed().isVisible();
+        return Conditions.not(elementFinder.find(By.id("destination-fields-missing-header")).timed().isVisible());
     }
 
 

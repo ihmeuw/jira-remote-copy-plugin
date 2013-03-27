@@ -29,7 +29,7 @@
             #end
 
             #if (!$action.issueFieldsThatCannotBeCopied.isEmpty())
-			<h4 class="sub-heading">$i18n.getText('cpji.source.issue.fields')</h4>
+			<h4 class="sub-heading" id="fields-cannot-be-copied-header">$i18n.getText('cpji.source.issue.fields')</h4>
 			    <span>
 					$i18n.getText('cpji.some.values.cannot.be.copied')
                 </span>
@@ -41,7 +41,7 @@
 			#end
 
             #if (!$action.destinationIssueFieldsThatAreRequired.isEmpty())
-			<h4 class="sub-heading">$i18n.getText('cpji.destination.issue.fields')</h4>
+			<h4 class="sub-heading" id="destination-fields-missing-header">$i18n.getText('cpji.destination.issue.fields')</h4>
 				<span>
 					$i18n.getText('cpji.some.fields.are.missing')
 				</span>
@@ -53,7 +53,7 @@
 			#end
 
             #if ($action.issueFieldsThatCannotBeCopied.isEmpty() && $action.destinationIssueFieldsThatAreRequired.isEmpty())
-                <p>$i18n.getText("cpji.please.confirm.clone")</p>
+                <p id="confirm-clone-no-errors">$i18n.getText("cpji.please.confirm.clone")</p>
             #end
 
             <p>
