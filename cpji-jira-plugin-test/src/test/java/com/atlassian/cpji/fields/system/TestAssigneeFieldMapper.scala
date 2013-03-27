@@ -19,27 +19,27 @@ import com.atlassian.cpji.fields.MappingResult
 import com.atlassian.jira.config.properties.{APKeys, ApplicationProperties}
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
 
-@RunWith(classOf[MockitoJUnitRunner]) class TestAsigneeFieldMapper {
+@RunWith(classOf[MockitoJUnitRunner]) class TestAssigneeFieldMapper {
 
 
-  var asigneeFieldMapper : AssigneeFieldMapper = null
+  var asigneeFieldMapper: AssigneeFieldMapper = null
 
   //components
-  @Mock var userMappingManager : UserMappingManager = null
-  @Mock var permissionManager : PermissionManager = null
-  @Mock var applicationProperties : ApplicationProperties = null
-  @Mock var defaultValuesManager : DefaultFieldValuesManager = null
+  @Mock var userMappingManager: UserMappingManager = null
+  @Mock var permissionManager: PermissionManager = null
+  @Mock var applicationProperties: ApplicationProperties = null
+  @Mock var defaultValuesManager: DefaultFieldValuesManager = null
 
   //data objects
-  @Mock var project : Project = null
-  @Mock var userBean :UserBean = null
-  @Mock var projectLead : User = null
-  @Mock var mappedUser : User = null
-  @Mock var inputParams : IssueInputParameters = null
-  @Mock var asigneeField : OrderableField = null
+  @Mock var project: Project = null
+  @Mock var userBean: UserBean = null
+  @Mock var projectLead: User = null
+  @Mock var mappedUser: User = null
+  @Mock var inputParams: IssueInputParameters = null
+  @Mock var asigneeField: OrderableField = null
 
   var plugedMapMethod = false
-  var pluggedMappingResult : InternalMappingResult = null
+  var pluggedMappingResult: InternalMappingResult = null
 
   @Before def setUp {
     plugedMapMethod = false
@@ -50,9 +50,9 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
 
     when(project.getLead).thenReturn(projectLead)
 
-    asigneeFieldMapper = new AssigneeFieldMapper(permissionManager, applicationProperties, fieldManager, userMappingManager, defaultValuesManager){
+    asigneeFieldMapper = new AssigneeFieldMapper(permissionManager, applicationProperties, fieldManager, userMappingManager, defaultValuesManager) {
       override def mapUser(user: UserBean, project: Project): InternalMappingResult = {
-        if (plugedMapMethod){
+        if (plugedMapMethod) {
           pluggedMappingResult
         } else
           super.mapUser(user, project)
@@ -62,25 +62,25 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
 
   //mappings
 
-  @Test def mappingShouldReturnNotFoundWhenNoUserBeanGiven(){
+  @Test def mappingShouldReturnNotFoundWhenNoUserBeanGiven() {
     mapAndTest(null, InternalMappingResult.MappingResultDecision.NOT_FOUND, null)
   }
 
-  @Test def mappingShouldReturnDefaultAssigneeWhenUserCannotBeMappedAndProjectLeadIsDefaultAssignee(){
+  @Test def mappingShouldReturnDefaultAssigneeWhenUserCannotBeMappedAndProjectLeadIsDefaultAssignee() {
     projectLeadIsDefaultAssignee
     userIsNotMapped
 
     mapAndTest(projectLead, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED)
   }
 
-  @Test def mappingShouldReturnNotFoundWhenUserCannotBeMappedAndDefaulAssigneeIsNotSet(){
+  @Test def mappingShouldReturnNotFoundWhenUserCannotBeMappedAndDefaulAssigneeIsNotSet() {
     leaveIssuesUnassigned
     userIsNotMapped
 
     mapAndTest(null, InternalMappingResult.MappingResultDecision.NOT_FOUND)
   }
 
-  @Test def mappingShouldReturnMappedAssigneeWhenIsMappableAndHasPermission(){
+  @Test def mappingShouldReturnMappedAssigneeWhenIsMappableAndHasPermission() {
     userIsWellMapped
     userCanBeAssigned
 
@@ -88,7 +88,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
   }
 
 
-  @Test def mappingShouldReturnDefaultAssigneeWhenUserIsMappedAndHasNoPermission(){
+  @Test def mappingShouldReturnDefaultAssigneeWhenUserIsMappedAndHasNoPermission() {
     projectLeadIsDefaultAssignee
 
     userIsWellMapped
@@ -97,30 +97,39 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
     mapAndTest(projectLead, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED)
   }
 
-  @Test def mappingShouldReturnNotFoundWhenUserIsMappedAndHasNoPermission(){
+  @Test def mappingShouldReturnNotFoundWhenUserIsMappedAndHasNoPermission() {
     leaveIssuesUnassigned
     userIsWellMapped
     userCannotBeAssigned
-    mapAndTest(null, InternalMappingResult.MappingResultDecision.NOT_FOUND )
+    mapAndTest(null, InternalMappingResult.MappingResultDecision.NOT_FOUND)
   }
 
 
-  def mapAndTest(desiredUser : User, desiredDecision : InternalMappingResult.MappingResultDecision, userBean : UserBean = this.userBean){
+  def mapAndTest(desiredUser: User, desiredDecision: InternalMappingResult.MappingResultDecision, userBean: UserBean = this.userBean) {
     val result = asigneeFieldMapper.mapUser(userBean, project)
     assertEquals(desiredUser, result.mappedUser)
     assertEquals(desiredDecision, result.decision)
   }
 
   def leaveIssuesUnassigned = when(project.getAssigneeType).thenReturn(AssigneeTypes.UNASSIGNED)
-  def projectLeadIsDefaultAssignee = when(project.getAssigneeType).thenReturn(AssigneeTypes.PROJECT_LEAD)
-  def userIsNotMapped =  when(userMappingManager.mapUser(userBean)).thenReturn(null)
+
+  def projectLeadIsDefaultAssignee = {
+    when(project.getAssigneeType).thenReturn(AssigneeTypes.PROJECT_LEAD)
+    when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, projectLead)).thenReturn(true)
+  }
+
+
+  def userIsNotMapped = when(userMappingManager.mapUser(userBean)).thenReturn(null)
+
   def userIsWellMapped = when(userMappingManager.mapUser(userBean)).thenReturn(mappedUser)
+
   def userCanBeAssigned = when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, mappedUser)).thenReturn(true)
+
   def userCannotBeAssigned = when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, mappedUser)).thenReturn(false)
 
   //population
 
-  @Test def shouldPopulateParametersWhenUserIsFoundOrDefaultAssignee(){
+  @Test def shouldPopulateParametersWhenUserIsFoundOrDefaultAssignee() {
 
     val bean = new CopyIssueBean
     bean.setAssignee(userBean)
@@ -137,7 +146,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
   }
 
 
-  @Test def shouldDoNothingWhenMappingIsNotFoundAndUnassignedAreAllowed(){
+  @Test def shouldDoNothingWhenMappingIsNotFoundAndUnassignedAreAllowed() {
     val bean = new CopyIssueBean
     bean.setAssignee(userBean)
 
@@ -148,7 +157,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
     verify(inputParams, never()).setAssigneeId(Matchers.any())
   }
 
-  @Test def shouldPopulateWithDefaultValueWhenItIsSet(){
+  @Test def shouldPopulateWithDefaultValueWhenItIsSet() {
     val bean = new CopyIssueBean
     bean.setAssignee(userBean)
 
@@ -158,14 +167,14 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
     val fieldLayoutItem = mock(classOf[FieldLayoutItem])
     when(fieldLayoutItem.getOrderableField).thenReturn(asigneeField)
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(true)
-    when(defaultValuesManager.getDefaultFieldValue(any(), any(), any())).thenReturn( Array("defaultAsgn"))
+    when(defaultValuesManager.getDefaultFieldValue(any(), any(), any())).thenReturn(Array("defaultAsgn"))
 
     asigneeFieldMapper.populateCurrentValue(inputParams, bean, fieldLayoutItem, project)
     verify(inputParams).setAssigneeId("defaultAsgn")
   }
 
 
-  @Test def shouldNotPopulateWhenNoDefaultValueIsDefined(){
+  @Test def shouldNotPopulateWhenNoDefaultValueIsDefined() {
     val bean = new CopyIssueBean
     bean.setAssignee(userBean)
 
@@ -181,12 +190,10 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
   }
 
 
-
-  def plugMapMethod(result : InternalMappingResult) {
+  def plugMapMethod(result: InternalMappingResult) {
     pluggedMappingResult = result
     plugedMapMethod = true
   }
-
 
 
 }
