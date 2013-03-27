@@ -29,7 +29,7 @@ public class UserMappingManager
 		Collection<User> usersInScope = userManager.getUsers();
 		List<User> matchedUsers = getUsersByEmail(userBean, usersInScope);
 		if (matchedUsers.size() == 1) {
-			log.debug(String.format("Mapped remote user: '%s' and email: '%s' to local user with user name: '%s'", userBean.getUserName(),  userBean.getEmail(), matchedUsers.get(0).getName()));
+			log.debug(String.format("Mapped remote user by email: '%s' and email: '%s' to local user with user name: '%s'", userBean.getUserName(),  userBean.getEmail(), matchedUsers.get(0).getName()));
 			return matchedUsers.get(0);
 		}
         if (!matchedUsers.isEmpty())
@@ -40,14 +40,14 @@ public class UserMappingManager
 		// now limit users by full name
 		matchedUsers = getUsersByFullName(userBean, usersInScope);
 		if (matchedUsers.size() == 1) {
-			log.debug(String.format("Mapped remote user: '%s' and email: '%s' to local user with user name: '%s'", userBean.getUserName(),  userBean.getEmail(), matchedUsers.get(0).getName()));
+			log.debug(String.format("Mapped remote user by full name: '%s' and email: '%s' to local user with user name: '%s'", userBean.getUserName(),  userBean.getEmail(), matchedUsers.get(0).getName()));
 			return matchedUsers.get(0);
 		}
 
 		// finally try username
 		matchedUsers = getUsersByUserName(userBean, usersInScope);
 		if (matchedUsers.size() == 1) {
-			log.debug(String.format("Mapped remote user: '%s' and email: '%s' to local user with user name: '%s'", userBean.getUserName(),  userBean.getEmail(), matchedUsers.get(0).getName()));
+			log.debug(String.format("Mapped remote user by user name: '%s' and email: '%s' to local user with user name: '%s'", userBean.getUserName(),  userBean.getEmail(), matchedUsers.get(0).getName()));
 			return matchedUsers.get(0);
 		}
 
