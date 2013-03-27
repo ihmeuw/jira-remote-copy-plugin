@@ -16,7 +16,7 @@
     <div class="content-body aui-panel">
         <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >
             #if($action.isCopyingPossible())
-                <h2 class="formtitle">$i18n.getText('cpji.confirm.new.values')</h2>
+                <h2 class="formtitle">$i18n.getText('cpji.confirm.clone')</h2>
                 #if(!$action.issueFieldsThatCannotBeCopied.isEmpty() || !$action.destinationIssueFieldsThatAreRequired.isEmpty())
                     <div class="aui-message warning"><span class="aui-icon icon-warning"></span>
                         <p>$i18n.getText('cpji.this.issue.can.be.copied')</p>
@@ -28,11 +28,9 @@
                 </div>
             #end
 
-			<h4 class="sub-heading">$i18n.getText('cpji.source.issue.fields')</h4>
-			#if ($action.issueFieldsThatCannotBeCopied.isEmpty())
-                <span id="issue-fields-retained">$i18n.getText('cpji.issue.fields.retained')</span>
-			#else
-                <span>
+            #if (!$action.issueFieldsThatCannotBeCopied.isEmpty())
+			<h4 class="sub-heading" id="fields-cannot-be-copied-header">$i18n.getText('cpji.source.issue.fields')</h4>
+			    <span>
 					$i18n.getText('cpji.some.values.cannot.be.copied')
                 </span>
                 <div class="fields-list">
@@ -42,10 +40,8 @@
                 </div>
 			#end
 
-			<h4 class="sub-heading">$i18n.getText('cpji.destination.issue.fields')</h4>
-			#if ($action.destinationIssueFieldsThatAreRequired.isEmpty())
-				<span id="no-missing-required">$i18n.getText('cpji.no.missing.required.fields')</span>
-			#else
+            #if (!$action.destinationIssueFieldsThatAreRequired.isEmpty())
+			<h4 class="sub-heading" id="destination-fields-missing-header">$i18n.getText('cpji.destination.issue.fields')</h4>
 				<span>
 					$i18n.getText('cpji.some.fields.are.missing')
 				</span>
@@ -55,6 +51,10 @@
 					#end
 				</div>
 			#end
+
+            #if ($action.issueFieldsThatCannotBeCopied.isEmpty() && $action.destinationIssueFieldsThatAreRequired.isEmpty())
+                <p id="confirm-clone-no-errors">$i18n.getText("cpji.please.confirm.clone")</p>
+            #end
 
             <p>
                 #if ($action.isCopyingPossible())
