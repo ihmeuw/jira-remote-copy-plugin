@@ -26,6 +26,10 @@ public class UserMappingManager
 
     public User mapUser(UserBean userBean)
     {
+		if (userBean == null) {
+			return null;
+		}
+
 		Collection<User> usersInScope = userManager.getUsers();
 		List<User> matchedUsers = getUsersByEmail(userBean, usersInScope);
 		if (matchedUsers.size() == 1) {
