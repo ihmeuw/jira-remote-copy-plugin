@@ -16,6 +16,7 @@
 	<div class="content-body aui-panel">
 		<form action="CopyDetailsAction.jspa" class="aui" method="get">
 			<h2 class="formtitle">$i18n.getText('cpji.copy.details')</h2>
+            <p>$i18n.getText('cpji.provide.details.for.destination.issue')</p>
 			<fieldset>
 				<div class="field-group">
 					<label for="issueType">$i18n.getText('cpji.issue.type')</label>
