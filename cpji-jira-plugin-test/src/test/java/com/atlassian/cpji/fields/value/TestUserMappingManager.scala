@@ -8,8 +8,7 @@ import com.atlassian.jira.user.util.UserManager
 import org.junit.{Test, Before}
 import com.atlassian.cpji.rest.model.UserBean
 import com.google.common.collect.Lists
-import com.atlassian.jira.user.MockUser
-import org.mockito.Mockito.{when}
+import org.mockito.Mockito.when
 import com.atlassian.crowd.embedded.api.User
 
 @RunWith(classOf[MockitoJUnitRunner])
@@ -27,9 +26,9 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 	}
 
 	@Test def shouldMatchByEmailFirst {
-		val users = Lists.newArrayList[User](new MockUser("pniewiadomski", "Pawel Niewiadomski", "11110000b@gmail.com"),
-			new MockUser("pn", "Pawel", "pniewiadomski@atlassian.com"),
-			new MockUser("admin"))
+		val users = Lists.newArrayList[User](mockUser("pniewiadomski", "Pawel Niewiadomski", "11110000b@gmail.com"),
+			mockUser("pn", "Pawel", "pniewiadomski@atlassian.com"),
+			mockUser("admin", "admin", "admin@localhost"))
 
 		when(userManager.getUsers).thenReturn(users)
 
@@ -41,9 +40,9 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 	}
 
 	@Test def shouldMatchByFullNameIfNoEmailMatches {
-		val users = Lists.newArrayList[User](new MockUser("pniewiadomski", "Pawel Niewiadomski", "11110000b@gmail.com"),
-			new MockUser("pn", "Pawel", "pawelniewiadomski@me.com"),
-			new MockUser("admin"))
+		val users = Lists.newArrayList[User](mockUser("pniewiadomski", "Pawel Niewiadomski", "11110000b@gmail.com"),
+			mockUser("pn", "Pawel", "pawelniewiadomski@me.com"),
+			mockUser("admin", "admin", "admin@localhost"))
 
 		when(userManager.getUsers).thenReturn(users)
 
@@ -55,9 +54,9 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 	}
 
 	@Test def shouldMatchByUserNameIfNothingElseMatches {
-		val users = Lists.newArrayList[User](new MockUser("pniewiadomski", "Pawel Niewiadomski", "pawelniewiadomski@me.com"),
-			new MockUser("pn", "Pawel Niewiadomski", "pawelniewiadomski@me.com"),
-			new MockUser("admin", "Pawel Niewiadomski", "pawelniewiadomski@me.com"))
+		val users = Lists.newArrayList[User](mockUser("pniewiadomski", "Pawel Niewiadomski", "pawelniewiadomski@me.com"),
+			mockUser("pn", "Pawel Niewiadomski", "pawelniewiadomski@me.com"),
+			mockUser("admin", "Pawel Niewiadomski", "pawelniewiadomski@me.com"))
 
 		when(userManager.getUsers).thenReturn(users)
 
@@ -66,5 +65,13 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 			'name ("admin"),
 			'displayName ("Pawel Niewiadomski")
 		)
+	}
+
+	def mockUser(username: String, fullName: String, email: String) : User = {
+		val user : User = mock[User]
+		when(user.getName).thenReturn(username)
+		when(user.getDisplayName).thenReturn(fullName)
+		when(user.getEmailAddress).thenReturn(email)
+		return user
 	}
 }
