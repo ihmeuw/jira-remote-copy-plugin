@@ -7,7 +7,6 @@ import org.mockito.Mockito._
 import org.mockito.{Matchers, Mock}
 import org.mockito.Matchers._
 import com.atlassian.jira.project.{AssigneeTypes, Project}
-import org.junit.Assert.{assertNull, assertEquals}
 import com.atlassian.cpji.fields.system.AssigneeFieldMapper.InternalMappingResult
 import com.atlassian.jira.issue.fields.{OrderableField, FieldManager}
 import com.atlassian.jira.issue.{IssueInputParameters, IssueFieldConstants}
@@ -18,8 +17,11 @@ import com.atlassian.jira.security.{PermissionManager, Permissions}
 import com.atlassian.cpji.fields.MappingResult
 import com.atlassian.jira.config.properties.{APKeys, ApplicationProperties}
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
+import org.scalatest.junit.{ShouldMatchersForJUnit, AssertionsForJUnit}
+import org.scalatest.mock.MockitoSugar
 
-@RunWith(classOf[MockitoJUnitRunner]) class TestAssigneeFieldMapper {
+@RunWith(classOf[MockitoJUnitRunner])
+class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
 
   var asigneeFieldMapper: AssigneeFieldMapper = null
@@ -44,7 +46,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
   @Before def setUp {
     plugedMapMethod = false
 
-    val fieldManager = mock(classOf[FieldManager])
+    val fieldManager = mock[FieldManager]
     when(asigneeField.getId).thenReturn(IssueFieldConstants.ASSIGNEE)
     when(fieldManager.getField(IssueFieldConstants.ASSIGNEE)).thenReturn(asigneeField)
 
@@ -107,8 +109,8 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
 
   def mapAndTest(desiredUser: User, desiredDecision: InternalMappingResult.MappingResultDecision, userBean: UserBean = this.userBean) {
     val result = asigneeFieldMapper.mapUser(userBean, project)
-    assertEquals(desiredUser, result.mappedUser)
-    assertEquals(desiredDecision, result.decision)
+    result.mappedUser should equal(desiredUser)
+    result.decision should  equal(result.decision)
   }
 
   def leaveIssuesUnassigned = when(project.getAssigneeType).thenReturn(AssigneeTypes.UNASSIGNED)
@@ -164,7 +166,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
     plugMapMethod(new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND))
     when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED)).thenReturn(false)
 
-    val fieldLayoutItem = mock(classOf[FieldLayoutItem])
+    val fieldLayoutItem = mock[FieldLayoutItem]
     when(fieldLayoutItem.getOrderableField).thenReturn(asigneeField)
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(true)
     when(defaultValuesManager.getDefaultFieldValue(any(), any(), any())).thenReturn(Array("defaultAsgn"))
@@ -181,7 +183,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
     plugMapMethod(new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND))
     when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED)).thenReturn(false)
 
-    val fieldLayoutItem = mock(classOf[FieldLayoutItem])
+    val fieldLayoutItem = mock[FieldLayoutItem]
     when(fieldLayoutItem.getOrderableField).thenReturn(asigneeField)
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(false)
 
