@@ -211,7 +211,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 	}
 
 	public static class UsersAndTrustDialog extends AddDialog {
-		@ElementBy (id = "differentUser", within = "dialog")
+		@ElementBy (id = "differentUser", within = "dialog", timeoutType = TimeoutType.PAGE_LOAD)
 		private PageElement differenUserRadio;
 
 		public UsersAndTrustDialog setUseDifferentUsers() {
