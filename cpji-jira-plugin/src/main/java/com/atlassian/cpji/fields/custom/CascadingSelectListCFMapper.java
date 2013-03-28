@@ -24,12 +24,12 @@ import java.util.Map;
 /**
  * @since v1.4
  */
-public class CascadingSelectListCFMapper implements CustomFieldMapper {
-	private final DefaultFieldValuesManager defaultFieldValuesManager;
+public class CascadingSelectListCFMapper extends CustomFieldMapperImpl {
 
-	public CascadingSelectListCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
-		this.defaultFieldValuesManager = defaultFieldValuesManager;
-	}
+    public CascadingSelectListCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
+        super(defaultFieldValuesManager);
+
+    }
 
 	@Override
 	public boolean acceptsType(CustomFieldType<?, ?> type) {
@@ -96,7 +96,7 @@ public class CascadingSelectListCFMapper implements CustomFieldMapper {
 			invalidValues = value;
 		}
 
-		return new CustomFieldMappingResult(validValues, invalidValues, defaultValueConfigured(project, customField, issueType));
+		return new CustomFieldMappingResult(validValues, invalidValues, hasDefaultValueDefined(customField, project, issueType));
 	}
 
 	@Override
@@ -141,15 +141,4 @@ public class CascadingSelectListCFMapper implements CustomFieldMapper {
         return options.getOptionForValue(value, parentId);
     }
 
-	/**
-	 * It will return true if the mapper detects there's a default value configured in the destination server. Either the value is configured
-	 * manually in project configuration or it can be detected based on JIRA configuration.
-	 *
-	 * @return true if we can guess the default value
-	 */
-	boolean defaultValueConfigured(Project project, CustomField customField, IssueType issueType)
-	{
-		return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), customField.getId(),
-				issueType.getName()) != null);
-	}
 }
