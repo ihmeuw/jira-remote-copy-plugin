@@ -11,7 +11,7 @@ import com.atlassian.cpji.components.model.SimplifiedIssueLinkType;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
@@ -484,7 +484,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		systemMissingFieldPermissionDescriptions = new ArrayList<MissingFieldPermissionDescription>();
 		canCopyIssue = true;
 
-		final Map<String, FieldMapper> fieldMappers = fieldMapperFactory.getSystemFieldMappers();
+		final Map<String, SystemFieldMapper> fieldMappers = fieldMapperFactory.getSystemFieldMappers();
 		for (SystemFieldPermissionBean fieldPermissionBean : fieldPermissionBeans) {
 			ValidationCode validationCode = ValidationCode.valueOf(fieldPermissionBean.getValidationCode());
 			boolean canCopyField = canCopyField(validationCode);
@@ -492,14 +492,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				canCopyIssue = false;
 			}
 
-			FieldMapper fieldMapper = fieldMappers.get(fieldPermissionBean.getFieldId());
+			SystemFieldMapper systemFieldMapper = fieldMappers.get(fieldPermissionBean.getFieldId());
 
-			if (fieldMapper != null && !ValidationCode.OK.equals(validationCode)) {
+			if (systemFieldMapper != null && !ValidationCode.OK.equals(validationCode)) {
 				systemMissingFieldPermissionDescriptions.add(new MissingFieldPermissionDescription(
 						fieldPermissionBean,
-						getI18nHelper().getText(fieldMapper.getFieldNameKey()),
+						getI18nHelper().getText(systemFieldMapper.getFieldNameKey()),
 						getI18nHelper().getText(validationCode.getI18nKey()), canCopyField));
-			} else if (fieldMapper == null) {
+			} else if (systemFieldMapper == null) {
 				log.error("No support for field with id '" + fieldPermissionBean.getFieldId() + "'");
 			}
 		}

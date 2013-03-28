@@ -10,7 +10,7 @@ import com.atlassian.jira.project.Project;
 /**
  * @since v1.4
  */
-public interface IssueCreationFieldMapper extends FieldMapper
+public interface IssueCreationFieldMapper extends SystemFieldMapper
 {
 	Class<? extends OrderableField>  getField();
 

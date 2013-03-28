@@ -105,7 +105,7 @@ public class FieldMapperFactory
         Field field = fieldManager.getField(id);
         if (!(field instanceof OrderableField))
         {
-            throw new RuntimeException("Field with id '" + id + "' is not an orderable field! Failed to initialize FieldMapper!");
+            throw new RuntimeException("Field with id '" + id + "' is not an orderable field! Failed to initialize SystemFieldMapper!");
         }
         return (OrderableField) field;
     }
@@ -142,9 +142,9 @@ public class FieldMapperFactory
         return fieldMapper;
     }
 
-    public Map<String, FieldMapper> getSystemFieldMappers()
+    public Map<String, SystemFieldMapper> getSystemFieldMappers()
     {
-        Map<String, FieldMapper> fieldMappers = new HashMap<String, FieldMapper>();
+        Map<String, SystemFieldMapper> fieldMappers = new HashMap<String, SystemFieldMapper>();
         for (IssueCreationFieldMapper fieldMapper : orderableFieldMapper.get().values())
         {
             fieldMappers.put(fieldMapper.getFieldId(), fieldMapper);
@@ -163,13 +163,13 @@ public class FieldMapperFactory
 
     public Map<String, NonOrderableSystemFieldMapper> getNonOrderableSystemFieldMappers()
     {
-        Map<String, FieldMapper> systemFieldMappers = getSystemFieldMappers();
+        Map<String, SystemFieldMapper> systemFieldMappers = getSystemFieldMappers();
         Map<String, NonOrderableSystemFieldMapper> nonOrderableSystemFieldMappers = new HashMap<String, NonOrderableSystemFieldMapper>();
-        for (FieldMapper fieldMapper : systemFieldMappers.values())
+        for (SystemFieldMapper systemFieldMapper : systemFieldMappers.values())
         {
-            if (NonOrderableSystemFieldMapper.class.isAssignableFrom(fieldMapper.getClass()))
+            if (NonOrderableSystemFieldMapper.class.isAssignableFrom(systemFieldMapper.getClass()))
             {
-               nonOrderableSystemFieldMappers.put(fieldMapper.getFieldId(), (NonOrderableSystemFieldMapper) fieldMapper);
+               nonOrderableSystemFieldMappers.put(systemFieldMapper.getFieldId(), (NonOrderableSystemFieldMapper) systemFieldMapper);
             }
         }
         return nonOrderableSystemFieldMappers;

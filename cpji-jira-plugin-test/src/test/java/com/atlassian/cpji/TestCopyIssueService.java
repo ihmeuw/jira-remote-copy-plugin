@@ -8,7 +8,7 @@ import com.atlassian.cpji.components.ProjectInfoService;
 import com.atlassian.cpji.components.exceptions.IssueCreatedWithErrorsException;
 import com.atlassian.cpji.components.exceptions.ValidationException;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
@@ -350,7 +350,7 @@ public class TestCopyIssueService {
             copyBean.setTargetIssueType(ISSUE_TYPE);
 
             //returning field populator
-            ImmutableMap<String, FieldMapper> fields = ImmutableMap.of();
+            ImmutableMap<String, SystemFieldMapper> fields = ImmutableMap.of();
             when(fieldMapperFactory.getSystemFieldMappers()).thenReturn(fields);
             when(inputParametersService.getFieldsPopulator(project, issueType, copyBean, fields)).thenReturn(fieldPopulator);
 

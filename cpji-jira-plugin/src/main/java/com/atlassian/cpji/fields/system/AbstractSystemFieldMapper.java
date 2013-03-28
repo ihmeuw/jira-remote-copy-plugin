@@ -1,6 +1,6 @@
 package com.atlassian.cpji.fields.system;
 
-import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -13,7 +13,7 @@ import com.atlassian.jira.project.Project;
 /**
  * @since v1.4
  */
-public abstract class AbstractSystemFieldMapper implements FieldMapper, IssueCreationFieldMapper {
+public abstract class AbstractSystemFieldMapper implements SystemFieldMapper, IssueCreationFieldMapper {
 	protected final DefaultFieldValuesManager defaultFieldValuesManager;
 
     final String nameKey;

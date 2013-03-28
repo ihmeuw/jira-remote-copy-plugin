@@ -10,7 +10,7 @@ import com.atlassian.cpji.components.exceptions.ProjectNotFoundException;
 import com.atlassian.cpji.components.exceptions.RemoteLinksNotFoundException;
 import com.atlassian.cpji.components.exceptions.ValidationException;
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
@@ -106,7 +106,7 @@ public class CopyIssueService {
         final IssueType issueType = findIssueType(copyIssueBean.getTargetIssueType(), project);
 
         //Not let's start copying values over from the original issue.
-        Map<String, FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
+        Map<String, SystemFieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
         InputParametersService.Populator builder = inputParametersService.getFieldsPopulator(project, issueType, copyIssueBean, allSystemFieldMappers);
 
 		if (copyIssueBean.getActionParams() != null && copyIssueBean.getFieldValuesHolder() != null) {

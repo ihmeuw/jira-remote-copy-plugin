@@ -7,7 +7,7 @@ import com.atlassian.jira.project.Project;
 /**
  * @since v1.4
  */
-public interface FieldMapper
+public interface SystemFieldMapper
 {
     boolean userHasRequiredPermission(Project project, User user);
 

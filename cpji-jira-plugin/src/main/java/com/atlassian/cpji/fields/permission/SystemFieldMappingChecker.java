@@ -1,6 +1,6 @@
 package com.atlassian.cpji.fields.permission;
 
-import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.ValidationCode;
@@ -54,7 +54,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
 
     public SystemFieldPermissionBean getFieldPermission(final String fieldId)
     {
-        final Map<String, FieldMapper> fieldMappers = fieldMapperFactory.getSystemFieldMappers();
+        final Map<String, SystemFieldMapper> fieldMappers = fieldMapperFactory.getSystemFieldMappers();
         final List<String> remoteFieldIds = copyIssueBean.getVisibleSystemFieldIds();
 
         if (!remoteFieldIds.contains(fieldId))
@@ -73,11 +73,11 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
             }
         }
 
-		final FieldMapper fieldMapper = fieldMappers.get(fieldId);
-        if (fieldMapper != null)
+		final SystemFieldMapper systemFieldMapper = fieldMappers.get(fieldId);
+        if (systemFieldMapper != null)
         {
-            final boolean hasPermission = fieldMapper.userHasRequiredPermission(project, authenticationContext.getLoggedInUser());
-            final MappingResult mappingResult = fieldMapper.getMappingResult(copyIssueBean, project);
+            final boolean hasPermission = systemFieldMapper.userHasRequiredPermission(project, authenticationContext.getLoggedInUser());
+            final MappingResult mappingResult = systemFieldMapper.getMappingResult(copyIssueBean, project);
             PermissionBeanCreator<SystemFieldPermissionBean> permissionBeanCreator = new PermissionBeanCreator<SystemFieldPermissionBean>()
             {
                 public SystemFieldPermissionBean createPermissionBean(final ValidationCode validationCode)

@@ -46,7 +46,7 @@ public class InputParametersService {
         this.issueTypeSchemeManager = issueTypeSchemeManager;
     }
 
-    public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, FieldMapper> allSystemFieldMappers) {
+    public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, SystemFieldMapper> allSystemFieldMappers) {
         return new Populator(project, issueType, allSystemFieldMappers, source, new IssueInputParametersImpl(), fieldMapperFactory, fieldManager, defaultFieldValuesManager);
     }
 
@@ -67,11 +67,11 @@ public class InputParametersService {
 
         private final Project project;
         private final IssueType issueType;
-        private final Map<String, FieldMapper> allSystemFieldMappers;
+        private final Map<String, SystemFieldMapper> allSystemFieldMappers;
         private final IssueInputParameters inputParameters;
         private final CopyIssueBean copyIssueBean;
 
-        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManagerImpl defaultFieldValuesManager) {
+        public Populator(Project project, IssueType issueType, Map<String, SystemFieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManagerImpl defaultFieldValuesManager) {
             this.project = project;
             this.issueType = issueType;
             this.allSystemFieldMappers = allSystemFieldMappers;
