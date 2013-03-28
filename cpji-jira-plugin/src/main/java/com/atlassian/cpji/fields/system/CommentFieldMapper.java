@@ -1,8 +1,8 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CommentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
@@ -32,10 +32,9 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
     private final ProjectRoleManager projectRoleManager;
     private final GroupManager groupManager;
     private final PermissionManager permissionsManager;
-    private final UserMappingManager userMappingManager;
 
     public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, GroupManager groupManager, 
-			final PermissionManager permissionManager, final OrderableField field, final UserMappingManager userMappingManager,
+			final PermissionManager permissionManager, final OrderableField field,
 			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(field, defaultFieldValuesManager);
@@ -43,17 +42,16 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         this.projectRoleManager = projectRoleManager;
         this.groupManager = groupManager;
         this.permissionsManager = permissionManager;
-        this.userMappingManager = userMappingManager;
     }
 
-    public void process(final Issue issue, final CopyIssueBean bean)
+    public void process(final CachingUserMapper userMapper, final Issue issue, final CopyIssueBean bean)
     {
         List<CommentBean> comments = bean.getComments();
         if (comments != null)
         {
             for (CommentBean comment : comments)
             {
-                ResultHolder<User> userResultHolder = findUser(comment.getAuthor(), issue.getProjectObject());
+                ResultHolder<User> userResultHolder = findUser(userMapper, comment.getAuthor(), issue.getProjectObject());
                 ResultHolder<Group> groupResultHolder = findGroup(comment.getGroupLevel());
                 ResultHolder<ProjectRole> projectRole = findProjectRole(comment.getRoleLevel());
                 if (userResultHolder.mapped && groupResultHolder.mapped && projectRole.mapped)
@@ -69,7 +67,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         return permissionsManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         List<String> unmappedFieldValues = new ArrayList<String>();
         List<CommentBean> comments = bean.getComments();
@@ -77,7 +75,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         {
             for (CommentBean comment : comments)
             {
-                ResultHolder<User> userResultHolder = findUser(comment.getAuthor(), project);
+                ResultHolder<User> userResultHolder = findUser(userMapper, comment.getAuthor(), project);
                 if (!userResultHolder.mapped)
                 {
                    unmappedFieldValues.add("User " + comment.getAuthor() + " can't comment on this issue.");
@@ -145,9 +143,9 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         return new ResultHolder<Group>(true);
     }
 
-    private ResultHolder<User> findUser(final UserBean userBean, final Project project)
+    private ResultHolder<User> findUser(final CachingUserMapper userMapper, final UserBean userBean, final Project project)
     {
-        User user = userMappingManager.mapUser(userBean);
+        User user = userMapper.mapUser(userBean);
         if (user == null)
         {
             return new ResultHolder<User>(false);

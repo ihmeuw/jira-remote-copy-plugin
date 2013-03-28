@@ -2,6 +2,7 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -33,7 +34,7 @@ public class LabelSystemFieldMapper extends AbstractSystemFieldMapper implements
         return true;
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         List<String> labels = bean.getLabels();
         if (labels != null && !labels.isEmpty())
@@ -49,9 +50,9 @@ public class LabelSystemFieldMapper extends AbstractSystemFieldMapper implements
     }
 
 	@Override
-	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+	public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		MappingResult mappingResult = getMappingResult(userMapper, copyIssueBean, project);
 		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
 			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
 			if (defaultFieldValue != null) {

@@ -1,8 +1,8 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -26,28 +26,26 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
     private final WatcherService watcherService;
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
-    private final UserMappingManager userMappingManager;
 
     public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager, 
-			final JiraAuthenticationContext jiraAuthenticationContext, final Field field, final UserMappingManager userMappingManager,
+			final JiraAuthenticationContext jiraAuthenticationContext, final Field field,
 			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(field, defaultFieldValuesManager);
         this.watcherService = watcherService;
         this.permissionManager = permissionManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
-        this.userMappingManager = userMappingManager;
     }
 
 
-    public void process(final Issue issue, final CopyIssueBean bean)
+    public void process(final CachingUserMapper userMapper, final Issue issue, final CopyIssueBean bean)
     {
         if (watcherService.isWatchingEnabled() && permissionManager.hasPermission(Permissions.MANAGE_WATCHER_LIST, issue, jiraAuthenticationContext.getLoggedInUser()))
         {
             List<UserBean> watchers = makeSureNotNull(bean.getWatchers());
             for (UserBean user : watchers)
             {
-                User watcher = findUser(user);
+                User watcher = userMapper.mapUser(user);
                 if (watcher != null)
                 {
                     watcherService.addWatcher(issue, jiraAuthenticationContext.getLoggedInUser(), watcher);
@@ -61,7 +59,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
         return permissionManager.hasPermission(Permissions.MANAGE_WATCHER_LIST, project, user) && watcherService.isWatchingEnabled();
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         List<String> unmappedValues = new ArrayList<String>();
         List<String> mappedValues = new ArrayList<String>();
@@ -72,7 +70,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
         }
         for (UserBean user : watchers)
         {
-            User watcher = findUser(user);
+            User watcher = userMapper.mapUser(user);
             if (watcher == null)
             {
                 unmappedValues.add(user.getUserName());
@@ -86,11 +84,6 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
     private <T>List makeSureNotNull(List<T> inputList)
     {
         return (inputList == null) ? Lists.newArrayList() : inputList;
-    }
-
-    private User findUser(final UserBean user)
-    {
-        return userMappingManager.mapUser(user);
     }
 
     public boolean isVisible()

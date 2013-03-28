@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields;
 
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.jira.issue.IssueInputParameters;
 import com.atlassian.jira.issue.fields.OrderableField;
@@ -14,6 +15,7 @@ public interface IssueCreationFieldMapper extends FieldMapper
 {
 	Class<? extends OrderableField>  getField();
 
-    void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean bean, FieldLayoutItem fieldLayoutItem,
+    void populateInputParams(CachingUserMapper userMapper,
+			IssueInputParameters inputParameters, CopyIssueBean bean, FieldLayoutItem fieldLayoutItem,
 			final Project project, IssueType issueType);
 }

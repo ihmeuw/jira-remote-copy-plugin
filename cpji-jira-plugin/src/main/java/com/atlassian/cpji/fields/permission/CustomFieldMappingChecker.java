@@ -36,15 +36,18 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
     private final FieldMapperFactory fieldMapperFactory;
     private final IssueTypeSchemeManager issueTypeSchemeManager;
 
-    private static final Logger log = Logger.getLogger(CustomFieldMappingChecker.class);
+	private static final Logger log = Logger.getLogger(CustomFieldMappingChecker.class);
 
-    public CustomFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout, final FieldManager fieldManager, final FieldMapperFactory fieldMapperFactory, final IssueTypeSchemeManager issueTypeSchemeManager)
+    public CustomFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager,
+			final CopyIssueBean copyIssueBean, final Project project,
+			FieldLayout fieldLayout, final FieldManager fieldManager,
+			final FieldMapperFactory fieldMapperFactory, final IssueTypeSchemeManager issueTypeSchemeManager)
     {
         super(defaultFieldValuesManager, copyIssueBean, project, fieldLayout);
         this.fieldManager = fieldManager;
         this.fieldMapperFactory = fieldMapperFactory;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
-    }
+	}
 
 
     public List<CustomFieldPermissionBean> findUnmappedRemoteFields(CopyIssueBean copyIssueBean, Iterable<FieldLayoutItem> fieldLayoutItems)

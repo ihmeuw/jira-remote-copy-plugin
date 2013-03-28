@@ -76,15 +76,15 @@ public class FieldMapperFactory
          * SystemFieldPostIssueCreationFieldMapper
          */
         PostIssueCreationFieldMapper commentFieldMapper = new CommentFieldMapper(commentService, projectRoleManager,
-				groupManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.COMMENT), userMappingManager, defaultFieldValuesManager);
+				groupManager, permissionManager, getOrderableField(fieldManager, IssueFieldConstants.COMMENT), defaultFieldValuesManager);
 		postIssueCreationFieldMapper.add(commentFieldMapper);
 
         PostIssueCreationFieldMapper watcherFieldMapper = new WatcherFieldMapper(watcherService, permissionManager,
-				jiraAuthenticationContext, createField(IssueFieldConstants.WATCHERS, "cpji.field.names.watchers"), userMappingManager, defaultFieldValuesManager);
+				jiraAuthenticationContext, createField(IssueFieldConstants.WATCHERS, "cpji.field.names.watchers"), defaultFieldValuesManager);
 		postIssueCreationFieldMapper.add(watcherFieldMapper);
 
         PostIssueCreationFieldMapper votersFieldMapper = new VoterFieldMapper(createField(IssueFieldConstants.VOTERS, "cpji.field.names.votes"),
-				voteService, permissionManager, jiraAuthenticationContext, userMappingManager, defaultFieldValuesManager);
+				voteService, permissionManager, jiraAuthenticationContext, defaultFieldValuesManager);
 		postIssueCreationFieldMapper.add(votersFieldMapper);
 
 		customFieldMappers = new LazyReference<List<CustomFieldMapper>>() {

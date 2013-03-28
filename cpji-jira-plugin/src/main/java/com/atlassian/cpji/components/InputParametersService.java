@@ -5,6 +5,7 @@ import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.permission.CustomFieldMapperUtil;
 import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldBean;
@@ -46,12 +47,12 @@ public class InputParametersService {
         this.issueTypeSchemeManager = issueTypeSchemeManager;
     }
 
-    public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, FieldMapper> allSystemFieldMappers) {
-        return new Populator(project, issueType, allSystemFieldMappers, source, new IssueInputParametersImpl(), fieldMapperFactory, fieldManager, defaultFieldValuesManager);
+    public Populator getFieldsPopulator(Project project, IssueType issueType, CopyIssueBean source, Map<String, FieldMapper> allSystemFieldMappers, CachingUserMapper userMapper) {
+        return new Populator(project, issueType, allSystemFieldMappers, source, new IssueInputParametersImpl(), fieldMapperFactory, fieldManager, defaultFieldValuesManager, userMapper);
     }
 
-    public SystemFieldMappingChecker getSystemFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout) {
-        return new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout);
+    public SystemFieldMappingChecker getSystemFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout, CachingUserMapper userMapper) {
+        return new SystemFieldMappingChecker(defaultFieldValuesManager, fieldMapperFactory, authenticationContext, copyIssueBean, project, fieldLayout, userMapper);
     }
 
     public CustomFieldMappingChecker getCustomFieldMappingChecker(Project project, CopyIssueBean copyIssueBean, FieldLayout fieldLayout) {
@@ -64,14 +65,18 @@ public class InputParametersService {
         private final FieldMapperFactory fieldMapperFactory;
         private final FieldManager fieldManager;
         private final DefaultFieldValuesManagerImpl defaultFieldValuesManager;
+		private final CachingUserMapper userMapper;
 
-        private final Project project;
+		private final Project project;
         private final IssueType issueType;
         private final Map<String, FieldMapper> allSystemFieldMappers;
         private final IssueInputParameters inputParameters;
         private final CopyIssueBean copyIssueBean;
 
-        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers, CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory, FieldManager fieldManager, DefaultFieldValuesManagerImpl defaultFieldValuesManager) {
+        public Populator(Project project, IssueType issueType, Map<String, FieldMapper> allSystemFieldMappers,
+				CopyIssueBean copyIssueBean, IssueInputParameters inputParameters, FieldMapperFactory fieldMapperFactory,
+				FieldManager fieldManager, DefaultFieldValuesManagerImpl defaultFieldValuesManager,
+				CachingUserMapper userMapper) {
             this.project = project;
             this.issueType = issueType;
             this.allSystemFieldMappers = allSystemFieldMappers;
@@ -81,7 +86,8 @@ public class InputParametersService {
             this.fieldMapperFactory = fieldMapperFactory;
             this.fieldManager = fieldManager;
             this.defaultFieldValuesManager = defaultFieldValuesManager;
-        }
+			this.userMapper = userMapper;
+		}
 
         public void injectInputParam(FieldLayoutItem item) {
             OrderableField orderableField = item.getOrderableField();
@@ -95,7 +101,7 @@ public class InputParametersService {
         public void populateProjectSystemField() {
             IssueCreationFieldMapper projectFieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(ProjectSystemField.class);
 			Preconditions.checkNotNull("There should be projectMapper defined.", projectFieldMapper);
-            projectFieldMapper.populateInputParams(inputParameters, copyIssueBean, null, project, issueType);
+            projectFieldMapper.populateInputParams(userMapper, inputParameters, copyIssueBean, null, project, issueType);
         }
 
         private void populateCustomField(FieldLayoutItem item, OrderableField orderableField) {
@@ -128,7 +134,7 @@ public class InputParametersService {
         private void populateSystemField(FieldLayoutItem item, OrderableField orderableField) {
             IssueCreationFieldMapper fieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(orderableField.getClass());
             if (fieldMapper != null) {
-				fieldMapper.populateInputParams(inputParameters, copyIssueBean, item, project, issueType);
+				fieldMapper.populateInputParams(userMapper, inputParameters, copyIssueBean, item, project, issueType);
             } else {
                 if (!allSystemFieldMappers.containsKey(orderableField.getId())) {
                     log.warn("No support for field '" + orderableField.getName() + "'");

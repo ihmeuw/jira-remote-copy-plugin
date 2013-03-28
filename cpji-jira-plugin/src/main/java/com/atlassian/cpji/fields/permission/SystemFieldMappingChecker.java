@@ -5,6 +5,7 @@ import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.MappingResult;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
@@ -28,15 +29,20 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
 {
     private final FieldMapperFactory fieldMapperFactory;
     private final JiraAuthenticationContext authenticationContext;
+	private final CachingUserMapper userMapper;
 
-    private static final Logger log = Logger.getLogger(SystemFieldMappingChecker.class);
+	private static final Logger log = Logger.getLogger(SystemFieldMappingChecker.class);
 
-    public SystemFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager, final FieldMapperFactory fieldMapperFactory, final JiraAuthenticationContext authenticationContext, final CopyIssueBean copyIssueBean, final Project project, FieldLayout fieldLayout)
+    public SystemFieldMappingChecker(final DefaultFieldValuesManagerImpl defaultFieldValuesManager,
+			final FieldMapperFactory fieldMapperFactory, final JiraAuthenticationContext authenticationContext,
+			final CopyIssueBean copyIssueBean, final Project project,
+			FieldLayout fieldLayout, CachingUserMapper userMapper)
     {
         super(defaultFieldValuesManager, copyIssueBean, project, fieldLayout);
         this.fieldMapperFactory = fieldMapperFactory;
         this.authenticationContext = authenticationContext;
-    }
+		this.userMapper = userMapper;
+	}
 
     public List<SystemFieldPermissionBean> findUnmappedRemoteFields(CopyIssueBean copyIssueBean, Iterable<FieldLayoutItem> fieldLayoutItems)
     {
@@ -77,7 +83,7 @@ public class SystemFieldMappingChecker extends AbstractFieldMappingChecker<Syste
         if (fieldMapper != null)
         {
             final boolean hasPermission = fieldMapper.userHasRequiredPermission(project, authenticationContext.getLoggedInUser());
-            final MappingResult mappingResult = fieldMapper.getMappingResult(copyIssueBean, project);
+            final MappingResult mappingResult = fieldMapper.getMappingResult(userMapper, copyIssueBean, project);
             PermissionBeanCreator<SystemFieldPermissionBean> permissionBeanCreator = new PermissionBeanCreator<SystemFieldPermissionBean>()
             {
                 public SystemFieldPermissionBean createPermissionBean(final ValidationCode validationCode)

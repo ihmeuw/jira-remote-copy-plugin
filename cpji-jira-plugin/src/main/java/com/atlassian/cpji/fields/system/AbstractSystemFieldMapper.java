@@ -2,6 +2,7 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -49,7 +50,8 @@ public abstract class AbstractSystemFieldMapper implements FieldMapper, IssueCre
 	}
 
 	@Override
-	public abstract void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+	public abstract void populateInputParams(CachingUserMapper userMapper,
+			IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType);
 
 }

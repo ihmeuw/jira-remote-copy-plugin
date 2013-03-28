@@ -2,6 +2,7 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -40,9 +41,9 @@ public class DueDateFieldMapper extends AbstractSystemFieldMapper implements Iss
     }
 
 	@Override
-	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+	public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		MappingResult mappingResult = getMappingResult(userMapper, copyIssueBean, project);
 		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
 			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
 			if (defaultFieldValue != null) {
@@ -69,7 +70,7 @@ public class DueDateFieldMapper extends AbstractSystemFieldMapper implements Iss
         return permissionManager.hasPermission(Permissions.SCHEDULE_ISSUE, project, user);
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         Date issueDueDate = bean.getIssueDueDate();
         if (issueDueDate != null)

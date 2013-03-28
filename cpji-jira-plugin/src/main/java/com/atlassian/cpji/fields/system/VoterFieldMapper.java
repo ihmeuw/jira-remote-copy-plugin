@@ -1,8 +1,8 @@
 package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -29,17 +29,14 @@ public class VoterFieldMapper extends AbstractFieldMapper
 {
     private final VoteService voteService;
     private final PermissionManager permissionManager;
-    private final UserMappingManager userMappingManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
     public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager, 
-			final JiraAuthenticationContext jiraAuthenticationContext, final UserMappingManager userMappingManager,
-			final DefaultFieldValuesManager defaultFieldValuesManager)
+			final JiraAuthenticationContext jiraAuthenticationContext, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(field, defaultFieldValuesManager);
         this.voteService = voteService;
         this.permissionManager = permissionManager;
-        this.userMappingManager = userMappingManager;
         this.jiraAuthenticationContext = jiraAuthenticationContext;
     }
 
@@ -48,7 +45,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         return permissionManager.hasPermission(Permissions.VIEW_VOTERS_AND_WATCHERS, project, user) && voteService.isVotingEnabled();
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         final List<UserBean> voters = bean.getVoters();
         if (voters == null)
@@ -70,7 +67,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         final List<String> mappedUsers = new ArrayList<String>();
         for (UserBean voter : voters)
         {
-            User user = userMappingManager.mapUser(voter);
+            User user = userMapper.mapUser(voter);
             if (user == null)
             {
                 unmappedUsers.add(voter.getUserName());
@@ -94,7 +91,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         return new MappingResult(unmappedUsers, !mappedUsers.isEmpty(), false, hasDefaultValue(project, bean));
     }
 
-    public void process(final Issue issue, final CopyIssueBean bean) throws FieldCreationException
+    public void process(final CachingUserMapper userMapper, final Issue issue, final CopyIssueBean bean) throws FieldCreationException
     {
         if (permissionManager.hasPermission(Permissions.VIEW_VOTERS_AND_WATCHERS, issue.getProjectObject(), jiraAuthenticationContext.getLoggedInUser()) && voteService.isVotingEnabled())
         {
@@ -104,7 +101,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
             {
                 for (UserBean voter : voters)
                 {
-                    User user = userMappingManager.mapUser(voter);
+                    User user = userMapper.mapUser(voter);
                     if (user != null)
                     {
                         VoteService.VoteValidationResult voteValidationResult = voteService.validateAddVote(jiraAuthenticationContext.getLoggedInUser(), user, issue);

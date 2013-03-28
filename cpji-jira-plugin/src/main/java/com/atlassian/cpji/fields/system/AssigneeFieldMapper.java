@@ -2,8 +2,8 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
@@ -33,7 +33,6 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
 public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final PermissionManager permissionManager;
     private final ApplicationProperties applicationProperties;
-    private final UserMappingManager userMappingManager;
 
     static class InternalMappingResult {
         final User mappedUser;
@@ -50,11 +49,10 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
     public AssigneeFieldMapper(PermissionManager permissionManager, final ApplicationProperties applicationProperties,
-                               FieldManager fieldManager, final UserMappingManager userMappingManager, final DefaultFieldValuesManager defaultFieldValuesManager) {
+                               FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager) {
         super(getOrderableField(fieldManager, IssueFieldConstants.ASSIGNEE), defaultFieldValuesManager);
         this.permissionManager = permissionManager;
         this.applicationProperties = applicationProperties;
-        this.userMappingManager = userMappingManager;
     }
 
     public Class<? extends OrderableField> getField() {
@@ -66,9 +64,9 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project) {
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project) {
         boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
-        InternalMappingResult mapResult = mapUser(bean.getAssignee(), project);
+        InternalMappingResult mapResult = mapUser(userMapper, bean.getAssignee(), project);
         switch (mapResult.decision) {
             case FOUND:
                 return new MappingResult(ImmutableList.<String>of(), true, false, true);
@@ -91,7 +89,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         }
     }
 
-    InternalMappingResult mapUser(UserBean user, final Project project) {
+    InternalMappingResult mapUser(CachingUserMapper userMapper, UserBean user, final Project project) {
         if (user == null) {
             return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
         }
@@ -100,7 +98,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         final boolean projectLeadIsDefaultAsignee = (project.getAssigneeType() == AssigneeTypes.PROJECT_LEAD)
                 && permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, project.getLead());
 
-        User assignee = findUser(user);
+        User assignee = userMapper.mapUser(user);
         if (assignee == null) {
             if (projectLeadIsDefaultAsignee) {
                 return new InternalMappingResult(project.getLead(), InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED);
@@ -121,9 +119,9 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
     @Override
-    public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+    public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
                                     FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-        InternalMappingResult assignee = mapUser(copyIssueBean.getAssignee(), project);
+        InternalMappingResult assignee = mapUser(userMapper, copyIssueBean.getAssignee(), project);
         switch (assignee.decision) {
             case FOUND:
             case DEFAULT_ASSIGNEE_USED:
@@ -140,10 +138,5 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
                 }
                 break;
         }
-    }
-
-
-    private User findUser(final UserBean user) {
-        return userMappingManager.mapUser(user);
     }
 }

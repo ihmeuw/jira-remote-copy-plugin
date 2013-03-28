@@ -1,5 +1,6 @@
 package com.atlassian.cpji.fields;
 
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.project.Project;
@@ -11,7 +12,7 @@ public interface FieldMapper
 {
     boolean userHasRequiredPermission(Project project, User user);
 
-    MappingResult getMappingResult(CopyIssueBean bean, final Project project);
+    MappingResult getMappingResult(CachingUserMapper userMapper, CopyIssueBean bean, final Project project);
 
     String getFieldNameKey();
 

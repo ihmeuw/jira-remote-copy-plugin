@@ -2,6 +2,7 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
 import com.atlassian.cpji.rest.model.ComponentBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -46,9 +47,9 @@ public class ComponentFieldMapper extends AbstractSystemFieldMapper implements I
     }
 
 	@Override
-	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+	public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-		MappingResult mappingResult = getMappingResult(copyIssueBean, project);
+		MappingResult mappingResult = getMappingResult(userMapper, copyIssueBean, project);
 		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
 			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
 			if (defaultFieldValue != null) {
@@ -81,7 +82,7 @@ public class ComponentFieldMapper extends AbstractSystemFieldMapper implements I
         return true;
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         List<String> unmappedFieldValues = new ArrayList<String>();
         List<ComponentBean> components = makeSureNotNull(bean.getComponents());

@@ -22,7 +22,7 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 	}
 
 	@Test def shouldNoCrashWhenThereAreNoUsers {
-		userMappingManager.mapUser(new UserBean("pniewiadomski", "pniewiadomski@atlassian.com", "Pawel Niewiadomski")) should be (null)
+		userMappingManager.getUserMapper.mapUser(new UserBean("pniewiadomski", "pniewiadomski@atlassian.com", "Pawel Niewiadomski")) should be (null)
 	}
 
 	@Test def shouldMatchByEmailFirst {
@@ -32,7 +32,7 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 
 		when(userManager.getUsers).thenReturn(users)
 
-		userMappingManager.mapUser(new UserBean("pniewiadomski", "pniewiadomski@atlassian.com", "Pawel Niewiadomski")) should have (
+		userMappingManager.getUserMapper.mapUser(new UserBean("pniewiadomski", "pniewiadomski@atlassian.com", "Pawel Niewiadomski")) should have (
 			'emailAddress ("pniewiadomski@atlassian.com"),
 			'name ("pn"),
 			'displayName ("Pawel")
@@ -46,7 +46,7 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 
 		when(userManager.getUsers).thenReturn(users)
 
-		userMappingManager.mapUser(new UserBean("pniewiadomski", "pniewiadomski@atlassian.com", "Pawel Niewiadomski")) should have (
+		userMappingManager.getUserMapper.mapUser(new UserBean("pniewiadomski", "pniewiadomski@atlassian.com", "Pawel Niewiadomski")) should have (
 			'emailAddress ("11110000b@gmail.com"),
 			'name ("pniewiadomski"),
 			'displayName ("Pawel Niewiadomski")
@@ -60,7 +60,7 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 
 		when(userManager.getUsers).thenReturn(users)
 
-		userMappingManager.mapUser(new UserBean("admin", "pawelniewiadomski@me.com", "Pawel Niewiadomski")) should have (
+		userMappingManager.getUserMapper.mapUser(new UserBean("admin", "pawelniewiadomski@me.com", "Pawel Niewiadomski")) should have (
 			'emailAddress ("pawelniewiadomski@me.com"),
 			'name ("admin"),
 			'displayName ("Pawel Niewiadomski")

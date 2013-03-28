@@ -17,6 +17,8 @@ import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
 import com.atlassian.cpji.fields.system.PostIssueCreationFieldMapper;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.RESTException;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
@@ -80,9 +82,17 @@ public class CopyIssueService {
     private final SubTaskManager subTaskManager;
     private final ProjectInfoService projectInfoService;
     private final ChangeHistoryManager changeHistoryManager;
+	private final UserMappingManager userMappingManager;
 
 
-    public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext, final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager, final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager, final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication, final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService, InputParametersService inputParametersService, SubTaskManager subTaskManager, ProjectInfoService projectInfoService, ChangeHistoryManager changeHistoryManager) {
+	public CopyIssueService(final IssueService issueService, final JiraAuthenticationContext authenticationContext,
+			final IssueTypeSchemeManager issueTypeSchemeManager, final FieldLayoutManager fieldLayoutManager,
+			final FieldMapperFactory fieldMapperFactory, final FieldManager fieldManager,
+			final FieldLayoutItemsRetriever fieldLayoutItemsRetriever, final InternalHostApplication internalHostApplication,
+			final IssueLinkService issueLinkService, final RemoteIssueLinkService remoteIssueLinkService,
+			InputParametersService inputParametersService, SubTaskManager subTaskManager,
+			ProjectInfoService projectInfoService, ChangeHistoryManager changeHistoryManager,
+			UserMappingManager userMappingManager) {
         this.issueService = issueService;
         this.authenticationContext = authenticationContext;
         this.issueTypeSchemeManager = issueTypeSchemeManager;
@@ -97,7 +107,8 @@ public class CopyIssueService {
         this.subTaskManager = subTaskManager;
         this.projectInfoService = projectInfoService;
         this.changeHistoryManager = changeHistoryManager;
-    }
+		this.userMappingManager = userMappingManager;
+	}
 
 
     public IssueCreationResultBean copyIssue(final CopyIssueBean copyIssueBean)
@@ -107,7 +118,8 @@ public class CopyIssueService {
 
         //Not let's start copying values over from the original issue.
         Map<String, FieldMapper> allSystemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
-        InputParametersService.Populator builder = inputParametersService.getFieldsPopulator(project, issueType, copyIssueBean, allSystemFieldMappers);
+		CachingUserMapper userMapper = userMappingManager.getUserMapper();
+        InputParametersService.Populator builder = inputParametersService.getFieldsPopulator(project, issueType, copyIssueBean, allSystemFieldMappers, userMapper);
 
 		if (copyIssueBean.getActionParams() != null && copyIssueBean.getFieldValuesHolder() != null) {
 			builder.getInputParameters().setFieldValuesHolder(copyIssueBean.getFieldValuesHolder());
@@ -160,7 +172,7 @@ public class CopyIssueService {
 
             for (PostIssueCreationFieldMapper issueCreationFieldMapper : postIssueCreationFieldMapper) {
                 try {
-                    issueCreationFieldMapper.process(createIssueResult.getIssue(), copyIssueBean);
+                    issueCreationFieldMapper.process(userMapper, createIssueResult.getIssue(), copyIssueBean);
                 } catch (FieldCreationException e) {
                     log.warn("Exception when creating field '" + e.getFieldId() + "'", e);
                     errors.addError(issueCreationFieldMapper.getFieldId(), e.getMessage());
@@ -219,7 +231,8 @@ public class CopyIssueService {
 
         final List<SystemFieldPermissionBean> systemFieldPermissionBeans = new ArrayList<SystemFieldPermissionBean>();
         final List<CustomFieldPermissionBean> customFieldPermissionBeans = new ArrayList<CustomFieldPermissionBean>();
-        SystemFieldMappingChecker systemFieldMappingChecker = inputParametersService.getSystemFieldMappingChecker(project, copyIssueBean, fieldLayout);
+		final CachingUserMapper userMapper = userMappingManager.getUserMapper();
+        SystemFieldMappingChecker systemFieldMappingChecker = inputParametersService.getSystemFieldMappingChecker(project, copyIssueBean, fieldLayout, userMapper);
         CustomFieldMappingChecker customFieldMappingChecker = inputParametersService.getCustomFieldMappingChecker(project, copyIssueBean, fieldLayout);
 
         systemFieldPermissionBeans.addAll(systemFieldMappingChecker.findUnmappedRemoteFields(copyIssueBean, fieldLayoutItems));

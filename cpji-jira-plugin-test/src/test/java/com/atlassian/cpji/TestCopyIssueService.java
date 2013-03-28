@@ -14,6 +14,8 @@ import com.atlassian.cpji.fields.permission.CustomFieldMappingChecker;
 import com.atlassian.cpji.fields.permission.SystemFieldMappingChecker;
 import com.atlassian.cpji.fields.system.FieldCreationException;
 import com.atlassian.cpji.fields.system.PostIssueCreationFieldMapper;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
+import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Pair;
@@ -101,6 +103,10 @@ public class TestCopyIssueService {
     private ProjectInfoService projectInfoService;
     @Mock
     private ChangeHistoryManager changeHistoryManager;
+	@Mock
+	private UserMappingManager userMappingManager;
+	@Mock
+	private CachingUserMapper userMapper;
 
     @Before
     public void setUp() throws Exception {
@@ -116,8 +122,12 @@ public class TestCopyIssueService {
 
         when(createdIssue.getKey()).thenReturn(ISSUE_KEY);
         when(createdIssue.getId()).thenReturn(ISSUE_ID);
+		when(userMappingManager.getUserMapper()).thenReturn(userMapper);
 
-        copyIssueService = new CopyIssueService(issueService, authenticationContext, issueTypeSchemeManager, fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever, internalHostApplication, issueLinkService, remoteIssueLinkService, inputParametersService, subTaskManager, projectInfoService, changeHistoryManager);
+        copyIssueService = new CopyIssueService(issueService, authenticationContext, issueTypeSchemeManager,
+				fieldLayoutManager, fieldMapperFactory, fieldManager, fieldLayoutItemsRetriever,
+				internalHostApplication, issueLinkService, remoteIssueLinkService,
+				inputParametersService, subTaskManager, projectInfoService, changeHistoryManager, userMappingManager);
     }
 
 
@@ -164,7 +174,7 @@ public class TestCopyIssueService {
         PostIssueCreationFieldMapper mapperWithException = mock(PostIssueCreationFieldMapper.class);
         PostIssueCreationFieldMapper mapper = mock(PostIssueCreationFieldMapper.class);
         when(mapperWithException.getFieldId()).thenReturn("fieldWithExceptionId");
-        doThrow(new FieldCreationException("field creation message", "fieldId")).when(mapperWithException).process(createdIssue, reqs.copyBean);
+        doThrow(new FieldCreationException("field creation message", "fieldId")).when(mapperWithException).process(userMapper, createdIssue, reqs.copyBean);
 
         when(fieldMapperFactory.getPostIssueCreationFieldMapper()).thenReturn(ImmutableList.of(
                 mapper,mapperWithException
@@ -172,8 +182,8 @@ public class TestCopyIssueService {
 
         copyIssueService.copyIssue(reqs.copyBean);
 
-        verify(mapper).process(createdIssue, reqs.copyBean);
-        verify(mapperWithException).process(createdIssue, reqs.copyBean);
+        verify(mapper).process(userMapper, createdIssue, reqs.copyBean);
+        verify(mapperWithException).process(userMapper, createdIssue, reqs.copyBean);
     }
 
     @Test(expected = ValidationException.class)
@@ -305,7 +315,8 @@ public class TestCopyIssueService {
             systemFieldPermissionBean = mock(SystemFieldPermissionBean.class);
             customFieldPermissionBean = mock(CustomFieldPermissionBean.class);
 
-            when(inputParametersService.getSystemFieldMappingChecker(eq(project), eq(bean), Matchers.<FieldLayout>any())).thenReturn(system);
+            when(inputParametersService.getSystemFieldMappingChecker(eq(project), eq(bean), Matchers.<FieldLayout>any(),
+					Matchers.<CachingUserMapper> any())).thenReturn(system);
             when(inputParametersService.getCustomFieldMappingChecker(eq(project), eq(bean), Matchers.<FieldLayout>any())).thenReturn(custom);
         }
 
@@ -352,13 +363,11 @@ public class TestCopyIssueService {
             //returning field populator
             ImmutableMap<String, FieldMapper> fields = ImmutableMap.of();
             when(fieldMapperFactory.getSystemFieldMappers()).thenReturn(fields);
-            when(inputParametersService.getFieldsPopulator(project, issueType, copyBean, fields)).thenReturn(fieldPopulator);
+            when(inputParametersService.getFieldsPopulator(eq(project), eq(issueType), eq(copyBean), eq(fields), Matchers.<CachingUserMapper>any())).thenReturn(fieldPopulator);
 
             //returning all field items
             when(fieldLayoutItemsRetriever.getAllVisibleFieldLayoutItems(project, issueType)).thenReturn(ImmutableList.of(genericFieldLayoutItem, genericFieldLayoutItem, genericFieldLayoutItem));
         }
-
-
     }
 
 

@@ -2,10 +2,9 @@ package com.atlassian.cpji.fields.system;
 
 import com.atlassian.cpji.fields.IssueCreationFieldMapper;
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
-import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -30,16 +29,14 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
  */
 public class ReporterFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final PermissionManager permissionManager;
-    private final UserMappingManager userMappingManager;
 	private final JiraAuthenticationContext authenticationContext;
 
 	public ReporterFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager, 
-			final UserMappingManager userMappingManager, final DefaultFieldValuesManager defaultFieldValuesManager,
+			final DefaultFieldValuesManager defaultFieldValuesManager,
 			final JiraAuthenticationContext authenticationContext)
     {
         super(getOrderableField(fieldManager, IssueFieldConstants.REPORTER), defaultFieldValuesManager);
         this.permissionManager = permissionManager;
-        this.userMappingManager = userMappingManager;
 		this.authenticationContext = authenticationContext;
 	}
 
@@ -49,11 +46,11 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
 	@Override
-	public void populateInputParams(IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
+	public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
 
 		final User loggedIn = authenticationContext.getLoggedInUser();
-		final User reporter = copyIssueBean.getReporter() != null ? findUser(copyIssueBean.getReporter(), project) : null;
+		final User reporter = copyIssueBean.getReporter() != null ? userMapper.mapUser(copyIssueBean.getReporter()) : null;
 
 		if (!fieldLayoutItem.isHidden()) {
 			if (reporter != null) {
@@ -74,23 +71,18 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
         return permissionManager.hasPermission(Permissions.MODIFY_REPORTER, project, user);
     }
 
-    public MappingResult getMappingResult(final CopyIssueBean bean, final Project project)
+    public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
         if (bean.getReporter() == null)
         {
            return new MappingResult(Collections.<String>emptyList(), true, true, true);
         }
-        final User reporter = findUser(bean.getReporter(), project);
+        final User reporter = userMapper.mapUser(bean.getReporter());
         if (reporter == null)
         {
             return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false, true);
         }
         return new MappingResult(Collections.<String>emptyList(), true, false, true);
-    }
-
-    private User findUser(final UserBean user, final Project project)
-    {
-        return userMappingManager.mapUser(user);
     }
 
     public String getFieldId()

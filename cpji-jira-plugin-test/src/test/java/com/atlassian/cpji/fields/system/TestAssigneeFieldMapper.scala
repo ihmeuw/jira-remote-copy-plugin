@@ -10,7 +10,7 @@ import com.atlassian.jira.project.{AssigneeTypes, Project}
 import com.atlassian.cpji.fields.system.AssigneeFieldMapper.InternalMappingResult
 import com.atlassian.jira.issue.fields.{OrderableField, FieldManager}
 import com.atlassian.jira.issue.{IssueInputParameters, IssueFieldConstants}
-import com.atlassian.cpji.fields.value.{DefaultFieldValuesManager, UserMappingManager}
+import com.atlassian.cpji.fields.value.{CachingUserMapper, DefaultFieldValuesManager, UserMappingManager}
 import com.atlassian.cpji.rest.model.{CopyIssueBean, UserBean}
 import com.atlassian.crowd.embedded.api.User
 import com.atlassian.jira.security.{PermissionManager, Permissions}
@@ -28,6 +28,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
   //components
   @Mock var userMappingManager: UserMappingManager = null
+  @Mock var userMapper: CachingUserMapper = null
   @Mock var permissionManager: PermissionManager = null
   @Mock var applicationProperties: ApplicationProperties = null
   @Mock var defaultValuesManager: DefaultFieldValuesManager = null
@@ -52,12 +53,12 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
     when(project.getLead).thenReturn(projectLead)
 
-    asigneeFieldMapper = new AssigneeFieldMapper(permissionManager, applicationProperties, fieldManager, userMappingManager, defaultValuesManager) {
-      override def mapUser(user: UserBean, project: Project): InternalMappingResult = {
+    asigneeFieldMapper = new AssigneeFieldMapper(permissionManager, applicationProperties, fieldManager, defaultValuesManager) {
+      override def mapUser(userMapper: CachingUserMapper, user: UserBean, project: Project): InternalMappingResult = {
         if (plugedMapMethod) {
           pluggedMappingResult
         } else
-          super.mapUser(user, project)
+          super.mapUser(userMapper, user, project)
       }
     }
   }
@@ -108,7 +109,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
 
   def mapAndTest(desiredUser: User, desiredDecision: InternalMappingResult.MappingResultDecision, userBean: UserBean = this.userBean) {
-    val result = asigneeFieldMapper.mapUser(userBean, project)
+    val result = asigneeFieldMapper.mapUser(userMapper, userBean, project)
     result.mappedUser should equal(desiredUser)
     result.decision should equal(result.decision)
   }
@@ -121,9 +122,9 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
   }
 
 
-  def userIsNotMapped = when(userMappingManager.mapUser(userBean)).thenReturn(null)
+  def userIsNotMapped = when(userMapper.mapUser(userBean)).thenReturn(null)
 
-  def userIsWellMapped = when(userMappingManager.mapUser(userBean)).thenReturn(mappedUser)
+  def userIsWellMapped = when(userMapper.mapUser(userBean)).thenReturn(mappedUser)
 
   def userCanBeAssigned = when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, mappedUser)).thenReturn(true)
 
@@ -138,12 +139,12 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
     when(mappedUser.getName).thenReturn("fred")
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.FOUND))
-    asigneeFieldMapper.populateInputParams(inputParams, bean, null, null, null)
+    asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, null, null, null)
     verify(inputParams).setAssigneeId("fred")
 
     when(mappedUser.getName).thenReturn("fred2")
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED))
-    asigneeFieldMapper.populateInputParams(inputParams, bean, null, null, null)
+    asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, null, null, null)
     verify(inputParams).setAssigneeId("fred2")
   }
 
@@ -155,7 +156,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     plugMapMethod(new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND))
     when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED)).thenReturn(true)
 
-    asigneeFieldMapper.populateInputParams(inputParams, bean, null, project, null)
+    asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, null, project, null)
     verify(inputParams, never()).setAssigneeId(Matchers.any())
   }
 
@@ -171,7 +172,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(true)
     when(defaultValuesManager.getDefaultFieldValue(any(), any(), any())).thenReturn(Array("defaultAsgn"))
 
-    asigneeFieldMapper.populateInputParams(inputParams, bean, fieldLayoutItem, project, null)
+    asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, fieldLayoutItem, project, null)
     verify(inputParams).setAssigneeId("defaultAsgn")
   }
 
@@ -187,7 +188,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     when(fieldLayoutItem.getOrderableField).thenReturn(asigneeField)
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(false)
 
-    asigneeFieldMapper.populateInputParams(inputParams, bean, fieldLayoutItem, project, null)
+    asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, fieldLayoutItem, project, null)
     verify(inputParams, never()).setAssigneeId(any())
   }
 
