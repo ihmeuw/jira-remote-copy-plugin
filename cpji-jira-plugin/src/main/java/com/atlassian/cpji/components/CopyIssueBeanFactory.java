@@ -1,7 +1,7 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.FieldMapper;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
@@ -110,7 +110,7 @@ public class CopyIssueBeanFactory {
 				.getAllVisibleFieldLayoutItems(issueToCopy);
 		List<String> visibleFieldIds = new ArrayList<String>();
 		List<CustomFieldBean> customFieldBeans = new ArrayList<CustomFieldBean>();
-		Map<String, FieldMapper> systemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
+		Map<String, SystemFieldMapper> systemFieldMappers = fieldMapperFactory.getSystemFieldMappers();
 		for (FieldLayoutItem fieldLayoutItem : fieldLayoutItems) {
 			OrderableField orderableField = fieldLayoutItem.getOrderableField();
 			if (fieldManager.isCustomField(orderableField.getId())) {
