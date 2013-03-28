@@ -1,8 +1,7 @@
 package com.atlassian.cpji.fields.system;
 
-import com.atlassian.cpji.fields.FieldMapper;
-import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.SystemFieldMapper;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.jira.issue.Issue;
 

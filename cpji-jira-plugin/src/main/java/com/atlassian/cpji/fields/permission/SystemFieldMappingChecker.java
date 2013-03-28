@@ -1,10 +1,11 @@
 package com.atlassian.cpji.fields.permission;
 
-import com.atlassian.cpji.fields.FieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
 import com.atlassian.cpji.fields.MappingResult;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.system.NonOrderableSystemFieldMapper;
+import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
