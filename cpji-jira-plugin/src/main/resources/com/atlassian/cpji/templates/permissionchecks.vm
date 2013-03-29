@@ -54,6 +54,7 @@
 
             #if ($action.issueFieldsThatCannotBeCopied.isEmpty() && $action.destinationIssueFieldsThatAreRequired.isEmpty())
                 <p id="confirm-clone-no-errors">$i18n.getText("cpji.please.confirm.clone")</p>
+				<input type="hidden" name="cleanCopy" value="true">
             #end
 
             <p>

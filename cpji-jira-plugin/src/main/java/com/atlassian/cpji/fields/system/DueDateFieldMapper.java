@@ -16,8 +16,8 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.util.DateFieldFormat;
 
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 
@@ -28,12 +28,15 @@ import static com.atlassian.cpji.fields.FieldMapperFactory.getOrderableField;
  */
 public class DueDateFieldMapper extends AbstractSystemFieldMapper implements IssueCreationFieldMapper {
     private final PermissionManager permissionManager;
+	private final DateFieldFormat dateFieldFormat;
 
-    public DueDateFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
+	public DueDateFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager,
+			final DefaultFieldValuesManager defaultFieldValuesManager, DateFieldFormat dateFieldFormat)
     {
         super(getOrderableField(fieldManager, IssueFieldConstants.DUE_DATE), defaultFieldValuesManager);
         this.permissionManager = permissionManager;
-    }
+		this.dateFieldFormat = dateFieldFormat;
+	}
 
     public Class<? extends OrderableField> getField()
     {
@@ -43,27 +46,18 @@ public class DueDateFieldMapper extends AbstractSystemFieldMapper implements Iss
 	@Override
 	public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
-		MappingResult mappingResult = getMappingResult(userMapper, copyIssueBean, project);
-		if (!mappingResult.hasOneValidValue() && fieldLayoutItem.isRequired()) {
+
+		final Date date = copyIssueBean.getIssueDueDate();
+
+		if (date != null) {
+			inputParameters.setDueDate(dateFieldFormat.formatDatePicker(date));
+		} else if (fieldLayoutItem.isRequired()) {
 			String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), getFieldId(), issueType.getName());
 			if (defaultFieldValue != null) {
 				inputParameters.getActionParameters().put(getFieldId(), defaultFieldValue);
 			}
-		} else {
-			populateCurrentValue(inputParameters, copyIssueBean, fieldLayoutItem, project);
 		}
 	}
-
-    public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
-    {
-        Date issueDueDate = bean.getIssueDueDate();
-        if (issueDueDate != null)
-        {
-            SimpleDateFormat dueDateFormat = new SimpleDateFormat("d/MMM/yy");
-            String dueDate = dueDateFormat.format(issueDueDate);
-            inputParameters.setDueDate(dueDate);
-        }
-    }
 
     public boolean userHasRequiredPermission(final Project project, final User user)
     {

@@ -15,14 +15,21 @@
 	#parse("/com/atlassian/cpji/templates/steps.vm")
 
 	<div class="content-body aui-panel">
+		#set ($issueUrl = "${req.contextPath}${action.issuePath}")
+		#set ($errorHtml = $i18n.getText('cpji.error.occurred', $issueUrl, $action.issueKey))
+
 		<div class="aui-message error">
-			#set($issueUrl = "${req.contextPath}${action.issuePath}")
-			<p class="title"><span class="aui-icon icon-error"></span><strong>$i18n.getText('cpji.error.occurred', $issueUrl, $action.issueKey)</strong></p>
-			<ul>
-			#foreach( $error in $action.getErrorMessages() )
-				<li>$textutils.htmlEncode($error)</li>
-		    #end
-    		</ul>
+			#if ($action.errorMessages.empty && $action.errors.empty)
+                <span class="aui-icon icon-error"></span>$errorHtml
+			#else
+                <p class="title"><span class="aui-icon icon-error"></span><strong>$errorHtml</strong></p>
+				#foreach($error in $action.getErrorMessages())
+					<p>$textutils.htmlEncode($error)</p>
+				#end
+				#foreach($error in $action.errors.values())
+					<p>$textutils.htmlEncode($error)</p>
+				#end
+			#end
 		</div>
 	</div>
 </div>

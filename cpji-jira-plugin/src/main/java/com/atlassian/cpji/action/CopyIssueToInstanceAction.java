@@ -11,8 +11,8 @@ import com.atlassian.cpji.components.model.SimplifiedIssueLinkType;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManagerImpl;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
@@ -22,7 +22,6 @@ import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
-import com.atlassian.jira.config.IssueTypeManager;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.MutableIssue;
@@ -81,6 +80,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private boolean copyAttachments;
 	private boolean copyIssueLinks;
 	private boolean copyComments;
+	private boolean cleanCopy;
 	private String remoteIssueLink;
 	private String linkToNewIssue;
     private String summary;
@@ -93,7 +93,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private final JiraAuthenticationContext authenticationContext;
 	private final IssueLinkManager issueLinkManager;
 	private final RemoteIssueLinkManager remoteIssueLinkManager;
-	private final IssueLinkTypeManager issueLinkTypeManager;
 	private final CopyIssueBeanFactory copyIssueBeanFactory;
 	private final CopyIssueService copyIssueService;
 
@@ -135,7 +134,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			final WebResourceManager webResourceManager,
 			FieldMapperFactory fieldMapperFactory,
 			final CopyIssueBeanFactory copyIssueBeanFactory,
-			final IssueTypeManager issueTypeManager,
 			final CopyIssueService copyIssueService
             ) {
 		super(subTaskManager, fieldLayoutManager, commentManager,
@@ -148,7 +146,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		this.issueFactory = issueFactory;
 		this.velocityManager = velocityManager;
 		this.authenticationContext = authenticationContext;
-		this.issueLinkTypeManager = issueLinkTypeManager;
 		this.fieldMapperFactory = fieldMapperFactory;
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
 		this.copyIssueService = copyIssueService;
@@ -183,14 +180,15 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 					public Void apply(NegativeResponseStatus input) {
 						Preconditions.checkNotNull(input);
 						if (input.getErrorCollection() != null) {
-							addErrorCollection(CopyIssueToInstanceAction.this.processErrors(input.getErrorCollection()));
+							addErrorCollection(CopyIssueToInstanceAction.this.processCopyIssueErrors(
+									input.getErrorCollection()));
 						}
 						return null;
 					}
 				});
 		if (copiedIssue == null) {
             final boolean canWeEnterValues = getSelectedDestinationProject().getJiraLocation().isLocal() && getHasErrors();
-            return canWeEnterValues  ? doDefault() : ERROR;
+			return canWeEnterValues && !cleanCopy ? doDefault() : ERROR;
 		}
 
 		copiedIssueKey = copiedIssue.getIssueKey();
@@ -311,7 +309,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
                 cloneIssueLinkType.getOutward().trim().toLowerCase().equals("is cloned by");
     }
 
-	protected ErrorCollection processErrors(ErrorCollection errorCollection) {
+	protected ErrorCollection processCopyIssueErrors(ErrorCollection errorCollection) {
 		Preconditions.checkNotNull(errorCollection);
 		final Pattern p = Pattern.compile("(.+?): (.*)");
 
@@ -326,6 +324,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 				return input;
 			}
 		}));
+
 		return errorCollection;
 	}
 
@@ -337,6 +336,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
 	public String getCopiedIssueKey() {
 		return copiedIssueKey;
+	}
+
+	public boolean isCleanCopy() {
+		return cleanCopy;
+	}
+
+	public void setCleanCopy(boolean cleanCopy) {
+		this.cleanCopy = cleanCopy;
 	}
 
 	public boolean getCopyAttachments() {
