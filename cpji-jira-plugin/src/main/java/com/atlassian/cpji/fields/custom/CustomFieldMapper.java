@@ -55,4 +55,8 @@ public interface CustomFieldMapper
      * @param issueType the IssueType of the issue to be created on this JIRA instance
      */
     public void populateInputParameters(final IssueInputParameters inputParameters, final CustomFieldMappingResult mappingResult, final CustomField customField, final Project project, final IssueType issueType);
+
+    public void populateWithDefaultValue(final IssueInputParameters inputParameters, final CustomField customField, final Project project, final IssueType issueType);
+
+    public boolean hasDefaultValueDefined(final CustomField customField, final Project project, final IssueType issueType);
 }

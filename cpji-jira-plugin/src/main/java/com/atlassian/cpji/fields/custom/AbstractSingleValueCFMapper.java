@@ -21,15 +21,14 @@ import java.util.List;
  * @param <T> the type of value stored by the custom field
  * @since v2.1
  */
-public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMapper
+public abstract class AbstractSingleValueCFMapper<T> extends CustomFieldMapperImpl
 {
 
     private static final Logger log = Logger.getLogger(AbstractSingleValueCFMapper.class);
-	private final DefaultFieldValuesManager defaultFieldValuesManager;
 
-	protected AbstractSingleValueCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
-		this.defaultFieldValuesManager = defaultFieldValuesManager;
-	}
+    protected AbstractSingleValueCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
+        super(defaultFieldValuesManager);
+    }
 
 	/**
      * Convert the value stored by the custom field to a String. The value will not be null.
@@ -112,7 +111,7 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
             invalidValues = Arrays.asList(value);
         }
 
-        return new CustomFieldMappingResult(validValues, invalidValues, defaultValueConfigured(project, customField, issueType));
+        return new CustomFieldMappingResult(validValues, invalidValues, hasDefaultValueDefined(customField, project, issueType));
     }
 
     @Override
@@ -147,15 +146,4 @@ public abstract class AbstractSingleValueCFMapper<T> implements CustomFieldMappe
         return (T) value;
     }
 
-	/**
-	 * It will return true if the mapper detects there's a default value configured in the destination server. Either the value is configured
-	 * manually in project configuration or it can be detected based on JIRA configuration.
-	 *
-	 * @return true if we can guess the default value
-	 */
-	boolean defaultValueConfigured(Project project, CustomField customField, IssueType issueType)
-	{
-		return (defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), customField.getId(),
-				issueType.getName()) != null);
-	}
 }

@@ -106,11 +106,12 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
             throw new RuntimeException("Field with id '" + fieldId + "' is not a custom field!");
         }
         CustomFieldBean matchingRemoteCustomField = CustomFieldMapperUtil.findMatchingRemoteCustomField(customField, copyIssueBean.getCustomFields());
+        CustomFieldMapper fieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
         if (matchingRemoteCustomField == null)
         {
             if (isFieldRequired(fieldLayout, fieldId) && !(customField.getCustomFieldType() instanceof ReadOnlyCFType))
             {
-                if (hasDefaultValue(fieldId))
+                if (fieldMapper.hasDefaultValueDefined(customField, project, findIssueType(copyIssueBean.getTargetIssueType(), project)))
                 {
                     return new CustomFieldPermissionBean(
 							customField.getId(),
@@ -128,7 +129,7 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
             }
         }
 
-        CustomFieldMapper fieldMapper = fieldMapperFactory.getCustomFieldMapper(customField.getCustomFieldType());
+
         if (fieldMapper == null)
         {
             log.info("No mapper for custom field '" + customField.getCustomFieldType().getClass().getCanonicalName() + "' found.");

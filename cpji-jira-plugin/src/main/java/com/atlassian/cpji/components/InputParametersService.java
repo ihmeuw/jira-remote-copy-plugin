@@ -112,24 +112,18 @@ public class InputParametersService {
                 if (matchingRemoteCustomField != null) {
                     CustomFieldMappingResult customFieldMappingResult = customFieldMapper.getMappingResult(matchingRemoteCustomField, customField, project, issueType);
                     if (!customFieldMappingResult.hasOneValidValue() && item.isRequired()) {
-                        populateWithDefaultValue(orderableField);
+                        customFieldMapper.populateWithDefaultValue(inputParameters, customField, project, issueType);
                     } else {
                         customFieldMapper.populateInputParameters(inputParameters, customFieldMappingResult, customField, project, issueType);
                     }
                 } else if (item.isRequired()) {
-                    populateWithDefaultValue(orderableField);
+                    customFieldMapper.populateWithDefaultValue(inputParameters, customField, project, issueType);
                 }
             } else {
                 log.warn("No support yet for custom field type '" + customField.getCustomFieldType().getClass().getCanonicalName() + "'");
             }
         }
 
-        private void populateWithDefaultValue(OrderableField orderableField) {
-            String[] defaultFieldValue = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(), orderableField.getId(), issueType.getName());
-            if (defaultFieldValue != null) {
-                inputParameters.addCustomFieldValue(orderableField.getId(), defaultFieldValue);
-            }
-        }
 
         private void populateSystemField(FieldLayoutItem item, OrderableField orderableField) {
             IssueCreationFieldMapper fieldMapper = fieldMapperFactory.getIssueCreationFieldMapper(orderableField.getClass());
