@@ -4,10 +4,14 @@ import com.atlassian.cpji.action.AbstractCopyIssueAction;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.plugin.projectoperation.AbstractPluggableProjectOperation;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.collect.ImmutableMap;
+
+import java.util.Locale;
 
 /**
  * @since v1.4
@@ -16,15 +20,22 @@ public class ConfigureDefaultValuesProjectOperation extends AbstractPluggablePro
 {
     private final PermissionManager permissionManager;
     private final WebResourceManager webResourceManager;
+	private final JiraAuthenticationContext authenticationContext;
 
-    public ConfigureDefaultValuesProjectOperation(PermissionManager permissionManager, WebResourceManager webResourceManager)
+	public ConfigureDefaultValuesProjectOperation(PermissionManager permissionManager, WebResourceManager webResourceManager,
+			JiraAuthenticationContext authenticationContext)
     {
         this.permissionManager = permissionManager;
         this.webResourceManager = webResourceManager;
-    }
+		this.authenticationContext = authenticationContext;
+	}
 
     final public String getHtml(Project project, User user)
     {
+		final Locale locale = authenticationContext.getLocale();
+		final CalendarResourceIncluder calendarResourceIncluder = new CalendarResourceIncluder();
+		calendarResourceIncluder.includeForLocale(locale);
+
         webResourceManager.requireResource(AbstractCopyIssueAction.RESOURCES_ADMIN_JS);
         ImmutableMap<String, ?> params = ImmutableMap.of(
                 "projectKey", project.getKey()
