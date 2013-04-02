@@ -21,7 +21,7 @@ import java.util.List;
  * @param <T> the type of value stored by the custom field
  * @since v2.1
  */
-public abstract class AbstractSingleValueCFMapper<T> extends CustomFieldMapperImpl
+public abstract class AbstractSingleValueCFMapper<T> extends AbstractCustomFieldMapper
 {
 
     private static final Logger log = Logger.getLogger(AbstractSingleValueCFMapper.class);

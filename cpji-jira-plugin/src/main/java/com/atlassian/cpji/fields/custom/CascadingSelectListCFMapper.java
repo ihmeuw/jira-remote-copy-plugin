@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * @since v1.4
  */
-public class CascadingSelectListCFMapper extends CustomFieldMapperImpl {
+public class CascadingSelectListCFMapper extends AbstractCustomFieldMapper {
 
     public CascadingSelectListCFMapper(DefaultFieldValuesManager defaultFieldValuesManager) {
         super(defaultFieldValuesManager);

@@ -6,15 +6,15 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 
-public abstract class CustomFieldMapperImpl implements CustomFieldMapper {
+public abstract class AbstractCustomFieldMapper implements CustomFieldMapper {
 
     protected final CustomFieldDefaultValueEvaluationStrategy customFieldDefaultValueEvaluationStrategy;
 
-    public CustomFieldMapperImpl(CustomFieldDefaultValueEvaluationStrategy customFieldDefaultValueEvaluationStrategy) {
+    public AbstractCustomFieldMapper(CustomFieldDefaultValueEvaluationStrategy customFieldDefaultValueEvaluationStrategy) {
         this.customFieldDefaultValueEvaluationStrategy = customFieldDefaultValueEvaluationStrategy;
     }
 
-    public CustomFieldMapperImpl(DefaultFieldValuesManager defaultFieldValuesManager){
+    public AbstractCustomFieldMapper(DefaultFieldValuesManager defaultFieldValuesManager){
         customFieldDefaultValueEvaluationStrategy = new DefaultValueWithFallbackToFieldConfig(defaultFieldValuesManager);
     }
 
