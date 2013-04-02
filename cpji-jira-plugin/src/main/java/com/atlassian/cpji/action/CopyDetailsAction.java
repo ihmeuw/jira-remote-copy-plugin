@@ -22,6 +22,7 @@ import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
+import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.jira.util.SimpleErrorCollection;
@@ -35,7 +36,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +62,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	private final IssueLinkManager issueLinkManager;
     private final ApplicationProperties applicationProperties;
     private final FieldManager fieldManager;
+	private final RemoteIssueLinkManager remoteIssueLinkManager;
 
 	private CopyInformationBean copyInfo;
 
@@ -76,15 +77,17 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             final IssueLinkManager issueLinkManager,
             final IssueLinkTypeManager issueLinkTypeManager,
             final ApplicationProperties applicationProperties,
-            final FieldManager fieldManager)
+            final FieldManager fieldManager,
+			final RemoteIssueLinkManager remoteIssueLinkManager)
     {
         super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory, webResourceManager, issueLinkTypeManager);
 		this.issueLinkManager = issueLinkManager;
         this.applicationProperties = applicationProperties;
         this.fieldManager = fieldManager;
+		this.remoteIssueLinkManager = remoteIssueLinkManager;
 
-        setCurrentStep("copydetails");
+		setCurrentStep("copydetails");
         webResourceManager.requireResource(PLUGIN_KEY+":copyDetailsAction");
 	}
 
@@ -101,7 +104,8 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		if (issueLinkManager.isLinkingEnabled()) {
 			//checking if there are any not-subtask issue links (inward or outward)
 			return Iterables.any(issueLinkManager.getOutwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink)
-					|| Iterables.any(issueLinkManager.getInwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink);
+					|| Iterables.any(issueLinkManager.getInwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink)
+					|| !remoteIssueLinkManager.getRemoteIssueLinksForIssue(issue).isEmpty();
 		}
 		return false;
 	}
