@@ -10,8 +10,11 @@ import collection.JavaConverters._
 import collection.JavaConversions._
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.pageobjects.elements.Options
+import org.scalatest.junit.ShouldMatchersForJUnit
+import org.codehaus.jettison.json.JSONArray
 
-class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
+
+class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit {
 	@Before def setUp {
 		login(jira2)
 	}
@@ -85,6 +88,19 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects {
 		permissionChecksPage.getSelectElement("customfield_10006").select(Options.text("beta"))
 
 		val successfulPage = permissionChecksPage.copyIssue()
-		assertTrue(successfulPage.isSuccessful)
+    assertTrue(successfulPage.isSuccessful)
+
+
+    //copied issue should contain default values
+    val copiedIssue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey, NPM)
+
+    copiedIssue.getFieldByName("NumberFieldWithDefault").getValue should equal(123456)
+
+    val multiSelectVal = copiedIssue.getFieldByName("MultiSelectWithDefault").getValue.asInstanceOf[JSONArray]
+    val pureValues = 0 until multiSelectVal.length() map(index => multiSelectVal.getJSONObject(index).getString("value"))
+    pureValues should have length(3)
+    pureValues should be eq(List("one", "three", "four"))
+
+
 	}
 }
