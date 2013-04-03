@@ -52,11 +52,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.GenericValue;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * TODO: Document this class / interface here
@@ -122,7 +118,8 @@ public class CopyIssueBeanFactory {
                         customFieldBeans.add(fieldBean);
                     } else {
                         copyIssueBean.addUnsupportedCustomField(new CustomFieldPermissionBean(customField.getId(), customField.getName(),
-                                ValidationCode.FIELD_TYPE_NOT_SUPPORTED.toString()));
+                                ValidationCode.FIELD_TYPE_NOT_SUPPORTED.toString(),
+                                Collections.<String>emptyList()));
                     }
                 }
 			} else {

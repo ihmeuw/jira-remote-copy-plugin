@@ -5,6 +5,9 @@ import com.atlassian.cpji.rest.model.PermissionBean;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
 * TODO: Document this class / interface here
 *
@@ -50,7 +53,11 @@ public class MissingFieldPermissionDescription
 		return this.validationCode;
 	}
 
-	public static Predicate<MissingFieldPermissionDescription> isDestinationFieldRequired() {
+    public List<String> getUnmappedValues() {
+        return permissionBean.getUnmappedValues() != null ? permissionBean.getUnmappedValues() : Collections.<String>emptyList();
+    }
+
+    public static Predicate<MissingFieldPermissionDescription> isDestinationFieldRequired() {
 		return new Predicate<MissingFieldPermissionDescription>() {
 			@Override
 			public boolean apply(MissingFieldPermissionDescription input) {

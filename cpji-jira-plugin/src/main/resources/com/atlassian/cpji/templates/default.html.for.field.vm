@@ -2,5 +2,23 @@
 <div class="field-group" data-field-id="$textutils.htmlEncode($permission.fieldId)" #if (!$permission.canCopyIssue()) class="status-inactive" #end>
 	<label>$textutils.htmlEncode($permission.fieldName)</label>
 	#set($error=!$permission.canCopyIssue())
-	<div class="field-value">#if ($error)<div class="error">#end$textutils.htmlEncode($permission.getValidationMessage())#if ($error)</div>#end</div>
+	<div class="field-value">
+        #if ($error)<div class="error">#end
+        $textutils.htmlEncode($permission.getValidationMessage())
+        #if ($error)</div>#end
+        #if (! $permission.unmappedValues.empty)
+            #if ($permission.unmappedValues.size() == 1)
+                <div>$i18n.getText("cpji.field.validation.not.mapped.single", $permission.unmappedValues.get(0))</div>
+            #else
+                <div>
+                    $i18n.getText("cpji.field.validation.not.mapped.multi")
+                    <ul>
+                    #foreach($value in $permission.unmappedValues)
+                        <li>$value</li>
+                    #end
+                    </ul>
+                </div>
+                #end
+        #end
+    </div>
 </div>

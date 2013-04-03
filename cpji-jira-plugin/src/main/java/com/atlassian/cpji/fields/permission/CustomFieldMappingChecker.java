@@ -22,10 +22,7 @@ import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * @since v1.4
@@ -64,7 +61,8 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                     fieldPermissionBeans.add(new CustomFieldPermissionBean(
 							customField.getId(),
 							customField.getCustomFieldName(),
-							ValidationCode.FIELD_NOT_MAPPED.name()));
+							ValidationCode.FIELD_NOT_MAPPED.name(),
+                            Collections.<String>emptyList()));
                 }
             }
         }
@@ -116,12 +114,14 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                     return new CustomFieldPermissionBean(
 							customField.getId(),
 							customField.getName(),
-							ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE.name());
+							ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE.name(),
+                            Collections.<String>emptyList());
                 }
                 return new CustomFieldPermissionBean(
 						customField.getId(),
 						customField.getName(),
-						ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED.name());
+						ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED.name(),
+                        Collections.<String>emptyList());
             }
             else
             {
@@ -144,7 +144,8 @@ public class CustomFieldMappingChecker extends AbstractFieldMappingChecker<Custo
                 return new CustomFieldPermissionBean(
 						customField.getId(),
 						customField.getName(),
-						validationCode.name());
+						validationCode.name(),
+                        mappingResult.getUnmappedValues());
             }
         };
         return checkField(mappingResult, fieldId, true, beanCreator);

@@ -430,7 +430,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			return velocityManager.getEncodedBody("com/atlassian/cpji/templates/", "default.html.for.field.vm",
 					getApplicationProperties().getEncoding(),
 					JiraVelocityUtils
-							.getDefaultVelocityParams(ImmutableMap.<String, Object>of("permission", permission),
+							.getDefaultVelocityParams(ImmutableMap.<String, Object>of("permission", permission, "i18n", getI18nHelper()),
 									authenticationContext));
 		} catch (VelocityException e) {
 			throw new RuntimeException(String.format("Unable to render template"), e);
