@@ -23,12 +23,14 @@
                 <span class="aui-icon icon-error"></span>$errorHtml
 			#else
                 <p class="title"><span class="aui-icon icon-error"></span><strong>$errorHtml</strong></p>
+				<ul>
 				#foreach($error in $action.getErrorMessages())
-					<p>$textutils.htmlEncode($error)</p>
+					<li>$textutils.htmlEncode($error)</li>
 				#end
 				#foreach($error in $action.errors.values())
-					<p>$textutils.htmlEncode($error)</p>
+					<li>$textutils.htmlEncode($error)</li>
 				#end
+                </ul>
 			#end
 		</div>
 	</div>
