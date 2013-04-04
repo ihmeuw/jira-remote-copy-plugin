@@ -21,7 +21,8 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects{
 
 		testkit2.attachments().disable()
 
-		try{
+    val unmappedUser: String = "reallyStrangeUser"
+    try{
 
 			login(jira1)
 			val issueBuilder = new IssueInputBuilder("NEL", 3L, "Sample issue for screenshots").setAssigneeName("admin")
@@ -47,11 +48,17 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects{
 			confirm.copyIssue()
 			takeScreenshot("04 Successful screen")
 
+      //prepare for displaying incorrect data
+      testkit1.usersAndGroups().addUser(unmappedUser, "rst", "Really Strange User", "really@strange.user")
+      testkit1.usersAndGroups().addUserToGroup(unmappedUser, "jira-developers")
+      testkit1.issues().assignIssue(issue.getKey, unmappedUser)
+
 			jira1.visit(classOf[SelectTargetProjectPage], issue.getId).setDestinationProject("Some fields required").next().next()
 			takeScreenshot("03b Uneditable requilred fields - failure")
 
 
 		} finally{
+      testkit1.usersAndGroups().deleteUser(unmappedUser)
 			testkit2.attachments().enable()
 		}
 

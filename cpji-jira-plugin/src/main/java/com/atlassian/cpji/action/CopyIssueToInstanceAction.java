@@ -431,7 +431,12 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
                 final String fieldEditHtml = orderableField.getEditHtml(fieldLayoutItem, this, this, fakeIssue, RequiredFieldsAwareAction
                         .getDisplayParameters());
-                final String unmappedValues =  jaxbJsonMarshaller.marshal(permission.getUnmappedValues());
+                final String unmappedValues;
+                if(!permission.getUnmappedValues().isEmpty()){
+                    unmappedValues =  jaxbJsonMarshaller.marshal(permission.getUnmappedValues());
+                } else {
+                    unmappedValues = "";
+                }
                 final String unmappedValuesHTML = soyTemplateRendererProvider.getRenderer().render(PLUGIN_KEY+":copyIssueToInstanceAction",
                     "RIC.Templates.jsonData",
                     ImmutableMap.<String, Object>of("json", unmappedValues,  "fieldId", orderableField.getId())

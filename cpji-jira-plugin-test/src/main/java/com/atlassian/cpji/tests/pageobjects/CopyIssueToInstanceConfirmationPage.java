@@ -1,5 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects;
 
+import com.atlassian.cpji.tests.pageobjects.confirmationPage.MappingResult;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
@@ -47,6 +48,10 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
         return Conditions.not(elementFinder.find(By.id("destination-fields-missing-header")).timed().isVisible());
     }
 
+    public MappingResult getMappingResultFor(String field){
+        return pageBinder.bind(MappingResult.class, field);
+    }
+
 
     public CopyIssueToInstanceSuccessfulPage copyIssue()
     {
@@ -67,30 +72,4 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
 		return pageBinder.bind(CopyIssueToInstanceConfirmationPage.class);
 	}
 
-	public CopyIssueToInstanceConfirmationPage typeToTextField(String name, CharSequence... value) {
-		Preconditions.checkNotNull(name);
-		PageElement textField = elementFinder.find(By.name(name));
-		textField.clear();
-		if (value != null) {
-			textField.type(value);
-		}
-		return this;
-	}
-
-	public CopyIssueToInstanceConfirmationPage setMultiSelect(String id, String... items) {
-		Preconditions.checkNotNull(id);
-		MultiSelectUtil.setMultiSelect(this.pageBinder, id, items);
-		return this;
-	}
-
-	public SingleSelect getSingleSelect(String containerId) {
-		Preconditions.checkNotNull(containerId);
-		final PageElement selectContainer = elementFinder.find(By.id(containerId));
-		return pageBinder.bind(SingleSelect.class, selectContainer);
-	}
-
-	public SelectElement getSelectElement(String name) {
-		Preconditions.checkNotNull(name);
-		return elementFinder.find(By.name(name), SelectElement.class);
-	}
 }
