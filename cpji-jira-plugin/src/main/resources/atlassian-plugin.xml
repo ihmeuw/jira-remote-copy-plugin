@@ -3,6 +3,10 @@
 		<description>${project.description}</description>
 		<version>${project.version}</version>
 		<vendor name="${project.organization.name}" url="${project.organization.url}"/>
+
+		<param name="plugin-icon">com/atlassian/cpji/marketing/icon.png</param>
+		<param name="plugin-logo">com/atlassian/cpji/marketing/logo.png</param>
+		<param name="plugin-banner">com/atlassian/cpji/marketing/ric_banner.png</param>
 	</plugin-info>
 
     <web-item key="remote-copy" i18n-name-key="cpji.operation.name" name="Copy this issue" section="operations-operations" weight="20">
