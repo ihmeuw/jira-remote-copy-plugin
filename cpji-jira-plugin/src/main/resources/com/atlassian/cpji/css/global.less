@@ -1,11 +1,11 @@
 #targetEntityLink-container {
 
-	.description {
-		.aui-message {
-			margin-bottom: 0;
-			margin-top: 1em;
-		}
-	}
+  .description {
+    .aui-message {
+      margin-bottom: 0;
+      margin-top: 1em;
+    }
+  }
 
   #noDestinationProjectError {
     clear: none;
@@ -14,12 +14,35 @@
 }
 
 form.aui {
-	fieldset .checkbox {
-		div.error {
-//        older JIRAs assume we have errors outside .checkbox. We need to force them to think differently
-          margin: 5px 0 0;
-        }
+  fieldset .checkbox {
+    div.error { //        older JIRAs assume we have errors outside .checkbox. We need to force them to think differently
+      margin: 5px 0 0;
     }
+  }
+}
+
+.unmapped-values {
+  padding: 10px; //copied from JIRA 6.0
+  .aui-lozenge.aui-lozenge-subtle {
+    background-color: #FFFFFF;
+    border-color: #CCCCCC;
+    color: #333333;
+  }
+  .aui-lozenge {
+    background: none repeat scroll 0 0 #CCCCCC;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px 3px 3px 3px;
+    color: #333333;
+    display: inline-block;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    margin: 0;
+    padding: 2px 5px 1px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
 }
 
 #stepped-process {
@@ -34,7 +57,12 @@ form.aui {
   form.aui.confirmation {
     .fields-list {
       margin-top: 15px;
+
+      label .aui-icon {
+        padding-right: 0.25em;
+      }
     }
+
   }
 
 }

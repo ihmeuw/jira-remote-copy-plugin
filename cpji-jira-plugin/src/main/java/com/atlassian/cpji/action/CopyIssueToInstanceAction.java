@@ -39,10 +39,13 @@ import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
+import com.atlassian.jira.template.soy.SoyTemplateRendererProvider;
 import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraVelocityUtils;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
+import com.atlassian.soy.renderer.SoyException;
 import com.atlassian.util.concurrent.LazyReference;
 import com.atlassian.velocity.VelocityManager;
 import com.google.common.base.Function;
@@ -61,10 +64,7 @@ import webwork.action.ActionContext;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,6 +95,8 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	private final RemoteIssueLinkManager remoteIssueLinkManager;
 	private final CopyIssueBeanFactory copyIssueBeanFactory;
 	private final CopyIssueService copyIssueService;
+    private final JaxbJsonMarshaller jaxbJsonMarshaller;
+    private final SoyTemplateRendererProvider soyTemplateRendererProvider;
 
 	private final LazyReference<List<MissingFieldPermissionDescription>> issueFieldsThatCannotBeCopied = new LazyReference<List<MissingFieldPermissionDescription>>() {
 		@Override
@@ -117,25 +119,26 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	};
 
 	public CopyIssueToInstanceAction(
-			final SubTaskManager subTaskManager,
-			final FieldLayoutManager fieldLayoutManager,
-			final CommentManager commentManager,
-			final CopyIssuePermissionManager copyIssuePermissionManager,
-			final IssueLinkManager issueLinkManager,
-			final RemoteIssueLinkManager remoteIssueLinkManager,
-			final ApplicationLinkService applicationLinkService,
-			final JiraProxyFactory jiraProxyFactory,
-			DefaultFieldValuesManagerImpl defaultFieldValuesManager,
-			FieldLayoutService fieldLayoutService,
-			IssueFactory issueFactory,
-			VelocityManager velocityManager,
-			JiraAuthenticationContext authenticationContext,
-			IssueLinkTypeManager issueLinkTypeManager,
-			final WebResourceManager webResourceManager,
-			FieldMapperFactory fieldMapperFactory,
-			final CopyIssueBeanFactory copyIssueBeanFactory,
-			final CopyIssueService copyIssueService
-            ) {
+            final SubTaskManager subTaskManager,
+            final FieldLayoutManager fieldLayoutManager,
+            final CommentManager commentManager,
+            final CopyIssuePermissionManager copyIssuePermissionManager,
+            final IssueLinkManager issueLinkManager,
+            final RemoteIssueLinkManager remoteIssueLinkManager,
+            final ApplicationLinkService applicationLinkService,
+            final JiraProxyFactory jiraProxyFactory,
+            DefaultFieldValuesManagerImpl defaultFieldValuesManager,
+            FieldLayoutService fieldLayoutService,
+            IssueFactory issueFactory,
+            VelocityManager velocityManager,
+            JiraAuthenticationContext authenticationContext,
+            IssueLinkTypeManager issueLinkTypeManager,
+            final WebResourceManager webResourceManager,
+            FieldMapperFactory fieldMapperFactory,
+            final CopyIssueBeanFactory copyIssueBeanFactory,
+            final CopyIssueService copyIssueService,
+            SoyTemplateRendererProvider soyTemplateRendererProvider,
+            JaxbJsonMarshaller jaxbJsonMarshaller) {
 		super(subTaskManager, fieldLayoutManager, commentManager,
 				copyIssuePermissionManager, applicationLinkService, jiraProxyFactory,
 				webResourceManager, issueLinkTypeManager);
@@ -149,8 +152,12 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		this.fieldMapperFactory = fieldMapperFactory;
 		this.copyIssueBeanFactory = copyIssueBeanFactory;
 		this.copyIssueService = copyIssueService;
+        this.jaxbJsonMarshaller = jaxbJsonMarshaller;
+        this.soyTemplateRendererProvider = soyTemplateRendererProvider;
 
-		setCurrentStep("confirmation");
+        webResourceManager.requireResource(PLUGIN_KEY+":copyIssueToInstanceAction");
+
+        setCurrentStep("confirmation");
 	}
 
 	@Override
@@ -396,7 +403,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 	}
 
 
-	public String getFieldHtml(MissingFieldPermissionDescription permission) {
+	public String getFieldHtml(MissingFieldPermissionDescription permission) throws SoyException {
 		final ImmutableSet<ValidationCode> possibleMapping = ImmutableSet.of(ValidationCode.FIELD_MANDATORY_BUT_NOT_SUPPLIED,
 				ValidationCode.FIELD_MANDATORY_VALUE_NOT_MAPPED, ValidationCode.FIELD_VALUE_NOT_MAPPED);
 
@@ -421,8 +428,15 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 						projectManager.getProjectObjByKey(getSelectedDestinationProject().getProjectKey()));
 				fakeIssue.setIssueTypeObject(
 						copyIssueService.findIssueType(getIssueType(), fakeIssue.getProjectObject()));
-				return orderableField.getEditHtml(fieldLayoutItem, this, this, fakeIssue, RequiredFieldsAwareAction
-						.getDisplayParameters());
+
+                final String fieldEditHtml = orderableField.getEditHtml(fieldLayoutItem, this, this, fakeIssue, RequiredFieldsAwareAction
+                        .getDisplayParameters());
+                final String unmappedValues =  jaxbJsonMarshaller.marshal(permission.getUnmappedValues());
+                final String unmappedValuesHTML = soyTemplateRendererProvider.getRenderer().render(PLUGIN_KEY+":copyIssueToInstanceAction",
+                    "RIC.Templates.jsonData",
+                    ImmutableMap.<String, Object>of("json", unmappedValues,  "fieldId", orderableField.getId())
+                );
+                return fieldEditHtml +unmappedValuesHTML;
 			}
 		}
 

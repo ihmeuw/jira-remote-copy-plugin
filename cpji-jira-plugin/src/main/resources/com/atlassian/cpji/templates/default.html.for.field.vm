@@ -7,18 +7,12 @@
         $textutils.htmlEncode($permission.getValidationMessage())
         #if ($error)</div>#end
         #if (! $permission.unmappedValues.empty)
-            #if ($permission.unmappedValues.size() == 1)
-                <div>$i18n.getText("cpji.field.validation.not.mapped.single", $permission.unmappedValues.get(0))</div>
-            #else
-                <div>
-                    $i18n.getText("cpji.field.validation.not.mapped.multi")
-                    <ul>
-                    #foreach($value in $permission.unmappedValues)
-                        <li>$value</li>
-                    #end
-                    </ul>
-                </div>
+            <div>
+                $i18n.getText("cpji.field.validation.not.mapped.multi")
+                #foreach($value in $permission.unmappedValues)
+                    <span class="aui-lozenge aui-lozenge-subtle">$value</span>
                 #end
+            </div>
         #end
     </div>
 </div>

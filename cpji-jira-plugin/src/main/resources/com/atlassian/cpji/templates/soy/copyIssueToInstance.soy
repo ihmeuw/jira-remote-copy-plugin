@@ -1,0 +1,32 @@
+{namespace RIC.Templates}
+
+/**
+* @param fieldId
+* @param json
+*/
+{template .jsonData}
+{if $json}
+<div id="unmapped-for-{$fieldId}" class="hidden">{$json}</div>
+{/if}
+{/template}
+
+/**
+* @param unmappedValues
+*/
+{template .unmappedValues}
+<div class="unmapped-values">
+{getText('cpji.field.validation.not.mapped.multi')}
+<ul>
+{foreach $name in $unmappedValues}
+    <li><span class="aui-lozenge aui-lozenge-subtle">{$name}</span></li>
+{/foreach}
+</ul>
+</div>
+{/template}
+
+
+/**
+ */
+{template .unmappedMarker}
+<span class="aui-icon aui-icon-help icon-help"></span>
+{/template}

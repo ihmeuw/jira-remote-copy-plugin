@@ -117,6 +117,10 @@
 		<interface>com.atlassian.sal.api.pluginsettings.PluginSettingsFactory</interface>
 	</component-import>
 
+	<component-import key="jaxbJsonMarshaller">
+		<interface>com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller</interface>
+	</component-import>
+
 	<web-resource key="global">
 		<transformation extension="less">
 			<transformer key="lessTransformer"/>
@@ -152,6 +156,18 @@
         <resource type="download" name="copyissue.js" location="com/atlassian/cpji/javascript/copyissue.js"/>
 		<resource type="download" name="common.js" location="com/atlassian/cpji/templates/soy/common.soy"/>
 		<resource type="download" name="selectTargetProject.js" location="com/atlassian/cpji/templates/soy/selectTargetProject.soy"/>
+    </web-resource>
+
+    <web-resource key="copyIssueToInstanceAction">
+        <transformation extension="soy">
+            <transformer key="soyTransformer"/>
+        </transformation>
+        <dependency>com.atlassian.soy.soy-template-plugin:soy-deps</dependency>
+
+        <resource type="download" name="copyIssueToInstance.js" location="com/atlassian/cpji/javascript/copyIssueToInstance.js"/>
+
+        <resource type="download" name="copyIssueToInstanceViews.js" location="com/atlassian/cpji/templates/soy/copyIssueToInstance.soy"/>
+        <resource type="soy" name="copyIssueToInstance" location="com/atlassian/cpji/templates/soy/copyIssueToInstance.soy"/>
     </web-resource>
 
     <web-resource key="copyDetailsAction">
