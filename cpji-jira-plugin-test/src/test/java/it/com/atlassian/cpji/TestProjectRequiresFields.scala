@@ -65,7 +65,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
     val textFields = Map(
-      "duedate"-> "16/kwi/13",
+      "duedate"-> "16/Jan/13",
       "environment"-> "Mac OS X",
       "description" -> "This is a description.",
       "timetracking_originalestimate" -> "1w",
