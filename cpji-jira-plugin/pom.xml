@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>cpji-jira-plugin</artifactId>
-    <name>Remote copying of issues (cpji-jira-plugin)</name>
+    <name>JIRA to JIRA Issue Copy</name>
     <description>Plugin that copies issues from one JIRA instance to another</description>
     <packaging>atlassian-plugin</packaging>
 
