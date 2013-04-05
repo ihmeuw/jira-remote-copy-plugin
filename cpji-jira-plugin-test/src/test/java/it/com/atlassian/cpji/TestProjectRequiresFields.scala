@@ -106,7 +106,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
         val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
         Poller.waitUntilTrue(assigneeRow.hasNotMappedNotify)
-        Poller.waitUntil(assigneeRow.getUnmappedNotifyText, StringContainsInOrder.stringContainsInOrder(List("could not be mapped", unmappedUser.toUpperCase)))
+        Poller.waitUntil(assigneeRow.getUnmappedNotifyText, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
       }
 
       //test remotely - display unmapped values as plain text
@@ -115,7 +115,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
         val permissionChecksPage = selectTargetProjectPage.setDestinationProject("Test").next.next
 
         val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
-        Poller.waitUntil(assigneeRow.getMessage, StringContainsInOrder.stringContainsInOrder(List("could not be mapped", unmappedUser.toUpperCase)))
+        Poller.waitUntil(assigneeRow.getMessage, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
         Poller.waitUntil(permissionChecksPage.getMappingResultFor("customfield_10201").getMessage, Matchers.containsString("field does not exist in the target project"))
       }
 

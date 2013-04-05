@@ -17,6 +17,8 @@ import com.atlassian.jira.config.properties.APKeys
 import com.atlassian.pageobjects.elements.{PageElement, CheckboxElement}
 import org.apache.commons.lang.StringUtils
 import org.hamcrest.Matchers
+import org.hamcrest.text.StringContainsInOrder
+import com.google.common.collect.ImmutableList
 
 class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
@@ -103,7 +105,7 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
 			var detailsPage = goToCopyDetails(issue.getId)
 			isAttachmentsPresentAndEnabled(detailsPage)
-			Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("Some of attachments exceed"))
+			Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, StringContainsInOrder.stringContainsInOrder(ImmutableList.of("Some of attachments", "exceed maximum")))
 		} finally {
 			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, attachmentSize)
 		}
