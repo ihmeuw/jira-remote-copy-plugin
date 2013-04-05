@@ -10,7 +10,7 @@ AJS.$(function ($) {
 					return this._originalMakeResultDiv(data, context);
 				} else {
 					var first = [ data[0] ], $resultDiv = this._originalMakeResultDiv(first, context);
-					$resultDiv.find("ul").append(AJS.$("<li class='no-suggestions'>" + AJS.I18n.getText("cpji.continue.typeing.to.see.more") + "</li>"));
+					$resultDiv.find("ul").append(AJS.$("<li class='no-suggestions'>" + AJS.I18n.getText("cpji.continue.typing.to.see.more") + "</li>"));
 					return $resultDiv;
 				}
 			};
