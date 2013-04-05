@@ -6,7 +6,7 @@
             if(unmapped.length == 1){
                 var unmappedJson = JSON.parse(unmapped.text());
                 if(unmappedJson.length > 0){
-                    var unmappedMarker = $(RIC.Templates.unmappedMarker());
+                    var unmappedMarker = $(RIC.Templates.warningMarker());
                     $(this).prepend(unmappedMarker);
                     AJS.InlineDialog(unmappedMarker, "unmapped-dialog-"+labelTarget,
                         function (content, trigger, showPopup) {
