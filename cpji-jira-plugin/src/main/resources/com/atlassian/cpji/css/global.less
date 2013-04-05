@@ -41,7 +41,7 @@ form.aui {
     font-size: 11px;
     font-weight: bold;
     line-height: 1;
-    margin: 0;
+    margin: 0 1px;
     padding: 2px 5px 1px;
     text-align: center;
     text-decoration: none;
@@ -66,7 +66,24 @@ form.aui {
         padding-right: 0.25em;
       }
     }
+  }
 
+  form.aui #copy-attachments-group .aui-icon{
+    margin-left: 0.25em;
+  }
+
+  .aui-message.aui-message-reset-style {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    .aui-icon {
+      display: inline-block;
+      position: static;
+      top: 0;
+      left: 0;
+    }
   }
 
 }

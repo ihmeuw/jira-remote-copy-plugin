@@ -30,7 +30,7 @@ public class MappingResult {
     @Init
     public void init() {
         container = elementFinder.find(By.xpath("//label[@for='" + fieldId + "']/.."));
-        unmappedNotify = container.find(By.cssSelector("label .aui-icon-help"));
+        unmappedNotify = container.find(By.cssSelector("label .icon-info"));
     }
 
     public TimedQuery<Boolean> hasNotMappedNotify() {

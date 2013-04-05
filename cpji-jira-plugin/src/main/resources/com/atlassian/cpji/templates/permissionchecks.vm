@@ -29,7 +29,7 @@
             #end
 
             #if (!$action.issueFieldsThatCannotBeCopied.isEmpty())
-			<h4 class="sub-heading" id="fields-cannot-be-copied-header">$i18n.getText('cpji.source.issue.fields')</h4>
+			    <h4 class="sub-heading" id="fields-cannot-be-copied-header">$i18n.getText('cpji.source.issue.fields')</h4>
 			    <span>
 					$i18n.getText('cpji.some.values.cannot.be.copied')
                 </span>
@@ -37,6 +37,9 @@
 					#foreach( $permission in $action.issueFieldsThatCannotBeCopied)
 						$!action.getFieldHtml($permission)
 					#end
+                </div>
+                <div class="hover-over-info description hidden">
+                    <p>$i18n.getText('cpji.hover.over.to.see.which.values.wont.be.copied', $action.warningMarkerHtml)</p>
                 </div>
 			#end
 

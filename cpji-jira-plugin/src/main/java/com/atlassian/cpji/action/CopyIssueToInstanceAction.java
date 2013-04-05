@@ -566,7 +566,12 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		return INPUT;
 	}
 
-	public boolean isCopyingPossible() {
+    public String getWarningMarkerHtml() throws SoyException{
+        return soyTemplateRendererProvider.getRenderer().render(PLUGIN_KEY+":copyIssueToInstanceAction",
+                "RIC.Templates.warningMarker", ImmutableMap.<String, Object>of());
+    }
+
+    public boolean isCopyingPossible() {
 		return canCopyIssue;
 	}
 

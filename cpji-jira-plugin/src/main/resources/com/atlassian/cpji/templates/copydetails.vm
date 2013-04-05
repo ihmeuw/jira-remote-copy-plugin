@@ -72,7 +72,17 @@
 					<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
 					#set ($error = $action.copyAttachmentsErrorMessage)
 					#if ($error != "")
-                        <div>$error</div>
+                        <div class="attachments-error">$error</div>
+                        #if ($action.attachmentsLargerThanAllowed.size() > 0)
+                            <div class="attachments-list hidden">
+                                $i18n.getText("cpji.attachments.which.wont.be.copied")
+                                <ul>
+                                #foreach($attachment in $action.attachmentsLargerThanAllowed)
+                                    <li>$textutils.htmlEncode($attachment.filename)</li>
+                                #end
+                                </ul>
+                            </div>
+                        #end
 					#end
                 </div>
 				#end

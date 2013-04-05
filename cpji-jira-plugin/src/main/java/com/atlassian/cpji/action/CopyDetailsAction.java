@@ -1,6 +1,7 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
+import com.atlassian.core.util.FileSize;
 import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
@@ -28,12 +29,10 @@ import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.util.UrlBuilder;
 import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.util.concurrent.LazyReference;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
@@ -349,15 +348,25 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 		return isIssueWithComments();
 	}
 
-    private int getNumberOfAttachmentsLargerThanAllowed(){
-        return Iterables.size(
-            Iterables.filter(getIssueObject().getAttachments(), new Predicate<Attachment>() {
-                @Override
-                public boolean apply(Attachment input) {
-                    return input.getFilesize() > copyInfo.getMaxAttachmentSize();
-                }
-            })
-        );
+    private LazyReference<List<Attachment>> attachmentsLargerThanAllowed = new LazyReference<List<Attachment>>() {
+        @Override
+        protected List<Attachment> create() throws Exception {
+            if(!canRemoteServerRecieveAttachments()){
+                return Collections.emptyList();
+            }
+            return ImmutableList.copyOf(
+                    Iterables.filter(getIssueObject().getAttachments(), new Predicate<Attachment>() {
+                        @Override
+                        public boolean apply(Attachment input) {
+                            return input.getFilesize() > copyInfo.getMaxAttachmentSize();
+                        }
+                    })
+            );
+        }
+    };
+
+    public List<Attachment> getAttachmentsLargerThanAllowed(){
+        return attachmentsLargerThanAllowed.get();
     }
 
     private int getAllAttachmentsCount(){
@@ -365,21 +374,25 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
     }
 
     public boolean isCopyAttachmentsEnabled(){
-        return copyInfo.getAttachmentsEnabled() && copyInfo.getHasCreateAttachmentPermission()
-                && getNumberOfAttachmentsLargerThanAllowed() < getAllAttachmentsCount();
+        return canRemoteServerRecieveAttachments()
+                && getAttachmentsLargerThanAllowed().size() < getAllAttachmentsCount();
     }
 
-	public String getCopyAttachmentsErrorMessage() {
+    private boolean canRemoteServerRecieveAttachments() {
+        return copyInfo.getAttachmentsEnabled() && copyInfo.getHasCreateAttachmentPermission();
+    }
+
+    public String getCopyAttachmentsErrorMessage() {
 		if (!copyInfo.getAttachmentsEnabled()) {
 			return getText("cpji.attachments.are.disabled");
 		} else if(!copyInfo.getHasCreateAttachmentPermission()) {
 			return getText("cpji.not.permitted.to.create.attachments");
 		} else{
-            int count = getNumberOfAttachmentsLargerThanAllowed();
-            if(count == getAllAttachmentsCount()){
-                return getText("cpji.all.attachments.are.too.big");
-            } else if(count > 0){
-                return getText("cpji.some.attachments.are.too.big");
+            List<Attachment> attachments = getAttachmentsLargerThanAllowed();
+            if(attachments.size() == getAllAttachmentsCount()){
+                return getText("cpji.all.attachments.are.too.big", FileSize.format(copyInfo.getMaxAttachmentSize()));
+            } else if(attachments.size() > 0){
+                return getText("cpji.some.attachments.are.too.big", Integer.toString(attachments.size()), FileSize.format(copyInfo.getMaxAttachmentSize()));
             }
         }
 		return "";

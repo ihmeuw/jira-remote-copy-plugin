@@ -15,18 +15,16 @@
 */
 {template .unmappedValues}
 <div class="unmapped-values">
-{getText('cpji.field.validation.not.mapped.multi')}
-<ul>
+{getText('cpji.field.validation.following.values.cannot.be.mapped')}<br/>
 {foreach $name in $unmappedValues}
-    <li><span class="aui-lozenge aui-lozenge-subtle">{$name}</span></li>
+    <span class="aui-lozenge aui-lozenge-subtle">{$name}</span>
 {/foreach}
-</ul>
 </div>
 {/template}
 
 
 /**
  */
-{template .unmappedMarker}
-<span class="aui-icon aui-icon-help icon-help"></span>
+{template .warningMarker}
+<span class="aui-message aui-message-reset-style"><span class="aui-icon icon-info"></span></span>
 {/template}
