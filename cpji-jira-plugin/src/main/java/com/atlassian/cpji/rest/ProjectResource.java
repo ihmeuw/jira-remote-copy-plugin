@@ -52,7 +52,7 @@ public class ProjectResource {
     }
 
     @GET
-    public Response getProjectsWithCreateIssuePermission(){
+    public Response getProjectsWithCreateIssuePermission() {
         Collection<Project> projects = permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, callingUser());
         return Response.ok(ProjectJsonBean.shortBeans(projects, baseUrls)).build();
     }

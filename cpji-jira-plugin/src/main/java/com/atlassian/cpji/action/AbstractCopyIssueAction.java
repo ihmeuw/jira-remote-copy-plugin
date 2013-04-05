@@ -2,7 +2,6 @@ package com.atlassian.cpji.action;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.components.CopyIssuePermissionManager;
-import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
@@ -150,24 +149,6 @@ public abstract class AbstractCopyIssueAction extends AbstractIssueSelectAction 
     public String getGenericResponseHandlerResult(){
         return genericResponseHandlerResult;
     }
-
-	public static class SelectedProject {
-		private final JiraLocation jiraLocation;
-		private final String projectKey;
-
-		public SelectedProject(JiraLocation jiraLocation, String projectKey) {
-			this.jiraLocation = jiraLocation;
-			this.projectKey = projectKey;
-		}
-
-		public JiraLocation getJiraLocation() {
-			return jiraLocation;
-		}
-
-		public String getProjectKey() {
-			return projectKey;
-		}
-	}
 
 	public void setCurrentStep(String name) {
 		Preconditions.checkNotNull(name);

@@ -16,7 +16,8 @@
         <form action="SelectTargetProject.jspa" class="aui" method="post">
             <h2 class="formtitle">$i18n.getText('cpji.select.destination.project')</h2>
             <fieldset>
-				<div class="field-group" id="targetEntityLink-container" data-selected-project-key="$textutils.htmlEncode($selectedIssueProjectKey)">
+				<div class="field-group" id="targetEntityLink-container" data-selected-project-key="$textutils.htmlEncode($action.selectedIssueProjectKey)"
+						data-recently-used-projects="$textutils.htmlEncode($action.recentlyUsedProjects)">
 					<label for="targetEntityLink">$i18n.getText('common.words.project')</label>
 					<select name="targetEntityLink" id="targetEntityLink" class="hidden"></select>
                     <span id="targetEntityLinkLoader" class="hidden">

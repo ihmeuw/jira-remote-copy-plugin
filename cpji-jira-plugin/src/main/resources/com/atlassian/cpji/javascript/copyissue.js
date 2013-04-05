@@ -1,5 +1,22 @@
 AJS.$(function ($) {
 
+	var SingleSelect = AJS.SingleSelect.extend({
+		init: function(options) {
+			this._super(options);
+			this.listController._originalMakeResultDiv = this.listController._makeResultDiv;
+			this.listController._makeResultDiv = function (data, context) {
+				var query = typeof(context) == "string" ? context : context.query;
+				if (query != "") {
+					return this._originalMakeResultDiv(data, context);
+				} else {
+					var first = [ data[0] ], $resultDiv = this._originalMakeResultDiv(first, context);
+					$resultDiv.find("ul").append(AJS.$("<li class='no-suggestions'>" + AJS.I18n.getText("cpji.continue.typeing.to.see.more") + "</li>"));
+					return $resultDiv;
+				}
+			};
+		}
+	});
+
     var copyIssue = {
 
         settings: {
@@ -8,8 +25,11 @@ AJS.$(function ($) {
             projectsSelect: null,
             submitButton: null,
             defaultInstance: "LOCAL",
-            defaultProject: null
+            defaultProject: null,
+			recentlyUsedProjects: null
         },
+
+		recentlyUsed: [],
 
         singleSelect: null,
 
@@ -32,22 +52,49 @@ AJS.$(function ($) {
             });
         },
 
+		convertRecentlyUsed: function () {
+			var elem = $("<optgroup></optgroup>");
+
+			elem.attr('label', AJS.I18n.getText('cpji.recently.used'));
+
+			if (!this.recentlyUsed || this.recentlyUsed.length == 0) {
+				return null;
+			}
+
+			for (var i in this.recentlyUsed) {
+				var project = this.recentlyUsed[i], projElem = $("<option></option>");
+				if (project.locationId == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
+					//for some strange reason setting this attribute through explicit attr call sometimes it is not preserved
+					projElem = $("<option selected='selected'></option>");
+				}
+				projElem.attr('value', project.locationId + "|" + project.key);
+				projElem.text(project.name + " (" + project.key + ") [" + project.locationName + "]");
+				elem.append(projElem);
+			}
+			return elem;
+		},
+
         convertGroupToOptgroup: function (json) {
-            var elem = $("<optgroup></optgroup>");
+            var elem = $("<optgroup></optgroup>"), locationId = json.id, recentlyUsed = this.settings.recentlyUsedProjects[locationId];
             elem.attr('label', json.name);
 
             for (var i in json.projects) {
                 var project = json.projects[i];
-                var projElem = $("<option></option>");
-                if (json.id == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
 
-                    //for some strange reason when I set this attribute throug explicit attr call sometimes it is not preserved
-                    projElem = $("<option selected='selected'></option>");
-//                    projElem.attr("selected", "selected");
-                }
-                projElem.attr('value', json.id + "|" + project.key);
-                projElem.text(project.name + " (" + project.key + ")");
-                elem.append(projElem);
+				if (_.indexOf(recentlyUsed, project.key) != -1) {
+					project.locationId = json.id;
+					project.locationName = json.name;
+					this.recentlyUsed.push(project);
+				} else {
+					var projElem = $("<option></option>");
+					if (json.id == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
+						//for some strange reason setting this attribute through explicit attr call sometimes it is not preserved
+						projElem = $("<option selected='selected'></option>");
+					}
+					projElem.attr('value', json.id + "|" + project.key);
+					projElem.text(project.name + " (" + project.key + ")");
+					elem.append(projElem);
+				}
             }
             return elem;
         },
@@ -64,6 +111,10 @@ AJS.$(function ($) {
                         var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
                         copyIssue.settings.projectsSelect.append(serverElem);
                     }
+					var recentlyUsed = copyIssue.convertRecentlyUsed();
+					if (recentlyUsed) {
+						copyIssue.settings.projectsSelect.prepend(recentlyUsed);
+					}
                     copyIssue.toggleLoadingState(false);
                     copyIssue.prepareSelect();
                 } else {
@@ -85,11 +136,12 @@ AJS.$(function ($) {
         },
 
         prepareSelect: function () {
-            copyIssue.singleSelect = new AJS.SingleSelect({
+            copyIssue.singleSelect = new SingleSelect({
                 element: copyIssue.settings.projectsSelect,
                 width: "250px",
                 showDropdownButton: true,
-                itemAttrDisplayed: "label"
+                itemAttrDisplayed: "label",
+				maxInlineResultsDisplayed: 5
             });
             copyIssue.settings.projectsSelect.bind("selected", copyIssue.onValueSelected);
             copyIssue.settings.projectsSelect.bind("unselect", copyIssue.onValueUnselected);
@@ -123,6 +175,7 @@ AJS.$(function ($) {
         projectsSelect: $("#targetEntityLink"),
         loader: $("#targetEntityLinkLoader"),
         submitButton: $("#select-project-submit"),
-        defaultProject: $("#targetEntityLink-container").data("selected-project-key")
+        defaultProject: $("#targetEntityLink-container").data("selected-project-key"),
+		recentlyUsedProjects: $("#targetEntityLink-container").data("recently-used-projects")
     });
 });

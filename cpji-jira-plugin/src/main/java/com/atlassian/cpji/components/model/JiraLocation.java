@@ -1,10 +1,11 @@
 package com.atlassian.cpji.components.model;
 
-import com.atlassian.applinks.api.ApplicationId;
 import com.atlassian.applinks.api.ApplicationLink;
-import com.atlassian.cpji.components.remote.LocalJiraProxy;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.annotation.Nullable;
 
@@ -16,8 +17,10 @@ public class JiraLocation {
 	public static final String LOCAL_ID = new String("LOCAL");
 	public static final JiraLocation LOCAL = new JiraLocation(LOCAL_ID, LOCAL_ID);
 
+	@JsonProperty
 	private final String id;
 
+	@JsonProperty
     private final String name;
 
 	public static Predicate<JiraLocation> isLocalLocation() {
@@ -48,7 +51,8 @@ public class JiraLocation {
         return id != null ? id.hashCode() : 0;
     }
 
-    public JiraLocation(final String id, final String name) {
+	@JsonCreator
+    public JiraLocation(@JsonProperty("id") final String id, @JsonProperty("name") final String name) {
         this.id = Preconditions.checkNotNull(id);
         this.name = name;
     }
@@ -61,13 +65,10 @@ public class JiraLocation {
         return name;
 	}
 
+	@JsonIgnore
 	public boolean isLocal() {
 		return id.equalsIgnoreCase(JiraLocation.LOCAL_ID);
 	}
-
-    public ApplicationId toApplicationId() {
-        return new ApplicationId(id);
-    }
 
     public static JiraLocation fromAppLink(ApplicationLink appLink) {
         return new JiraLocation(appLink.getId().get(), appLink.getName());
