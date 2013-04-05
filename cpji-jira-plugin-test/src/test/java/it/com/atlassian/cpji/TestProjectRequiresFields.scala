@@ -115,7 +115,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
         val permissionChecksPage = selectTargetProjectPage.setDestinationProject("Test").next.next
 
         val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
-        Poller.waitUntil(assigneeRow.getMessage, StringContainsInOrder.stringContainsInOrder(List("could not be mapped", unmappedUser)))
+        Poller.waitUntil(assigneeRow.getMessage, StringContainsInOrder.stringContainsInOrder(List("could not be mapped", unmappedUser.toUpperCase)))
         Poller.waitUntil(permissionChecksPage.getMappingResultFor("customfield_10201").getMessage, Matchers.containsString("field does not exist in the target project"))
       }
 
