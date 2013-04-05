@@ -3,16 +3,19 @@
 	<label for="$permission.fieldId">$textutils.htmlEncode($permission.fieldName)</label>
 	#set($error=!$permission.canCopyIssue())
 	<div class="field-value">
-        #if ($error)<div class="error">#end
-        $textutils.htmlEncode($permission.getValidationMessage())
-        #if ($error)</div>#end
+        ## if we have we just display unmapped values
         #if (! $permission.unmappedValues.empty)
             <div>
-                $i18n.getText("cpji.field.validation.not.mapped.multi")
+                $i18n.getText("cpji.field.validation.following.values.cannot.be.mapped")
                 #foreach($value in $permission.unmappedValues)
                     <span class="aui-lozenge aui-lozenge-subtle">$value</span>
                 #end
             </div>
+        #else
+            ##otherwise we display "plain" message
+            #if ($error)<div class="error">#end
+            $textutils.htmlEncode($permission.getValidationMessage())
+            #if ($error)</div>#end
         #end
     </div>
 </div>

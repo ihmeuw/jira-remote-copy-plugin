@@ -38,8 +38,8 @@
 						$!action.getFieldHtml($permission)
 					#end
                 </div>
-                <div class="hover-over-info hidden">
-                    $i18n.getText('cpji.hover.over.to.see.which.values.wont.be.copied', $action.warningMarkerHtml)
+                <div class="hover-over-info description hidden">
+                    <p>$i18n.getText('cpji.hover.over.to.see.which.values.wont.be.copied', $action.warningMarkerHtml)</p>
                 </div>
 			#end
 
