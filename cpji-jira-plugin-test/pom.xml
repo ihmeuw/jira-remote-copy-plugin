@@ -302,4 +302,19 @@
         <xvfb.enable>true</xvfb.enable>
         <jira.qunit.testoutput.location>${project.basedir}/target/test-results</jira.qunit.testoutput.location>
     </properties>
+
+	<profiles>
+		<profile>
+			<id>releaseProfile</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>cpji-jira-plugin</artifactId>
+					<version>${project.version}</version>
+					<scope>system</scope>
+					<systemPath>${project.basedir}/../cpji-jira-plugin/target/cpji-jira-plugin-${project.version}.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>
