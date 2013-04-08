@@ -70,7 +70,7 @@
 				<div class="checkbox" id="copy-attachments-group">
 					<input type="checkbox" class="checkbox" id="copy-attachments" name="copyAttachments" value="true" #if (!$isEnabled) disabled="" #else #if($copyAttachments) checked="checked" #end #end/>
 					<label for="copy-attachments">$i18n.getText('cpji.copy.attachments')</label>
-					#set ($error = $action.copyAttachmentsErrorMessage)
+					#set ($error = $action.copyAttachmentsErrorMessageHtml)
 					#if ($error != "")
                         <div class="attachments-error">$error</div>
                         #if ($action.attachmentsLargerThanAllowed.size() > 0)

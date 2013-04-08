@@ -382,7 +382,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
         return copyInfo.getAttachmentsEnabled() && copyInfo.getHasCreateAttachmentPermission();
     }
 
-    public String getCopyAttachmentsErrorMessage() {
+    public String getCopyAttachmentsErrorMessageHtml() {
 		if (!copyInfo.getAttachmentsEnabled()) {
 			return getText("cpji.attachments.are.disabled");
 		} else if(!copyInfo.getHasCreateAttachmentPermission()) {
