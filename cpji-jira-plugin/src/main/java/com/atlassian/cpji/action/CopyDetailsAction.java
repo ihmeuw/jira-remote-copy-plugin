@@ -393,7 +393,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             if(attachments.size() == getAllAttachmentsCount()){
                 return getText("cpji.all.attachments.are.too.big", FileSize.format(copyInfo.getMaxAttachmentSize()));
             } else if(attachments.size() == 1) {
-                return getText("cpji.some.attachments.are.too.big", TextUtils.htmlEncode(attachments.get(0).getFilename()), FileSize.format(copyInfo.getMaxAttachmentSize()));
+                return getText("cpji.one.attachment.is.too.big", TextUtils.htmlEncode(attachments.get(0).getFilename()), FileSize.format(copyInfo.getMaxAttachmentSize()));
             }else if(attachments.size() > 1){
                 String countText = getText("cpji.some.attachments.count", Integer.toString(attachments.size()));
                 return getText("cpji.some.attachments.are.too.big", countText, FileSize.format(copyInfo.getMaxAttachmentSize()));
