@@ -93,16 +93,18 @@ public class VoterFieldMapper extends AbstractFieldMapper
 
     public void process(final CachingUserMapper userMapper, final Issue issue, final CopyIssueBean bean) throws FieldCreationException
     {
-        if (permissionManager.hasPermission(Permissions.VIEW_VOTERS_AND_WATCHERS, issue.getProjectObject(), jiraAuthenticationContext.getLoggedInUser()) && voteService.isVotingEnabled())
+        if (permissionManager.hasPermission(Permissions.VIEW_VOTERS_AND_WATCHERS, issue.getProjectObject(),
+				jiraAuthenticationContext.getLoggedInUser()) && voteService.isVotingEnabled())
         {
             final List<String> errors = new ArrayList<String>();
             final List<UserBean> voters = bean.getVoters();
+			final User reporter = issue.getReporterUser();
             if (voters != null)
             {
                 for (UserBean voter : voters)
                 {
                     User user = userMapper.mapUser(voter);
-                    if (user != null)
+                    if (user != null && (reporter == null || !user.equals(reporter)))
                     {
                         VoteService.VoteValidationResult voteValidationResult = voteService.validateAddVote(jiraAuthenticationContext.getLoggedInUser(), user, issue);
                         if (voteValidationResult.isValid())
