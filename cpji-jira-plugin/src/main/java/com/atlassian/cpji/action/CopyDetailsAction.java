@@ -33,6 +33,7 @@ import com.atlassian.util.concurrent.LazyReference;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.*;
+import com.opensymphony.util.TextUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;
@@ -391,8 +392,11 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
             List<Attachment> attachments = getAttachmentsLargerThanAllowed();
             if(attachments.size() == getAllAttachmentsCount()){
                 return getText("cpji.all.attachments.are.too.big", FileSize.format(copyInfo.getMaxAttachmentSize()));
-            } else if(attachments.size() > 0){
-                return getText("cpji.some.attachments.are.too.big", Integer.toString(attachments.size()), FileSize.format(copyInfo.getMaxAttachmentSize()));
+            } else if(attachments.size() == 1) {
+                return getText("cpji.some.attachments.are.too.big", TextUtils.htmlEncode(attachments.get(0).getFilename()), FileSize.format(copyInfo.getMaxAttachmentSize()));
+            }else if(attachments.size() > 1){
+                String countText = getText("cpji.some.attachments.count", Integer.toString(attachments.size()));
+                return getText("cpji.some.attachments.are.too.big", countText, FileSize.format(copyInfo.getMaxAttachmentSize()));
             }
         }
 		return "";

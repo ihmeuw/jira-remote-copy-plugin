@@ -64,7 +64,7 @@
 					#end
 				</div>
 				#end
-
+$textutils.htmlEncode()
 				#if ($action.copyAttachmentsSectionVisible)
 				#set ($isEnabled = $action.copyAttachmentsEnabled)
 				<div class="checkbox" id="copy-attachments-group">
@@ -73,7 +73,7 @@
 					#set ($error = $action.copyAttachmentsErrorMessageHtml)
 					#if ($error != "")
                         <div class="attachments-error">$error</div>
-                        #if ($action.attachmentsLargerThanAllowed.size() > 0)
+                        #if ($action.attachmentsLargerThanAllowed.size() > 1)
                             <div class="attachments-list hidden">
                                 $i18n.getText("cpji.attachments.which.wont.be.copied")
                                 <ul>
