@@ -3,6 +3,7 @@ package com.atlassian.cpji.action;
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.RecentlyUsedProjectsManager;
+import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.PluginVersion;
 import com.atlassian.cpji.components.remote.JiraProxy;
@@ -51,7 +52,11 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
     @Override
     public String doDefault() throws Exception
     {
-        return checkPermissions();
+        final String result = checkPermissions();
+		if (SUCCESS.equals(result) && recentlyUsedProjectsManager.getRecentProjects(getLoggedInUser()).isEmpty()) {
+			recentlyUsedProjectsManager.addProject(getLoggedInUser(), new SelectedProject(JiraLocation.LOCAL, getSelectedIssueProjectKey()));
+		}
+		return result;
     }
 
     @Override
