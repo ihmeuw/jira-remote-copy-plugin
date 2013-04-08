@@ -138,7 +138,7 @@ AJS.$(function ($) {
         prepareSelect: function () {
             copyIssue.singleSelect = new SingleSelect({
                 element: copyIssue.settings.projectsSelect,
-                width: "250px",
+                width: "350px",
                 showDropdownButton: true,
                 itemAttrDisplayed: "label",
 				maxInlineResultsDisplayed: 5
