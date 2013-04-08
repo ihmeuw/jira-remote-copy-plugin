@@ -105,7 +105,7 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
 			var detailsPage = goToCopyDetails(issue.getId)
 			isAttachmentsPresentAndEnabled(detailsPage)
-			Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("of attachments exceed maximum"))
+			Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("ATTACHMENT(S) exceed maximum attachment size"))
 		} finally {
 			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, attachmentSize)
 		}
