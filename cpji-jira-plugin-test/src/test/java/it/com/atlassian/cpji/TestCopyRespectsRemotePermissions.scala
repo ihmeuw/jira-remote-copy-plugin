@@ -99,14 +99,30 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 		val attachmentSize =  apControl.getString(APKeys.JIRA_ATTACHMENT_SIZE)
 		try{
 			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, 30L.toString)
-			AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
-				issue.getAttachmentsUri, new ByteArrayInputStream(StringUtils.repeat("this is a stream", 100).getBytes("UTF-8")),
-				this.getClass.getCanonicalName)
 
-			var detailsPage = goToCopyDetails(issue.getId)
-			isAttachmentsPresentAndEnabled(detailsPage)
-			Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("exceed maximum attachment size"))
-		} finally {
+      //single attachment
+      AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+        issue.getAttachmentsUri, new ByteArrayInputStream(StringUtils.repeat("this is a stream", 100).getBytes("UTF-8")),
+        "attachment1.txt")
+
+      var detailsPage = goToCopyDetails(issue.getId)
+      isAttachmentsPresentAndEnabled(detailsPage)
+      Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("ATTACHMENT1.TXT exceeds maximum attachment size "))
+
+
+      AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+        issue.getAttachmentsUri, new ByteArrayInputStream(StringUtils.repeat("this is a stream", 100).getBytes("UTF-8")),
+        "attachment2.txt")
+
+      detailsPage = goToCopyDetails(issue.getId)
+      isAttachmentsPresentAndEnabled(detailsPage)
+      Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("2 ATTACHMENTS exceed maximum attachment size "))
+
+      detailsPage.showNotCopiedAttachmentsList()
+      Poller.waitUntil(detailsPage.getNotCopiedAttachmentsList, Matchers.containsString("attachment1.txt"))
+      Poller.waitUntil(detailsPage.getNotCopiedAttachmentsList, Matchers.containsString("attachment2.txt"))
+
+    } finally {
 			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, attachmentSize)
 		}
 	}
