@@ -63,12 +63,13 @@ AJS.$(function ($) {
 
 			for (var i in this.recentlyUsed) {
 				var project = this.recentlyUsed[i], projElem = $("<option></option>");
-				if (project.locationId == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
-					//for some strange reason setting this attribute through explicit attr call sometimes it is not preserved
-					projElem = $("<option selected='selected'></option>");
-				}
 				projElem.attr('value', project.locationId + "|" + project.key);
 				projElem.text(project.name + " (" + project.key + ") [" + project.locationName + "]");
+
+				if (project.locationId == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
+					this.selectedProject = projElem.val();
+				}
+
 				elem.append(projElem);
 			}
 			return elem;
@@ -87,12 +88,13 @@ AJS.$(function ($) {
 					this.recentlyUsed.push(project);
 				} else {
 					var projElem = $("<option></option>");
-					if (json.id == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
-						//for some strange reason setting this attribute through explicit attr call sometimes it is not preserved
-						projElem = $("<option selected='selected'></option>");
-					}
 					projElem.attr('value', json.id + "|" + project.key);
 					projElem.text(project.name + " (" + project.key + ")");
+
+					if (json.id == copyIssue.settings.defaultInstance && project.key == copyIssue.settings.defaultProject) {
+						this.selectedProject = projElem.val();
+					}
+
 					elem.append(projElem);
 				}
             }
@@ -108,12 +110,17 @@ AJS.$(function ($) {
                 }, 0);
                 if (projectCount > 0) {
                     for (var server in data.projects) {
-                        var serverElem = copyIssue.convertGroupToOptgroup(data.projects[server]);
-                        copyIssue.settings.projectsSelect.append(serverElem);
+						copyIssue.settings.projectsSelect.append(copyIssue.convertGroupToOptgroup(data.projects[server]));
                     }
 					var recentlyUsed = copyIssue.convertRecentlyUsed();
 					if (recentlyUsed) {
 						copyIssue.settings.projectsSelect.prepend(recentlyUsed);
+					}
+					if (copyIssue.selectedProject) {
+						var $toSelect = copyIssue.settings.projectsSelect.find("option").filter(function() { return AJS.$(this).val() == copyIssue.selectedProject; });
+						if ($toSelect.length) {
+							$toSelect.attr("selected", "selected");
+						}
 					}
                     copyIssue.toggleLoadingState(false);
                     copyIssue.prepareSelect();
