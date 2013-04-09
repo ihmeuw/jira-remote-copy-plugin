@@ -9,7 +9,10 @@
             })
         });
 
-        if($("#copy-attachments-group .attachments-list").length){
+        //JRA-32483 - we do not display hovers on IE 10
+        var isIE10 = (AJS.$.browser.msie && ~~(AJS.$.browser.version) >= 10) && ( !JIRA.Version.isGreaterThanOrEqualTo("6") );
+        if(!isIE10 && $("#copy-attachments-group .attachments-list").length){
+
             var marker = $("#copy-attachments-group .attachments-error .aui-lozenge");
             AJS.InlineDialog(marker, "attachments-popup",
                 function (content, trigger, showPopup) {
@@ -17,7 +20,8 @@
                     showPopup();
                 },
                 {
-                    onHover: true
+                    onHover: true,
+                    hideDelay : 10000
                 }
             );
 

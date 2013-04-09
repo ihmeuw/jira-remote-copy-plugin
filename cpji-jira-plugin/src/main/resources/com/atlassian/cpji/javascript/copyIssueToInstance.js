@@ -1,5 +1,12 @@
 (function ($) {
     $(function () {
+
+        //JRA-32483 - we do not display hovers on IE 10
+        var isIE10 = (AJS.$.browser.msie && ~~(AJS.$.browser.version) >= 10) && ( !JIRA.Version.isGreaterThanOrEqualTo("6") );
+        if(isIE10){
+            return;
+        }
+
         var isWarningAdded = false;
         $(".fields-list label").each(function(){
             var labelTarget = $(this).attr("for");
@@ -17,12 +24,15 @@
                             }));
                             showPopup();
                         },
-                        {onHover: true}
+                        {
+                            onHover: true,
+                            hideDelay : 10000
+                        }
                     );
                 }
             }
         });
-        console.log(isWarningAdded);
+
         if(isWarningAdded){
             $(".hover-over-info").removeClass("hidden");
         }
