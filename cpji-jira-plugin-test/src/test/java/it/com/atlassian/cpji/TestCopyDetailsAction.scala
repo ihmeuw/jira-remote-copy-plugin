@@ -6,11 +6,9 @@ import com.atlassian.jira.rest.client.domain._
 import com.atlassian.jira.rest.client.domain.input.{LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import org.joda.time.DateTime
-import com.atlassian.cpji.tests.pageobjects.Options
 import org.junit.Assert._
 import java.io.ByteArrayInputStream
 import org.hamcrest.core.IsCollectionContaining
-import com.google.common.collect.Collections2
 import com.atlassian.pageobjects.elements.query.Poller
 import com.atlassian.cpji.CopyIssueProcess
 

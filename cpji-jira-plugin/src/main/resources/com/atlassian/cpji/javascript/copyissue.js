@@ -79,7 +79,6 @@ AJS.$(function ($) {
 				}
 
 				elem.append(projElem);
-				break;
 			}
 			return elem;
 		},
