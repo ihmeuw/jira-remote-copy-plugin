@@ -14,6 +14,14 @@ AJS.$(function ($) {
 					return $resultDiv;
 				}
 			};
+			this.listController._originalAddResultToContainer = this.listController._addResultToContainer;
+			this.listController._addResultToContainer = function($result, context) {
+				var query = typeof(context) == "string" ? context : context.query;
+				this._originalAddResultToContainer($result, context);
+				if (query == "") {
+					this.$container.find("li.no-suggestions").replaceWith(AJS.$("<li class='no-suggestions'>" + AJS.I18n.getText("cpji.continue.typing.to.see.more") + "</li>"));
+				}
+			}
 		}
 	});
 
@@ -71,6 +79,7 @@ AJS.$(function ($) {
 				}
 
 				elem.append(projElem);
+				break;
 			}
 			return elem;
 		},
