@@ -60,28 +60,30 @@ public class CachingUserMapper {
 
 
 	@Nullable
-	private Multimap<String, User> getUsersByEmail(UserBean userBean, Multimap<String, User> usersInScope) {
-		final String emailAddress = IdentifierUtils.toLowerCase(StringUtils.trimToNull(userBean.getEmail()));
-		if (emailAddress != null) {
-			return Multimaps.index(usersInScope.get(emailAddress), GET_FULL_NAME);
+	protected Multimap<String, User> getUsersByEmail(UserBean userBean, Multimap<String, User> usersInScope) {
+        final String trimmedEmail = StringUtils.trimToNull(userBean.getEmail());
+		if (trimmedEmail != null) {
+            final String emailAddress = IdentifierUtils.toLowerCase(trimmedEmail);
+            return Multimaps.index(usersInScope.get(emailAddress), GET_FULL_NAME);
 		}
 		return null;
 	}
 
 	@Nullable
-	private Multimap<String, User> getUsersByFullName(UserBean userBean, Multimap<String, User> usersInScope) {
-		final String fullName = IdentifierUtils.toLowerCase(StringUtils.trimToNull(userBean.getFullName()));
-		if (fullName != null) {
-			return Multimaps.index(usersInScope.get(fullName), GET_USER_NAME);
+    protected Multimap<String, User> getUsersByFullName(UserBean userBean, Multimap<String, User> usersInScope) {
+        final String trimmedFullName = StringUtils.trimToNull(userBean.getFullName());
+		if (trimmedFullName != null) {
+            final String fullName = IdentifierUtils.toLowerCase(trimmedFullName);
+            return Multimaps.index(usersInScope.get(fullName), GET_USER_NAME);
 		}
 		return null;
 	}
 
 	@Nonnull
-	private Collection<User> getUsersByUserName(UserBean userBean, Multimap<String, User> usersInScope) {
-		final String userName = IdentifierUtils.toLowerCase(StringUtils.trimToNull(userBean.getUserName()));
-		if (userName != null) {
-			return usersInScope.get(userName);
+    protected Collection<User> getUsersByUserName(UserBean userBean, Multimap<String, User> usersInScope) {
+        final String trimmedName = StringUtils.trimToNull(userBean.getUserName());
+		if (trimmedName != null) {
+            return usersInScope.get(IdentifierUtils.toLowerCase(trimmedName));
 		}
 		return Collections.emptyList();
 	}
