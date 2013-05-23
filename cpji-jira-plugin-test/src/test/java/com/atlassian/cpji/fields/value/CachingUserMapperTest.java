@@ -1,6 +1,5 @@
 package com.atlassian.cpji.fields.value;
 
-import com.atlassian.core.util.StringUtils;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.google.common.collect.ImmutableList;
@@ -15,7 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  *
