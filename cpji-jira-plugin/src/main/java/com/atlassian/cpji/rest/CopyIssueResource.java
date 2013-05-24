@@ -44,7 +44,7 @@ public class CopyIssueResource
         }
         catch (CopyIssueException e)
         {
-			log.error(String.format("Failed to copy issue: %s", e.getMessage()));
+			log.error("Failed to copy issue", e);
             return Response.serverError().entity(ErrorBean.convertErrorCollection(e.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
     }
@@ -60,11 +60,12 @@ public class CopyIssueResource
         }
         catch (CopyIssueException e)
         {
+            log.error(String.format("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey()), e);
             return Response.serverError().entity(ErrorBean.convertErrorCollection(e.getErrorCollection())).cacheControl(RESTException.never()).build();
         }
         catch (Exception ex)
         {
-            log.error(String.format("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "': %s", ex.getMessage()));
+            log.error(String.format("Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey()), ex);
             return Response.serverError().entity(new ErrorBean(
 					"Failed to check field permissions for source issue '" + copyIssueBean.getOriginalKey() + "'. Please contact your administrator."))
 					.cacheControl(RESTException.never()).build();
