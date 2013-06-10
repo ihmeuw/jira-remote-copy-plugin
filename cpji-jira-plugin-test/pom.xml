@@ -316,5 +316,17 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>ci</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>cpji-jira-plugin</artifactId>
+					<version>${project.version}</version>
+					<scope>system</scope>
+					<systemPath>${project.basedir}/passedArtifacts/cpji-jira-plugin-${project.version}.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
 	</profiles>
 </project>
