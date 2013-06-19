@@ -4,6 +4,8 @@ import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.crowd.embedded.impl.IdentifierUtils;
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import org.apache.commons.lang.StringUtils;
@@ -19,24 +21,39 @@ public class CachingUserMapper {
 
 	public static final Function<User, String> GET_EMAIL = new Function<User, String>() {
 		@Override
-		public String apply(@Nullable User input) {
-			return IdentifierUtils.toLowerCase(input.getEmailAddress());
+		public String apply(User input) {
+			return IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getEmailAddress()));
 		}
 	};
 
 	public static final Function<User, String> GET_FULL_NAME = new Function<User, String>() {
 		@Override
-		public String apply(@Nullable User input) {
-			return IdentifierUtils.toLowerCase(input.getDisplayName());
+		public String apply(User input) {
+			return IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getDisplayName()));
 		}
 	};
 
 	public static final Function<User, String> GET_USER_NAME = new Function<User, String>() {
 		@Override
-		public String apply(@Nullable User input) {
-			return IdentifierUtils.toLowerCase(input.getName());
+		public String apply(User input) {
+			return IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getName()));
 		}
 	};
+
+	public static ImmutableListMultimap<String, User> indexIgnoringNullsOrEmptyStrings(
+			Collection<User> values, Function<User, String> function) {
+		Preconditions.checkNotNull(values, "values");
+		Preconditions.checkNotNull(function, "function");
+
+		final ImmutableListMultimap.Builder<String, User> listBuilder = ImmutableListMultimap.builder();
+		for(User value : values) {
+			final String functionResult = function.apply(value);
+			if (StringUtils.isNotEmpty(functionResult)) {
+				listBuilder.put(functionResult, value);
+			}
+		}
+		return listBuilder.build();
+	}
 
 	protected final Multimap<String, User> usersByEmail, usersByFullName, usersByUserName;
 
@@ -47,17 +64,16 @@ public class CachingUserMapper {
 	}
 
 	private Multimap<String, User> createUsersByUserName(Collection<User> users) {
-		return Multimaps.index(users, GET_USER_NAME);
+		return indexIgnoringNullsOrEmptyStrings(users, GET_USER_NAME);
 	}
 
 	private Multimap<String, User> createUsersByFullNameMap(Collection<User> users) {
-		return Multimaps.index(users, GET_FULL_NAME);
+		return indexIgnoringNullsOrEmptyStrings(users, GET_FULL_NAME);
 	}
 
 	private Multimap<String, User> createUsersByEmailMap(Collection<User> users) {
-		return Multimaps.index(users, GET_EMAIL);
+		return indexIgnoringNullsOrEmptyStrings(users, GET_EMAIL);
 	}
-
 
 	@Nullable
 	protected Multimap<String, User> getUsersByEmail(UserBean userBean, Multimap<String, User> usersInScope) {
