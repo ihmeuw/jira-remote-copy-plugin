@@ -2,7 +2,6 @@ package com.atlassian.cpji.fields.value;
 
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.user.MockUser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -16,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -48,10 +48,34 @@ public class CachingUserMapperTest {
 	@Test
 	public void testCachingUserMapperIgnoresNullOrEmptyValues()
 	{
-		new CachingUserMapper(Lists.<User>newArrayList(new MockUser("username", "fullName", "email")));
-		new CachingUserMapper(Lists.<User>newArrayList(new MockUser(null, "fullName", "email")));
-		new CachingUserMapper(Lists.<User>newArrayList(new MockUser("username", null, "email")));
-		new CachingUserMapper(Lists.<User>newArrayList(new MockUser("username", "fullName", null)));
+		{
+			User user1 = mock(User.class);
+			when(user1.getName()).thenReturn("username");
+			when(user1.getDisplayName()).thenReturn("fullName");
+			when(user1.getEmailAddress()).thenReturn("email");
+			new CachingUserMapper(Lists.<User>newArrayList(user1));
+		}
+
+		{
+			User user1 = mock(User.class);
+			when(user1.getDisplayName()).thenReturn("fullName");
+			when(user1.getEmailAddress()).thenReturn("email");
+			new CachingUserMapper(Lists.<User>newArrayList(user1));
+		}
+
+		{
+			User user1 = mock(User.class);
+			when(user1.getName()).thenReturn("username");
+			when(user1.getEmailAddress()).thenReturn("email");
+			new CachingUserMapper(Lists.<User>newArrayList(user1));
+		}
+
+		{
+			User user1 = mock(User.class);
+			when(user1.getName()).thenReturn("username");
+			when(user1.getDisplayName()).thenReturn("fullName");
+			new CachingUserMapper(Lists.<User>newArrayList(user1));
+		}
 	}
 
     @Test

@@ -142,7 +142,7 @@
                             <version>${jira.version}</version>
                             <httpPort>2990</httpPort>
                             <jvmDebugPort>5002</jvmDebugPort>
-                            <dataPath>${project.build.directory}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
+                            <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Dplugin.webresource.batching.off=false</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
