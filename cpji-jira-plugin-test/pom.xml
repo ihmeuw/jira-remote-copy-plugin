@@ -145,6 +145,15 @@
 		</dependency>
 	</dependencies>
     <build>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+			<testResource>
+				<directory>src/test/amps</directory>
+				<targetPath>xml</targetPath>
+			</testResource>
+		</testResources>
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
