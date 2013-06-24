@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>3.2</version>
+    <version>3.3-SNAPSHOT</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
