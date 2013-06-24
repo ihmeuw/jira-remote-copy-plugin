@@ -21,7 +21,6 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 	var issue: Issue = null
 
 	@Before def setUp {
-		testkit1.restoreDataFromResource("xml/jira1-backup.zip")
 		login(jira1)
 
 		issue = restClient1.getIssueClient

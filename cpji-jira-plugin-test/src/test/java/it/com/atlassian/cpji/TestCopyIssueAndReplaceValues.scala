@@ -13,58 +13,63 @@ import org.scalatest.BeforeAndAfter
 class TestCopyIssueAndReplaceValues extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit {
 
 	@Before def setUp {
-		testkit1.restoreDataFromResource("xml/jira1-backup.zip")
 		login(jira1)
 	}
 
-	@After def tearDown {
-		testkit1.restoreDataFromResource("xml/jira1-backup.zip")
-	}
-
 	@Test def testFillMissingValuesAndCopy {
-		restClient1.getVersionRestClient.createVersion(VersionInput.create("NEL", "version-1", null, null, false, false), NPM)
-		restClient1.getComponentClient.createComponent("NEL", new ComponentInput("component-1", null, null, null), NPM)
+		val fromKey = "FROM"
+		val toKey = "TOP"
 
-		restClient1.getVersionRestClient.createVersion(VersionInput.create("TST", "other-version-1", null, null, false, false), NPM)
-		restClient1.getComponentClient.createComponent("TST", new ComponentInput("other-component-1", null, null, null), NPM)
+		testkit1.project().addProject("From project", fromKey, "admin")
+		testkit1.project().addProject("To project", toKey, "admin")
+		try {
+			restClient1.getVersionRestClient.createVersion(VersionInput.create(fromKey, "version-1", null, null, false, false), NPM)
+			restClient1.getComponentClient.createComponent(fromKey, new ComponentInput("component-1", null, null, null), NPM)
 
-		val issueBuilder = new IssueInputBuilder("NEL", 3L, "Sample issue assigned to not mappable user")
-				.setAffectedVersionsNames(asJavaIterable(Array("version-1")))
-				.setComponentsNames(asJavaIterable(Array("component-1")))
-				.setFixVersionsNames(asJavaIterable(Array("version-1")))
+			restClient1.getVersionRestClient.createVersion(VersionInput.create(toKey, "other-version-1", null, null, false, false), NPM)
+			restClient1.getComponentClient.createComponent(toKey, new ComponentInput("other-component-1", null, null, null), NPM)
 
-		val issue: Issue = restClient1.getIssueClient
-				.getIssue(restClient1.getIssueClient.createIssue(issueBuilder.build(), NPM).getKey, NPM)
+			val issueBuilder = new IssueInputBuilder(fromKey, 3L, "Sample issue assigned to not mappable user")
+					.setAffectedVersionsNames(asJavaIterable(Array("version-1")))
+					.setComponentsNames(asJavaIterable(Array("component-1")))
+					.setFixVersionsNames(asJavaIterable(Array("version-1")))
 
-		val selectTargetProjectPage: SelectTargetProjectPage = jira1
-				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(issue.getId))
+			val issue: Issue = restClient1.getIssueClient
+					.getIssue(restClient1.getIssueClient.createIssue(issueBuilder.build(), NPM).getKey, NPM)
 
-		selectTargetProjectPage.setDestinationProject("Test")
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
-		var permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+			val selectTargetProjectPage: SelectTargetProjectPage = jira1
+					.visit(classOf[SelectTargetProjectPage], new java.lang.Long(issue.getId))
 
-		Poller.waitUntilFalse(permissionChecksPage.areAllIssueFieldsRetained)
-		Poller.waitUntilTrue(permissionChecksPage.areAllRequiredFieldsFilledIn)
+			selectTargetProjectPage.setDestinationProject("To project")
+			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
+			var permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
 
-		permissionChecksPage.setAffectsVersions(asJavaIterable(Array("other-version-1")))
-		permissionChecksPage.setFixVersions(asJavaIterable(Array("other-version-1")))
-		permissionChecksPage.setComponents(asJavaIterable(Array("other-component-1")))
+			Poller.waitUntilFalse(permissionChecksPage.areAllIssueFieldsRetained)
+			Poller.waitUntilTrue(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
-		val copied = permissionChecksPage.copyIssue()
-		val issueKey = copied.getRemoteIssueKey
-		val restIssue = restClient1.getIssueClient.getIssue(issueKey, NPM)
+			permissionChecksPage.setAffectsVersions(asJavaIterable(Array("other-version-1")))
+			permissionChecksPage.setFixVersions(asJavaIterable(Array("other-version-1")))
+			permissionChecksPage.setComponents(asJavaIterable(Array("other-component-1")))
 
-		val components = iterableAsScalaIterable(restIssue.getComponents)
-		components should have size (1)
-		components.head.getName should be === "other-component-1"
+			val copied = permissionChecksPage.copyIssue()
+			val issueKey = copied.getRemoteIssueKey
+			val restIssue = restClient1.getIssueClient.getIssue(issueKey, NPM)
 
-		var versions = iterableAsScalaIterable(restIssue.getAffectedVersions)
-		versions should have size (1)
-		versions.head.getName should be === "other-version-1"
+			val components = iterableAsScalaIterable(restIssue.getComponents)
+			components should have size (1)
+			components.head.getName should be === "other-component-1"
 
-		var fixForVersions = iterableAsScalaIterable(restIssue.getFixVersions)
-		fixForVersions should have size (1)
-		fixForVersions.head.getName should be === "other-version-1"
+			var versions = iterableAsScalaIterable(restIssue.getAffectedVersions)
+			versions should have size (1)
+			versions.head.getName should be === "other-version-1"
+
+			var fixForVersions = iterableAsScalaIterable(restIssue.getFixVersions)
+			fixForVersions should have size (1)
+			fixForVersions.head.getName should be === "other-version-1"
+		} finally {
+			testkit1.project().deleteProject("TOP")
+			testkit1.project().deleteProject("FROM")
+		}
 	}
 
 }
