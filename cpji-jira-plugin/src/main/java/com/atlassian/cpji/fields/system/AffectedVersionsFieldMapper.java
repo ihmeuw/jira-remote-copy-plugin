@@ -60,19 +60,22 @@ public class AffectedVersionsFieldMapper extends AbstractSystemFieldMapper imple
 
     public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
-        List<VersionBean> affectedVersions = makeSureNotNull(bean.getAffectedVersions());
-        List<Long> affectedVersionIds = new ArrayList<Long>();
+        final List<VersionBean> affectedVersions = makeSureNotNull(bean.getAffectedVersions());
+        final List<Long> affectedVersionIds = new ArrayList<Long>();
         for (VersionBean affectedVersion : affectedVersions)
         {
-            Long affectedVersionId = findVersion(affectedVersion.getName(), project.getId());
+            final Long affectedVersionId = findVersion(affectedVersion.getName(), project.getId());
             if (affectedVersionId != null)
             {
                 affectedVersionIds.add(affectedVersionId);
             }
         }
-        Long[] ids = new Long[affectedVersionIds.size()];
-        affectedVersionIds.toArray(ids);
-        inputParameters.setAffectedVersionIds(ids);
+
+		if (affectedVersionIds.size() > 0) {
+			final Long[] ids = new Long[affectedVersionIds.size()];
+			affectedVersionIds.toArray(ids);
+			inputParameters.setAffectedVersionIds(ids);
+		}
     }
 
     public boolean userHasRequiredPermission(final Project project, final User user)

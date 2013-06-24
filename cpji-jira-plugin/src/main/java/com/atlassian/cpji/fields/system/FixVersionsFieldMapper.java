@@ -65,8 +65,8 @@ public class FixVersionsFieldMapper extends AbstractSystemFieldMapper implements
 
     public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
-        List<VersionBean> fixVersions = makeSureNotNull(bean.getFixedForVersions());
-        List<Long> fixVersionIds = new ArrayList<Long>();
+        final List<VersionBean> fixVersions = makeSureNotNull(bean.getFixedForVersions());
+        final List<Long> fixVersionIds = new ArrayList<Long>();
         for (VersionBean fixVersion : fixVersions)
         {
             Long fixVersionId = findVersion(fixVersion.getName(), project.getId());
@@ -75,9 +75,11 @@ public class FixVersionsFieldMapper extends AbstractSystemFieldMapper implements
                 fixVersionIds.add(fixVersionId);
             }
         }
-        Long[] ids = new Long[fixVersionIds.size()];
-        fixVersionIds.toArray(ids);
-        inputParameters.setFixVersionIds(ids);
+		if (fixVersionIds.size() > 0) {
+			Long[] ids = new Long[fixVersionIds.size()];
+			fixVersionIds.toArray(ids);
+			inputParameters.setFixVersionIds(ids);
+		}
     }
 
     public boolean userHasRequiredPermission(final Project project, final User user)
@@ -107,14 +109,14 @@ public class FixVersionsFieldMapper extends AbstractSystemFieldMapper implements
 
     public MappingResult getMappingResult(final CachingUserMapper userMapper, final CopyIssueBean bean, final Project project)
     {
-        List<VersionBean> fixforVersions = makeSureNotNull(bean.getFixedForVersions());
+        List<VersionBean> fixForVersions = makeSureNotNull(bean.getFixedForVersions());
         List<String> unmappedValues = new ArrayList<String>();
-        if (fixforVersions.isEmpty())
+        if (fixForVersions.isEmpty())
         {
          return new MappingResult(unmappedValues, false, true, hasDefaultValue(project, bean));
         }
         boolean hasValidValue = false;
-        for (VersionBean fixedForVersion : fixforVersions)
+        for (VersionBean fixedForVersion : fixForVersions)
         {
             Long versionId = findVersion(fixedForVersion.getName(), project.getId());
             if (versionId == null)

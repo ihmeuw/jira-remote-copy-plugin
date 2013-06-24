@@ -4,15 +4,16 @@ import com.atlassian.cpji.tests.pageobjects.confirmationPage.MappingResult;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
-import com.atlassian.pageobjects.elements.SelectElement;
 import com.atlassian.pageobjects.elements.TimedElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.TimedQuery;
-import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
 
+import javax.annotation.Nonnull;
 import java.util.Iterator;
 
 /**
@@ -25,7 +26,7 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
     private static final String URL = "/secure/PermissionChecksAction.jspa";
 
     @ElementBy(className = "submit")
-    private PageElement copyIssueButton;
+    PageElement copyIssueButton;
 
     @Override
     public TimedCondition isAt()
@@ -72,4 +73,27 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
 		return pageBinder.bind(CopyIssueToInstanceConfirmationPage.class);
 	}
 
+	public CopyIssueToInstanceConfirmationPage setAffectsVersions(@Nonnull Iterable<String> iterable) {
+		MultiSelectUtil.setMultiSelect(this.pageBinder, "versions", iterable);
+		return this;
+	}
+
+	public CopyIssueToInstanceConfirmationPage setFixVersions(@Nonnull Iterable<String> iterable) {
+		MultiSelectUtil.setMultiSelect(this.pageBinder, "fixVersions", iterable);
+		return this;
+	}
+
+	public CopyIssueToInstanceConfirmationPage setComponents(@Nonnull Iterable<String> iterable) {
+		MultiSelectUtil.setMultiSelect(this.pageBinder, "components", iterable);
+		return this;
+	}
+
+	protected Supplier<SingleSelect> getSingleSelect(final PageElement container) {
+		return Suppliers.memoize(new Supplier<SingleSelect>() {
+			@Override
+			public SingleSelect get() {
+				return pageBinder.bind(SingleSelect.class, container);
+			}
+		});
+	}
 }

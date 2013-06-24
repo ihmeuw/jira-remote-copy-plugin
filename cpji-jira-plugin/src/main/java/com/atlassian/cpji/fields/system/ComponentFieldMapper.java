@@ -62,8 +62,8 @@ public class ComponentFieldMapper extends AbstractSystemFieldMapper implements I
 
     public void populateCurrentValue(final IssueInputParameters inputParameters, final CopyIssueBean bean, final FieldLayoutItem fieldLayoutItem, final Project project)
     {
-        List<ComponentBean> components = makeSureNotNull(bean.getComponents());
-        List<Long> componentIds = new ArrayList<Long>();
+        final List<ComponentBean> components = makeSureNotNull(bean.getComponents());
+        final List<Long> componentIds = new ArrayList<Long>();
         for (ComponentBean component : components)
         {
             Long componentId = findProjectComponent(component.getName(), project.getId());
@@ -72,9 +72,11 @@ public class ComponentFieldMapper extends AbstractSystemFieldMapper implements I
                 componentIds.add(componentId);
             }
         }
-        Long[] ids = new Long[componentIds.size()];
-        componentIds.toArray(ids);
-        inputParameters.setComponentIds(ids);
+		if (componentIds.size() > 0) {
+			Long[] ids = new Long[componentIds.size()];
+			componentIds.toArray(ids);
+			inputParameters.setComponentIds(ids);
+		}
     }
 
     public boolean userHasRequiredPermission(final Project project, final User user)
