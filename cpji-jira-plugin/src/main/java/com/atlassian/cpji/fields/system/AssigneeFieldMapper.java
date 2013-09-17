@@ -90,10 +90,6 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
     InternalMappingResult mapUser(CachingUserMapper userMapper, UserBean user, final Project project) {
-        if (user == null) {
-            return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
-        }
-
         //we can use project lead as asignee when it is configured and project lead can be assigned
         final boolean projectLeadIsDefaultAsignee = (project.getAssigneeType() == AssigneeTypes.PROJECT_LEAD)
                 && permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, project.getLead());

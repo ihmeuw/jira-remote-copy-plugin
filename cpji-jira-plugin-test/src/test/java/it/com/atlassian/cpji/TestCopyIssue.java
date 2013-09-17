@@ -192,4 +192,18 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         assertEquals("Bug", fields.getJSONObject("issuetype").getString("name"));
     }
 
+    @Test
+    public void testCopyIssueAssociatedWithInvalidUser() throws Exception {
+        final com.atlassian.jira.testkit.client.restclient.Issue issue = testkit1.issues().getIssue("IWRU-1");
+
+        final String remoteIssueKey = remoteCopy(jira1, issue.key, Long.parseLong(issue.id), "Blah", "A test task with changed name");
+
+        // Query the remotely copied issue via REST
+        final JSONObject json = getIssueJson(jira2, remoteIssueKey);
+        final JSONObject fields = json.getJSONObject("fields");
+
+        // System fields
+        assertEquals("A test task with changed name", fields.getString("summary"));
+        assertEquals("admin", fields.getJSONObject("assignee").getString("name"));
+    }
 }

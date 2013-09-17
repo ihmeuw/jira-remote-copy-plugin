@@ -210,10 +210,12 @@ public class CopyIssueBeanFactory {
 
 			for (Comment comment : comments) {
 				UserBean userBean = userMappingManager.createUserBean(comment.getAuthor());
-				CommentBean commentBean = new CommentBean(comment.getBody(), userBean,
-						(comment.getRoleLevel() == null) ? null : comment.getRoleLevel().getName(),
-						comment.getGroupLevel(), comment.getCreated(), comment.getUpdated());
-				commentBeans.add(commentBean);
+				if (userBean != null) {
+					final CommentBean commentBean = new CommentBean(comment.getBody(), userBean,
+							(comment.getRoleLevel() == null) ? null : comment.getRoleLevel().getName(),
+							comment.getGroupLevel(), comment.getCreated(), comment.getUpdated());
+					commentBeans.add(commentBean);
+				}
 			}
 			copyIssueBean.setComments(commentBeans);
 		}

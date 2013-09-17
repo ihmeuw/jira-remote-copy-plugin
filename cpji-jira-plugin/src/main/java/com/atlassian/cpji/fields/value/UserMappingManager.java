@@ -21,7 +21,14 @@ public class UserMappingManager
     {
         Assertions.notBlank("userName", userName);
         User user = userManager.getUserObject(userName);
-        return new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
+        if (user == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName());
+        }
     }
 
 	public CachingUserMapper getUserMapper() {
