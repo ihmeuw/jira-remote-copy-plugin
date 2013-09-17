@@ -11,12 +11,12 @@ import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.IssueFieldConstants;
 import com.atlassian.jira.issue.IssueInputParameters;
+import com.atlassian.jira.issue.IssueUtils;
 import com.atlassian.jira.issue.fields.AssigneeSystemField;
 import com.atlassian.jira.issue.fields.FieldManager;
 import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
-import com.atlassian.jira.project.AssigneeTypes;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
@@ -39,7 +39,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         final MappingResultDecision decision;
 
         public enum MappingResultDecision {
-            FOUND, NOT_FOUND, DEFAULT_ASSIGNEE_USED
+            FOUND, NOT_FOUND
         }
 
         InternalMappingResult(User mappedUser, MappingResultDecision decision) {
@@ -70,11 +70,6 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         switch (mapResult.decision) {
             case FOUND:
                 return new MappingResult(ImmutableList.<String>of(), true, false, true);
-            case DEFAULT_ASSIGNEE_USED:
-                List<String> unmappedUser = bean.getAssignee() != null ?
-                        ImmutableList.of(bean.getAssignee().getUserName()) :
-                        ImmutableList.<String>of();
-                return new MappingResult(unmappedUser, true, false, true);
             case NOT_FOUND:
                 List<String> unmapped = bean.getAssignee() != null ?
                         ImmutableList.of(bean.getAssignee().getUserName()) :
@@ -90,26 +85,14 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
     InternalMappingResult mapUser(CachingUserMapper userMapper, UserBean user, final Project project) {
-        //we can use project lead as asignee when it is configured and project lead can be assigned
-        final boolean projectLeadIsDefaultAsignee = (project.getAssigneeType() == AssigneeTypes.PROJECT_LEAD)
-                && permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, project.getLead());
-
         User assignee = userMapper.mapUser(user);
         if (assignee == null) {
-            if (projectLeadIsDefaultAsignee) {
-                return new InternalMappingResult(project.getLead(), InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED);
-            } else {
-                return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
-            }
+            return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
         } else {
             if (permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, assignee)) {
                 return new InternalMappingResult(assignee, InternalMappingResult.MappingResultDecision.FOUND);
             } else {
-                if (projectLeadIsDefaultAsignee) {
-                    return new InternalMappingResult(project.getLead(), InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED);
-                } else {
-                    return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
-                }
+                return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
             }
         }
     }
@@ -120,16 +103,19 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         InternalMappingResult assignee = mapUser(userMapper, copyIssueBean.getAssignee(), project);
         switch (assignee.decision) {
             case FOUND:
-            case DEFAULT_ASSIGNEE_USED:
                 inputParameters.setAssigneeId(assignee.mappedUser.getName());
                 break;
             case NOT_FOUND:
                 boolean unassignedAllowed = applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED);
-                if (!unassignedAllowed && hasDefaultValue(project, copyIssueBean)) {
-                    String[] defaults = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(),
-                            fieldLayoutItem.getOrderableField().getId(), copyIssueBean.getTargetIssueType());
-                    if (StringUtils.isNotBlank(defaults[0])) {
-                        inputParameters.setAssigneeId(defaults[0]);
+                if (!unassignedAllowed) {
+                    if (hasDefaultValue(project, copyIssueBean)) {
+                        String[] defaults = defaultFieldValuesManager.getDefaultFieldValue(project.getKey(),
+                                fieldLayoutItem.getOrderableField().getId(), copyIssueBean.getTargetIssueType());
+                        if (StringUtils.isNotBlank(defaults[0])) {
+                            inputParameters.setAssigneeId(defaults[0]);
+                        }
+                    } else {
+                        inputParameters.setAssigneeId(IssueUtils.AUTOMATIC_ASSIGNEE);
                     }
                 }
                 break;

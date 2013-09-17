@@ -69,13 +69,6 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     mapAndTest(null, InternalMappingResult.MappingResultDecision.NOT_FOUND, null)
   }
 
-  @Test def mappingShouldReturnDefaultAssigneeWhenUserCannotBeMappedAndProjectLeadIsDefaultAssignee() {
-    projectLeadIsDefaultAssignee
-    userIsNotMapped
-
-    mapAndTest(projectLead, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED)
-  }
-
   @Test def mappingShouldReturnNotFoundWhenUserCannotBeMappedAndDefaulAssigneeIsNotSet() {
     leaveIssuesUnassigned
     userIsNotMapped
@@ -88,16 +81,6 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     userCanBeAssigned
 
     mapAndTest(mappedUser, InternalMappingResult.MappingResultDecision.FOUND)
-  }
-
-
-  @Test def mappingShouldReturnDefaultAssigneeWhenUserIsMappedAndHasNoPermission() {
-    projectLeadIsDefaultAssignee
-
-    userIsWellMapped
-    userCannotBeAssigned
-
-    mapAndTest(projectLead, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED)
   }
 
   @Test def mappingShouldReturnNotFoundWhenUserIsMappedAndHasNoPermission() {
@@ -116,12 +99,6 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
   def leaveIssuesUnassigned = when(project.getAssigneeType).thenReturn(AssigneeTypes.UNASSIGNED)
 
-  def projectLeadIsDefaultAssignee = {
-    when(project.getAssigneeType).thenReturn(AssigneeTypes.PROJECT_LEAD)
-    when(permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, projectLead)).thenReturn(true)
-  }
-
-
   def userIsNotMapped = when(userMapper.mapUser(userBean)).thenReturn(null)
 
   def userIsWellMapped = when(userMapper.mapUser(userBean)).thenReturn(mappedUser)
@@ -132,7 +109,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
 
   //population
 
-  @Test def shouldPopulateParametersWhenUserIsFoundOrDefaultAssignee() {
+  @Test def shouldPopulateParametersWhenUserIsFound() {
 
     val bean = new CopyIssueBean
     bean.setAssignee(userBean)
@@ -141,13 +118,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.FOUND))
     asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, null, null, null)
     verify(inputParams).setAssigneeId("fred")
-
-    when(mappedUser.getName).thenReturn("fred2")
-    plugMapMethod(new InternalMappingResult(mappedUser, InternalMappingResult.MappingResultDecision.DEFAULT_ASSIGNEE_USED))
-    asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, null, null, null)
-    verify(inputParams).setAssigneeId("fred2")
   }
-
 
   @Test def shouldDoNothingWhenMappingIsNotFoundAndUnassignedAreAllowed() {
     val bean = new CopyIssueBean
@@ -177,7 +148,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
   }
 
 
-  @Test def shouldNotPopulateWhenNoDefaultValueIsDefined() {
+  @Test def shouldPopulateWithAutomaticAssigneeWhenNoDefaultValueIsDefined() {
     val bean = new CopyIssueBean
     bean.setAssignee(userBean)
 
@@ -189,7 +160,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
     when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(false)
 
     asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, fieldLayoutItem, project, null)
-    verify(inputParams, never()).setAssigneeId(any())
+    verify(inputParams).setAssigneeId("-1") //jira should choose assignee automatically
   }
 
 
