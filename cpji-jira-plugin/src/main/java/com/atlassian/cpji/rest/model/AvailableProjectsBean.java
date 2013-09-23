@@ -4,6 +4,7 @@ import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.Projects;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
+import com.atlassian.fugue.Eithers;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -11,10 +12,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
 
 /**
  *
@@ -36,9 +37,9 @@ public class AvailableProjectsBean {
         Preconditions.checkNotNull(proxyFactory);
         Preconditions.checkNotNull(issueId);
         Preconditions.checkNotNull(projects);
-		return new AvailableProjectsBean(Iterables.transform(Either.allRight(projects),
+		return new AvailableProjectsBean(Iterables.transform(Eithers.filterRight(projects),
 				new ProjectsToProjectGroupBean()),
-				RemoteFailuresBean.create(proxyFactory, issueId, Either.allLeft(projects)));
+				RemoteFailuresBean.create(proxyFactory, issueId, Eithers.filterLeft(projects)));
 	}
 
 	private static class ProjectsToProjectGroupBean implements Function<Projects, ProjectGroupBean> {
