@@ -33,6 +33,12 @@
 				<artifactId>atlassian-pageobjects-api</artifactId>
 				<version>${atlassian.selenium.version}</version>
 				<scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
@@ -48,6 +54,14 @@
 						<groupId>com.sun.jersey</groupId>
 						<artifactId>jersey-core</artifactId>
 					</exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -67,6 +81,16 @@
 				<artifactId>jira-core</artifactId>
 				<version>${jira.compile.version}</version>
 				<scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-log4j12</artifactId>
+                    </exclusion>
+                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.selenium</groupId>
@@ -134,6 +158,10 @@
 						<groupId>com.sun.jersey</groupId>
 						<artifactId>jersey-core</artifactId>
 					</exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
@@ -230,11 +258,6 @@
 				<artifactId>jsr305</artifactId>
 				<version>2.0.0</version>
 			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.5.8</version>
-			</dependency>
             <dependency>
                 <artifactId>jira-view-issue-plugin</artifactId>
                 <groupId>com.atlassian.jira</groupId>
@@ -258,6 +281,12 @@
 				<version>2.4.1</version>
 				<scope>provided</scope>
 			</dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.4</version>
+                <scope>provided</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
