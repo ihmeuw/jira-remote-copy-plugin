@@ -347,20 +347,6 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>jira-5.2.x</id>
-			<properties>
-				<jira.version>5.2.9</jira.version>
-				<testkit.version>6.0.5</testkit.version>
-			</properties>
-		</profile>
-		<profile>
-			<id>jira-6</id>
-			<properties>
-				<jira.version>6.0-SNAPSHOT</jira.version>
-				<testkit.version>6.0.8</testkit.version>
-			</properties>
-		</profile>
-		<profile>
 			<id>jira-5.0.x</id>
 			<properties>
 				<atlassian.selenium.version>2.1-m14</atlassian.selenium.version>
@@ -372,6 +358,34 @@
 				<jira.version>5.1.8</jira.version>
 			</properties>
 		</profile>
+        <profile>
+            <id>jira-5.2.x</id>
+            <properties>
+                <jira.version>5.2.9</jira.version>
+                <testkit.version>6.0.5</testkit.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>jira-6</id>
+            <properties>
+                <jira.version>6.0-SNAPSHOT</jira.version>
+                <testkit.version>6.0.8</testkit.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>jira-6.1</id>
+            <properties>
+                <jira.version>6.1-SNAPSHOT</jira.version>
+                <testkit.version>6.0.41</testkit.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>jira-6.2</id>
+            <properties>
+                <jira.version>6.2-SNAPSHOT</jira.version>
+                <testkit.version>6.0.41</testkit.version>
+            </properties>
+        </profile>
 		<profile>
 			<id>testing</id>
 			<properties>
