@@ -269,31 +269,24 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
         }
 
         if (StringUtils.isNotBlank(remoteIssueLink)) {
-
-            final boolean shouldReverseCloneLink;
             if (cloneIssueLinkType == null) {
                 //if we faked up link type - we can't use it in local clone
                 if (proxy.getJiraLocation().isLocal()) {
                     linkType = null;
                 }
-                shouldReverseCloneLink = false;
-            } else {
-                // JRA-24563: Check on legacy link direction
-                shouldReverseCloneLink = shouldReverseCloneLink(cloneIssueLinkType);
             }
 
             if (linkType != null) {
                 final RemoteIssueLinkType remoteIssueLinkType = RemoteIssueLinkType.valueOf(remoteIssueLink);
                 final JiraProxy.LinkCreationDirection localDirection, remoteDirection;
                 if (remoteIssueLinkType.hasLocalIssueLinkToRemote()) {
-                    // JRA-24563: Consider legacy reversed link direction
-                    localDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.OUTWARD : JiraProxy.LinkCreationDirection.INWARD ;
+                    localDirection = JiraProxy.LinkCreationDirection.INWARD;
                 } else {
                     localDirection = JiraProxy.LinkCreationDirection.IGNORE;
                 }
 
                 if(remoteIssueLinkType.hasRemoteIssueLinkToLocal()){
-                    remoteDirection = shouldReverseCloneLink ? JiraProxy.LinkCreationDirection.INWARD : JiraProxy.LinkCreationDirection.OUTWARD;
+                    remoteDirection = JiraProxy.LinkCreationDirection.OUTWARD;
                 } else {
                     remoteDirection = JiraProxy.LinkCreationDirection.IGNORE;
                 }
@@ -304,16 +297,6 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
                         remoteDirection);
             }
         }
-    }
-
-    private boolean shouldReverseCloneLink(IssueLinkType cloneIssueLinkType)
-    {
-        // JRA-24563: For a long time we created the clone links in the wrong direction, and so users would change the
-        // wording of the Clone link type.
-        // We try to detect if this is the case and continue to use the reverse direction (legacy mode).
-        // Of course this only works for English language
-        return cloneIssueLinkType.getInward().trim().toLowerCase().equals("clones") ||
-                cloneIssueLinkType.getOutward().trim().toLowerCase().equals("is cloned by");
     }
 
 	protected ErrorCollection processCopyIssueErrors(ErrorCollection errorCollection) {
