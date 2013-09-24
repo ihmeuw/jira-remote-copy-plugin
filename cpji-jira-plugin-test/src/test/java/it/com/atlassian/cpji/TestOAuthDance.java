@@ -1,12 +1,15 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
+import com.atlassian.jira.tests.annotations.JiraBuildNumberDependent;
+import com.atlassian.jira.tests.annotations.LongCondition;
+import com.atlassian.jira.tests.rules.JiraBuildNumberRule;
 import com.atlassian.pageobjects.binder.PageBindingWaitException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.UnhandledAlertException;
 import org.slf4j.Logger;
@@ -18,13 +21,19 @@ import static org.junit.Assert.assertFalse;
  * @since v3.0
  */
 public class TestOAuthDance extends AbstractCopyIssueTest {
-	private static final Logger logger = LoggerFactory.getLogger(TestOAuthDance.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestOAuthDance.class);
+
+    private static final int BN_JIRA_6_1 = 6100;
+
+    @Rule
+    public JiraBuildNumberRule jiraBuildNumberRule = new JiraBuildNumberRule(jira1);
 
 	@Before
 	public void setup() {
 		login(jira1);
 	}
 
+    @JiraBuildNumberDependent(value = TestOAuthDance.BN_JIRA_6_1, condition = LongCondition.LESS_THAN)
 	@Test
 	public void doTheDanceBaby() {
 		final String issueKey = "TST-2";
