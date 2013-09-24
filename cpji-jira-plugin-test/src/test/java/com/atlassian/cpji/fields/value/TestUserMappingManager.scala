@@ -72,6 +72,7 @@ class TestUserMappingManager extends ShouldMatchersForJUnit with MockitoSugar {
 		when(user.getName).thenReturn(username)
 		when(user.getDisplayName).thenReturn(fullName)
 		when(user.getEmailAddress).thenReturn(email)
+		when(user.isActive).thenReturn(true)
 		return user
 	}
 }
