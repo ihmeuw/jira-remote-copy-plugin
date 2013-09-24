@@ -4,6 +4,9 @@ import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.dbc.Assertions;
+import com.google.common.base.Predicate;
+
+import static com.google.common.collect.Collections2.filter;
 
 /**
  * @since v2.0
@@ -31,8 +34,12 @@ public class UserMappingManager
         }
     }
 
-	public CachingUserMapper getUserMapper() {
-		return new CachingUserMapper(userManager.getUsers());
-	}
-
+    public CachingUserMapper getUserMapper() {
+        return new CachingUserMapper(filter(userManager.getUsers(), new Predicate<User>() {
+            @Override
+            public boolean apply(User user) {
+                return user.isActive();
+            }
+        }));
+    }
 }
