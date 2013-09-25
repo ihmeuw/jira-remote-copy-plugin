@@ -147,7 +147,7 @@
                             <httpPort>2990</httpPort>
                             <jvmDebugPort>5002</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Dplugin.webresource.batching.off=false</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.jira.tests</groupId>
@@ -168,7 +168,7 @@
                             <httpPort>2991</httpPort>
                             <jvmDebugPort>5003</jvmDebugPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Dplugin.webresource.batching.off=false</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.jira.tests</groupId>
@@ -189,7 +189,7 @@
 							<httpPort>2992</httpPort>
 							<jvmDebugPort>5004</jvmDebugPort>
 							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Dplugin.webresource.batching.off=false</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.jira.tests</groupId>
