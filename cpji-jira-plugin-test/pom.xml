@@ -70,12 +70,6 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-webdriver-tests</artifactId>
 			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-			</exclusions>
         </dependency>
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>

@@ -62,7 +62,15 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
-				</exclusions>
+                    <exclusion>
+                        <groupId>com.atlassian.jira</groupId>
+                        <artifactId>jira-rest-java-client-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.atlassian.jira</groupId>
+                        <artifactId>jira-rest-java-client-core</artifactId>
+                    </exclusion>
+                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.jersey.contribs</groupId>
@@ -75,6 +83,20 @@
 				<artifactId>jira-webdriver-tests</artifactId>
 				<version>${jira.version}</version>
 				<scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.atlassian.jira</groupId>
+                        <artifactId>jira-rest-java-client-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.atlassian.jira</groupId>
+                        <artifactId>jira-rest-java-client-core</artifactId>
+                    </exclusion>
+                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
