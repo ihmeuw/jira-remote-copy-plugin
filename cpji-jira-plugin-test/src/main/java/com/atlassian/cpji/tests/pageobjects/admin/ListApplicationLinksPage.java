@@ -2,6 +2,7 @@ package com.atlassian.cpji.tests.pageobjects.admin;
 
 import com.atlassian.cpji.tests.pageobjects.PageElements;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
+import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
@@ -27,13 +28,23 @@ import java.util.List;
  * @since v3.0
  */
 public class ListApplicationLinksPage extends AbstractJiraPage {
-	private static final Logger logger = LoggerFactory.getLogger(ListApplicationLinksPage.class);
-
     @ElementBy (className = "links-loading")
     private PageElement linksLoading;
 
     @ElementBy(id="application-links-table")
     private PageElement applicationLinksTable;
+
+    //this button was in JIRA 6.0 and earlier
+    @ElementBy(id = "add-application-link")
+    private PageElement addApplicationLink;
+
+    //this field is in JIRA 6.1 and later
+    @ElementBy(id = "applinks-url-entered")
+    private PageElement applicationUrl;
+
+    //this field is in JIRA 6.1 and later
+    @ElementBy(cssSelector = "#createApplicationLink .aui-button")
+    private PageElement createNewLink;
 
     @Inject
     private Timeouts timeouts;
@@ -63,14 +74,27 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 		elementFinder.find(By.tagName("body")).javascript().execute("window.onbeforeunload=null;");
 	}
 
+    public ConfirmApplicationUrlDialog setApplicationUrl(String url) {
+        Preconditions.checkNotNull(url);
+        applicationUrl.clear();
+        applicationUrl.type(url);
+        Poller.waitUntilTrue(createNewLink.timed().isEnabled());
+        createNewLink.click();
+        return pageBinder.bind(ConfirmApplicationUrlDialog.class);
+    }
+
 	public SetApplicationUrlDialog clickAddApplicationLink() {
-		elementFinder.find(By.id("add-application-link")).click();
+        addApplicationLink.click();
 		return pageBinder.bind(SetApplicationUrlDialog.class);
 	}
 
-	public DeleteDialog clickDelete(String url) {
-		Preconditions.checkNotNull(url);
-		final By by = By.cssSelector(String.format("tr[id='ual-row-%s'] .app-delete-link", url));
+    public boolean isAddApplicationLinkPresent() {
+        return addApplicationLink.isPresent();
+    }
+
+	public DeleteDialog clickDelete(String name) {
+		Preconditions.checkNotNull(name);
+		final By by = By.xpath(String.format("//td[preceding-sibling::td[. = '%s']]//a[@class='app-delete-link']", name));
 		driver.waitUntilElementIsVisible(by);
 		elementFinder.find(by).click();
 		return pageBinder.bind(DeleteDialog.class);
@@ -83,11 +107,11 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
 	public List<ApplicationLinkBean> getApplicationLinks() {
 		return ImmutableList.copyOf(Iterables.transform(getApplicationLinksTable().findAll(By.tagName("tr")), new Function<PageElement, ApplicationLinkBean>() {
-			@Override
-			public ApplicationLinkBean apply(@Nullable PageElement input) {
-				return new ApplicationLinkBean(input.find(By.className("application-name")).getText(), input.find(By.className("application-url")).getText());
-			}
-		}));
+            @Override
+            public ApplicationLinkBean apply(@Nullable PageElement input) {
+                return new ApplicationLinkBean(input.find(By.className("application-name")).getText(), input.find(By.className("application-url")).getText());
+            }
+        }));
 	}
 
 	public List<String> getNamesOfApplicationLinks() {
@@ -231,7 +255,30 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 		}
 	}
 
-	private class ApplicationLinkBean {
+    public static class ConfirmApplicationUrlDialog extends AbstractJiraPage {
+        @ElementBy (id = "create-applink-dialog")
+        protected PageElement dialog;
+
+        @ElementBy(cssSelector = "button.aui-button-primary")
+        protected PageElement continueButton;
+
+        @Override
+        public String getUrl() {
+            throw new UnsupportedOperationException("Not implemented");
+        }
+
+        public JiraLoginPage clickContinue() {
+            continueButton.click();
+            return pageBinder.bind(JiraLoginPage.class);
+        }
+
+        @Override
+        public TimedCondition isAt() {
+            return dialog.timed().isVisible();
+        }
+    }
+
+    private class ApplicationLinkBean {
 		private final String name;
 		private final String url;
 

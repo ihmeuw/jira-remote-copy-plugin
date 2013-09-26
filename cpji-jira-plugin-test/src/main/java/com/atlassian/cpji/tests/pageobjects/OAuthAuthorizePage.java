@@ -31,8 +31,7 @@ public class OAuthAuthorizePage implements Page {
 		return approve.timed().isVisible();
 	}
 
-	public JiraLoginPage approve() {
+	public void approve() {
 		approve.click();
-		return pageBinder.bind(JiraLoginPage.class);
 	}
 }

@@ -89,12 +89,11 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 		return !elementFinder.findAll(By.cssSelector(String.format("a[data-application-id=%s]", applicationId))).isEmpty();
 	}
 
-	public JiraLoginPage clickOAuthApproval(String applicationId) {
+	public void clickOAuthApproval(String applicationId) {
 		Preconditions.checkNotNull(applicationId);
 		By link = By.cssSelector(String.format("a[data-application-id=%s]", applicationId));
 		driver.waitUntilElementIsVisible(link);
 		elementFinder.find(link).click();
-		return pageBinder.bind(JiraLoginPage.class);
 	}
 
     public CopyDetailsPage next()

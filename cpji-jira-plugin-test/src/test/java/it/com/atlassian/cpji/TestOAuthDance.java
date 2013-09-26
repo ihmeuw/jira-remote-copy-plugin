@@ -23,17 +23,11 @@ import static org.junit.Assert.assertFalse;
 public class TestOAuthDance extends AbstractCopyIssueTest {
     private static final Logger logger = LoggerFactory.getLogger(TestOAuthDance.class);
 
-    private static final int BN_JIRA_6_1 = 6100;
-
-    @Rule
-    public JiraBuildNumberRule jiraBuildNumberRule = new JiraBuildNumberRule(jira1);
-
 	@Before
 	public void setup() {
 		login(jira1);
 	}
 
-    @JiraBuildNumberDependent(value = TestOAuthDance.BN_JIRA_6_1, condition = LongCondition.LESS_THAN)
 	@Test
 	public void doTheDanceBaby() {
 		final String issueKey = "TST-2";
@@ -43,11 +37,17 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 		try {
 			ListApplicationLinksPage appLinks = jira1.visit(ListApplicationLinksPage.class);
 
-			appLinks = appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
-					.setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
-					.setUseDifferentUsers().next();
+            if (appLinks.isAddApplicationLinkPresent()) { // method for adding application links changed in JIRA 6.1
+                appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
+                        .setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
+                        .setUseDifferentUsers().next();
+            } else {
+                appLinks.setApplicationUrl("http://localhost:2992/jira").clickContinue()
+                        .loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.ConfirmApplicationUrlDialog.class)
+                        .clickContinue().loginAsSysAdmin(ListApplicationLinksPage.class);
+            }
 
-			try {
+            try {
 				viewIssue(jira1, issueKey);
 			} catch (PageBindingWaitException e) {
 				if (e.getCause() instanceof UnhandledAlertException) {
@@ -63,17 +63,28 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 
 			// usually you'd not have to log in when returning to first JIRA but since JIRA is usually accessed using localhost
 			// it may redirect to the real hostname after OAuth dance
-			selectTargetProjectPage = selectTargetProjectPage.clickOAuthApproval(
-					applicationId).loginAsSystemAdminAndFollowRedirect(
-					OAuthAuthorizePage.class).approve().loginAsSystemAdminAndFollowRedirect(SelectTargetProjectPage.class,
-					selectTargetProjectPage.getIssueId());
-			assertFalse(selectTargetProjectPage.hasOAuthApproval(applicationId));
+            selectTargetProjectPage.clickOAuthApproval(applicationId);
+            OAuthAuthorizePage oAuthAuthorizePage;
+
+            if (jira1.getTester().getDriver().getCurrentUrl().contains("/plugins/servlet/oauth")) {
+                oAuthAuthorizePage = jira1.getPageBinder().bind(OAuthAuthorizePage.class);
+            } else {
+                oAuthAuthorizePage = jira1.getPageBinder().bind(JiraLoginPage.class).loginAsSystemAdminAndFollowRedirect(
+                        OAuthAuthorizePage.class);
+            }
+            oAuthAuthorizePage.approve();
+
+
+            if(jira1.getTester().getDriver().getCurrentUrl().contains("login")) {
+                selectTargetProjectPage = jira1.getPageBinder().bind(JiraLoginPage.class).loginAsSystemAdminAndFollowRedirect(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId());
+            } else{
+                selectTargetProjectPage = jira1.getPageBinder().bind(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId());
+            }
+            assertFalse(selectTargetProjectPage.hasOAuthApproval(applicationId));
 		} finally {
-
-
 			try {
                 ListApplicationLinksPage page = jira1.visit(ListApplicationLinksPage.class);
-                ListApplicationLinksPage.DeleteDialog deleteDialog = page.clickDelete("http://localhost:2992/jira");
+                ListApplicationLinksPage.DeleteDialog deleteDialog = page.clickDelete("JIRA3");
                 deleteDialog = deleteDialog.delete();
                 deleteDialog.deleteAndReturn();
 			} catch (Exception e) {
