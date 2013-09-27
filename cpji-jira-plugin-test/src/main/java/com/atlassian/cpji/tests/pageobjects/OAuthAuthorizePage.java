@@ -1,7 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects;
 
-import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
-import com.atlassian.pageobjects.Page;
+import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.binder.WaitUntil;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
@@ -10,7 +9,7 @@ import com.atlassian.pageobjects.elements.query.TimedCondition;
 /**
  * @since v3.0
  */
-public class OAuthAuthorizePage implements Page {
+public class OAuthAuthorizePage extends AbstractJiraPage {
 	@javax.inject.Inject
 	protected com.atlassian.pageobjects.PageBinder pageBinder;
 	@javax.inject.Inject

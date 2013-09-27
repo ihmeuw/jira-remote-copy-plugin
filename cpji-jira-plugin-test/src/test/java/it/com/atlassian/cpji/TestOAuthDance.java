@@ -3,18 +3,18 @@ package it.com.atlassian.cpji;
 import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
+import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
-import com.atlassian.jira.tests.annotations.JiraBuildNumberDependent;
-import com.atlassian.jira.tests.annotations.LongCondition;
-import com.atlassian.jira.tests.rules.JiraBuildNumberRule;
 import com.atlassian.pageobjects.binder.PageBindingWaitException;
+import com.atlassian.pageobjects.elements.query.Poller;
+import com.atlassian.pageobjects.elements.query.TimedCondition;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.UnhandledAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.atlassian.pageobjects.elements.query.Conditions.or;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -66,7 +66,8 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
             selectTargetProjectPage.clickOAuthApproval(applicationId);
             OAuthAuthorizePage oAuthAuthorizePage;
 
-            if (jira1.getTester().getDriver().getCurrentUrl().contains("/plugins/servlet/oauth")) {
+            Poller.waitUntilTrue(or(isAt(OAuthAuthorizePage.class), isAt(JiraLoginPage.class)));
+            if (isAt(OAuthAuthorizePage.class).now()) {
                 oAuthAuthorizePage = jira1.getPageBinder().bind(OAuthAuthorizePage.class);
             } else {
                 oAuthAuthorizePage = jira1.getPageBinder().bind(JiraLoginPage.class).loginAsSystemAdminAndFollowRedirect(
@@ -74,8 +75,8 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
             }
             oAuthAuthorizePage.approve();
 
-
-            if(jira1.getTester().getDriver().getCurrentUrl().contains("login")) {
+            Poller.waitUntilTrue(or(isAt(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId()), isAt(JiraLoginPage.class)));
+            if(isAt(JiraLoginPage.class).now()) {
                 selectTargetProjectPage = jira1.getPageBinder().bind(JiraLoginPage.class).loginAsSystemAdminAndFollowRedirect(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId());
             } else{
                 selectTargetProjectPage = jira1.getPageBinder().bind(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId());
@@ -92,4 +93,8 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 			}
 		}
 	}
+
+    private TimedCondition isAt(Class<? extends AbstractJiraPage> pageClass, Object ... args) {
+        return jira1.getPageBinder().delayedBind(pageClass, args).inject().get().isAt();
+    }
 }
