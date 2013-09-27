@@ -43,9 +43,17 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
                         .setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
                         .setUseDifferentUsers().next();
             } else {
-                appLinks.setApplicationUrl("http://localhost:2992/jira").clickContinue()
-                        .loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.ConfirmApplicationUrlDialog.class)
-                        .clickContinue().loginAsSysAdmin(ListApplicationLinksPage.class);
+                try {
+                    appLinks.setApplicationUrl("http://localhost:2992/jira").clickContinue()
+                            .loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.ConfirmApplicationUrlDialog.class)
+                            .clickContinue().loginAsSysAdmin(ListApplicationLinksPage.class);
+                } catch (PageBindingWaitException e) {
+                    if (e.getCause() instanceof UnhandledAlertException) {
+                        // sometimes we get a dirty warning here
+                        throw new RuntimeException("There was a modal window: " + jira1.getTester().getDriver().switchTo().alert().getText(), e);
+                    }
+                    throw e;
+                }
             }
 
             try {
