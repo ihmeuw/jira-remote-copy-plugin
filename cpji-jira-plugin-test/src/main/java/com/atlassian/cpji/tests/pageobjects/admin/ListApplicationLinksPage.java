@@ -8,6 +8,7 @@ import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.AbstractTimedCondition;
+import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
@@ -23,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
+
+import static com.atlassian.pageobjects.elements.query.Conditions.and;
+import static com.atlassian.pageobjects.elements.query.Conditions.not;
 
 /**
  * @since v3.0
@@ -51,15 +55,8 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 
     @Override
 	public TimedCondition isAt() {
-        return new AbstractTimedCondition(timeouts.timeoutFor(TimeoutType.SLOW_PAGE_LOAD), timeouts.timeoutFor(TimeoutType.EVALUATION_INTERVAL)) {
-            @Override
-            protected Boolean currentValue() {
-                final boolean present = applicationLinksTable.isPresent();
-                final boolean visible = linksLoading.isVisible();
-                return present && !visible;
-            }
-        };
-	}
+        return and(applicationLinksTable.timed().isPresent(), not(linksLoading.timed().isVisible()));
+    }
 
 	@Override
 	public String getUrl() {

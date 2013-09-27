@@ -46,7 +46,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
                 try {
                     appLinks.setApplicationUrl("http://localhost:2992/jira").clickContinue()
                             .loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.ConfirmApplicationUrlDialog.class)
-                            .clickContinue().loginAsSysAdmin(ListApplicationLinksPage.class);
+                            .clickContinue().loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.class);
                 } catch (PageBindingWaitException e) {
                     if (e.getCause() instanceof UnhandledAlertException) {
                         // sometimes we get a dirty warning here
