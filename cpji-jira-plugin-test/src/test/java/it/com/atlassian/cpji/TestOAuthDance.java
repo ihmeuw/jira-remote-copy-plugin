@@ -1,5 +1,6 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.cpji.tests.ScreenshotUtil;
 import com.atlassian.cpji.tests.pageobjects.OAuthAuthorizePage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
@@ -29,13 +30,13 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
 	}
 
 	@Test
-	public void doTheDanceBaby() {
+	public void doTheDanceBaby() throws Exception {
 		final String issueKey = "TST-2";
 		final Long issueId = 10100L;
 		final String applicationId = "db60eb28-51aa-3f22-b3cc-b8967fa6281b";
 
-		try {
-			ListApplicationLinksPage appLinks = jira1.visit(ListApplicationLinksPage.class);
+        try {
+            ListApplicationLinksPage appLinks = jira1.visit(ListApplicationLinksPage.class);
 
             if (appLinks.isAddApplicationLinkPresent()) { // method for adding application links changed in JIRA 6.1
                 appLinks.clickAddApplicationLink().setApplicationUrl("http://localhost:2992/jira").next()
@@ -48,21 +49,21 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
             }
 
             try {
-				viewIssue(jira1, issueKey);
-			} catch (PageBindingWaitException e) {
-				if (e.getCause() instanceof UnhandledAlertException) {
-					// sometimes we get a dirty warning here
-					jira1.getTester().getDriver().switchTo().alert().dismiss();
-					viewIssue(jira1, issueKey);
-				} else {
-					throw e;
-				}
-			}
+                viewIssue(jira1, issueKey);
+            } catch (PageBindingWaitException e) {
+                if (e.getCause() instanceof UnhandledAlertException) {
+                    // sometimes we get a dirty warning here
+                    jira1.getTester().getDriver().switchTo().alert().dismiss();
+                    viewIssue(jira1, issueKey);
+                } else {
+                    throw e;
+                }
+            }
 
-			SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, issueId);
+            SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, issueId);
 
-			// usually you'd not have to log in when returning to first JIRA but since JIRA is usually accessed using localhost
-			// it may redirect to the real hostname after OAuth dance
+            // usually you'd not have to log in when returning to first JIRA but since JIRA is usually accessed using localhost
+            // it may redirect to the real hostname after OAuth dance
             selectTargetProjectPage.clickOAuthApproval(applicationId);
             OAuthAuthorizePage oAuthAuthorizePage;
 
@@ -76,20 +77,23 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
             oAuthAuthorizePage.approve();
 
             Poller.waitUntilTrue(or(isAt(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId()), isAt(JiraLoginPage.class)));
-            if(isAt(JiraLoginPage.class).now()) {
+            if (isAt(JiraLoginPage.class).now()) {
                 selectTargetProjectPage = jira1.getPageBinder().bind(JiraLoginPage.class).loginAsSystemAdminAndFollowRedirect(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId());
-            } else{
+            } else {
                 selectTargetProjectPage = jira1.getPageBinder().bind(SelectTargetProjectPage.class, selectTargetProjectPage.getIssueId());
             }
             assertFalse(selectTargetProjectPage.hasOAuthApproval(applicationId));
-		} finally {
-			try {
+        } catch (Exception e) {
+            ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver(), "TestOAuthDance-failed");
+            throw e;
+        } finally {
+            try {
                 ListApplicationLinksPage page = jira1.visit(ListApplicationLinksPage.class);
                 ListApplicationLinksPage.DeleteDialog deleteDialog = page.clickDelete("JIRA3");
                 deleteDialog = deleteDialog.delete();
                 deleteDialog.deleteAndReturn();
-			} catch (Exception e) {
-				logger.error("Unable to delete Application Link", e);
+            } catch (Exception e) {
+                logger.error("Unable to delete Application Link", e);
 			}
 		}
 	}
