@@ -84,7 +84,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
             }
             assertFalse(selectTargetProjectPage.hasOAuthApproval(applicationId));
         } catch (Exception e) {
-            ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver(), "TestOAuthDance-failed");
+            ScreenshotUtil.attemptScreenshot(jira1.getTester().getDriver().getDriver(), "TestOAuthDance-failed");
             throw e;
         } finally {
             try {
