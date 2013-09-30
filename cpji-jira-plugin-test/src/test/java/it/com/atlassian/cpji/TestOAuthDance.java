@@ -52,6 +52,7 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
                         .clickContinue().loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.class);
             }
 
+            Thread.sleep(10000L);
             jira1.getTester().getDriver().getDriver().navigate().to(jira1.getProductInstance().getBaseUrl() + "/browse/" + issueKey);
             @SuppressWarnings({"unchecked"})
             final Matcher<Boolean> matcher = (Matcher<Boolean>) Matchers.is(Boolean.TRUE);
