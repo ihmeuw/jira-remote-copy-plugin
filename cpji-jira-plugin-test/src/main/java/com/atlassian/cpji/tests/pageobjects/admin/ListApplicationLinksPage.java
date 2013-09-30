@@ -7,8 +7,6 @@ import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
-import com.atlassian.pageobjects.elements.query.AbstractTimedCondition;
-import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
@@ -18,8 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -50,12 +46,15 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
     @ElementBy(cssSelector = "#createApplicationLink .aui-button")
     private PageElement createNewLink;
 
+    @ElementBy(id = "create-applink-dialog")
+    private PageElement createApplinkDialog;
+
     @Inject
     private Timeouts timeouts;
 
     @Override
 	public TimedCondition isAt() {
-        return and(applicationLinksTable.timed().isPresent(), not(linksLoading.timed().isVisible()));
+        return and(applicationLinksTable.timed().isPresent(), not(linksLoading.timed().isVisible()), not(createApplinkDialog.timed().isVisible()));
     }
 
 	@Override
