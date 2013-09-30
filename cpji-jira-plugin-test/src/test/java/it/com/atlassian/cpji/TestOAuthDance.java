@@ -6,16 +6,20 @@ import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
-import com.atlassian.pageobjects.binder.PageBindingWaitException;
+import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.UnhandledAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.atlassian.pageobjects.elements.query.Conditions.or;
+import static com.atlassian.pageobjects.elements.query.Poller.by;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -43,30 +47,15 @@ public class TestOAuthDance extends AbstractCopyIssueTest {
                         .setUsername(JiraLoginPage.USER_ADMIN).setPassword(JiraLoginPage.PASSWORD_ADMIN).next()
                         .setUseDifferentUsers().next();
             } else {
-                try {
-                    appLinks.setApplicationUrl("http://localhost:2992/jira").clickContinue()
-                            .loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.ConfirmApplicationUrlDialog.class)
-                            .clickContinue().loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.class);
-                } catch (PageBindingWaitException e) {
-                    if (e.getCause() instanceof UnhandledAlertException) {
-                        // sometimes we get a dirty warning here
-                        throw new RuntimeException("There was a modal window: " + jira1.getTester().getDriver().switchTo().alert().getText(), e);
-                    }
-                    throw e;
-                }
+                appLinks.setApplicationUrl("http://localhost:2992/jira").clickContinue()
+                        .loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.ConfirmApplicationUrlDialog.class)
+                        .clickContinue().loginAsSystemAdminAndFollowRedirect(ListApplicationLinksPage.class);
             }
 
-            try {
-                viewIssue(jira1, issueKey);
-            } catch (PageBindingWaitException e) {
-                if (e.getCause() instanceof UnhandledAlertException) {
-                    // sometimes we get a dirty warning here
-                    jira1.getTester().getDriver().switchTo().alert().dismiss();
-                    viewIssue(jira1, issueKey);
-                } else {
-                    throw e;
-                }
-            }
+            jira1.getTester().getDriver().getDriver().navigate().to(jira1.getProductInstance().getBaseUrl() + "/browse/" + issueKey);
+            @SuppressWarnings({"unchecked"})
+            final Matcher<Boolean> matcher = (Matcher<Boolean>) Matchers.is(Boolean.TRUE);
+            Poller.waitUntil(isAt(ViewIssuePage.class, issueKey), matcher, by(60, TimeUnit.SECONDS));
 
             SelectTargetProjectPage selectTargetProjectPage = jira1.visit(SelectTargetProjectPage.class, issueId);
 
