@@ -83,7 +83,7 @@ public class TestProjectInfoService {
 
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS)).thenReturn(true);
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ISSUELINKING)).thenReturn(true);
-        when(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE)).thenReturn("1000");
+        when(applicationProperties.getDefaultBackedString(APKeys.JIRA_ATTACHMENT_SIZE)).thenReturn("1000");
 
         CopyInformationBean result = projectInfoService.getIssueTypeInformation("KEY");
 

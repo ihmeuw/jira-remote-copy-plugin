@@ -63,7 +63,7 @@ public class ProjectInfoService {
         final boolean hasCreateAttachmentPermission = permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
         final boolean hasCreateCommentPermission = permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
         final boolean hasCreateLinksPermission = permissionManager.hasPermission(Permissions.LINK_ISSUE, project, user);
-        final long maxAttachmentSize = Long.parseLong(applicationProperties.getString(APKeys.JIRA_ATTACHMENT_SIZE));
+        final long maxAttachmentSize = Long.parseLong(applicationProperties.getDefaultBackedString(APKeys.JIRA_ATTACHMENT_SIZE));
 
 
         Iterable<IssueTypeBean> issueTypesForProject = Collections2.transform(issueTypeSchemeManager.getNonSubTaskIssueTypesForProject(project), convertIssueType(project));
