@@ -193,7 +193,7 @@
                             <instanceId>jira1</instanceId>
                             <version>${jira.version}</version>
                             <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=250 -Datlassian.plugins.enable.wait=300</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -223,7 +223,7 @@
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=500 -Datlassian.plugins.enable.wait=300</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -254,7 +254,7 @@
 							<httpPort>2992</httpPort>
 							<jvmDebugPort>5004</jvmDebugPort>
 							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.slomo=133 -Datlassian.plugins.enable.wait=300</jvmArgs>
+							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.cpji</groupId>
