@@ -1,5 +1,6 @@
 package it.com.atlassian.cpji;
 
+import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.google.common.collect.Iterables;
 import com.atlassian.cpji.tests.pageobjects.ConfigureCopyIssuesAdminActionPage;
@@ -78,6 +79,7 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 	public void permissionDeniedShouldBePresentedWhenAnonymous() {
 		jira1.logout();
 		jira1.getTester().getDriver().navigate().to(jira1.getProductInstance().getBaseUrl() + "/secure/ConfigureCopyIssuesAdminAction!default.jspa?projectKey=TST");
+		jira1.getPageBinder().bind(JiraLoginPage.class);
 		final JiraLoginPageWithWarnings jiraPage = jira1.getPageBinder().bind(JiraLoginPageWithWarnings.class);
 		assertTrue(jiraPage.hasWarnings());
 		final PageElement warning = Iterables.getFirst(jiraPage.getWarnings(), null);
