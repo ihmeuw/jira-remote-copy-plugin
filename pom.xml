@@ -438,7 +438,7 @@
             <id>jira-6.2</id>
             <properties>
                 <jira.version>6.2-SNAPSHOT</jira.version>
-                <testkit.version>6.2.4</testkit.version>
+                <testkit.version>6.2.5</testkit.version>
             </properties>
         </profile>
 		<profile>
