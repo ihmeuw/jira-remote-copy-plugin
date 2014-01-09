@@ -72,14 +72,14 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 	}
 
 	@Test def shouldDisableCopyLinksCheckboxIfDoesntHavePermissionToLinkIssues() {
+		val roleIds = removeProjectRolePermissions(AbstractCopyIssueTest.testkit2, 0, Permissions.LINK_ISSUE, Array(10000, 10001))
 		try {
-			removeProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.LINK_ISSUE, 10001)
 
 			val copyDetailsPage: CopyDetailsPage = goToCopyDetails(issue.getId)
 			isPresentAndDisabled(copyDetailsPage, _.getCopyIssueLinksGroup, _.getCopyIssueLinks, _.getCopyIssueLinksNotice)
 
 		} finally {
-			addProjectRolePermission(AbstractCopyIssueTest.testkit2, 0, Permissions.LINK_ISSUE, 10001)
+			addProjectRolePermissions(AbstractCopyIssueTest.testkit2, 0, Permissions.LINK_ISSUE, roleIds)
 		}
 	}
 
