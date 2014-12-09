@@ -450,9 +450,9 @@
 	</profiles>
 
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git</developerConnection>
-        <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
+        <connection>scm:git:ssh://git@bitbucket.org/atlassian/jira-remote-copy-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassian/jira-remote-copy-plugin.git</developerConnection>
+        <url>https://bitbucket.org/atlassian/jira-remote-copy-plugin</url>
     </scm>
 
 	<pluginRepositories>
