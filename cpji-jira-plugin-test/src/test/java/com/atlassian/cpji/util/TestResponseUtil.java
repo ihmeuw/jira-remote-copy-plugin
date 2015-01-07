@@ -4,6 +4,7 @@ import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.when;
  * @since v3.0
  */
 @RunWith(MockitoJUnitRunner.class)
+@Ignore
 public class TestResponseUtil {
 
     @Mock
