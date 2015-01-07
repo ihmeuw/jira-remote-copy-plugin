@@ -6,8 +6,8 @@
 
     <parent>
         <groupId>com.atlassian.pom</groupId>
-        <artifactId>public-pom</artifactId>
-        <version>3.0.84</version>
+        <artifactId>atlassian-closedsource-pom</artifactId>
+        <version>25</version>
     </parent>
 
     <groupId>com.atlassian.cpji</groupId>
