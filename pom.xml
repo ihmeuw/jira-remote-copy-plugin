@@ -367,7 +367,7 @@
         <applinks.version>3.5.6</applinks.version>
 		<testkit.version>5.0.24</testkit.version>
 		<test-basics.version>1.9.5</test-basics.version>
-		<amps.version>5.0.4</amps.version>
+		<amps.version>4.2.0</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
 		<jersey.version>1.8-atlassian-6</jersey.version>
     </properties>
