@@ -19,30 +19,28 @@ import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.exception.CreateException;
+import com.atlassian.jira.issue.AttachmentError;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.web.util.AttachmentException;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 
-import java.io.File;
-import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @since v3.0
@@ -82,7 +80,7 @@ public class LocalJiraProxy implements JiraProxy {
 
     @Override
     public Either<NegativeResponseStatus, Projects> getProjects() {
-        Collection<Project> projects = permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, jiraAuthenticationContext.getLoggedInUser());
+        Collection<Project> projects = permissionManager.getProjects(ProjectPermissions.CREATE_ISSUES, jiraAuthenticationContext.getUser());
 
         Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>() {
             @Override
@@ -132,16 +130,12 @@ public class LocalJiraProxy implements JiraProxy {
     }
 
     @Override
-    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType) {
-        Issue issue = issueManager.getIssueObject(issueKey);
-        try {
-            final String name = jiraAuthenticationContext.getLoggedInUser() != null ? jiraAuthenticationContext.getLoggedInUser().getName() : null;
-            attachmentManager.createAttachmentCopySourceFile(attachmentFile, filename, contentType, name, issue,
-                    Collections.<String, Object>emptyMap(), new Timestamp(System.currentTimeMillis()));
-            return Either.right(SuccessfulResponse.build(jiraLocation));
-        } catch (AttachmentException e) {
-            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
+    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, Attachment attachment) {
+        Either<AttachmentError, Attachment> result = attachmentManager.copyAttachment(attachment, jiraAuthenticationContext.getUser(), issueKey);
+        if (result.isLeft()) {
+            return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, result.left().get().getLogMessage()));
         }
+        return Either.right(SuccessfulResponse.build(jiraLocation));
     }
 
 
@@ -180,7 +174,7 @@ public class LocalJiraProxy implements JiraProxy {
         Issue issue = issueManager.getIssueObject(remoteIssueKey);
         try {
             RemoteIssueLinkBuilder builder = new RemoteIssueLinkBuilder(remoteIssueLink).issueId(issue.getId()).id(null);
-            remoteIssueLinkManager.createRemoteIssueLink(builder.build(), jiraAuthenticationContext.getLoggedInUser());
+            remoteIssueLinkManager.createRemoteIssueLink(builder.build(), jiraAuthenticationContext.getUser());
             return SuccessfulResponse.buildEither(jiraLocation);
         } catch (CreateException e) {
             return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));

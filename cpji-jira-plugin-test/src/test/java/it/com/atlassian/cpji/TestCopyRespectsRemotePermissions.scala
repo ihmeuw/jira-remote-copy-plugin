@@ -53,7 +53,7 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 		try {
 			AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
 		} catch {
-			case e: Exception => ""
+			case e: Exception =>
 		}
 	}
 

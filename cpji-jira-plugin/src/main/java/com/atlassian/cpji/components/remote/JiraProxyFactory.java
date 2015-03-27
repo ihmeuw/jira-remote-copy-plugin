@@ -65,7 +65,7 @@ public class JiraProxyFactory {
         else {
             try {
                 final ApplicationLink applicationLink = applicationLinkService.getApplicationLink(new ApplicationId(jira.getId()));
-                return new RemoteJiraProxy(hostApplication, applicationLink, jira, issueLinkClient, jiraAuthenticationContext);
+                return new RemoteJiraProxy(hostApplication, applicationLink, jira, issueLinkClient, jiraAuthenticationContext, attachmentManager);
             } catch (TypeNotInstalledException e) {
                 return null;
             }

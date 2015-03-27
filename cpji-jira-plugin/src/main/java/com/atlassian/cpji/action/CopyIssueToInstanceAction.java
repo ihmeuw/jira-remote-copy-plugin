@@ -43,6 +43,7 @@ import com.atlassian.jira.template.soy.SoyTemplateRendererProvider;
 import com.atlassian.jira.util.AttachmentUtils;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.JiraVelocityUtils;
+import com.atlassian.jira.util.io.InputStreamConsumer;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller;
 import com.atlassian.soy.renderer.SoyException;
@@ -64,6 +65,8 @@ import webwork.action.ActionContext;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -202,34 +205,21 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		final Collection<Attachment> attachments = issueToCopy.getAttachments();
 		if (getCopyAttachments() && !attachments.isEmpty()) {
 			for (final Attachment attachment : attachments) {
-				File attachmentFile = AttachmentUtils.getAttachmentFile(attachment);
-                // Check if the attachment actually exists
-                if (attachmentFile != null && attachmentFile.exists())
-                {
-                    Either<NegativeResponseStatus, SuccessfulResponse> addResult = proxy
-                            .addAttachment(copiedIssueKey, attachmentFile, attachment.getFilename(),
-                                    attachment.getMimetype());
-                    if (addResult.isLeft()) {
-                        NegativeResponseStatus responseStatus = addResult.left().get();
-                        ErrorCollection ec = responseStatus.getErrorCollection();
-                        if (ec != null) {
-                            addErrorMessages(
-                                    Lists.newArrayList(
-                                            Iterables.transform(ec.getErrorMessages(), new Function<String, String>() {
-                                                @Override
-                                                public String apply(@Nullable String input) {
-                                                    return attachment.getFilename() + ": " + input;
-                                                }
-                                            })));
-                        }
-                    }
-                }
-                else
-                {
-                    // File not found
-                    addErrorMessage(getText("cpji.attachment.file.not.found", attachment.getFilename()));
-                }
-
+				Either<NegativeResponseStatus, SuccessfulResponse> addResult = proxy.addAttachment(copiedIssueKey, attachment);
+				if (addResult.isLeft()) {
+					NegativeResponseStatus responseStatus = addResult.left().get();
+					ErrorCollection ec = responseStatus.getErrorCollection();
+					if (ec != null) {
+						addErrorMessages(
+										Lists.newArrayList(
+														Iterables.transform(ec.getErrorMessages(), new Function<String, String>() {
+															@Override
+															public String apply(@Nullable String input) {
+																return attachment.getFilename() + ": " + input;
+															}
+														})));
+					}
+				}
 			}
 		}
 
@@ -396,7 +386,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 					.createDefaultFieldLayoutItem(permission.getFieldId(), true);
 			if (fieldLayoutItem.getOrderableField() != null) {
 				OrderableField orderableField = fieldLayoutItem.getOrderableField();
-				Object defaultFieldValue = defaultFieldValuesManager
+				String[] defaultFieldValue = defaultFieldValuesManager
 						.getDefaultFieldValue(getSelectedDestinationProject().getProjectKey(),
 								orderableField.getId(), issueType);
 				if (ActionContext.getParameters().get(orderableField.getId()) == null) {
