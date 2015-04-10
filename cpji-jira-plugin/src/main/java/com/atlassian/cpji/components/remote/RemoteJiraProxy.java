@@ -25,19 +25,20 @@ import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.util.io.InputStreamConsumer;
 import com.atlassian.modzdetector.IOUtils;
 import com.atlassian.sal.api.net.Request;
+import com.atlassian.sal.api.net.RequestFilePart;
 import com.atlassian.sal.api.net.Response;
 import com.atlassian.sal.api.net.ResponseException;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONTokener;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.StreamingOutput;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 
 /**
@@ -112,7 +113,7 @@ public class RemoteJiraProxy implements JiraProxy {
                 final String version = ResponseUtil.getResponseAsTrimmedString(response).trim();
                 if (version.startsWith(PluginInfoResource.PLUGIN_INSTALLED)) {
                     log.debug("Remote JIRA instance '" + applicationLink.getName() + "' has the CPJI plugin installed.");
-                    if(version.equals(PluginInfoResource.PLUGIN_INSTALLED)){
+                    if (version.equals(PluginInfoResource.PLUGIN_INSTALLED)) {
                         return new PluginVersion(jiraLocation, PluginInfoResource.PLUGIN_INSTALLED);
                     } else {
                         String[] respArray = StringUtils.split(version, " ", 2);
@@ -165,57 +166,64 @@ public class RemoteJiraProxy implements JiraProxy {
                     ErrorBean errorBean = response.getEntity(ErrorBean.class);
                     return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, errorBean));
                 }
-
             }
         });
     }
 
     @Override
     public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(final String issueKey, final Attachment attachment) {
- 				InputStreamConsumer<Either<NegativeResponseStatus, SuccessfulResponse>> inputStreamConsumer = new InputStreamConsumer<Either<NegativeResponseStatus, SuccessfulResponse>>() {
-					@Override
-					public Either<NegativeResponseStatus, SuccessfulResponse> withInputStream(final InputStream is) throws IOException {
-              return callRestService(Request.MethodType.POST, "rest/api/latest/issue/" + issueKey + "/attachments", new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
-
-                  @Override
-                  public Either<NegativeResponseStatus, SuccessfulResponse> handle(Response response) throws ResponseException {
-                      //api provides 404 when attachments exceeds max size
-                      if (response.getStatusCode() == 404) {
-                          final String responseString = ResponseUtil.getResponseAsTrimmedString(response);
-                          if (StringUtils.contains(responseString, "exceeds its maximum")) {
-                              String message = jiraAuthenticationContext.getI18nHelper().getText("cpji.attachment.is.too.big");
-                              return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, message));
-                          }
-
-                      }
-                      return super.handle(response);
-                  }
-
-                  @Override
-                  protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
-                      if (response.isSuccessful()) {
-                          return SuccessfulResponse.build(jiraLocation);
-                      } else {
-                          return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, ResponseUtil.getResponseAsTrimmedString(response)));
-                      }
-                  }
-
-                  @Override
-                  protected void modifyRequest(ApplicationLinkRequest request) {
-                      request.addHeader("X-Atlassian-Token", "nocheck");
-                      StreamingOutput streamingOutput = new StreamingOutput() {
-                          @Override
-                          public void write(OutputStream outputStream) throws IOException, WebApplicationException {
-                              IOUtils.copy(is, outputStream);
-                          }
-                      };
-                      request.setEntity(streamingOutput);
-                  }
-              });
-					}
-				};
         try {
-            return attachmentManager.streamAttachmentContent(attachment, inputStreamConsumer);
+            final File attachmentFile = attachmentManager.streamAttachmentContent(attachment, new InputStreamConsumer<File>() {
+                @Override
+                public File withInputStream(final InputStream inputStream) throws IOException {
+                    final File file = File.createTempFile("attachment", ".tmp");
+                    final FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    try {
+                        IOUtils.copy(inputStream, fileOutputStream);
+                    } finally {
+                        fileOutputStream.close();
+                    }
+                    return file;
+                }
+            });
+
+            try {
+                return callRestService(Request.MethodType.POST, "rest/api/latest/issue/" + issueKey + "/attachments", new AbstractJsonResponseHandler<SuccessfulResponse>(jiraLocation) {
+                    @Override
+                    public Either<NegativeResponseStatus, SuccessfulResponse> handle(Response response) throws ResponseException {
+                        //api provides 404 when attachments exceeds max size
+                        if (response.getStatusCode() == 404) {
+                            final String responseString = ResponseUtil.getResponseAsTrimmedString(response);
+                            if (StringUtils.contains(responseString, "exceeds its maximum")) {
+                                String message = jiraAuthenticationContext.getI18nHelper().getText("cpji.attachment.is.too.big");
+                                return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, message));
+                            }
+                        }
+
+                        return super.handle(response);
+                    }
+
+                    @Override
+                    protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
+                        if (response.isSuccessful()) {
+                            return SuccessfulResponse.build(jiraLocation);
+                        } else {
+                            return provideResponseStatus(NegativeResponseStatus.errorOccured(jiraLocation, ResponseUtil.getResponseAsTrimmedString(response)));
+                        }
+                    }
+
+                    @Override
+                    protected void modifyRequest(ApplicationLinkRequest request) {
+                        RequestFilePart requestFilePart = new RequestFilePart(attachment.getMimetype(), attachment.getFilename(), attachmentFile, "file");
+                        request.setFiles(ImmutableList.of(requestFilePart));
+                        request.addHeader("X-Atlassian-Token", "nocheck");
+                    }
+                });
+            } finally {
+                if (!attachmentFile.delete()) {
+                    log.warn(String.format("Temporary attachment file (%s) was not successfully deleted.", attachmentFile.getAbsolutePath()));
+                }
+            }
         } catch (AttachmentReadException e) {
             if (e.getCause() == null) {
                 return Either.left(NegativeResponseStatus.errorOccured(jiraLocation, e.getMessage()));
@@ -320,6 +328,7 @@ public class RemoteJiraProxy implements JiraProxy {
                 request.setSoTimeout(CONNECTION_TIMEOUTS);
                 request.setConnectionTimeout(CONNECTION_TIMEOUTS);
             }
+
             @Override
             protected SuccessfulResponse parseResponse(Response response) throws ResponseException, JSONException {
                 return SuccessfulResponse.build(jiraLocation);
