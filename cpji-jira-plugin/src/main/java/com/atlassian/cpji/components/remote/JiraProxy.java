@@ -7,6 +7,7 @@ import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 
@@ -26,7 +27,7 @@ public interface JiraProxy {
 
     public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, File attachmentFile, String filename, String contentType);
+    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, Attachment originalAttachment);
 
     public Either<NegativeResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean);
 

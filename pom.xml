@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>3.3.4-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -357,10 +357,12 @@
 
     <properties>
 		<jdkLevel>1.6</jdkLevel>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cpji.build.directory>target</cpji.build.directory>
         <atlassian.qunit.version>0.32</atlassian.qunit.version>
-        <jira.version>5.0.7</jira.version>
-        <jira.compile.version>5.0.7</jira.compile.version>
+        <jira.version>6.4</jira.version>
+        <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>

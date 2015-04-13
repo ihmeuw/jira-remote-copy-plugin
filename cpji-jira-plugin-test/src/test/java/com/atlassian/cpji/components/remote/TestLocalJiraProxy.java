@@ -16,13 +16,16 @@ import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Either;
+import com.atlassian.fugue.Option;
 import com.atlassian.fugue.Pair;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.exception.CreateException;
+import com.atlassian.jira.issue.AttachmentError;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.fields.rest.json.beans.JiraBaseUrls;
 import com.atlassian.jira.issue.link.IssueLinkManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
@@ -30,11 +33,13 @@ import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.mock.issue.MockIssue;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.util.AttachmentException;
@@ -82,6 +87,7 @@ public class TestLocalJiraProxy {
     @Mock private JiraBaseUrls jiraBaseUrls;
     @Mock private ApplicationProperties applicationProperties;
     @Mock private User currentUser;
+    @Mock private ApplicationUser currentApplicationUser;
 
     private final SimpleErrorCollection errors = new SimpleErrorCollection();
 
@@ -91,6 +97,7 @@ public class TestLocalJiraProxy {
     public void setUp() throws Exception {
         when(applicationProperties.getString(anyString())).thenReturn(LOCAL_JIRA_NAME);
         when(jiraAuthenticationContext.getLoggedInUser()).thenReturn(currentUser);
+        when(jiraAuthenticationContext.getUser()).thenReturn(currentApplicationUser);
 
         localJiraProxy = new LocalJiraProxy( permissionManager, jiraAuthenticationContext, copyIssueService,
                 attachmentManager, issueManager, issueLinkManager, remoteIssueLinkManager,
@@ -107,7 +114,7 @@ public class TestLocalJiraProxy {
     @Test
     public void getProjectsReturnsProjectsList(){
 
-        when(permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, currentUser)).thenReturn(ImmutableList.<Project>of(
+        when(permissionManager.getProjects(ProjectPermissions.CREATE_ISSUES, currentApplicationUser)).thenReturn(ImmutableList.<Project>of(
                 new MockProject(0, "KEY0", "Name 0"),
                 new MockProject(1, "KEY1", "Name 1")
         ));
@@ -209,22 +216,18 @@ public class TestLocalJiraProxy {
 
     @Test
     public void testAddAttachment() throws Exception {
-        final MockIssue issue = new MockIssue();
-        File file = new File(".");
-        when(issueManager.getIssueObject("key")).thenReturn(issue);
-
-        verifySuccess(localJiraProxy.addAttachment("key", file, "filename", "type"));
-
-        verify(attachmentManager).createAttachmentCopySourceFile(eq(file), eq("filename"), eq("type"), Matchers.<String>eq(null), eq(issue), eq(Collections.<String, Object>emptyMap()), Matchers.<Date>any());
+        Attachment attachment = mock(Attachment.class);
+        when(attachmentManager.copyAttachment(eq(attachment), eq(currentApplicationUser), eq("key"))).thenReturn(Either.<AttachmentError, Attachment>right(attachment));
+        verifySuccess(localJiraProxy.addAttachment("key", attachment));
+        verify(attachmentManager).copyAttachment(eq(attachment), eq(currentApplicationUser), eq("key"));
     }
 
     @Test
     public void addAttachmentShouldReturnResponseStatusOnException() throws Exception {
-        when(attachmentManager.createAttachmentCopySourceFile(Matchers.<File>any(), Matchers.<String>any(), Matchers.<String>any(),
-                Matchers.<String>any(), Matchers.<Issue>any(), Matchers.<Map<String,Object>> any(), Matchers.<Date>any()))
-                .thenThrow(new AttachmentException("message"));
+        when(attachmentManager.copyAttachment(Matchers.<Attachment>any(), Matchers.<ApplicationUser>any(), Matchers.<String>any()))
+                .thenReturn(Either.<AttachmentError, Attachment>left(new AttachmentError("message", null, null, ErrorCollection.Reason.SERVER_ERROR)));
 
-        verifyFailure(localJiraProxy.addAttachment(null, null, null, null));
+        verifyFailure(localJiraProxy.addAttachment(null, null));
     }
 
     @Test
@@ -302,11 +305,11 @@ public class TestLocalJiraProxy {
 
         verifySuccess(localJiraProxy.copyRemoteIssueLink(sourceLink, "key"));
 
-        verify(remoteIssueLinkManager).createRemoteIssueLink(argThat(new RemoteIssueMatcherByRefs(null, issue.getId(), globalId)), eq(currentUser));
+        verify(remoteIssueLinkManager).createRemoteIssueLink(argThat(new RemoteIssueMatcherByRefs(null, issue.getId(), globalId)), eq(currentApplicationUser));
 
         //testing wrapping exception into response
         reset(remoteIssueLinkManager);
-        when(remoteIssueLinkManager.createRemoteIssueLink(any(RemoteIssueLink.class), eq(currentUser))).thenThrow(new CreateException("message"));
+        when(remoteIssueLinkManager.createRemoteIssueLink(any(RemoteIssueLink.class), eq(currentApplicationUser))).thenThrow(new CreateException("message"));
         verifyFailure(localJiraProxy.copyRemoteIssueLink(sourceLink, "key"));
     }
 

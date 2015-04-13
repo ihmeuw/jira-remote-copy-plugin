@@ -154,8 +154,8 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
     val multiSelectVal = copiedIssue.getFieldByName("MultiSelectWithDefault").getValue.asInstanceOf[JSONArray]
     val pureValues = 0 until multiSelectVal.length() map(index => multiSelectVal.getJSONObject(index).getString("value"))
-    pureValues should have length(3)
-    pureValues should be eq(List("one", "three", "four"))
+    pureValues should have length 3
+    pureValues should be eq List("one", "three", "four").toIndexedSeq
 
 
 	}

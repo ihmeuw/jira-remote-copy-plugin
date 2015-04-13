@@ -7,10 +7,10 @@ import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.TimedQuery;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import com.atlassian.pageobjects.elements.timeout.Timeouts;
-import com.atlassian.webdriver.AtlassianWebDriver;
 import com.google.common.base.Supplier;
 import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class SingleSelect
 {
 
     @Inject private PageElementFinder elementFinder;
-    @Inject private AtlassianWebDriver webDriver;
+    @Inject private JavascriptExecutor webDriver;
     @Inject private Timeouts timeouts;
 
     private final PageElement parent;
