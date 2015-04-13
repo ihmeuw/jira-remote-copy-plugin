@@ -225,7 +225,7 @@ public class TestLocalJiraProxy {
     @Test
     public void addAttachmentShouldReturnResponseStatusOnException() throws Exception {
         when(attachmentManager.copyAttachment(Matchers.<Attachment>any(), Matchers.<ApplicationUser>any(), Matchers.<String>any()))
-                .thenReturn(Either.<AttachmentError, Attachment>left(new AttachmentError("message", null, null, Option.<Exception>none())));
+                .thenReturn(Either.<AttachmentError, Attachment>left(new AttachmentError("message", null, null, ErrorCollection.Reason.SERVER_ERROR)));
 
         verifyFailure(localJiraProxy.addAttachment(null, null));
     }

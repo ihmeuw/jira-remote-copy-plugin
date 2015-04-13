@@ -361,7 +361,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cpji.build.directory>target</cpji.build.directory>
         <atlassian.qunit.version>0.32</atlassian.qunit.version>
-        <jira.version>6.4-OD-14-040</jira.version>
+        <jira.version>6.4</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
