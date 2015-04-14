@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>atlassian-closedsource-pom</artifactId>
-        <version>25</version>
+        <version>41</version>
     </parent>
 
     <groupId>com.atlassian.cpji</groupId>
@@ -320,14 +320,16 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.5</version>
+				<version>3.1</version>
 				<configuration>
 					<source>${jdkLevel}</source>
 					<target>${jdkLevel}</target>
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.1</version>
 				<configuration>
 					<preparationGoals>clean test</preparationGoals>
 					<releaseProfiles>releaseProfile</releaseProfiles>
@@ -367,9 +369,9 @@
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
         <applinks.version>3.5.6</applinks.version>
-		<testkit.version>5.0.24</testkit.version>
+		<testkit.version>6.4.2</testkit.version>
 		<test-basics.version>1.9.5</test-basics.version>
-		<amps.version>4.2.0</amps.version>
+		<amps.version>6.0.1</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
 		<jersey.version>1.8-atlassian-6</jersey.version>
     </properties>
@@ -382,65 +384,11 @@
 				<maven.test.it.skip>true</maven.test.it.skip>
 			</properties>
 		</profile>
-		<profile>
-			<id>jira1</id>
-			<properties>
-				<http.port>2990</http.port>
-				<cli.port>1234</cli.port>
-			</properties>
-		</profile>
-		<profile>
-			<id>jira2</id>
-			<properties>
-				<http.port>2991</http.port>
-				<cli.port>5678</cli.port>
-			</properties>
-		</profile>
-		<profile>
-			<id>jira3</id>
-			<properties>
-				<http.port>2992</http.port>
-				<cli.port>5679</cli.port>
-			</properties>
-		</profile>
-		<profile>
-			<id>jira-5.0.x</id>
-			<properties>
-				<atlassian.selenium.version>2.1-m14</atlassian.selenium.version>
-			</properties>
-		</profile>
-		<profile>
-			<id>jira-5.1.x</id>
-			<properties>
-				<jira.version>5.1.8</jira.version>
-			</properties>
-		</profile>
         <profile>
-            <id>jira-5.2.x</id>
+            <id>jira-6.4</id>
             <properties>
-                <jira.version>5.2.9</jira.version>
-                <testkit.version>6.0.5</testkit.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jira-6</id>
-            <properties>
-                <jira.version>6.0-SNAPSHOT</jira.version>
-                <testkit.version>6.0.8</testkit.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jira-6.1</id>
-            <properties>
-                <jira.version>6.1</jira.version>
-                <testkit.version>6.0.41</testkit.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jira-6.2</id>
-            <properties>
-                <jira.version>6.2-SNAPSHOT</jira.version>
-                <testkit.version>6.2.5</testkit.version>
+                <jira.version>6.4</jira.version>
+                <testkit.version>6.4.2</testkit.version>
             </properties>
         </profile>
 		<profile>
