@@ -6,7 +6,7 @@
     <parent>
         <artifactId>cpji-jira</artifactId>
         <groupId>com.atlassian.cpji</groupId>
-		<version>4.0.1-SNAPSHOT</version>
+		<version>4.0.1</version>
     </parent>
 
     <artifactId>cpji-jira-plugin</artifactId>
