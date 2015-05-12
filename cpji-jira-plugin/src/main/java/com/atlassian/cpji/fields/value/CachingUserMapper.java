@@ -144,7 +144,7 @@ public class CachingUserMapper {
 			return user;
 		}
 
-		log.warn(String.format(
+		log.debug(String.format(
 				"Could not find a local user for remote user with user name: '%s' and email: '%s' returning no user",
 				userBean.getUserName(), userBean.getEmail()));
 		return null;
