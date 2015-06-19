@@ -12,12 +12,12 @@
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
-		<!--<dependency>-->
-			<!--<groupId>${project.groupId}</groupId>-->
-			<!--<artifactId>cpji-jira-plugin</artifactId>-->
-			<!--<version>${project.version}</version>-->
-            <!--<scope>compile</scope>-->
-		<!--</dependency>-->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>cpji-jira-plugin</artifactId>
+			<version>${project.version}</version>
+            <scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.atlassian.fugue</groupId>
 			<artifactId>fugue</artifactId>
