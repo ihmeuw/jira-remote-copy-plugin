@@ -1,23 +1,22 @@
 package com.atlassian.cpji.fields.system
 
-import org.junit.runner.RunWith
-import org.mockito.runners.MockitoJUnitRunner
-import org.junit.{Test, Before}
-import org.mockito.Mockito._
-import org.mockito.{Matchers, Mock}
-import org.mockito.Matchers._
-import com.atlassian.jira.project.{AssigneeTypes, Project}
 import com.atlassian.cpji.fields.system.AssigneeFieldMapper.InternalMappingResult
-import com.atlassian.jira.issue.fields.{OrderableField, FieldManager}
-import com.atlassian.jira.issue.{IssueInputParameters, IssueFieldConstants}
 import com.atlassian.cpji.fields.value.{CachingUserMapper, DefaultFieldValuesManager, UserMappingManager}
 import com.atlassian.cpji.rest.model.{CopyIssueBean, UserBean}
-import com.atlassian.crowd.embedded.api.User
-import com.atlassian.jira.security.{PermissionManager, Permissions}
-import com.atlassian.cpji.fields.MappingResult
 import com.atlassian.jira.config.properties.{APKeys, ApplicationProperties}
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem
-import org.scalatest.junit.{ShouldMatchersForJUnit, AssertionsForJUnit}
+import com.atlassian.jira.issue.fields.{FieldManager, OrderableField}
+import com.atlassian.jira.issue.{IssueFieldConstants, IssueInputParameters}
+import com.atlassian.jira.project.{AssigneeTypes, Project}
+import com.atlassian.jira.security.{PermissionManager, Permissions}
+import com.atlassian.jira.user.ApplicationUser
+import org.junit.runner.RunWith
+import org.junit.{Before, Test}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
+import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.{Matchers, Mock}
+import org.scalatest.junit.ShouldMatchersForJUnit
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[MockitoJUnitRunner])
@@ -36,10 +35,10 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
   //data objects
   @Mock var project: Project = null
   @Mock var userBean: UserBean = null
-  @Mock var projectLead: User = null
-  @Mock var mappedUser: User = null
+  @Mock var projectLead: ApplicationUser = null
+  @Mock var mappedUser: ApplicationUser = null
   @Mock var inputParams: IssueInputParameters = null
-  @Mock var asigneeField: OrderableField = null
+  @Mock var asigneeField: OrderableField[_] = null
 
   var plugedMapMethod = false
   var pluggedMappingResult: InternalMappingResult = null
@@ -91,7 +90,7 @@ class TestAssigneeFieldMapper extends ShouldMatchersForJUnit with MockitoSugar {
   }
 
 
-  def mapAndTest(desiredUser: User, desiredDecision: InternalMappingResult.MappingResultDecision, userBean: UserBean = this.userBean) {
+  def mapAndTest(desiredUser: ApplicationUser, desiredDecision: InternalMappingResult.MappingResultDecision, userBean: UserBean = this.userBean) {
     val result = asigneeFieldMapper.mapUser(userMapper, userBean, project)
     result.mappedUser should equal(desiredUser)
     result.decision should equal(result.decision)

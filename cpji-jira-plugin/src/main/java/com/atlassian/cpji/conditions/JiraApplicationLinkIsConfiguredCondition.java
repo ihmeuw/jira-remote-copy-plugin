@@ -6,6 +6,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractIssueCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
 
@@ -24,7 +25,7 @@ public class JiraApplicationLinkIsConfiguredCondition extends AbstractIssueCondi
     }
 
     @Override
-    public boolean shouldDisplay(final User user, final Issue issue, final JiraHelper jiraHelper)
+    public boolean shouldDisplay(final ApplicationUser user, final Issue issue, final JiraHelper jiraHelper)
     {
         final boolean hasJiraLink = !Iterables.isEmpty(applicationLinkService.getApplicationLinks(JiraApplicationType.class));
         log.debug("shouldDisplay for " + issue.getKey() + ": [hasJiraLink: " + hasJiraLink + "]");

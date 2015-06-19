@@ -3,6 +3,7 @@ package com.atlassian.cpji.conditions;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractJiraCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.BuildUtilsInfo;
 import com.google.common.primitives.Ints;
 
@@ -19,7 +20,7 @@ public class HasRICBundledCondition extends AbstractJiraCondition {
     }
 
     @Override
-    public boolean shouldDisplay(User user, JiraHelper jiraHelper) {
+    public boolean shouldDisplay(ApplicationUser user, JiraHelper jiraHelper) {
         int[] jiraVersion = buildUtilsInfo.getVersionNumbers();
         return Ints.lexicographicalComparator().compare(jiraVersion, minimumJiraVersion) >= 0;
     }

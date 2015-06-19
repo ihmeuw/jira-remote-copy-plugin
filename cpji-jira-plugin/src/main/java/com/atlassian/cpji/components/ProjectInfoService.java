@@ -18,6 +18,7 @@ import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.BuildUtilsInfo;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
@@ -55,7 +56,7 @@ public class ProjectInfoService {
     }
 
     public CopyInformationBean getIssueTypeInformation(final String projectKey) throws ProjectNotFoundException {
-        final User user = jiraAuthenticationContext.getLoggedInUser();
+        final ApplicationUser user = jiraAuthenticationContext.getLoggedInUser();
 
         Project project = getProjectForCreateIssue(projectKey);
 
@@ -69,7 +70,7 @@ public class ProjectInfoService {
         Iterable<IssueTypeBean> issueTypesForProject = Collections2.transform(issueTypeSchemeManager.getNonSubTaskIssueTypesForProject(project), convertIssueType(project));
         Iterable<IssueTypeBean> subTaskIssueTypesForProject = Collections2.transform(issueTypeSchemeManager.getSubTaskIssueTypesForProject(project), convertIssueType(project));
 
-        CopyInformationBean copyInformationBean = new CopyInformationBean(
+        return new CopyInformationBean(
                 issueTypesForProject,
                 subTaskIssueTypesForProject,
                 applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWATTACHMENTS),
@@ -78,7 +79,6 @@ public class ProjectInfoService {
                 hasCreateAttachmentPermission, hasCreateCommentPermission, hasCreateLinksPermission,
                 buildUtilsInfo.getVersion(),
                 maxAttachmentSize);
-        return copyInformationBean;
 
     }
 

@@ -86,7 +86,7 @@ public class TestLocalJiraProxy {
     @Mock private ProjectInfoService projectInfoService;
     @Mock private JiraBaseUrls jiraBaseUrls;
     @Mock private ApplicationProperties applicationProperties;
-    @Mock private User currentUser;
+    @Mock private ApplicationUser currentUser;
     @Mock private ApplicationUser currentApplicationUser;
 
     private final SimpleErrorCollection errors = new SimpleErrorCollection();

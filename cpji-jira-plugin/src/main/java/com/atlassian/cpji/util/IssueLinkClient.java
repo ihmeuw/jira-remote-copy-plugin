@@ -12,6 +12,7 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.util.UrlBuilder;
@@ -74,7 +75,7 @@ public class IssueLinkClient
                 .title(remoteIssueKey)
                 .build();
 
-        final User user = callingUser();
+        final ApplicationUser user = callingUser();
         final RemoteIssueLinkService.CreateValidationResult issueLinkValidationResult = remoteIssueLinkService.validateCreate(user, remoteIssueLink);
         if (issueLinkValidationResult.isValid())
         {
@@ -245,7 +246,7 @@ public class IssueLinkClient
         }
     }
 
-    private User callingUser()
+    private ApplicationUser callingUser()
     {
         return jiraAuthenticationContext.getLoggedInUser();
     }

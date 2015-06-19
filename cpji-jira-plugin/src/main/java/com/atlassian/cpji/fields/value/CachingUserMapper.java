@@ -3,6 +3,7 @@ package com.atlassian.cpji.fields.value;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.crowd.embedded.impl.IdentifierUtils;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableListMultimap;
@@ -19,34 +20,19 @@ import java.util.Collections;
 public class CachingUserMapper {
 	private static final Logger log = Logger.getLogger(CachingUserMapper.class);
 
-	public static final Function<User, String> GET_EMAIL = new Function<User, String>() {
-		@Override
-		public String apply(User input) {
-			return IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getEmailAddress()));
-		}
-	};
+	public static final Function<ApplicationUser, String> GET_EMAIL = input -> IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getEmailAddress()));
 
-	public static final Function<User, String> GET_FULL_NAME = new Function<User, String>() {
-		@Override
-		public String apply(User input) {
-			return IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getDisplayName()));
-		}
-	};
+	public static final Function<ApplicationUser, String> GET_FULL_NAME = input -> IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getDisplayName()));
 
-	public static final Function<User, String> GET_USER_NAME = new Function<User, String>() {
-		@Override
-		public String apply(User input) {
-			return IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getName()));
-		}
-	};
+	public static final Function<ApplicationUser, String> GET_USER_NAME = input -> IdentifierUtils.toLowerCase(StringUtils.defaultString(input.getName()));
 
-	public static ImmutableListMultimap<String, User> indexIgnoringNullsOrEmptyStrings(
-			Collection<User> values, Function<User, String> function) {
+	public static ImmutableListMultimap<String, ApplicationUser> indexIgnoringNullsOrEmptyStrings(
+			Collection<ApplicationUser> values, Function<ApplicationUser, String> function) {
 		Preconditions.checkNotNull(values, "values");
 		Preconditions.checkNotNull(function, "function");
 
-		final ImmutableListMultimap.Builder<String, User> listBuilder = ImmutableListMultimap.builder();
-		for(User value : values) {
+		final ImmutableListMultimap.Builder<String, ApplicationUser> listBuilder = ImmutableListMultimap.builder();
+		for(ApplicationUser value : values) {
 			final String functionResult = function.apply(value);
 			if (StringUtils.isNotEmpty(functionResult)) {
 				listBuilder.put(functionResult, value);
@@ -55,28 +41,28 @@ public class CachingUserMapper {
 		return listBuilder.build();
 	}
 
-	protected final Multimap<String, User> usersByEmail, usersByFullName, usersByUserName;
+	protected final Multimap<String, ApplicationUser> usersByEmail, usersByFullName, usersByUserName;
 
-	public CachingUserMapper(Collection<User> users) {
+	public CachingUserMapper(Collection<ApplicationUser> users) {
 		this.usersByEmail = createUsersByEmailMap(users);
 		this.usersByFullName = createUsersByFullNameMap(users);
 		this.usersByUserName = createUsersByUserName(users);
 	}
 
-	private Multimap<String, User> createUsersByUserName(Collection<User> users) {
+	private Multimap<String, ApplicationUser> createUsersByUserName(Collection<ApplicationUser> users) {
 		return indexIgnoringNullsOrEmptyStrings(users, GET_USER_NAME);
 	}
 
-	private Multimap<String, User> createUsersByFullNameMap(Collection<User> users) {
+	private Multimap<String, ApplicationUser> createUsersByFullNameMap(Collection<ApplicationUser> users) {
 		return indexIgnoringNullsOrEmptyStrings(users, GET_FULL_NAME);
 	}
 
-	private Multimap<String, User> createUsersByEmailMap(Collection<User> users) {
+	private Multimap<String, ApplicationUser> createUsersByEmailMap(Collection<ApplicationUser> users) {
 		return indexIgnoringNullsOrEmptyStrings(users, GET_EMAIL);
 	}
 
 	@Nullable
-	protected Multimap<String, User> getUsersByEmail(UserBean userBean, Multimap<String, User> usersInScope) {
+	protected Multimap<String, ApplicationUser> getUsersByEmail(UserBean userBean, Multimap<String, ApplicationUser> usersInScope) {
         final String trimmedEmail = StringUtils.trimToNull(userBean.getEmail());
 		if (trimmedEmail != null) {
             final String emailAddress = IdentifierUtils.toLowerCase(trimmedEmail);
@@ -86,7 +72,7 @@ public class CachingUserMapper {
 	}
 
 	@Nullable
-    protected Multimap<String, User> getUsersByFullName(UserBean userBean, Multimap<String, User> usersInScope) {
+    protected Multimap<String, ApplicationUser> getUsersByFullName(UserBean userBean, Multimap<String, ApplicationUser> usersInScope) {
         final String trimmedFullName = StringUtils.trimToNull(userBean.getFullName());
 		if (trimmedFullName != null) {
             final String fullName = IdentifierUtils.toLowerCase(trimmedFullName);
@@ -96,7 +82,7 @@ public class CachingUserMapper {
 	}
 
 	@Nonnull
-    protected Collection<User> getUsersByUserName(UserBean userBean, Multimap<String, User> usersInScope) {
+    protected Collection<ApplicationUser> getUsersByUserName(UserBean userBean, Multimap<String, ApplicationUser> usersInScope) {
         final String trimmedName = StringUtils.trimToNull(userBean.getUserName());
 		if (trimmedName != null) {
             return usersInScope.get(IdentifierUtils.toLowerCase(trimmedName));
@@ -104,15 +90,15 @@ public class CachingUserMapper {
 		return Collections.emptyList();
 	}
 
-	public User mapUser(UserBean userBean) {
+	public ApplicationUser mapUser(UserBean userBean) {
 		if (userBean == null) {
 			return null;
 		}
 
-		Multimap<String, User> usersInScope = usersByEmail;
-		Multimap<String, User> matchedUsers = getUsersByEmail(userBean, usersInScope);
+		Multimap<String, ApplicationUser> usersInScope = usersByEmail;
+		Multimap<String, ApplicationUser> matchedUsers = getUsersByEmail(userBean, usersInScope);
 		if (matchedUsers != null && matchedUsers.size() == 1) {
-			final User user = matchedUsers.values().iterator().next();
+			final ApplicationUser user = matchedUsers.values().iterator().next();
 			log.debug(String.format(
 					"Mapped remote user by email: '%s' and email: '%s' to local user with user name: '%s'",
 					userBean.getUserName(), userBean.getEmail(),
@@ -125,7 +111,7 @@ public class CachingUserMapper {
 		// now limit users by full name
 		matchedUsers = getUsersByFullName(userBean, usersInScope);
 		if (matchedUsers != null && matchedUsers.size() == 1) {
-			final User user = matchedUsers.values().iterator().next();
+			final ApplicationUser user = matchedUsers.values().iterator().next();
 			log.debug(String.format(
 					"Mapped remote user by full name: '%s' and email: '%s' to local user with user name: '%s'",
 					userBean.getUserName(), userBean.getEmail(), user.getName()));
@@ -135,9 +121,9 @@ public class CachingUserMapper {
 		usersInScope = matchedUsers != null && !matchedUsers.isEmpty() ? matchedUsers : usersByUserName;
 
 		// finally try username
-		Collection<User> finalMatch = getUsersByUserName(userBean, usersInScope);
+		Collection<ApplicationUser> finalMatch = getUsersByUserName(userBean, usersInScope);
 		if (finalMatch.size() == 1) {
-			final User user = finalMatch.iterator().next();
+			final ApplicationUser user = finalMatch.iterator().next();
 			log.debug(String.format(
 					"Mapped remote user by user name: '%s' and email: '%s' to local user with user name: '%s'",
 					userBean.getUserName(), userBean.getEmail(), user.getName()));

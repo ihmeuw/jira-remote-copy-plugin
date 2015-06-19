@@ -14,6 +14,7 @@ import com.atlassian.jira.issue.fields.OrderableField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.user.ApplicationUser;
 
 import java.util.Collections;
 
@@ -47,7 +48,7 @@ public class EnvironmentFieldMapper extends AbstractSystemFieldMapper implements
 		}
 	}
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return true;
     }

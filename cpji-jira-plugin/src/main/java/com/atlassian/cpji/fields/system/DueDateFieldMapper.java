@@ -16,6 +16,7 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.DateFieldFormat;
 
 import java.util.Collections;
@@ -59,7 +60,7 @@ public class DueDateFieldMapper extends AbstractSystemFieldMapper implements Iss
 		}
 	}
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.SCHEDULE_ISSUE, project, user);
     }

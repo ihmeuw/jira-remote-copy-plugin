@@ -6,8 +6,8 @@
 
     <parent>
         <groupId>com.atlassian.pom</groupId>
-        <artifactId>atlassian-closedsource-pom</artifactId>
-        <version>41</version>
+        <artifactId>closedsource-pom</artifactId>
+        <version>3.0.90</version>
     </parent>
 
     <groupId>com.atlassian.cpji</groupId>
@@ -358,18 +358,18 @@
 	</build>
 
     <properties>
-		<jdkLevel>1.6</jdkLevel>
+		<jdkLevel>1.8</jdkLevel>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<cpji.build.directory>target</cpji.build.directory>
-        <atlassian.qunit.version>0.32</atlassian.qunit.version>
-        <jira.version>6.4</jira.version>
+        <atlassian.qunit.version>1.0.0-m5</atlassian.qunit.version>
+        <jira.version>7.0.0-QR20150617180424</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>2.6.1</my.sal.version>
         <rest.version>2.7.1</rest.version>
         <applinks.version>3.5.6</applinks.version>
-		<testkit.version>6.4.2</testkit.version>
+		<testkit.version>7.0.53</testkit.version>
 		<test-basics.version>1.9.5</test-basics.version>
 		<amps.version>6.0.1</amps.version>
 		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
@@ -384,13 +384,6 @@
 				<maven.test.it.skip>true</maven.test.it.skip>
 			</properties>
 		</profile>
-        <profile>
-            <id>jira-6.4</id>
-            <properties>
-                <jira.version>6.4</jira.version>
-                <testkit.version>6.4.2</testkit.version>
-            </properties>
-        </profile>
 		<profile>
 			<id>testing</id>
 			<properties>

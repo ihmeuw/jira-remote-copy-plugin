@@ -1,8 +1,7 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.cpji.action.SelectedProject;
-import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.usercompatibility.UserCompatibilityHelper;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.common.collect.Lists;
@@ -10,10 +9,12 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nonnull;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * TODO: Document this class / interface here
@@ -32,9 +33,9 @@ public class RecentlyUsedProjectsManager {
 		this.pluginSettingsFactory = pluginSettingsFactory;
 	}
 
-	public void addProject(User user, SelectedProject project) {
+	public void addProject(ApplicationUser user, SelectedProject project) {
 		PluginSettings settings = pluginSettingsFactory
-				.createSettingsForKey("user." + UserCompatibilityHelper.getKeyForUser(user));
+				.createSettingsForKey("user." + checkNotNull(user).getKey());
 
 		List<SelectedProject> recentlyUsed = Lists.newArrayList(getRecentProjects(user));
 		if (recentlyUsed.contains(project)) {
@@ -57,9 +58,9 @@ public class RecentlyUsedProjectsManager {
 	 * @return immutable list of recently selected projects
 	 */
 	@Nonnull
-	public List<SelectedProject> getRecentProjects(User user) {
+	public List<SelectedProject> getRecentProjects(ApplicationUser user) {
 		PluginSettings settings = pluginSettingsFactory
-				.createSettingsForKey("user." + UserCompatibilityHelper.getKeyForUser(user));
+				.createSettingsForKey("user." + checkNotNull(user).getKey());
 		List<SelectedProject> recentlyUsed = null;
 		try {
 			recentlyUsed = new ObjectMapper().readValue(

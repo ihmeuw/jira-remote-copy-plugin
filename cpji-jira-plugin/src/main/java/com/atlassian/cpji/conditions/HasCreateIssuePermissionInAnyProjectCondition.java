@@ -2,10 +2,12 @@ package com.atlassian.cpji.conditions;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractIssueCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,8 +24,8 @@ public class HasCreateIssuePermissionInAnyProjectCondition extends AbstractIssue
     }
 
     @Override
-    public boolean shouldDisplay(final User user, final Issue issue, final JiraHelper jiraHelper) {
-        final boolean canCreateInLocalProjects = !permissionManager.getProjectObjects(Permissions.CREATE_ISSUE, user).isEmpty();
+    public boolean shouldDisplay(final ApplicationUser user, final Issue issue, final JiraHelper jiraHelper) {
+        final boolean canCreateInLocalProjects = !permissionManager.getProjects(ProjectPermissions.CREATE_ISSUES, user).isEmpty();
         log.debug("shouldDisplay for " + issue.getKey() + ": [canCreateInLocalProjects: " + canCreateInLocalProjects + "]");
         return canCreateInLocalProjects;
     }

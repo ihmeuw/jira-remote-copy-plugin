@@ -18,6 +18,7 @@ import com.atlassian.jira.issue.security.IssueSecuritySchemeManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.GenericEntityException;
 import org.ofbiz.core.entity.GenericValue;
@@ -36,8 +37,8 @@ public class IssueSecurityFieldMapper extends AbstractSystemFieldMapper implemen
     private final IssueSecurityLevelManager issueSecurityLevelManager;
     private final PermissionManager permissionManager;
 
-    public IssueSecurityFieldMapper(IssueSecuritySchemeManager issueSecuritySchemeManager, 
-			IssueSecurityLevelManager issueSecurityLevelManager, final PermissionManager permissionManager, 
+    public IssueSecurityFieldMapper(IssueSecuritySchemeManager issueSecuritySchemeManager,
+			IssueSecurityLevelManager issueSecurityLevelManager, final PermissionManager permissionManager,
 			final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(getOrderableField(fieldManager, IssueFieldConstants.SECURITY), defaultFieldValuesManager);
@@ -78,7 +79,7 @@ public class IssueSecurityFieldMapper extends AbstractSystemFieldMapper implemen
         }
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.SET_ISSUE_SECURITY, project, user);
     }

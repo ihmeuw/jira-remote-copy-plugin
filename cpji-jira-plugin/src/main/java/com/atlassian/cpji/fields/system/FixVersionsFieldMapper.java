@@ -19,6 +19,7 @@ import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.project.version.VersionManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -36,7 +37,7 @@ public class FixVersionsFieldMapper extends AbstractSystemFieldMapper implements
     private final VersionManager versionManager;
     private final PermissionManager permissionManager;
 
-    public FixVersionsFieldMapper(VersionManager versionManager, final PermissionManager permissionManager, 
+    public FixVersionsFieldMapper(VersionManager versionManager, final PermissionManager permissionManager,
 			final FieldManager fieldManager, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(getOrderableField(fieldManager, IssueFieldConstants.FIX_FOR_VERSIONS), defaultFieldValuesManager);
@@ -82,7 +83,7 @@ public class FixVersionsFieldMapper extends AbstractSystemFieldMapper implements
 		}
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.RESOLVE_ISSUE, project, user);
     }

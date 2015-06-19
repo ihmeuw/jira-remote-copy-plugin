@@ -7,6 +7,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.collect.ImmutableMap;
@@ -30,7 +31,7 @@ public class ConfigureDefaultValuesProjectOperation extends AbstractPluggablePro
 		this.authenticationContext = authenticationContext;
 	}
 
-    final public String getHtml(Project project, User user)
+    final public String getHtml(Project project, ApplicationUser user)
     {
 		final Locale locale = authenticationContext.getLocale();
 		final CalendarResourceIncluder calendarResourceIncluder = new CalendarResourceIncluder();
@@ -43,7 +44,7 @@ public class ConfigureDefaultValuesProjectOperation extends AbstractPluggablePro
         return descriptor.getHtml("view", params);
     }
 
-    public boolean showOperation(final Project project, final User user)
+    public boolean showOperation(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.PROJECT_ADMIN, project, user) || permissionManager.hasPermission(Permissions.ADMINISTER, user);
     }

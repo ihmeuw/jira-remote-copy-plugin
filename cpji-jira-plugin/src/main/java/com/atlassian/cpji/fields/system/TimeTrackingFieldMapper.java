@@ -17,6 +17,7 @@ import com.atlassian.jira.issue.fields.TimeTrackingSystemField;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.JiraDurationUtils;
 
 import java.util.Collections;
@@ -36,7 +37,7 @@ public class TimeTrackingFieldMapper extends AbstractSystemFieldMapper implement
     }
 
     @Override
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return true;
     }

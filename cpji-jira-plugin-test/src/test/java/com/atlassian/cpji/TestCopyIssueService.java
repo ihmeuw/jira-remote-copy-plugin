@@ -39,6 +39,7 @@ import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.mock.issue.MockIssue;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.I18nHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -90,7 +91,7 @@ public class TestCopyIssueService {
     @Mock
     private InputParametersService inputParametersService;
     @Mock
-    private User currentUser;
+    private ApplicationUser currentUser;
     @Mock
     private IssueType issueType;
     @Mock

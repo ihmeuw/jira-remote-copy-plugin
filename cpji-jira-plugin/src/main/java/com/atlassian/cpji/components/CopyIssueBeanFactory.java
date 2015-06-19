@@ -45,6 +45,7 @@ import com.atlassian.jira.issue.label.Label;
 import com.atlassian.jira.issue.watchers.WatcherManager;
 import com.atlassian.jira.project.version.Version;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -222,13 +223,13 @@ public class CopyIssueBeanFactory {
 	}
 
 	private void setVoters(CopyIssueBean copyIssueBean, MutableIssue issueToCopy, List<String> visibleFieldIds) {
-		ServiceOutcome<Collection<User>> collectionServiceOutcome = voteService
+		ServiceOutcome<Collection<ApplicationUser>> collectionServiceOutcome = voteService
 				.viewVoters(issueToCopy, authenticationContext.getLoggedInUser());
 		if (collectionServiceOutcome.isValid()) {
 			visibleFieldIds.add(IssueFieldConstants.VOTERS);
-			Collection<User> returnedValue = collectionServiceOutcome.getReturnedValue();
+			Collection<ApplicationUser> returnedValue = collectionServiceOutcome.getReturnedValue();
 			List<UserBean> voters = new ArrayList<UserBean>();
-			for (User user : returnedValue) {
+			for (ApplicationUser user : returnedValue) {
 				voters.add(new UserBean(user.getName(), user.getEmailAddress(), user.getDisplayName()));
 			}
 			copyIssueBean.setVoters(voters);

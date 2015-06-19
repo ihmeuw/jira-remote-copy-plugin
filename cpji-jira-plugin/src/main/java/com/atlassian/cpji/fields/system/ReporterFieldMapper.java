@@ -17,6 +17,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.Lists;
 
 import java.util.Collections;
@@ -31,7 +32,7 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
     private final PermissionManager permissionManager;
 	private final JiraAuthenticationContext authenticationContext;
 
-	public ReporterFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager, 
+	public ReporterFieldMapper(final PermissionManager permissionManager, final FieldManager fieldManager,
 			final DefaultFieldValuesManager defaultFieldValuesManager,
 			final JiraAuthenticationContext authenticationContext)
     {
@@ -49,8 +50,8 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
 	public void populateInputParams(CachingUserMapper userMapper, IssueInputParameters inputParameters, CopyIssueBean copyIssueBean,
 			FieldLayoutItem fieldLayoutItem, Project project, IssueType issueType) {
 
-		final User loggedIn = authenticationContext.getLoggedInUser();
-		final User reporter = copyIssueBean.getReporter() != null ? userMapper.mapUser(copyIssueBean.getReporter()) : null;
+		final ApplicationUser loggedIn = authenticationContext.getLoggedInUser();
+		final ApplicationUser reporter = copyIssueBean.getReporter() != null ? userMapper.mapUser(copyIssueBean.getReporter()) : null;
 
 		if (!fieldLayoutItem.isHidden()) {
 			if (reporter != null) {
@@ -66,7 +67,7 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
 		}
 	}
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.MODIFY_REPORTER, project, user);
     }
@@ -77,7 +78,7 @@ public class ReporterFieldMapper extends AbstractSystemFieldMapper implements Is
         {
            return new MappingResult(Collections.<String>emptyList(), true, true, true);
         }
-        final User reporter = userMapper.mapUser(bean.getReporter());
+        final ApplicationUser reporter = userMapper.mapUser(bean.getReporter());
         if (reporter == null)
         {
             return new MappingResult(Lists.newArrayList(bean.getReporter().getUserName()), false, false, true);

@@ -17,6 +17,7 @@ import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.security.roles.ProjectRole;
 import com.atlassian.jira.security.roles.ProjectRoleManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import org.apache.commons.lang.StringUtils;
 
@@ -33,7 +34,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
     private final GroupManager groupManager;
     private final PermissionManager permissionsManager;
 
-    public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, GroupManager groupManager, 
+    public CommentFieldMapper(CommentService commentService, ProjectRoleManager projectRoleManager, GroupManager groupManager,
 			final PermissionManager permissionManager, final OrderableField field,
 			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
@@ -51,7 +52,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         {
             for (CommentBean comment : comments)
             {
-                ResultHolder<User> userResultHolder = findUser(userMapper, comment.getAuthor(), issue.getProjectObject());
+                ResultHolder<ApplicationUser> userResultHolder = findUser(userMapper, comment.getAuthor(), issue.getProjectObject());
                 ResultHolder<Group> groupResultHolder = findGroup(comment.getGroupLevel());
                 ResultHolder<ProjectRole> projectRole = findProjectRole(comment.getRoleLevel());
                 if (userResultHolder.mapped && groupResultHolder.mapped && projectRole.mapped)
@@ -62,7 +63,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         }
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionsManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
     }
@@ -75,7 +76,7 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         {
             for (CommentBean comment : comments)
             {
-                ResultHolder<User> userResultHolder = findUser(userMapper, comment.getAuthor(), project);
+                ResultHolder<ApplicationUser> userResultHolder = findUser(userMapper, comment.getAuthor(), project);
                 if (!userResultHolder.mapped)
                 {
                    unmappedFieldValues.add("User " + comment.getAuthor() + " can't comment on this issue.");
@@ -143,17 +144,17 @@ public class CommentFieldMapper extends AbstractFieldMapper implements PostIssue
         return new ResultHolder<Group>(true);
     }
 
-    private ResultHolder<User> findUser(final CachingUserMapper userMapper, final UserBean userBean, final Project project)
+    private ResultHolder<ApplicationUser> findUser(final CachingUserMapper userMapper, final UserBean userBean, final Project project)
     {
-        User user = userMapper.mapUser(userBean);
+        ApplicationUser user = userMapper.mapUser(userBean);
         if (user == null)
         {
-            return new ResultHolder<User>(false);
+            return new ResultHolder<ApplicationUser>(false);
         }
         if (permissionsManager.hasPermission(Permissions.COMMENT_ISSUE, project, user))
         {
-            return new ResultHolder<User>(user, true);
+            return new ResultHolder<ApplicationUser>(user, true);
         }
-        return new ResultHolder<User>(false);
+        return new ResultHolder<ApplicationUser>(false);
     }
 }

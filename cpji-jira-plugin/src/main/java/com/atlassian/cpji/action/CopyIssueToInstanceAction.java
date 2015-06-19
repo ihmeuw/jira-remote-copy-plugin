@@ -23,6 +23,7 @@ import com.atlassian.cpji.rest.model.SystemFieldPermissionBean;
 import com.atlassian.cpji.util.IssueLinkCopier;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueFactory;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
@@ -174,7 +175,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		final SelectedProject linkToTargetEntity = getSelectedDestinationProject();
 		final JiraProxy proxy = jiraProxyFactory.createJiraProxy(linkToTargetEntity.getJiraLocation());
 
-		MutableIssue issueToCopy = getIssueObject();
+		MutableIssue issueToCopy = getMutableIssue();
 		CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(linkToTargetEntity.getProjectKey(), issueToCopy,
 				issueType, summary, copyComments);
 
@@ -185,17 +186,14 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 
 		Either<NegativeResponseStatus, IssueCreationResultBean> result = proxy.copyIssue(copyIssueBean);
 		IssueCreationResultBean copiedIssue = handleGenericResponseStatus(proxy, result,
-				new Function<NegativeResponseStatus, Void>() {
-					@Override
-					public Void apply(NegativeResponseStatus input) {
-						Preconditions.checkNotNull(input);
-						if (input.getErrorCollection() != null) {
-							addErrorCollection(CopyIssueToInstanceAction.this.processCopyIssueErrors(
-									input.getErrorCollection()));
-						}
-						return null;
-					}
-				});
+				input -> {
+                    Preconditions.checkNotNull(input);
+                    if (input.getErrorCollection() != null) {
+                        addErrorCollection(CopyIssueToInstanceAction.this.processCopyIssueErrors(
+                                input.getErrorCollection()));
+                    }
+                    return null;
+                });
 		if (copiedIssue == null) {
             final boolean canWeEnterValues = getSelectedDestinationProject().getJiraLocation().isLocal() && getHasErrors();
 			return canWeEnterValues && !cleanCopy ? doDefault() : ERROR;
@@ -212,12 +210,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 					if (ec != null) {
 						addErrorMessages(
 										Lists.newArrayList(
-														Iterables.transform(ec.getErrorMessages(), new Function<String, String>() {
-															@Override
-															public String apply(@Nullable String input) {
-																return attachment.getFilename() + ": " + input;
-															}
-														})));
+														Iterables.transform(ec.getErrorMessages(), input -> attachment.getFilename() + ": " + input)));
 					}
 				}
 			}
@@ -294,16 +287,13 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		final Pattern p = Pattern.compile("(.+?): (.*)");
 
 		// transform messages like "Environment: Environment is required." -> "Environment is required."
-		errorCollection.setErrorMessages(Collections2.transform(errorCollection.getErrorMessages(), new Function<String, String>() {
-			@Override
-			public String apply(String input) {
-				Matcher m = p.matcher(input);
-				if (m.matches() && m.groupCount() == 2 && StringUtils.startsWith(m.group(2), m.group(1))) {
-					return m.group(2);
-				}
-				return input;
-			}
-		}));
+		errorCollection.setErrorMessages(Collections2.transform(errorCollection.getErrorMessages(), input -> {
+            Matcher m = p.matcher(input);
+            if (m.matches() && m.groupCount() == 2 && StringUtils.startsWith(m.group(2), m.group(1))) {
+                return m.group(2);
+            }
+            return input;
+        }));
 
 		return errorCollection;
 	}
@@ -471,7 +461,7 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 		final SelectedProject entityLink = getSelectedDestinationProject();
 		final JiraProxy proxy = jiraProxyFactory.createJiraProxy(entityLink.getJiraLocation());
 
-		CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(entityLink.getProjectKey(), getIssueObject(),
+		CopyIssueBean copyIssueBean = copyIssueBeanFactory.create(entityLink.getProjectKey(), getMutableIssue(),
 				issueType, summary,copyComments);
 		Either<NegativeResponseStatus, FieldPermissionsBean> result = proxy.checkPermissions(copyIssueBean);
 		FieldPermissionsBean fieldValidationBean = handleGenericResponseStatus(proxy, result, null);
@@ -523,18 +513,15 @@ public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implement
 			}
 		}
 		if (!copyIssueBean.getUnsupportedCustomFields().isEmpty()) {
-			customMissingFieldPermissionDescriptions.addAll(Collections2.transform(copyIssueBean.getUnsupportedCustomFields(), new Function<CustomFieldPermissionBean, MissingFieldPermissionDescription>() {
-				@Override
-				public MissingFieldPermissionDescription apply(CustomFieldPermissionBean customFieldPermissionBean) {
-					Preconditions.checkNotNull(customFieldPermissionBean);
-					ValidationCode validationCode = ValidationCode
-							.valueOf(customFieldPermissionBean.getValidationCode());
-					return new MissingFieldPermissionDescription(
-							customFieldPermissionBean,
-							customFieldPermissionBean.getFieldName(),
-							getI18nHelper().getText(validationCode.getI18nKey()), canCopyField(validationCode));
-				}
-			}));
+			customMissingFieldPermissionDescriptions.addAll(Collections2.transform(copyIssueBean.getUnsupportedCustomFields(), customFieldPermissionBean -> {
+                Preconditions.checkNotNull(customFieldPermissionBean);
+                ValidationCode validationCode = ValidationCode
+                        .valueOf(customFieldPermissionBean.getValidationCode());
+                return new MissingFieldPermissionDescription(
+                        customFieldPermissionBean,
+                        customFieldPermissionBean.getFieldName(),
+                        getI18nHelper().getText(validationCode.getI18nKey()), canCopyField(validationCode));
+            }));
 		}
 		return INPUT;
 	}

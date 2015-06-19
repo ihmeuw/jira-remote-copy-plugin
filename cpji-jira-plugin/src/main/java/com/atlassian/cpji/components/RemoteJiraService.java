@@ -10,7 +10,9 @@ import com.atlassian.cpji.rest.PluginInfoResource;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Either;
 import com.atlassian.jira.ComponentManager;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -70,32 +72,21 @@ public class RemoteJiraService {
     private <T> Iterable<T> executeForEveryJira(final FunctionWithFallback<T> function) {
         final ExecutorService es = Executors.newFixedThreadPool(THREADS);
         final Iterable<JiraProxy> applicationLinks = jiraProxyFactory.getAllJiraProxies();
-        final User user = authenticationContext.getLoggedInUser();
+        final ApplicationUser user = authenticationContext.getLoggedInUser();
         final List<Callable<T>> queries = Lists.newArrayList(
                 Iterables.transform(applicationLinks,
-                        new Function<JiraProxy, Callable<T>>() {
-                            @Override
-                            public Callable<T> apply(final JiraProxy applicationLink) {
-                                return new Callable<T>() {
-                                    @Override
-                                    public T call() {
-                                        ComponentManager.getInstance().getJiraAuthenticationContext().setLoggedInUser(user);
-                                        return function.apply(applicationLink);
-                                    }
-                                };
-                            }
+                        applicationLink -> () -> {
+                            ComponentAccessor.getJiraAuthenticationContext().setLoggedInUser(user);
+                            return function.apply(applicationLink);
                         })
         );
         try {
             return ImmutableList.copyOf(Iterables.transform(es.invokeAll(queries),
-                    new Function<Future<T>, T>() {
-                        @Override
-                        public T apply(Future<T> eitherFuture) {
-                            try {
-                                return eitherFuture.get();
-                            } catch (Exception e) {
-                                return function.onInvocationException(e);
-                            }
+                    eitherFuture -> {
+                        try {
+                            return eitherFuture.get();
+                        } catch (Exception e) {
+                            return function.onInvocationException(e);
                         }
                     }));
         } catch (Exception e) {

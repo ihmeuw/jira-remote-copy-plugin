@@ -13,6 +13,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -31,7 +32,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager, 
+    public VoterFieldMapper(final Field field, final VoteService voteService, final PermissionManager permissionManager,
 			final JiraAuthenticationContext jiraAuthenticationContext, final DefaultFieldValuesManager defaultFieldValuesManager)
     {
         super(field, defaultFieldValuesManager);
@@ -40,7 +41,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         this.jiraAuthenticationContext = jiraAuthenticationContext;
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.VIEW_VOTERS_AND_WATCHERS, project, user) && voteService.isVotingEnabled();
     }
@@ -67,7 +68,7 @@ public class VoterFieldMapper extends AbstractFieldMapper
         final List<String> mappedUsers = new ArrayList<String>();
         for (UserBean voter : voters)
         {
-            User user = userMapper.mapUser(voter);
+            ApplicationUser user = userMapper.mapUser(voter);
             if (user == null)
             {
                 unmappedUsers.add(voter.getUserName());
@@ -98,12 +99,12 @@ public class VoterFieldMapper extends AbstractFieldMapper
         {
             final List<String> errors = new ArrayList<String>();
             final List<UserBean> voters = bean.getVoters();
-			final User reporter = issue.getReporterUser();
+			final ApplicationUser reporter = issue.getReporterUser();
             if (voters != null)
             {
                 for (UserBean voter : voters)
                 {
-                    User user = userMapper.mapUser(voter);
+                    ApplicationUser user = userMapper.mapUser(voter);
                     if (user != null && (reporter == null || !user.equals(reporter)))
                     {
                         VoteService.VoteValidationResult voteValidationResult = voteService.validateAddVote(jiraAuthenticationContext.getLoggedInUser(), user, issue);

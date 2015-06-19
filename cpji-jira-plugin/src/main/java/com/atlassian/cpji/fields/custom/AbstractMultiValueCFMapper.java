@@ -70,7 +70,7 @@ public abstract class AbstractMultiValueCFMapper<T> extends AbstractCustomFieldM
         final Collection<?> collection = castToCollection(value);
         if (collection != null)
         {
-            values = new ArrayList<String>(collection.size());
+            values = new ArrayList<>(collection.size());
             for (final Object element : collection)
             {
                 try
@@ -134,8 +134,8 @@ public abstract class AbstractMultiValueCFMapper<T> extends AbstractCustomFieldM
         final List<String> values = customFieldBean.getValues();
         if (values != null)
         {
-            validValues = new ArrayList<String>();
-            invalidValues = new ArrayList<String>();
+            validValues = new ArrayList<>();
+            invalidValues = new ArrayList<>();
 
             for (final String value : values)
             {
@@ -161,7 +161,7 @@ public abstract class AbstractMultiValueCFMapper<T> extends AbstractCustomFieldM
     @Override
     public void populateInputParameters(final IssueInputParameters inputParameters, final CustomFieldMappingResult mappingResult, final CustomField customField, final Project project, final IssueType issueType)
     {
-        final List<String> formattedValues = new ArrayList<String>(mappingResult.getValidValues().size());
+        final List<String> formattedValues = new ArrayList<>(mappingResult.getValidValues().size());
         for (final String value : mappingResult.getValidValues())
         {
             formattedValues.add(formatStringForInputParams(value, customField, project, issueType));

@@ -1,9 +1,9 @@
 package it.com.atlassian.cpji;
 
-import com.atlassian.aui.test.runner.QUnitPageObjectsHelper;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.tests.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
+import com.atlassian.qunit.test.runner.QUnitPageObjectsHelper;
 import org.apache.axis.utils.StringUtils;
 import org.junit.Test;
 

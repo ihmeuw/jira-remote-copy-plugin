@@ -20,6 +20,7 @@ import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang.StringUtils;
 
@@ -35,14 +36,14 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     private final ApplicationProperties applicationProperties;
 
     static class InternalMappingResult {
-        final User mappedUser;
+        final ApplicationUser mappedUser;
         final MappingResultDecision decision;
 
         public enum MappingResultDecision {
             FOUND, NOT_FOUND
         }
 
-        InternalMappingResult(User mappedUser, MappingResultDecision decision) {
+        InternalMappingResult(ApplicationUser mappedUser, MappingResultDecision decision) {
             this.mappedUser = mappedUser;
             this.decision = decision;
         }
@@ -59,7 +60,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
         return AssigneeSystemField.class;
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user) {
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user) {
         return permissionManager.hasPermission(Permissions.ASSIGN_ISSUE, project, user);
     }
 
@@ -85,7 +86,7 @@ public class AssigneeFieldMapper extends AbstractSystemFieldMapper implements Is
     }
 
     InternalMappingResult mapUser(CachingUserMapper userMapper, UserBean user, final Project project) {
-        User assignee = userMapper.mapUser(user);
+        ApplicationUser assignee = userMapper.mapUser(user);
         if (assignee == null) {
             return new InternalMappingResult(null, InternalMappingResult.MappingResultDecision.NOT_FOUND);
         } else {

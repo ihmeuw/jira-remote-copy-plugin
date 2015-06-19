@@ -15,6 +15,7 @@ import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -62,7 +63,7 @@ public class IssueTypeFieldMapper extends AbstractSystemFieldMapper  implements 
         return IssueFieldConstants.ISSUE_TYPE;
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return true;
     }

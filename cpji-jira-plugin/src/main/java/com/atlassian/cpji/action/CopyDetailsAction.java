@@ -100,7 +100,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 	}
 
 	public boolean isIssueWithLinks() {
-		final MutableIssue issue = getIssueObject();
+		final MutableIssue issue = getMutableIssue();
 		if (issueLinkManager.isLinkingEnabled()) {
 			//checking if there are any not-subtask issue links (inward or outward)
 			return Iterables.any(issueLinkManager.getOutwardLinks(issue.getId()), IssueLinkCopier.isNotSubtaskIssueLink)
@@ -284,7 +284,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
 
 	private List<Option> getIssueTypeOptionsList(final Collection<IssueTypeBean> values)
     {
-        MutableIssue issue = getIssueObject();
+        MutableIssue issue = getMutableIssue();
         List<Option> result = Lists.newArrayList();
         if(values != null){
         for (IssueTypeBean value : values)

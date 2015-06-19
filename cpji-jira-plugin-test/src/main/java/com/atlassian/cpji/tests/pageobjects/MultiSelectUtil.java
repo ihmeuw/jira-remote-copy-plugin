@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class MultiSelectUtil {
 	public static void setMultiSelect(@Nonnull PageBinder pageBinder, @Nonnull String id, @Nullable String...values) {
-		setMultiSelect(pageBinder, id, values != null ? ImmutableList.copyOf(values) : null);
+		setMultiSelect(pageBinder, id, values != null ? ImmutableList.of(values) : null);
 	}
 
 	public static void setMultiSelect(@Nonnull PageBinder pageBinder, @Nonnull String id, @Nullable Iterable<String> values) {

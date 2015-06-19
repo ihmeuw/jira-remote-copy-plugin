@@ -13,6 +13,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
     private final PermissionManager permissionManager;
     private final JiraAuthenticationContext jiraAuthenticationContext;
 
-    public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager, 
+    public WatcherFieldMapper(final WatcherService watcherService, final PermissionManager permissionManager,
 			final JiraAuthenticationContext jiraAuthenticationContext, final Field field,
 			final DefaultFieldValuesManager defaultFieldValuesManager)
     {
@@ -45,7 +46,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
             List<UserBean> watchers = makeSureNotNull(bean.getWatchers());
             for (UserBean user : watchers)
             {
-                User watcher = userMapper.mapUser(user);
+                ApplicationUser watcher = userMapper.mapUser(user);
                 if (watcher != null)
                 {
                     watcherService.addWatcher(issue, jiraAuthenticationContext.getLoggedInUser(), watcher);
@@ -54,7 +55,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
         }
     }
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return permissionManager.hasPermission(Permissions.MANAGE_WATCHER_LIST, project, user) && watcherService.isWatchingEnabled();
     }
@@ -70,7 +71,7 @@ public class WatcherFieldMapper extends AbstractFieldMapper implements PostIssue
         }
         for (UserBean user : watchers)
         {
-            User watcher = userMapper.mapUser(user);
+            ApplicationUser watcher = userMapper.mapUser(user);
             if (watcher == null)
             {
                 unmappedValues.add(user.getUserName());

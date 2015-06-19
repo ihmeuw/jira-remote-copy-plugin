@@ -2,6 +2,7 @@ package com.atlassian.cpji.fields.value;
 
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.dbc.Assertions;
 import com.google.common.base.Predicate;
@@ -23,7 +24,7 @@ public class UserMappingManager
     public UserBean createUserBean(final String userName)
     {
         Assertions.notBlank("userName", userName);
-        User user = userManager.getUserObject(userName);
+        ApplicationUser user = userManager.getUserObject(userName);
         if (user == null)
         {
             return null;
@@ -35,11 +36,6 @@ public class UserMappingManager
     }
 
     public CachingUserMapper getUserMapper() {
-        return new CachingUserMapper(filter(userManager.getUsers(), new Predicate<User>() {
-            @Override
-            public boolean apply(User user) {
-                return user.isActive();
-            }
-        }));
+        return new CachingUserMapper(filter(userManager.getUsers(), ApplicationUser::isActive));
     }
 }

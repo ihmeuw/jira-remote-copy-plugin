@@ -8,6 +8,7 @@ import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
+import com.atlassian.jira.issue.IssueConstant;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
@@ -16,6 +17,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.BuildUtilsInfo;
 import com.atlassian.jira.webtests.Permissions;
 import com.google.common.base.Function;
@@ -57,7 +59,7 @@ public class TestProjectInfoService {
     @Mock
     private BuildUtilsInfo buildUtilsInfo;
     @Mock
-    private User mockedUser;
+    private ApplicationUser mockedUser;
     @Mock
     private FieldLayoutItemsRetriever fieldLayoutItemsRetriever;
 
@@ -134,21 +136,11 @@ public class TestProjectInfoService {
     }
 
     public static Function<IssueTypeBean, String> issueTypeBeanToName() {
-        return new Function<IssueTypeBean, String>() {
-            @Override
-            public String apply(@Nullable IssueTypeBean input) {
-                return input.getName();
-            }
-        };
+        return IssueTypeBean::getName;
     }
 
     public static Function<IssueType, String> issueTypeToName() {
-        return new Function<IssueType, String>() {
-            @Override
-            public String apply(@Nullable IssueType input) {
-                return input.getName();
-            }
-        };
+        return IssueConstant::getName;
     }
 
 

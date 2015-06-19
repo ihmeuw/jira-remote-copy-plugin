@@ -7,6 +7,8 @@ import com.atlassian.jira.issue.customfields.impl.UserCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.usercompatibility.UserCompatibilityHelper;
 
@@ -15,7 +17,7 @@ import com.atlassian.jira.usercompatibility.UserCompatibilityHelper;
  *
  * @since v2.1
  */
-public class UserCFMapper extends AbstractSingleValueCFMapper<User>
+public class UserCFMapper extends AbstractSingleValueCFMapper<ApplicationUser>
 {
 	private final UserManager userManager;
 
@@ -32,7 +34,7 @@ public class UserCFMapper extends AbstractSingleValueCFMapper<User>
     }
 
     @Override
-    protected String convertToString(final User value)
+    protected String convertToString(final ApplicationUser value)
     {
         return value.getName();
     }
@@ -50,10 +52,10 @@ public class UserCFMapper extends AbstractSingleValueCFMapper<User>
     }
 
     @Override
-    protected User convertToGenericType(final Object value)
+    protected ApplicationUser convertToGenericType(final Object value)
     {
         if(value == null)
             return null;
-        return UserCompatibilityHelper.convertUserObject(value).getUser();
+        return ApplicationUsers.from(UserCompatibilityHelper.convertUserObject(value).getUser());
     }
 }

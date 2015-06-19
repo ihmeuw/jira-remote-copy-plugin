@@ -45,6 +45,7 @@ import com.atlassian.jira.issue.link.RemoteIssueLink;
 import com.atlassian.jira.plugin.viewissue.issuelink.GlobalIdFactory;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Function;
@@ -265,7 +266,7 @@ public class CopyIssueService {
     }
 
     public void convertRemoteLinksToLocal(String issueKey) throws IssueNotFoundException, RemoteLinksNotFoundException, IssueLinkCreationException {
-        final User user = callingUser();
+        final ApplicationUser user = callingUser();
 
         // Get issue
         final IssueService.IssueResult result = issueService.getIssue(user, issueKey);
@@ -311,7 +312,7 @@ public class CopyIssueService {
     }
 
 
-    private void createIssueLink(final User user, final Issue fromIssue, final Issue toIssue, final String relationship) throws IssueLinkCreationException {
+    private void createIssueLink(final ApplicationUser user, final Issue fromIssue, final Issue toIssue, final String relationship) throws IssueLinkCreationException {
 
         IssueLinkType issueLinkType = findIssueLinkTypeByNames(relationship);
 
@@ -331,7 +332,7 @@ public class CopyIssueService {
         }
     }
 
-    private Issue getIssue(final User user, final Long issueId) {
+    private Issue getIssue(final ApplicationUser user, final Long issueId) {
         final IssueService.IssueResult result = issueService.getIssue(user, issueId);
         if (!result.isValid()) {
             return null;
@@ -375,7 +376,7 @@ public class CopyIssueService {
     }
 
 
-    private User callingUser() {
+    private ApplicationUser callingUser() {
         return authenticationContext.getLoggedInUser();
     }
 

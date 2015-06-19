@@ -2,6 +2,7 @@ package com.atlassian.cpji.fields.value;
 
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -29,10 +30,10 @@ public class CachingUserMapperTest {
     private UserBean userBean;
 
     @MockitoAnnotations.Mock
-    private User user;
+    private ApplicationUser user;
 
     @MockitoAnnotations.Mock
-    private Multimap<String,User> multimap;
+    private Multimap<String, ApplicationUser> multimap;
 
     private CachingUserMapper cachingUserMapper;
 
@@ -49,87 +50,87 @@ public class CachingUserMapperTest {
 	public void testCachingUserMapperIgnoresNullOrEmptyValues()
 	{
 		{
-			User user1 = mock(User.class);
+            ApplicationUser user1 = mock(ApplicationUser.class);
 			when(user1.getName()).thenReturn("username");
 			when(user1.getDisplayName()).thenReturn("fullName");
 			when(user1.getEmailAddress()).thenReturn("email");
-			new CachingUserMapper(Lists.<User>newArrayList(user1));
+			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
 		}
 
 		{
-			User user1 = mock(User.class);
+            ApplicationUser user1 = mock(ApplicationUser.class);
 			when(user1.getDisplayName()).thenReturn("fullName");
 			when(user1.getEmailAddress()).thenReturn("email");
-			new CachingUserMapper(Lists.<User>newArrayList(user1));
+			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
 		}
 
 		{
-			User user1 = mock(User.class);
+            ApplicationUser user1 = mock(ApplicationUser.class);
 			when(user1.getName()).thenReturn("username");
 			when(user1.getEmailAddress()).thenReturn("email");
-			new CachingUserMapper(Lists.<User>newArrayList(user1));
+			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
 		}
 
 		{
-			User user1 = mock(User.class);
+            ApplicationUser user1 = mock(ApplicationUser.class);
 			when(user1.getName()).thenReturn("username");
 			when(user1.getDisplayName()).thenReturn("fullName");
-			new CachingUserMapper(Lists.<User>newArrayList(user1));
+			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
 		}
 	}
 
     @Test
     public void testGetUsersByEmailWhenEmailIsNull() throws Exception {
         when(userBean.getEmail()).thenReturn(null);
-        final Multimap<String, User> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
+        final Multimap<String, ApplicationUser> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
         Assert.assertNull(usersByEmail);
     }
 
     @Test
     public void testGetUsersByEmailWhenEmailIsEmpty() throws Exception {
         when(userBean.getEmail()).thenReturn("");
-        final Multimap<String, User> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
+        final Multimap<String, ApplicationUser> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
         Assert.assertNull(usersByEmail);
     }
     @Test
     public void testGetUsersByEmailWhenEmailIsPresent() throws Exception {
         when(userBean.getEmail()).thenReturn("test@domain.com");
-        final Multimap<String, User> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
+        final Multimap<String, ApplicationUser> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
         Assert.assertNotNull(usersByEmail);
     }
 
     @Test
     public void testGetUsersByFullNameWhenFullNameIsNull() throws Exception {
         when(userBean.getFullName()).thenReturn(null);
-        final Multimap<String, User> usersByFullName = cachingUserMapper.getUsersByFullName(userBean, multimap);
+        final Multimap<String, ApplicationUser> usersByFullName = cachingUserMapper.getUsersByFullName(userBean, multimap);
         Assert.assertNull(usersByFullName);
     }
 
     @Test
     public void testGetUsersByFullNameWhenFullNameIsEmpty() throws Exception {
         when(userBean.getFullName()).thenReturn("");
-        final Multimap<String, User> usersByFullName = cachingUserMapper.getUsersByFullName(userBean, multimap);
+        final Multimap<String, ApplicationUser> usersByFullName = cachingUserMapper.getUsersByFullName(userBean, multimap);
         Assert.assertNull(usersByFullName);
     }
 
     @Test
     public void testGetUsersByFullNameWhenFullNameIsPresent() throws Exception {
         when(userBean.getFullName()).thenReturn("Jon Sample");
-        final Multimap<String, User> usersByFullName = cachingUserMapper.getUsersByFullName(userBean, multimap);
+        final Multimap<String, ApplicationUser> usersByFullName = cachingUserMapper.getUsersByFullName(userBean, multimap);
         Assert.assertNotNull(usersByFullName);
     }
 
     @Test
     public void testGetUsersByUserNameWhenUserNameIsNull() throws Exception {
         when(userBean.getUserName()).thenReturn(null);
-        final Collection<User> usersByUserName = cachingUserMapper.getUsersByUserName(userBean, multimap);
+        final Collection<ApplicationUser> usersByUserName = cachingUserMapper.getUsersByUserName(userBean, multimap);
         Assert.assertEquals(usersByUserName, Collections.emptyList());
     }
 
     @Test
     public void testGetUsersByUserNameWhenUserNameIsEmpty() throws Exception {
         when(userBean.getUserName()).thenReturn("");
-        final Collection<User> usersByUserName = cachingUserMapper.getUsersByUserName(userBean, multimap);
+        final Collection<ApplicationUser> usersByUserName = cachingUserMapper.getUsersByUserName(userBean, multimap);
         Assert.assertEquals(usersByUserName, Collections.emptyList());
     }
 
@@ -137,7 +138,7 @@ public class CachingUserMapperTest {
     public void testGetUsersByUserNameWhenUserNameIsPresent() throws Exception {
         when(userBean.getUserName()).thenReturn("someuser");
         when(multimap.get("someuser")).thenReturn(ImmutableList.of(user));
-        final Collection<User> usersByUserName = cachingUserMapper.getUsersByUserName(userBean, multimap);
+        final Collection<ApplicationUser> usersByUserName = cachingUserMapper.getUsersByUserName(userBean, multimap);
         Assert.assertEquals(usersByUserName, ImmutableList.of(user));
     }
 }

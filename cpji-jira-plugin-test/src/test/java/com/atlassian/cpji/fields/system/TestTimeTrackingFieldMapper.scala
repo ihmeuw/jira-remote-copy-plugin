@@ -30,7 +30,7 @@ import com.atlassian.jira.util.JiraDurationUtils
 	val worker = new MockComponentWorker()
 
 	@Before def setUp {
-		val of: OrderableField = mock(classOf[OrderableField])
+		val of: OrderableField[Object] = mock(classOf[OrderableField[Object]])
 		when(fieldManager.getField(IssueFieldConstants.TIMETRACKING)) thenReturn (of)
 
 		timeTrackingFieldMapper = new TimeTrackingFieldMapper(fieldManager, timeTrackingConfiguration, null)

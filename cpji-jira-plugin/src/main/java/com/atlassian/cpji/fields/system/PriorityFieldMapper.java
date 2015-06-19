@@ -16,6 +16,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutItem;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.priority.Priority;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -58,7 +59,7 @@ public class PriorityFieldMapper extends AbstractSystemFieldMapper implements Is
 		}
 	}
 
-    public boolean userHasRequiredPermission(final Project project, final User user)
+    public boolean userHasRequiredPermission(final Project project, final ApplicationUser user)
     {
         return true;
     }

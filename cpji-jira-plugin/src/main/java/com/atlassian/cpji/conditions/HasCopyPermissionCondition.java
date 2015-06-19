@@ -5,6 +5,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractIssueCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import com.atlassian.jira.user.ApplicationUser;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,7 +23,7 @@ public class HasCopyPermissionCondition extends AbstractIssueCondition
     }
 
     @Override
-    public boolean shouldDisplay(final User user, final Issue issue, final JiraHelper jiraHelper)
+    public boolean shouldDisplay(final ApplicationUser user, final Issue issue, final JiraHelper jiraHelper)
     {
         final boolean hasPermissionForProject = copyIssuePermissionManager.hasPermissionForProject(issue.getProjectObject().getKey());
         log.debug("shouldDisplay for " + issue.getKey() + ": [hasPermissionForProject: " + hasPermissionForProject + "]");
