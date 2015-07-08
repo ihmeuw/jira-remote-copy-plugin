@@ -72,7 +72,7 @@ public class TestProjectConfiguration extends AbstractCopyIssueTest
 
     }
 
-    private Matcher<Iterable<String>> expectedRequiredFields() {
+    private Matcher<Iterable<? extends String>> expectedRequiredFields() {
         return IsIterableContainingInAnyOrder.<String>containsInAnyOrder(startsWith("Issue Type"), startsWith("Reporter"));
     }
 
