@@ -1,16 +1,13 @@
 package com.atlassian.cpji.fields.custom;
 
 import com.atlassian.cpji.fields.value.DefaultFieldValuesManager;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.customfields.CustomFieldType;
 import com.atlassian.jira.issue.customfields.impl.MultiUserCFType;
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.user.ApplicationUsers;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.usercompatibility.UserCompatibilityHelper;
 
 /**
  * Maps the {@link com.atlassian.jira.issue.customfields.impl.MultiGroupCFType} custom field type.
@@ -58,7 +55,7 @@ public class MultiUserCFMapper extends AbstractMultiValueCFMapper<ApplicationUse
         if(value == null)
             return null;
 
-        return ApplicationUsers.from(UserCompatibilityHelper.convertUserObject(value).getUser());
+        return (ApplicationUser) value;
     }
 
 }

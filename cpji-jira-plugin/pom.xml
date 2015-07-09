@@ -19,10 +19,6 @@
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-core</artifactId>
         </dependency>
-        <!--dependency>
-            <groupId>com.atlassian.selenium</groupId>
-            <artifactId>atlassian-selenium</artifactId>
-        </dependency-->
         <!-- REST dependencies-->
         <dependency>
             <groupId>javax.xml.bind</groupId>
@@ -40,35 +36,6 @@
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-module</artifactId>
         </dependency>
-		<dependency>
-			<groupId>org.codehaus.jettison</groupId>
-			<artifactId>jettison</artifactId>
-		</dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <!-- UAL dependencies -->
-        <dependency>
-            <groupId>com.atlassian.applinks</groupId>
-            <artifactId>applinks-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.sal</groupId>
-            <artifactId>sal-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client</artifactId>
@@ -107,25 +74,9 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.atlassian.fugue</groupId>
-			<artifactId>fugue</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-		</dependency>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-view-issue-plugin</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.usercompatibility</groupId>
-            <artifactId>usercompatibility-jira</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
         </dependency>
 	</dependencies>
 

@@ -21,7 +21,7 @@ import com.atlassian.cpji.action.RemoteIssueLinkType
 
 class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
-	implicit def fieldInputFromVals(arg: (IssueFieldId, AnyRef)) = new FieldInput(arg._1, arg._2)
+	implicit def fieldInputFromVals(arg: (IssueFieldId, AnyRef)): FieldInput = new FieldInput(arg._1, arg._2)
 
 	val createIssues3 = new CreateIssues(restClient3)
 
@@ -37,7 +37,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 			(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3"))
 		)
 
-		createIssues3.newIssue((fieldInputs ++ additionalFields): _*)
+		createIssues3.newIssue(fieldInputs ++ additionalFields: _*)
 	}
 
 	val createIssue = (summary: String) => {
@@ -217,7 +217,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 		eq(_.getAttachments.asScala.map(x => (x.getSize, x.getFilename, x.getMimeType)))
 		//issue links should equals (of course without links between theese two issues)
 		eq(_.getIssueLinks.asScala
-				.filter(x => (x.getTargetIssueId != issue.getId && x.getTargetIssueId != copiedIssue.getId))
+				.filter(x => x.getTargetIssueId != issue.getId && x.getTargetIssueId != copiedIssue.getId)
 				.map(x => (x.getIssueLinkType, x.getTargetIssueId, x.getTargetIssueKey))
 		)
 	}

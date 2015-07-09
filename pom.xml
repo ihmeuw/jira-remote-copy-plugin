@@ -75,7 +75,7 @@
 			<dependency>
 				<groupId>com.sun.jersey.contribs</groupId>
 				<artifactId>jersey-apache-client</artifactId>
-				<version>1.8-atlassian-1</version>
+				<version>1.9.1</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -113,12 +113,6 @@
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.selenium</groupId>
-				<artifactId>atlassian-selenium</artifactId>
-				<version>${atlassian.selenium.version}</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira.tests</groupId>
@@ -203,17 +197,6 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>org.codehaus.jettison</groupId>
-				<artifactId>jettison</artifactId>
-				<version>1.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>stax</groupId>
-						<artifactId>stax-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
 				<groupId>com.atlassian.jira</groupId>
 				<artifactId>jira-rest-java-client</artifactId>
 				<version>1.1-m02</version>
@@ -227,63 +210,6 @@
 				<version>4.0</version>
 				<scope>provided</scope>
 			</dependency>
-
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.4</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<!-- UAL dependencies -->
-			<dependency>
-				<groupId>com.atlassian.applinks</groupId>
-				<artifactId>applinks-api</artifactId>
-				<version>${applinks.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.sal</groupId>
-				<artifactId>sal-api</artifactId>
-				<version>${my.sal.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>2.5</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.15</version>
-				<scope>provided</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.jms</groupId>
-						<artifactId>jms</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jdmk</groupId>
-						<artifactId>jmxtools</artifactId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jmxri</artifactId>
-						<groupId>com.sun.jmx</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.fugue</groupId>
-				<artifactId>fugue</artifactId>
-				<version>1.2.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.code.findbugs</groupId>
-				<artifactId>jsr305</artifactId>
-				<version>2.0.0</version>
-			</dependency>
             <dependency>
                 <artifactId>jira-view-issue-plugin</artifactId>
                 <groupId>com.atlassian.jira</groupId>
@@ -296,11 +222,6 @@
 				<version>1.9.0</version>
 				<scope>test</scope>
 			</dependency>
-            <dependency>
-                <groupId>com.atlassian.usercompatibility</groupId>
-                <artifactId>usercompatibility-jira</artifactId>
-                <version>0.09</version>
-            </dependency>
 			<dependency>
 				<groupId>com.atlassian.util.concurrent</groupId>
 				<artifactId>atlassian-util-concurrent</artifactId>
@@ -366,14 +287,14 @@
         <jira.version>7.0.0-QR20150617180424</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
-        <my.sal.version>2.6.1</my.sal.version>
-        <rest.version>2.7.1</rest.version>
-        <applinks.version>3.5.6</applinks.version>
+		<my.sal.version>3.0.2</my.sal.version>
+        <rest.version>3.0.0-m012</rest.version>
+		<applinks.version>5.0.0</applinks.version>
 		<testkit.version>7.0.53</testkit.version>
 		<test-basics.version>1.9.5</test-basics.version>
 		<amps.version>6.0.1</amps.version>
-		<atlassian.selenium.version>2.1-m18</atlassian.selenium.version>
-		<jersey.version>1.8-atlassian-6</jersey.version>
+		<atlassian.selenium.version>2.2.1-m02-jira-1</atlassian.selenium.version>
+		<jersey.version>1.8-atlassian-16</jersey.version>
     </properties>
 
 	<profiles>
@@ -396,8 +317,8 @@
         <connection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git</developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+      	<tag>HEAD</tag>
+  	</scm>
 
 	<pluginRepositories>
 		<pluginRepository>

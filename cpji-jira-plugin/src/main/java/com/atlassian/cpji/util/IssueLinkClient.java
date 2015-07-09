@@ -6,7 +6,6 @@ import com.atlassian.applinks.api.ApplicationLinkRequest;
 import com.atlassian.applinks.api.ApplicationLinkRequestFactory;
 import com.atlassian.applinks.api.CredentialsRequiredException;
 import com.atlassian.applinks.host.spi.InternalHostApplication;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.link.RemoteIssueLink;
@@ -26,7 +25,6 @@ import com.atlassian.sal.api.net.ResponseException;
 import com.atlassian.sal.api.net.ReturningResponseHandler;
 import org.apache.log4j.Logger;
 
-import javax.ws.rs.core.MediaType;
 import java.util.Iterator;
 
 /**
@@ -55,7 +53,7 @@ public class IssueLinkClient
             throws CredentialsRequiredException, ResponseException
     {
         final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
-        request.setRequestContentType(MediaType.APPLICATION_JSON);
+//        request.setRequestContentType(MediaType.APPLICATION_JSON);
         request.setRequestBody(getJsonForCreateRemoteLinkToLocalIssue(internalHostApplication, localIssue, relationship));
         return request.executeAndReturn(new RestResponseHandler());
     }
@@ -90,7 +88,7 @@ public class IssueLinkClient
     public RestResponse createRemoteIssueLink(final RemoteIssueLink remoteIssueLink, final String remoteIssueKey, final ApplicationLink applicationLink) throws CredentialsRequiredException, ResponseException
     {
         final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
-        request.setRequestContentType(MediaType.APPLICATION_JSON);
+//        request.setRequestContentType(MediaType.APPLICATION_JSON);
         request.setRequestBody(getJsonForCreateRemoteIssueLink(remoteIssueLink));
         return request.executeAndReturn(new RestResponseHandler());
     }
