@@ -14,16 +14,24 @@
     <description>Plugin that copies issues from one JIRA instance to another</description>
     <packaging>atlassian-plugin</packaging>
 
-    <dependencies>
+	<dependencies>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-api</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-        </dependency>
-        <!-- REST dependencies-->
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-core</artifactId>
+		</dependency>
+		<!-- REST dependencies-->
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>jsr311-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.plugins.rest</groupId>
+			<artifactId>atlassian-rest-common</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client</artifactId>
@@ -62,10 +70,10 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-view-issue-plugin</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-view-issue-plugin</artifactId>
+		</dependency>
 	</dependencies>
 
     <build>

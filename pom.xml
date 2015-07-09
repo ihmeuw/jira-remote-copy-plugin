@@ -100,6 +100,12 @@
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
+				<artifactId>jira-api</artifactId>
+				<version>${jira.compile.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.atlassian.jira</groupId>
 				<artifactId>jira-core</artifactId>
 				<version>${jira.compile.version}</version>
 				<scope>provided</scope>
@@ -156,6 +162,12 @@
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
 				<version>2.1</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>jsr311-api</artifactId>
+				<version>1.1.1</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
