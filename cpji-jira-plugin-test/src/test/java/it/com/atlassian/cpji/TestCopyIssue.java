@@ -6,9 +6,9 @@ import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceSuccessfulPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
-import com.atlassian.jira.rest.client.IssueRestClient;
-import com.atlassian.jira.rest.client.domain.Attachment;
-import com.atlassian.jira.rest.client.domain.Issue;
+import com.atlassian.jira.rest.client.api.IssueRestClient;
+import com.atlassian.jira.rest.client.api.domain.Attachment;
+import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.pageobjects.elements.query.Poller;
 import com.google.common.collect.ImmutableList;
@@ -83,7 +83,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     public void testAttachmentsCopying() throws Exception {
         final String remoteIssueKey = remoteCopy(jira1, "NEL-4", 10400L);
 
-        Issue restIssue = restClient2.getIssueClient().getIssue(remoteIssueKey, ImmutableList.of(IssueRestClient.Expandos.CHANGELOG), NPM);
+        Issue restIssue = restClient2.getIssueClient().getIssue(remoteIssueKey, ImmutableList.of(IssueRestClient.Expandos.CHANGELOG)).claim();
         List<Attachment> attachments = ImmutableList.copyOf(restIssue.getAttachments());
         checkAttachment(attachments.get(0), "document.doc", 9216, "application/msword; charset=ISO-8859-1");
         checkAttachment(attachments.get(1), "screenshot.png", 36743, "image/png; charset=ISO-8859-1");

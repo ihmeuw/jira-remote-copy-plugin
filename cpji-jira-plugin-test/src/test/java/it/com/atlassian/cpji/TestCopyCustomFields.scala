@@ -1,12 +1,13 @@
 package it.com.atlassian.cpji
 
-import org.junit.{Test, Before}
-import org.junit.Assert.{assertTrue, assertEquals, assertThat}
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage
+import com.atlassian.jira.rest.client.api.domain.IssueField
 import com.google.common.collect.Iterables
-import com.atlassian.jira.rest.client.domain.Field
-import collection.JavaConversions._
 import org.hamcrest.collection.IsIterableContainingInAnyOrder
+import org.junit.Assert.{assertEquals, assertThat, assertTrue}
+import org.junit.{Before, Test}
+
+import scala.collection.JavaConversions._
 
 class TestCopyCustomFields extends AbstractCopyIssueTest with JiraObjects {
 	@Before def setup {
@@ -19,12 +20,12 @@ class TestCopyCustomFields extends AbstractCopyIssueTest with JiraObjects {
 		val copiedIssuePage = selectTargetPage.next().next().copyIssue()
 		assertTrue(copiedIssuePage.isSuccessful)
 
-		val i1 = restClient2.getIssueClient.getIssue("ACF-1", NPM)
-		val i2 = restClient2.getIssueClient.getIssue(copiedIssuePage.getRemoteIssueKey, NPM)
+		val i1 = restClient2.getIssueClient.getIssue("ACF-1").claim()
+		val i2 = restClient2.getIssueClient.getIssue(copiedIssuePage.getRemoteIssueKey).claim()
 
-		val fields1 = List(Iterables.toArray(i1.getFields, classOf[Field]):_*)
+		val fields1 = List(Iterables.toArray(i1.getFields, classOf[IssueField]):_*)
 				.filter(p => p.getId.startsWith("customfield_") && p.getValue != null).map(f => (f.getName, f.getValue.toString)).sortBy(_._1)
-		val fields2 = List(Iterables.toArray(i2.getFields, classOf[Field]):_*)
+		val fields2 = List(Iterables.toArray(i2.getFields, classOf[IssueField]):_*)
 				.filter(p => p.getId.startsWith("customfield_") && p.getValue != null).map(f => (f.getName, f.getValue.toString)).sortBy(_._1)
 		assertEquals(22, fields1.length)
 		assertEquals(fields2, fields1)

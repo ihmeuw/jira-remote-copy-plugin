@@ -36,7 +36,7 @@ import com.atlassian.jira.mock.issue.MockIssue;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.rest.client.domain.BasicProject;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;

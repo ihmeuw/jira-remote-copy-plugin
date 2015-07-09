@@ -1,21 +1,20 @@
 package it.com.atlassian.cpji
 
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, CopyDetailsPage, SelectTargetProjectPage}
-import org.junit.{Rule, Before, Test, Assert}
-import org.junit.Assert._
-import org.hamcrest.collection.IsIterableContainingInOrder
-import org.openqa.selenium.By
-import collection.JavaConverters._
-import collection.JavaConversions._
-import com.atlassian.pageobjects.elements.query.Poller
-import com.atlassian.pageobjects.elements.Options
-import com.atlassian.jira.pageobjects.pages.DashboardPage
-import org.hamcrest.Matchers
-import com.atlassian.jira.rest.client.domain.input.{ComplexIssueInputFieldValue, FieldInput}
-import com.atlassian.jira.rest.client.domain.IssueFieldId._
-import com.atlassian.jira.rest.client.domain.{BasicUser, IssueFieldId}
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
 import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.config.properties.APKeys
+import com.atlassian.jira.pageobjects.pages.DashboardPage
+import com.atlassian.jira.rest.client.api.domain.IssueFieldId._
+import com.atlassian.jira.rest.client.api.domain.input.{ComplexIssueInputFieldValue, FieldInput}
+import com.atlassian.jira.rest.client.api.domain.{BasicUser, IssueFieldId}
+import com.atlassian.pageobjects.elements.query.Poller
+import org.hamcrest.Matchers
+import org.hamcrest.collection.IsIterableContainingInOrder
+import org.junit.Assert._
+import org.junit.{Before, Rule, Test}
+import org.openqa.selenium.By
+
+import scala.collection.JavaConversions._
 
 class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 	val createIssues: CreateIssues = new CreateIssues(restClient1)
@@ -44,7 +43,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 		val successfulPage = permissionChecksPage.copyIssue()
 		assertTrue(successfulPage.isSuccessful)
 
-		val issue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey, NPM)
+		val issue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey).claim()
 		assertThat(issue.getAssignee.getName, Matchers.equalTo("admin"))
 		assertThat(issue.getReporter.getName, Matchers.equalTo("fred"))
 	}
@@ -77,7 +76,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 			val successfulPage = permissionChecksPage.copyIssue()
 			assertTrue(successfulPage.isSuccessful)
 
-			val issue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey, NPM)
+			val issue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey).claim()
 			assertThat(issue.getAssignee.getName, Matchers.equalTo("admin"))
 			assertThat(issue.getReporter.getName, Matchers.equalTo("fred"))
 		} finally {

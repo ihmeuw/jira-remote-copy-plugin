@@ -1,24 +1,21 @@
 package it.com.atlassian.cpji
 
-import org.junit._
-import org.junit.Assert._
-import com.atlassian.jira.rest.client.domain._
-import input.{IssueInput, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
-import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.io.ByteArrayInputStream
-import com.atlassian.cpji.tests.pageobjects.CopyDetailsPage
-import com.atlassian.pageobjects.elements.query.Poller
-import com.atlassian.cpji.tests.rules.CreateIssues
-import org.joda.time.DateTime
+
 import com.atlassian.cpji.CopyIssueProcess
-import it.com.atlassian.cpji.BackdoorHelpers._
-import com.atlassian.jira.security.Permissions
+import com.atlassian.cpji.tests.pageobjects.CopyDetailsPage
+import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.config.properties.APKeys
-import com.atlassian.pageobjects.elements.{PageElement, CheckboxElement}
+import com.atlassian.jira.rest.client.api.domain.input.{ComplexIssueInputFieldValue, FieldInput, IssueInput, LinkIssuesInput}
+import com.atlassian.jira.rest.client.api.domain.{Comment, Issue, IssueFieldId}
+import com.atlassian.jira.security.Permissions
+import com.atlassian.pageobjects.elements.query.Poller
+import com.atlassian.pageobjects.elements.{CheckboxElement, PageElement}
+import it.com.atlassian.cpji.BackdoorHelpers._
 import org.apache.commons.lang.StringUtils
 import org.hamcrest.Matchers
-import org.hamcrest.text.StringContainsInOrder
-import com.google.common.collect.ImmutableList
+import org.joda.time.DateTime
+import org.junit._
 
 class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
@@ -32,26 +29,24 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
 		issue = AbstractCopyIssueTest.restClient1.getIssueClient
 				.getIssue(AbstractCopyIssueTest.restClient1.getIssueClient.createIssue(
-			IssueInput.createWithFields(new FieldInput(SUMMARY_FIELD, "Issue with comments and attachments"),
-				new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
-				new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3"))),
-			AbstractCopyIssueTest.NPM).getKey,
-			AbstractCopyIssueTest.NPM)
+			IssueInput.createWithFields(new FieldInput(IssueFieldId.SUMMARY_FIELD, "Issue with comments and attachments"),
+				new FieldInput(IssueFieldId.PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
+				new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))).claim().getKey).claim()
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.addComment(AbstractCopyIssueTest.NPM, issue.getCommentsUri,
+		AbstractCopyIssueTest.restClient1.getIssueClient.addComment(issue.getCommentsUri,
 			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null))
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
-			this.getClass.getCanonicalName)
+			this.getClass.getCanonicalName).claim()
 
 		AbstractCopyIssueTest.restClient1.getIssueClient
-				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate")).claim()
 	}
 
 	@After def tearDown() {
 		try {
-			AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
+			AbstractCopyIssueTest.restClient1.getIssueClient.deleteIssue(issue.getKey, true).claim()
 		} catch {
 			case e: Exception =>
 		}
@@ -101,18 +96,18 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, 30L.toString)
 
       //single attachment
-      AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+      AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(
         issue.getAttachmentsUri, new ByteArrayInputStream(StringUtils.repeat("this is a stream", 100).getBytes("UTF-8")),
-        "attachment1.txt")
+        "attachment1.txt").claim()
 
       var detailsPage = goToCopyDetails(issue.getId)
       isAttachmentsPresentAndEnabled(detailsPage)
       Poller.waitUntil(detailsPage.getCopyAttachmentsNotice.timed().getText, Matchers.containsString("ATTACHMENT1.TXT exceeds maximum attachment size "))
 
 
-      AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+      AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(
         issue.getAttachmentsUri, new ByteArrayInputStream(StringUtils.repeat("this is a stream", 100).getBytes("UTF-8")),
-        "attachment2.txt")
+        "attachment2.txt").claim()
 
       detailsPage = goToCopyDetails(issue.getId)
       isAttachmentsPresentAndEnabled(detailsPage)

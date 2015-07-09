@@ -1,7 +1,6 @@
 package com.atlassian.cpji.tests;
 
 import com.atlassian.jira.pageobjects.config.TestEnvironment;
-import com.atlassian.jira.tests.rules.WebDriverScreenshot;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hamcrest.StringDescription;
@@ -16,7 +15,7 @@ import java.io.File;
 /**
  */
 public class ScreenshotUtil {
-	private static final Logger logger = LoggerFactory.getLogger(WebDriverScreenshot.class);
+	private static final Logger logger = LoggerFactory.getLogger(ScreenshotUtil.class);
 
 	public static void attemptScreenshot(WebDriver driver, String name)
 	{

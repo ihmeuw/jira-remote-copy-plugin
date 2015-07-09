@@ -33,44 +33,12 @@
 				<artifactId>atlassian-pageobjects-api</artifactId>
 				<version>${atlassian.selenium.version}</version>
 				<scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
 				<artifactId>atlassian-jira-pageobjects</artifactId>
 				<version>${jira.version}</version>
 				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>com.sun.jersey.contribs</groupId>
-						<artifactId>jersey-apache-client</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.atlassian.jira</groupId>
-                        <artifactId>jira-rest-java-client-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.atlassian.jira</groupId>
-                        <artifactId>jira-rest-java-client-core</artifactId>
-                    </exclusion>
-                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.sun.jersey.contribs</groupId>
@@ -83,20 +51,6 @@
 				<artifactId>jira-webdriver-tests</artifactId>
 				<version>${jira.version}</version>
 				<scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>junit</groupId>
-                        <artifactId>junit</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.atlassian.jira</groupId>
-                        <artifactId>jira-rest-java-client-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.atlassian.jira</groupId>
-                        <artifactId>jira-rest-java-client-core</artifactId>
-                    </exclusion>
-                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
@@ -109,35 +63,11 @@
 				<artifactId>jira-core</artifactId>
 				<version>${jira.compile.version}</version>
 				<scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                </exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira.tests</groupId>
 				<artifactId>jira-testkit-client</artifactId>
 				<version>${testkit.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>com.sun.jersey.contribs</groupId>
-						<artifactId>jersey-apache-client</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-simple</artifactId>
-                    </exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira.tests</groupId>
@@ -210,8 +140,13 @@
 			</dependency>
 			<dependency>
 				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-rest-java-client</artifactId>
-				<version>1.1-m02</version>
+				<artifactId>jira-rest-java-client-api</artifactId>
+				<version>2.0.0-m31</version>
+			</dependency>
+			<dependency>
+				<groupId>com.atlassian.jira</groupId>
+				<artifactId>jira-rest-java-client-core</artifactId>
+				<version>2.0.0-m31</version>
 			</dependency>
 
 			<!-- Remote Issue Links dependencies -->

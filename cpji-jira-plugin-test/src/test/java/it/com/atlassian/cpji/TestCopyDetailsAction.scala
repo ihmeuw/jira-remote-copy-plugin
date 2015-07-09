@@ -1,16 +1,16 @@
 package it.com.atlassian.cpji
 
-import org.junit.{Before, Rule, Test}
+import java.io.ByteArrayInputStream
+
+import com.atlassian.cpji.CopyIssueProcess
 import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.domain._
-import com.atlassian.jira.rest.client.domain.input.{LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
-import com.atlassian.jira.rest.client.domain.IssueFieldId._
+import com.atlassian.jira.rest.client.api.domain.{Issue, IssueFieldId, Comment}
+import com.atlassian.jira.rest.client.api.domain.input.{LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
+import com.atlassian.pageobjects.elements.query.Poller
+import org.hamcrest.core.IsCollectionContaining
 import org.joda.time.DateTime
 import org.junit.Assert._
-import java.io.ByteArrayInputStream
-import org.hamcrest.core.IsCollectionContaining
-import com.atlassian.pageobjects.elements.query.Poller
-import com.atlassian.cpji.CopyIssueProcess
+import org.junit.{Before, Rule, Test}
 
 class TestCopyDetailsAction extends AbstractCopyIssueTest {
 	val createIssues: CreateIssues = new CreateIssues(AbstractCopyIssueTest.restClient1)
@@ -24,8 +24,8 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 	def goToCopyDetails = CopyIssueProcess.goToCopyDetails(AbstractCopyIssueTest.jira1, _: java.lang.Long)
 
 	@Test def testAdvancedSectionIncludesItemsBasedOnIssueContent() {
-		val issue: Issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
-			new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
+		val issue: Issue = createIssues.newIssue(new FieldInput(IssueFieldId.SUMMARY_FIELD, "Issue with comments"),
+			new FieldInput(IssueFieldId.PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 
 		{
@@ -37,8 +37,8 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 			assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 		}
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.addComment(AbstractCopyIssueTest.NPM, issue.getCommentsUri,
-			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null))
+		AbstractCopyIssueTest.restClient1.getIssueClient.addComment(issue.getCommentsUri,
+			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null)).claim()
 
 		{
 			val copyDetailsPage = goToCopyDetails(issue.getId)
@@ -50,9 +50,9 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		}
 
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
-			this.getClass.getCanonicalName)
+			this.getClass.getCanonicalName).claim()
 
 		{
 			val copyDetailsPage = goToCopyDetails(issue.getId)
@@ -64,7 +64,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		}
 
 		AbstractCopyIssueTest.restClient1.getIssueClient
-				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate")).claim()
 
 		val copyDetailsPage = goToCopyDetails(issue.getId)
 
@@ -73,21 +73,21 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		Poller.waitUntilTrue(copyDetailsPage.getCopyIssueLinksGroup.timed().isVisible)
 		assertTrue(copyDetailsPage.isCreateIssueLinksGroupVisible)
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
+		AbstractCopyIssueTest.restClient1.getIssueClient.deleteIssue(issue.getKey, true).claim()
 	}
 
 
 	@Test def testAdvancedSectionReportsMissingFeaturesOnRemoteSide() {
-		val issue: Issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
-			new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
+		val issue: Issue = createIssues.newIssue(new FieldInput(IssueFieldId.SUMMARY_FIELD, "Issue with comments"),
+			new FieldInput(IssueFieldId.PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 
-		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(AbstractCopyIssueTest.NPM,
+		AbstractCopyIssueTest.restClient1.getIssueClient.addAttachment(
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
-			this.getClass.getCanonicalName)
+			this.getClass.getCanonicalName).claim()
 
 		AbstractCopyIssueTest.restClient1.getIssueClient
-				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), AbstractCopyIssueTest.NPM)
+				.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate")).claim()
 
 		try {
 			AbstractCopyIssueTest.testkit2.attachments().disable()
@@ -105,7 +105,7 @@ class TestCopyDetailsAction extends AbstractCopyIssueTest {
 		} finally {
 			AbstractCopyIssueTest.testkit2.attachments().enable()
 			AbstractCopyIssueTest.testkit2.issueLinking().enable()
-			AbstractCopyIssueTest.restClient1.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
+			AbstractCopyIssueTest.restClient1.getIssueClient.deleteIssue(issue.getKey, true).claim()
 		}
 	}
 

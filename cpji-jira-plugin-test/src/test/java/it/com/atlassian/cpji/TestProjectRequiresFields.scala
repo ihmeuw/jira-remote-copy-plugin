@@ -1,6 +1,7 @@
 package it.com.atlassian.cpji
 
 import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, CopyDetailsPage, SelectTargetProjectPage}
+import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
 import org.junit.{Rule, Before, Test, Assert}
 import org.junit.Assert._
 import org.hamcrest.collection.IsIterableContainingInOrder
@@ -12,7 +13,6 @@ import com.atlassian.pageobjects.elements.Options
 import org.scalatest.junit.ShouldMatchersForJUnit
 import org.codehaus.jettison.json.JSONArray
 import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.domain.input.IssueInputBuilder
 import com.atlassian.cpji.tests.pageobjects.confirmationPage.MappingResult
 import org.hamcrest.Matchers
 import org.hamcrest.text.StringContainsInOrder
@@ -148,7 +148,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
 
     //copied issue should contain default values
-    val copiedIssue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey, NPM)
+    val copiedIssue = restClient2.getIssueClient.getIssue(successfulPage.getRemoteIssueKey).claim()
 
     copiedIssue.getFieldByName("NumberFieldWithDefault").getValue should equal(123456)
 

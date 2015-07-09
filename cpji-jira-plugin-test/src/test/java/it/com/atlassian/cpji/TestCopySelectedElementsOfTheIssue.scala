@@ -1,20 +1,20 @@
 package it.com.atlassian.cpji
 
-import org.junit._
-import com.atlassian.jira.rest.client.domain._
-import input.{IssueInput, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
-import com.atlassian.jira.rest.client.domain.IssueFieldId._
 import java.io.ByteArrayInputStream
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceSuccessfulPage, CopyDetailsPage}
-import org.junit.Assert._
-import com.atlassian.pageobjects.elements.query.Poller
-import org.joda.time.DateTime
-import org.hamcrest.collection.IsIterableWithSize
-import com.atlassian.cpji.tests.RawRestUtil._
-import org.json.{JSONObject, JSONArray}
+
 import com.atlassian.cpji.CopyIssueProcess
-import collection.JavaConverters._
 import com.atlassian.cpji.action.RemoteIssueLinkType
+import com.atlassian.cpji.tests.RawRestUtil._
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceSuccessfulPage}
+import com.atlassian.pageobjects.elements.query.Poller
+import org.hamcrest.collection.IsIterableWithSize
+import org.joda.time.DateTime
+import org.json.{JSONArray, JSONObject}
+import org.junit.Assert._
+import org.junit._
+import com.atlassian.jira.rest.client.api.domain.input.{ComplexIssueInputFieldValue, FieldInput, IssueInput, LinkIssuesInput}
+import com.atlassian.jira.rest.client.api.domain._
+import scala.collection.JavaConverters._
 
 class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with JiraObjects {
 
@@ -25,20 +25,19 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 
 		issue = restClient1.getIssueClient
 				.getIssue(restClient1.getIssueClient.createIssue(
-			IssueInput.createWithFields(new FieldInput(SUMMARY_FIELD, "Issue with comments and attachments"),
-				new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
-				new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3"))), NPM)
-				.getKey,
-			NPM)
+			IssueInput.createWithFields(new FieldInput(IssueFieldId.SUMMARY_FIELD, "Issue with comments and attachments"),
+				new FieldInput(IssueFieldId.PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "TST")),
+				new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))).claim()
+				.getKey).claim()
 
-		restClient1.getIssueClient.addComment(NPM, issue.getCommentsUri,
-			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null))
+		restClient1.getIssueClient.addComment(issue.getCommentsUri,
+			new Comment(null, "This is a comment", null, null, new DateTime, new DateTime, null, null)).claim()
 
-		restClient1.getIssueClient.addAttachment(NPM,
+		restClient1.getIssueClient.addAttachment(
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
-			this.getClass.getCanonicalName)
+			this.getClass.getCanonicalName).claim()
 
-		restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate"), NPM)
+		restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "NEL-1", "Duplicate")).claim()
 	}
 
 	def goToCopyDetails = CopyIssueProcess.goToCopyDetails(jira1, _: java.lang.Long)
@@ -53,7 +52,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
 
-		val issueRest: Issue = restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, NPM)
+		val issueRest: Issue = restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey).claim()
 		assertEquals("CLONE - Issue with comments and attachments", issueRest.getSummary)
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](0))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
@@ -73,7 +72,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
 
-		val issueRest: Issue = restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, NPM)
+		val issueRest: Issue = restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey).claim()
 		assertEquals("CLONE - Issue with comments and attachments", issueRest.getSummary)
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](1))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](0))
@@ -97,7 +96,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 		val issueToInstancePage: CopyIssueToInstanceSuccessfulPage = copyDetailsPage.next().copyIssue()
 		assertTrue(issueToInstancePage.isSuccessful)
 
-		val issueRest: Issue = restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey, NPM)
+		val issueRest: Issue = restClient2.getIssueClient.getIssue(issueToInstancePage.getRemoteIssueKey).claim()
 		assertEquals("CLONE - Issue with comments and attachments", issueRest.getSummary)
 		assertThat(issueRest.getComments, IsIterableWithSize.iterableWithSize[Comment](1))
 		assertThat(issueRest.getAttachments, IsIterableWithSize.iterableWithSize[Attachment](1))
@@ -111,14 +110,14 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 
 
 	@Test def shouldNotCopyClonerIssueLinks() {
-		restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "TST-1", "Cloners"), NPM)
-		restClient1.getIssueClient.linkIssue(new LinkIssuesInput("TST-2", issue.getKey, "Cloners"), NPM)
-		assertEquals(3, restClient1.getIssueClient.getIssue(issue.getKey, NPM).getIssueLinks.asScala.size)
+		restClient1.getIssueClient.linkIssue(new LinkIssuesInput(issue.getKey, "TST-1", "Cloners")).claim()
+		restClient1.getIssueClient.linkIssue(new LinkIssuesInput("TST-2", issue.getKey, "Cloners")).claim()
+		assertEquals(3, restClient1.getIssueClient.getIssue(issue.getKey).claim().getIssueLinks.asScala.size)
 
 		val result = goToCopyDetails(issue.getId).next().copyIssue()
 		assertTrue(result.isSuccessful)
 
-		val copiedIssue = restClient2.getIssueClient.getIssue(result.getRemoteIssueKey, NPM)
+		val copiedIssue = restClient2.getIssueClient.getIssue(result.getRemoteIssueKey).claim()
 		//issue should have two remote issue links - old "duplicate" and fresh new created cloned
 		val remoteLinks = getIssueRemoteLinksJson(jira2, copiedIssue.getKey)
 		assertEquals(2, remoteLinks.length())

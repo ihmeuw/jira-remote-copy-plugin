@@ -1,8 +1,8 @@
 package com.atlassian.cpji.tests.pageobjects;
 
+import com.atlassian.jira.pageobjects.elements.AuiMessage;
+import com.atlassian.jira.pageobjects.elements.AuiMessages;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
-import com.atlassian.jira.tests.elements.AuiMessage;
-import com.atlassian.jira.tests.elements.AuiMessages;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.TimedCondition;

@@ -1,6 +1,6 @@
 package com.atlassian.cpji.rest.model;
 
-import com.atlassian.jira.rest.client.domain.BasicProject;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

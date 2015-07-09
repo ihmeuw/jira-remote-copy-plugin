@@ -1,23 +1,23 @@
 package it.com.atlassian.cpji
 
-import org.junit.{Test, Before}
-import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.domain.{IssueFieldId, Issue}
-import com.atlassian.jira.rest.client.domain.input.{IssueInputBuilder, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
-import java.lang.String
-import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
-import org.junit.Assert._
-import com.atlassian.jira.pageobjects.JiraTestedProduct
-import com.atlassian.jira.webtests.Permissions
-import org.hamcrest.Matchers
 import java.io.ByteArrayInputStream
-import scala.collection.JavaConverters._
-import com.atlassian.pageobjects.elements.query.Poller
-import org.codehaus.jettison.json.JSONObject
-import com.atlassian.jira.testkit.client.restclient.TimeTracking
-import com.google.common.collect.ImmutableMap
-import org.hamcrest.collection.IsIterableContainingInAnyOrder
+
 import com.atlassian.cpji.action.RemoteIssueLinkType
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.rules.CreateIssues
+import com.atlassian.jira.pageobjects.JiraTestedProduct
+import com.atlassian.jira.rest.client.api.domain.{Issue, IssueFieldId}
+import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
+import com.atlassian.jira.testkit.client.restclient.TimeTracking
+import com.atlassian.jira.webtests.Permissions
+import com.atlassian.pageobjects.elements.query.Poller
+import com.google.common.collect.ImmutableMap
+import org.codehaus.jettison.json.JSONObject
+import org.hamcrest.Matchers
+import org.hamcrest.collection.IsIterableContainingInAnyOrder
+import org.junit.Assert._
+import org.junit.{Before, Test}
+import scala.collection.JavaConverters._
 
 class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
@@ -82,7 +82,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 				Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
 			})
 
-		val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+		val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey).claim()
 		assertEquals(issue.getProject.getKey, copiedIssue.getProject.getKey)
 		issuesEquals(issue, copiedIssue)
 		assertEquals(100, copiedIssue.getTimeTracking.getOriginalEstimateMinutes)
@@ -98,12 +98,12 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 		{
 			val issueToLink = createIssue("Issue to link")
 			restClient3.getIssueClient
-					.linkIssue(new LinkIssuesInput(issue.getKey, issueToLink.getKey, "Duplicate"), NPM)
+					.linkIssue(new LinkIssuesInput(issue.getKey, issueToLink.getKey, "Duplicate")).claim()
 		}
 
-		restClient3.getIssueClient.addAttachment(NPM,
+		restClient3.getIssueClient.addAttachment(
 			issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
-			this.getClass.getCanonicalName)
+			this.getClass.getCanonicalName).claim()
 
 
 		val copiedIssueKey = remoteCopy(jira3, issue.getId,
@@ -118,9 +118,9 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 			}
 		)
 
-		val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+		val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey).claim()
 
-		val issueWithExtras = restClient3.getIssueClient.getIssue(issue.getKey, NPM)
+		val issueWithExtras = restClient3.getIssueClient.getIssue(issue.getKey).claim()
 
 		issuesEquals(issueWithExtras, copiedIssue)
 	}
@@ -160,7 +160,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 				Poller.waitUntilTrue(page.areAllRequiredFieldsFilledIn)
 			})
 
-			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey).claim()
 
 			issuesEquals(subtask, copiedIssue)
 
@@ -191,7 +191,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 				selectTargetInteraction = (page) => page.setDestinationProject("acrobata")
 			)
 
-			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey, NPM)
+			val copiedIssue = restClient3.getIssueClient.getIssue(copiedIssueKey).claim()
 
 			assertEquals("CLONE - " + subtask.getSummary, copiedIssue.getSummary)
 			assertEquals("AOBA", copiedIssue.getProject.getKey)
@@ -217,8 +217,8 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 		eq(_.getAttachments.asScala.map(x => (x.getSize, x.getFilename, x.getMimeType)))
 		//issue links should equals (of course without links between theese two issues)
 		eq(_.getIssueLinks.asScala
-				.filter(x => x.getTargetIssueId != issue.getId && x.getTargetIssueId != copiedIssue.getId)
-				.map(x => (x.getIssueLinkType, x.getTargetIssueId, x.getTargetIssueKey))
+				.filter(x => x.getTargetIssueKey != issue.getKey && x.getTargetIssueKey != copiedIssue.getKey)
+				.map(x => (x.getIssueLinkType, x.getTargetIssueUri, x.getTargetIssueKey))
 		)
 	}
 

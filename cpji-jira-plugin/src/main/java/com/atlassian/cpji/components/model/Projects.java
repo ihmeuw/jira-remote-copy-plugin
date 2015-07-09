@@ -1,6 +1,6 @@
 package com.atlassian.cpji.components.model;
 
-import com.atlassian.jira.rest.client.domain.BasicProject;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 
 /**
  * @since v2.1

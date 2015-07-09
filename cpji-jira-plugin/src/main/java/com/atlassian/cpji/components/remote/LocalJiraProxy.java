@@ -33,7 +33,7 @@ import com.atlassian.jira.issue.link.RemoteIssueLinkBuilder;
 import com.atlassian.jira.issue.link.RemoteIssueLinkManager;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.rest.client.domain.BasicProject;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.google.common.base.Function;
@@ -82,12 +82,9 @@ public class LocalJiraProxy implements JiraProxy {
     public Either<NegativeResponseStatus, Projects> getProjects() {
         Collection<Project> projects = permissionManager.getProjects(ProjectPermissions.CREATE_ISSUES, jiraAuthenticationContext.getUser());
 
-        Iterable<BasicProject> basicProjects = Iterables.transform(projects, new Function<Project, BasicProject>() {
-            @Override
-            public BasicProject apply(final Project input) {
-				Preconditions.checkNotNull(input);
-                return new BasicProject(null, input.getKey(), input.getName(), null);
-            }
+        Iterable<BasicProject> basicProjects = Iterables.transform(projects, input -> {
+            Preconditions.checkNotNull(input);
+            return new BasicProject(null, input.getKey(), input.getId(), input.getName());
         });
 
         return Either.right(new Projects(jiraLocation, basicProjects));

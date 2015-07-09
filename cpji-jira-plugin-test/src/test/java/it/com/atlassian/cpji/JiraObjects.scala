@@ -12,6 +12,4 @@ trait JiraObjects {
 	val restClient1 = AbstractCopyIssueTest.restClient1
 	val restClient2 = AbstractCopyIssueTest.restClient2
 	val restClient3 = AbstractCopyIssueTest.restClient3
-
-	val NPM = AbstractCopyIssueTest.NPM
 }

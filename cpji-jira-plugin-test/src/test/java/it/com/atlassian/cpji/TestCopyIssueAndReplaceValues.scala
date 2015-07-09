@@ -1,13 +1,13 @@
 package it.com.atlassian.cpji
 
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, CopyDetailsPage, SelectTargetProjectPage}
-import org.junit._
-import collection.JavaConversions._
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
+import com.atlassian.jira.rest.client.api.domain.Issue
+import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, ComponentInput, VersionInput}
 import com.atlassian.pageobjects.elements.query.Poller
+import org.junit._
 import org.scalatest.junit.ShouldMatchersForJUnit
-import com.atlassian.jira.rest.client.domain.input.{ComponentInput, VersionInput, IssueInputBuilder}
-import com.atlassian.jira.rest.client.domain.Issue
-import org.scalatest.BeforeAndAfter
+
+import scala.collection.JavaConversions._
 
 
 class TestCopyIssueAndReplaceValues extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit {
@@ -23,11 +23,11 @@ class TestCopyIssueAndReplaceValues extends AbstractCopyIssueTest with JiraObjec
 		testkit1.project().addProject("From project", fromKey, "admin")
 		testkit1.project().addProject("To project", toKey, "admin")
 		try {
-			restClient1.getVersionRestClient.createVersion(VersionInput.create(fromKey, "version-1", null, null, false, false), NPM)
-			restClient1.getComponentClient.createComponent(fromKey, new ComponentInput("component-1", null, null, null), NPM)
+			restClient1.getVersionRestClient.createVersion(VersionInput.create(fromKey, "version-1", null, null, false, false)).claim()
+			restClient1.getComponentClient.createComponent(fromKey, new ComponentInput("component-1", null, null, null)).claim()
 
-			restClient1.getVersionRestClient.createVersion(VersionInput.create(toKey, "other-version-1", null, null, false, false), NPM)
-			restClient1.getComponentClient.createComponent(toKey, new ComponentInput("other-component-1", null, null, null), NPM)
+			restClient1.getVersionRestClient.createVersion(VersionInput.create(toKey, "other-version-1", null, null, false, false)).claim()
+			restClient1.getComponentClient.createComponent(toKey, new ComponentInput("other-component-1", null, null, null)).claim()
 
 			val issueBuilder = new IssueInputBuilder(fromKey, 3L, "Sample issue assigned to not mappable user")
 					.setAffectedVersionsNames(asJavaIterable(Array("version-1")))
@@ -35,7 +35,7 @@ class TestCopyIssueAndReplaceValues extends AbstractCopyIssueTest with JiraObjec
 					.setFixVersionsNames(asJavaIterable(Array("version-1")))
 
 			val issue: Issue = restClient1.getIssueClient
-					.getIssue(restClient1.getIssueClient.createIssue(issueBuilder.build(), NPM).getKey, NPM)
+					.getIssue(restClient1.getIssueClient.createIssue(issueBuilder.build()).claim().getKey).claim()
 
 			val selectTargetProjectPage: SelectTargetProjectPage = jira1
 					.visit(classOf[SelectTargetProjectPage], new java.lang.Long(issue.getId))
@@ -53,7 +53,7 @@ class TestCopyIssueAndReplaceValues extends AbstractCopyIssueTest with JiraObjec
 
 			val copied = permissionChecksPage.copyIssue()
 			val issueKey = copied.getRemoteIssueKey
-			val restIssue = restClient1.getIssueClient.getIssue(issueKey, NPM)
+			val restIssue = restClient1.getIssueClient.getIssue(issueKey).claim()
 
 			val components = iterableAsScalaIterable(restIssue.getComponents)
 			components should have size (1)

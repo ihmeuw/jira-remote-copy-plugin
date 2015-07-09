@@ -5,7 +5,7 @@ import com.atlassian.cpji.components.model.Projects;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.fugue.Either;
 import com.atlassian.fugue.Eithers;
-import com.atlassian.jira.rest.client.domain.BasicProject;
+import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;

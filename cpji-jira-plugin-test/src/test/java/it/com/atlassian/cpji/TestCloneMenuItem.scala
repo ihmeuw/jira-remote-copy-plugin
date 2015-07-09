@@ -1,21 +1,16 @@
 package it.com.atlassian.cpji
 
-import org.junit.{Ignore, Rule, Test}
-import org.junit.Assert._
-import org.hamcrest.collection.IsIterableWithSize
-import com.atlassian.cpji.tests.pageobjects._
-import admin.ListApplicationLinksPage
-import com.atlassian.pageobjects.elements.query.{TimedQuery, Poller}
-import com.atlassian.jira.security.Permissions
-import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.domain.IssueFieldId
-import com.atlassian.jira.rest.client.domain.input.{ComplexIssueInputFieldValue, FieldInput}
-import com.atlassian.jira.rest.client.domain.IssueFieldId._
-import java.lang.String
-import BackdoorHelpers._
-import org.hamcrest.{Matchers, Matcher}
-import org.apache.log4j.Logger
 import com.atlassian.cpji.tests.ScreenshotUtil
+import com.atlassian.cpji.tests.pageobjects._
+import com.atlassian.cpji.tests.pageobjects.admin.ListApplicationLinksPage
+import com.atlassian.cpji.tests.rules.CreateIssues
+import com.atlassian.jira.rest.client.api.domain.IssueFieldId
+import com.atlassian.jira.rest.client.api.domain.input.{ComplexIssueInputFieldValue, FieldInput}
+import com.atlassian.jira.security.Permissions
+import com.atlassian.pageobjects.elements.query.Poller
+import it.com.atlassian.cpji.BackdoorHelpers._
+import org.apache.log4j.Logger
+import org.junit.{Rule, Test}
 
 /**
  * Check if Clone/Copy menu item is visible by conditions described at https://jdog.atlassian.net/browse/JRADEV-16762
@@ -42,8 +37,8 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 	}
 
 	@Test def shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks() {
-		val issue = createIssues.newIssue(new FieldInput(SUMMARY_FIELD, "Issue with comments"),
-			new FieldInput(PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "AFER")),
+		val issue = createIssues.newIssue(new FieldInput(IssueFieldId.SUMMARY_FIELD, "Issue with comments"),
+			new FieldInput(IssueFieldId.PRIORITY_FIELD, ComplexIssueInputFieldValue.`with`("key", "AFER")),
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 		try {
 			testkit3.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
@@ -61,7 +56,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 			}
 		} finally {
 			testkit3.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
-			AbstractCopyIssueTest.restClient3.getIssueClient.removeIssue(issue.getKey, true, AbstractCopyIssueTest.NPM)
+			AbstractCopyIssueTest.restClient3.getIssueClient.deleteIssue(issue.getKey, true).claim()
 		}
 	}
 

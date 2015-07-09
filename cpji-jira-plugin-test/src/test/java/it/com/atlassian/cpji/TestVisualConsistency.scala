@@ -2,11 +2,11 @@ package it.com.atlassian.cpji
 
 import org.junit.{Rule, Test}
 import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.domain.input.{LinkIssuesInput, IssueInputBuilder}
+import com.atlassian.jira.rest.client.api.domain.input.{LinkIssuesInput, IssueInputBuilder}
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage
 import com.atlassian.cpji.tests.ScreenshotUtil
 import java.io.ByteArrayInputStream
-import com.atlassian.jira.rest.client.domain.Comment
+import com.atlassian.jira.rest.client.api.domain.Comment
 import org.joda.time.DateTime
 
 class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
@@ -32,15 +32,15 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
 				"Sample issue for screenshots - I need one for linking")
 			val issueToLinkWith = createIssues.newIssue(issueToLinkBuilder.build())
 
-			restClient1.getIssueClient.addAttachment(NPM,
+			restClient1.getIssueClient.addAttachment(
 				issue.getAttachmentsUri, new ByteArrayInputStream("this is a stream".getBytes("UTF-8")),
-				this.getClass.getCanonicalName)
+				this.getClass.getCanonicalName).claim()
 
 			restClient1.getIssueClient
-					.linkIssue(new LinkIssuesInput(issue.getKey, issueToLinkWith.getKey, "Duplicate"), NPM)
+					.linkIssue(new LinkIssuesInput(issue.getKey, issueToLinkWith.getKey, "Duplicate")).claim()
 
-			restClient1.getIssueClient.addComment(NPM, issue.getCommentsUri,
-				new Comment(null, "Smile!", null, null, new DateTime, new DateTime, null, null))
+			restClient1.getIssueClient.addComment(issue.getCommentsUri,
+				new Comment(null, "Smile!", null, null, new DateTime, new DateTime, null, null)).claim()
 
 			val selectTargetProject = jira1.visit(classOf[SelectTargetProjectPage], issue.getId)
 			selectTargetProject.setDestinationProject("Destination not")
