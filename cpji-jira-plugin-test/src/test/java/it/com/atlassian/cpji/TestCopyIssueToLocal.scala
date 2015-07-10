@@ -6,20 +6,29 @@ import com.atlassian.cpji.action.RemoteIssueLinkType
 import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
 import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.pageobjects.JiraTestedProduct
+import com.atlassian.jira.pageobjects.setup.JiraWebTestRules
+import com.atlassian.jira.rest.client.api.domain.input.{ComplexIssueInputFieldValue, FieldInput, IssueInputBuilder, LinkIssuesInput}
 import com.atlassian.jira.rest.client.api.domain.{Issue, IssueFieldId}
-import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
 import com.atlassian.jira.testkit.client.restclient.TimeTracking
 import com.atlassian.jira.webtests.Permissions
 import com.atlassian.pageobjects.elements.query.Poller
+import com.atlassian.pageobjects.{DefaultProductInstance, TestedProductFactory}
 import com.google.common.collect.ImmutableMap
 import org.codehaus.jettison.json.JSONObject
 import org.hamcrest.Matchers
 import org.hamcrest.collection.IsIterableContainingInAnyOrder
 import org.junit.Assert._
-import org.junit.{Before, Test}
+import org.junit.{Before, Rule, Test}
+
 import scala.collection.JavaConverters._
 
-class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
+object TestCopyIssueToLocal {
+	val jira3: JiraTestedProduct = TestedProductFactory.create(classOf[JiraTestedProduct], new DefaultProductInstance("http://localhost:2992/jira", "jira3", 2992, "/jira"), null)
+
+	@Rule val chain = JiraWebTestRules.forJira(jira3)
+}
+
+class TestCopyIssueToLocal extends JiraObjects {
 
 	implicit def fieldInputFromVals(arg: (IssueFieldId, AnyRef)): FieldInput = new FieldInput(arg._1, arg._2)
 
@@ -27,7 +36,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
 	@Before
 	def setUp() {
-		login(jira3)
+		jira3.quickLoginAsAdmin()
 	}
 
 	val createIssueAdvanced: ((String, List[FieldInput]) => Issue) = (summary, additionalFields) => {
@@ -132,7 +141,7 @@ class TestCopyIssueToLocal extends AbstractCopyIssueTest with JiraObjects {
 
 		try {
 			testkit3.permissionSchemes().removeProjectRolePermission(0L, Permissions.CREATE_ISSUE, 10000)
-			viewIssue(jira3, issue.getKey)
+			jira3.goToViewIssue(issue.getKey)
 
 			val selectTargetProjectPage = jira3.visit(classOf[SelectTargetProjectPage], issue.getId)
 

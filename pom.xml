@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -26,60 +27,59 @@
         <url>http://www.atlassian.com</url>
     </organization>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.atlassian.selenium</groupId>
-				<artifactId>atlassian-pageobjects-api</artifactId>
-				<version>${atlassian.selenium.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>atlassian-jira-pageobjects</artifactId>
-				<version>${jira.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.sun.jersey.contribs</groupId>
-				<artifactId>jersey-apache-client</artifactId>
-				<version>1.9.1</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-webdriver-tests</artifactId>
-				<version>${jira.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-api</artifactId>
-				<version>${jira.compile.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-core</artifactId>
-				<version>${jira.compile.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira.tests</groupId>
-				<artifactId>jira-testkit-client</artifactId>
-				<version>${testkit.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira.tests</groupId>
-				<artifactId>jira-func-test-basics</artifactId>
-				<version>${test-basics.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>rhino</groupId>
-				<artifactId>js</artifactId>
-				<version>1.7R2.0</version>
-				<scope>compile</scope>
-			</dependency>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.atlassian.selenium</groupId>
+                <artifactId>atlassian-pageobjects-api</artifactId>
+                <version>${atlassian.selenium.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>atlassian-jira-pageobjects</artifactId>
+                <version>${jira.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-webdriver-tests</artifactId>
+                <version>${jira.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-api</artifactId>
+                <version>${jira.compile.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-httpclient</groupId>
+                        <artifactId>commons-httpclient</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-core</artifactId>
+                <version>${jira.compile.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-httpclient</groupId>
+                        <artifactId>commons-httpclient</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira.tests</groupId>
+                <artifactId>jira-testkit-client</artifactId>
+                <version>${testkit.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.atlassian.jira</groupId>
                 <artifactId>jira-tests</artifactId>
@@ -87,198 +87,363 @@
                 <scope>test</scope>
             </dependency>
 
-			<!-- REST dependencies-->
-			<dependency>
-				<groupId>javax.xml.bind</groupId>
-				<artifactId>jaxb-api</artifactId>
-				<version>2.1</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>javax.ws.rs</groupId>
-				<artifactId>jsr311-api</artifactId>
-				<version>1.1.1</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>javax.annotation</groupId>
-				<artifactId>jsr250-api</artifactId>
-				<version>1.0</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.plugins.rest</groupId>
-				<artifactId>atlassian-rest-common</artifactId>
-				<version>${rest.version}</version>
-				<scope>provided</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.ws.rs</groupId>
-						<artifactId>jsr311-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
+            <!-- REST dependencies-->
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>1.1.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.plugins.rest</groupId>
+                <artifactId>atlassian-rest-common</artifactId>
+                <version>${rest.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.ws.rs</groupId>
+                        <artifactId>jsr311-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-core</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.plugins.rest</groupId>
-				<artifactId>atlassian-rest-module</artifactId>
-				<version>${rest.version}</version>
-				<scope>provided</scope>
-				<exclusions>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-rest-java-client-api</artifactId>
-				<version>2.0.0-m31</version>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.jira</groupId>
-				<artifactId>jira-rest-java-client-core</artifactId>
-				<version>2.0.0-m31</version>
-			</dependency>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-rest-java-client-api</artifactId>
+                <version>2.0.0-m31</version>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.jira</groupId>
+                <artifactId>jira-rest-java-client-core</artifactId>
+                <version>2.0.0-m31</version>
+            </dependency>
 
-			<!-- Remote Issue Links dependencies -->
-			<!-- TODO, once a newer version of 5.0 is released (e.g. beta3), change this dependency to the jira-view-issue-plugin -->
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>4.0</version>
-				<scope>provided</scope>
-			</dependency>
+            <!-- Remote Issue Links dependencies -->
+            <!-- TODO, once a newer version of 5.0 is released (e.g. beta3), change this dependency to the jira-view-issue-plugin -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.0</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <artifactId>jira-view-issue-plugin</artifactId>
                 <groupId>com.atlassian.jira</groupId>
                 <version>${jira.version}</version>
                 <scope>provided</scope>
             </dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>1.9.0</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.atlassian.util.concurrent</groupId>
-				<artifactId>atlassian-util-concurrent</artifactId>
-				<version>2.4.1</version>
-				<scope>provided</scope>
-			</dependency>
+
+            <!-- enforcing right scopes -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>1.3.9</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>1.9.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.9.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.sal</groupId>
+                <artifactId>sal-api</artifactId>
+                <version>3.0.0-m109</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.7</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+                <scope>provided</scope>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.6.4</version>
+                <version>1.7.9</version>
                 <scope>provided</scope>
             </dependency>
-		</dependencies>
-	</dependencyManagement>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>11.0.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>aopalliance</groupId>
+                <artifactId>aopalliance</artifactId>
+                <version>1.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>4.1.6.RELEASE</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>4.1.6.RELEASE</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>4.1.6.RELEASE</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>4.1.6.RELEASE</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>4.1.6.RELEASE</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.util.concurrent</groupId>
+                <artifactId>atlassian-util-concurrent</artifactId>
+                <version>2.6.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.event</groupId>
+                <artifactId>atlassian-event</artifactId>
+                <version>2.3.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-cache</artifactId>
+                <version>4.2.1-atlassian-2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.2.1-atlassian-2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>1.1.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-jaxrs</artifactId>
+                <version>1.9.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-xc</artifactId>
+                <version>1.9.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.atlassian.httpclient</groupId>-->
+                <!--<artifactId>atlassian-httpclient-api</artifactId>-->
+                <!--<version>0.13.2</version>-->
+                <!--<scope>provided</scope>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>com.atlassian.httpclient</groupId>-->
+                <!--<artifactId>atlassian-httpclient-spi</artifactId>-->
+                <!--<version>0.13.2</version>-->
+                <!--<scope>provided</scope>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-json</artifactId>
+                <version>1.5</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>2.2.3</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.stream</groupId>
+                <artifactId>stax-api</artifactId>
+                <version>1.0-2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.atlassian.httpclient</groupId>
+                <artifactId>atlassian-httpclient-apache-httpcomponents</artifactId>
+                <version>0.13.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient-cache</artifactId>
+                <version>4.0-beta3-atlassian-1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpasyncclient</artifactId>
+                <version>4.0-beta3-atlassian-1</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore-nio</artifactId>
+                <version>4.2.2</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-				<configuration>
-					<source>${jdkLevel}</source>
-					<target>${jdkLevel}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.1</version>
-				<configuration>
-					<preparationGoals>clean test</preparationGoals>
-					<releaseProfiles>releaseProfile</releaseProfiles>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>net.sf.alchim</groupId>
-				<artifactId>yuicompressor-maven-plugin</artifactId>
-				<version>0.7.1</version>
-			</plugin>
-			<plugin>
-				<groupId>com.atlassian.maven.plugins</groupId>
-				<artifactId>sandbox-maven-plugin</artifactId>
-				<version>2.0.1</version>
-				<executions>
-					<execution>
-						<id>enable-sandbox</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>sandbox</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${jdkLevel}</source>
+                    <target>${jdkLevel}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <preparationGoals>clean test</preparationGoals>
+                    <releaseProfiles>releaseProfile</releaseProfiles>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.sf.alchim</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <version>0.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>sandbox-maven-plugin</artifactId>
+                <version>2.0.1</version>
+                <executions>
+                    <execution>
+                        <id>enable-sandbox</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>sandbox</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <properties>
-		<jdkLevel>1.8</jdkLevel>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<cpji.build.directory>target</cpji.build.directory>
+        <jdkLevel>1.8</jdkLevel>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <cpji.build.directory>target</cpji.build.directory>
         <atlassian.qunit.version>1.0.0-m5</atlassian.qunit.version>
         <jira.version>7.0.0-QR20150617180424</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
-		<my.sal.version>3.0.2</my.sal.version>
+        <my.sal.version>3.0.2</my.sal.version>
         <rest.version>3.0.0-m012</rest.version>
-		<applinks.version>5.0.0</applinks.version>
-		<testkit.version>7.0.53</testkit.version>
-		<test-basics.version>1.9.5</test-basics.version>
-		<amps.version>6.0.1</amps.version>
-		<atlassian.selenium.version>2.2.1-m02-jira-1</atlassian.selenium.version>
-		<jersey.version>1.8-atlassian-16</jersey.version>
+        <applinks.version>5.0.0</applinks.version>
+        <testkit.version>7.0.53</testkit.version>
+        <test-basics.version>1.9.5</test-basics.version>
+        <amps.version>6.0.1</amps.version>
+        <atlassian.selenium.version>2.2.1-m02-jira-1</atlassian.selenium.version>
+        <jersey.version>1.8-atlassian-16</jersey.version>
     </properties>
 
-	<profiles>
-		<profile>
-			<id>releaseProfile</id>
-			<properties>
-				<maven.test.unit.skip>false</maven.test.unit.skip>
-				<maven.test.it.skip>true</maven.test.it.skip>
-			</properties>
-		</profile>
-		<profile>
-			<id>testing</id>
-			<properties>
-				<jira.compile.version>${jira.version}</jira.compile.version>
-			</properties>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>releaseProfile</id>
+            <properties>
+                <maven.test.unit.skip>false</maven.test.unit.skip>
+                <maven.test.it.skip>true</maven.test.it.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>testing</id>
+            <properties>
+                <jira.compile.version>${jira.version}</jira.compile.version>
+            </properties>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git
+        </developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-      	<tag>HEAD</tag>
-  	</scm>
+        <tag>HEAD</tag>
+    </scm>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>scala</id>
-			<name>Scala Tools</name>
-			<url>http://scala-tools.org/repo-releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>scala</id>
+            <name>Scala Tools</name>
+            <url>http://scala-tools.org/repo-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>

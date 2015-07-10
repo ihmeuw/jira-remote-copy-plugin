@@ -1,7 +1,8 @@
 package com.atlassian.cpji.util;
 
 import com.atlassian.jira.util.ErrorCollection;
-import com.atlassian.util.concurrent.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Represents a response from a JIRA REST resource.

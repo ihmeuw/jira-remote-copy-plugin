@@ -14,15 +14,12 @@ import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.fugue.Either;
-import com.atlassian.fugue.Option;
 import com.atlassian.fugue.Pair;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.AttachmentError;
 import com.atlassian.jira.issue.AttachmentManager;
-import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.attachment.Attachment;
@@ -36,18 +33,13 @@ import com.atlassian.jira.mock.issue.MockIssue;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
-import com.atlassian.jira.web.util.AttachmentException;
-import com.atlassian.jira.webtests.Permissions;
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,17 +48,20 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertSame;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @since v3.0
@@ -123,13 +118,8 @@ public class TestLocalJiraProxy {
 
         assertEquals(2, Iterables.size(projects.getResult()));
 
-        Iterable<Pair<String, String>> keysAndNames = Iterables.transform(projects.getResult(), new Function<BasicProject, Pair<String, String>>() {
-            @Override
-            public Pair<String, String> apply(BasicProject input) {
-                return Pair.pair(input.getKey(), input.getName());
-            }
-        });
-        assertThat(keysAndNames, IsIterableContainingInAnyOrder.containsInAnyOrder(Pair.pair("KEY0", "Name 0"), Pair.pair("KEY1", "Name 1")));
+        Iterable<Pair<String, String>> keysAndNames = Iterables.transform(projects.getResult(), input -> Pair.pair(input.getKey(), input.getName()));
+        assertThat(keysAndNames, containsInAnyOrder(Pair.pair("KEY0", "Name 0"), Pair.pair("KEY1", "Name 1")));
     }
 
     @Test

@@ -3,22 +3,30 @@ package it.com.atlassian.cpji;
 import com.atlassian.cpji.tests.BackdoorFactory;
 import com.atlassian.jira.pageobjects.BaseJiraWebTest;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
+import com.atlassian.jira.pageobjects.config.junit4.rule.DirtyWarningTerminatorRule;
+import com.atlassian.jira.pageobjects.framework.util.DirtyWarningTerminator;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.atlassian.jira.testkit.client.Backdoor;
 import com.atlassian.jira.testkit.client.rules.EmptySystemDashboardRule;
+import com.atlassian.jira.testkit.client.rules.WebSudoRule;
 import com.atlassian.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
+import com.atlassian.webdriver.testing.rule.SessionCleanupRule;
+import com.atlassian.webdriver.testing.rule.WindowSizeRule;
+import com.google.inject.Inject;
 import org.junit.ClassRule;
+import org.junit.Rule;
+import org.openqa.selenium.remote.server.handler.MaximizeWindow;
 
 import java.net.URI;
 
 /**
  * @since v2.1
  */
-public abstract class AbstractCopyIssueTest extends BaseJiraWebTest
+public abstract class AbstractCopyIssueTest
 {
     static JiraTestedProduct jira1 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2990/jira", "jira1", 2990, "/jira"), null);
     static JiraTestedProduct jira2 = TestedProductFactory.create(JiraTestedProduct.class, new DefaultProductInstance("http://localhost:2991/jira", "jira2", 2991, "/jira"), null);
@@ -28,8 +36,21 @@ public abstract class AbstractCopyIssueTest extends BaseJiraWebTest
 	static Backdoor testkit2 = BackdoorFactory.getBackdoor(jira2);
 	static Backdoor testkit3 = BackdoorFactory.getBackdoor(jira3);
 
-	@ClassRule
-	public static EmptySystemDashboardRule emptySystemDashboardRule = new EmptySystemDashboardRule(testkit1, testkit2, testkit3);
+	@Rule
+	public SessionCleanupRule sessionCleanupRule = new SessionCleanupRule();
+	@Rule
+	public WindowSizeRule maximizeWindow = new WindowSizeRule();
+	@Rule
+	public WebSudoRule webSudoRule = new WebSudoRule(testkit1, testkit2, testkit3);
+//	@Rule
+//	public WebDriverScreenshot webDriverScreenshot = new WebDriverScreenshot();
+	@Inject
+	public DirtyWarningTerminator dirtyWarningTerminator;
+	@Rule
+	public DirtyWarningTerminatorRule dirtyWarningTerminatorRule = new DirtyWarningTerminatorRule(dirtyWarningTerminator);
+
+//	@ClassRule
+//	public static EmptySystemDashboardRule emptySystemDashboardRule = new EmptySystemDashboardRule(testkit1, testkit2, testkit3);
 
 	static JiraRestClient restClient1 = getJiraRestClient(jira1);
 	static JiraRestClient restClient2 = getJiraRestClient(jira2);
