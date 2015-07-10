@@ -55,7 +55,7 @@ public class IssueLinkClient
             throws CredentialsRequiredException, ResponseException
     {
         final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
-        request.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         request.setRequestBody(getJsonForCreateRemoteLinkToLocalIssue(internalHostApplication, localIssue, relationship));
         return request.executeAndReturn(new RestResponseHandler());
     }
@@ -90,7 +90,7 @@ public class IssueLinkClient
     public RestResponse createRemoteIssueLink(final RemoteIssueLink remoteIssueLink, final String remoteIssueKey, final ApplicationLink applicationLink) throws CredentialsRequiredException, ResponseException
     {
         final ApplicationLinkRequest request = createCreateRemoteIssueLinkRequest(applicationLink, remoteIssueKey);
-        request.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         request.setRequestBody(getJsonForCreateRemoteIssueLink(remoteIssueLink));
         return request.executeAndReturn(new RestResponseHandler());
     }

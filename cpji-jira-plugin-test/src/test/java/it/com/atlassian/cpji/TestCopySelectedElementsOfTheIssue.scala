@@ -20,7 +20,7 @@ class TestCopySelectedElementsOfTheIssue extends AbstractCopyIssueTest with Jira
 
 	var issue: Issue = null
 
-	@Before def setUp {
+	@Before def setUp() {
 		login(jira1)
 
 		issue = restClient1.getIssueClient
