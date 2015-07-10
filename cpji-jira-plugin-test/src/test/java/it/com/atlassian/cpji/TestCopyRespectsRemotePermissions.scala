@@ -24,7 +24,7 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
 	@Rule def createIssuesRule = createIssues
 
-	@Before def setUp {
+	@Before def setUp() {
 		login(AbstractCopyIssueTest.jira1)
 
 		issue = AbstractCopyIssueTest.restClient1.getIssueClient
@@ -123,7 +123,7 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 	}
 
 	@Test def shouldDisableCopyAttachmentsCheckboxWhenAllAttachmentsExceedMaxSize(){
-		var apControl = AbstractCopyIssueTest.testkit2.applicationProperties()
+		val apControl = AbstractCopyIssueTest.testkit2.applicationProperties()
 		val attachmentSize =  apControl.getString(APKeys.JIRA_ATTACHMENT_SIZE)
 		try{
 			apControl.setString(APKeys.JIRA_ATTACHMENT_SIZE, 1L.toString)

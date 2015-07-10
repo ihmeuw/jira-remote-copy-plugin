@@ -17,35 +17,35 @@ import java.io.File;
  * @since v3.0
  */
 public interface JiraProxy {
-    public JiraLocation getJiraLocation();
+    JiraLocation getJiraLocation();
 
-    public Either<NegativeResponseStatus, Projects> getProjects();
+    Either<NegativeResponseStatus, Projects> getProjects();
 
-    public Either<NegativeResponseStatus, PluginVersion> isPluginInstalled();
+    Either<NegativeResponseStatus, PluginVersion> isPluginInstalled();
 
-    public Either<NegativeResponseStatus, CopyInformationBean> getCopyInformation(String projectKey);
+    Either<NegativeResponseStatus, CopyInformationBean> getCopyInformation(String projectKey);
 
-    public Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean);
+    Either<NegativeResponseStatus, IssueCreationResultBean> copyIssue(CopyIssueBean copyIssueBean);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, Attachment originalAttachment);
+    Either<NegativeResponseStatus, SuccessfulResponse> addAttachment(String issueKey, Attachment originalAttachment);
 
-    public Either<NegativeResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean);
+    Either<NegativeResponseStatus, FieldPermissionsBean> checkPermissions(CopyIssueBean copyIssueBean);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
+    Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, IssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, SimplifiedIssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
+    Either<NegativeResponseStatus, SuccessfulResponse> copyLocalIssueLink(Issue localIssue, String remoteIssueKey, Long remoteIssueId, SimplifiedIssueLinkType issueLinkType, LinkCreationDirection localDirection, LinkCreationDirection remoteDirection);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey);
+    Either<NegativeResponseStatus, SuccessfulResponse> copyRemoteIssueLink(RemoteIssueLink remoteIssueLink, String remoteIssueKey);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey);
+    Either<NegativeResponseStatus, SuccessfulResponse> convertRemoteIssueLinksIntoLocal(String remoteIssueKey);
 
-    public Either<NegativeResponseStatus, SuccessfulResponse> clearChangeHistory(String issueKey);
+    Either<NegativeResponseStatus, SuccessfulResponse> clearChangeHistory(String issueKey);
 
-    public String generateAuthenticationUrl(String issueId);
+    String generateAuthenticationUrl(String issueId);
 
-    public String getIssueUrl(String issueKey);
+    String getIssueUrl(String issueKey);
 
-    public static enum LinkCreationDirection {
+    enum LinkCreationDirection {
         OUTWARD, INWARD, IGNORE;
 
         public String getNameFromIssueLinkType(SimplifiedIssueLinkType linkType) {

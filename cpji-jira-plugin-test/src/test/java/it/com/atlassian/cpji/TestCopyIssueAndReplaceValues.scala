@@ -1,8 +1,11 @@
 package it.com.atlassian.cpji
 
 import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
+import com.atlassian.jira.pageobjects.JiraTestedProduct
+import com.atlassian.jira.pageobjects.setup.JiraWebTestRules
 import com.atlassian.jira.rest.client.api.domain.Issue
 import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, ComponentInput, VersionInput}
+import com.atlassian.pageobjects.{DefaultProductInstance, TestedProductFactory}
 import com.atlassian.pageobjects.elements.query.Poller
 import org.junit._
 import org.scalatest.junit.ShouldMatchersForJUnit
@@ -10,13 +13,19 @@ import org.scalatest.junit.ShouldMatchersForJUnit
 import scala.collection.JavaConversions._
 
 
-class TestCopyIssueAndReplaceValues extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit {
+object TestCopyIssueAndReplaceValues {
+	val jira1: JiraTestedProduct = TestedProductFactory.create(classOf[JiraTestedProduct], new DefaultProductInstance("http://localhost:2990/jira", "jira1", 2990, "/jira"), null)
 
-	@Before def setUp {
-		login(jira1)
+	@Rule val chain = JiraWebTestRules.forJira(jira1)
+}
+
+class TestCopyIssueAndReplaceValues extends JiraObjects with org.scalatest.Matchers with org.scalatest.junit.AssertionsForJUnit {
+
+	@Before def setUp() {
+		jira1.quickLoginAsAdmin()
 	}
 
-	@Test def testFillMissingValuesAndCopy {
+	@Test def testFillMissingValuesAndCopy() {
 		val fromKey = "FROM"
 		val toKey = "TOP"
 

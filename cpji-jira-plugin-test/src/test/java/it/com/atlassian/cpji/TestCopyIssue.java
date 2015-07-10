@@ -38,13 +38,6 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     private static final String JIRA2_SELECT_LIST_CF = "customfield_10006";
     private static final String JIRA2_NUMBER_FIELD_CF = "customfield_10005";
 
-    private static final String JIRA1_DATE_PICKER_CF = "customfield_10000";
-    private static final String JIRA1_GROUP_PICKER_CF = "customfield_10001";
-    private static final String JIRA1_MULTI_GROUP_PICKER_CF = "customfield_10002";
-    private static final String JIRA1_FREE_TEXT_FIELD_CF = "customfield_10005";
-    private static final String JIRA1_SELECT_LIST_CF = "customfield_10004";
-    private static final String JIRA1_NUMBER_FIELD_CF = "customfield_10003";
-
     @Rule
     public CreateIssues createIssues = new CreateIssues(restClient1);
 

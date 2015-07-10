@@ -124,6 +124,12 @@
                 <artifactId>jira-rest-java-client-core</artifactId>
                 <version>2.0.0-m31</version>
             </dependency>
+            <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.1</version>
+                <scope>compile</scope>
+            </dependency>
 
             <!-- Remote Issue Links dependencies -->
             <!-- TODO, once a newer version of 5.0 is released (e.g. beta3), change this dependency to the jira-view-issue-plugin -->
@@ -295,12 +301,6 @@
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-json</artifactId>
                 <version>1.5</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jettison</groupId>
-                <artifactId>jettison</artifactId>
-                <version>1.1</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
