@@ -21,11 +21,11 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 
 	@Rule def createIssuesRule = createIssues
 
-	@Before def setUp {
+	@Before def setUp() {
 		jira1.gotoLoginPage().login("fred", "fred", classOf[DashboardPage])
 	}
 
-	@Test def shouldCopyWhenUserDoesntHaveModifyReporterPermission {
+	@Test def shouldCopyWhenUserDoesntHaveModifyReporterPermission() {
 		val selectTargetProjectPage: SelectTargetProjectPage = jira1
 				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10200L))
 		selectTargetProjectPage.setDestinationProject("Blah")
@@ -36,7 +36,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 		Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
-		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups()
+		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups
 				.map(element => element.find(By.tagName("label")))
 				.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String]("Assignee", "Reporter"))
 
@@ -48,7 +48,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 		assertThat(issue.getReporter.getName, Matchers.equalTo("fred"))
 	}
 
-	@Test def shouldCopyIssueWithoutAssignee {
+	@Test def shouldCopyIssueWithoutAssignee() {
 		testkit1.applicationProperties().setOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED, true)
 		testkit1.project().setProjectDefaultAssignee(10100l, false)
 		try {
@@ -69,7 +69,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 			Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
 			Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
-			assertThat(asJavaIterable(permissionChecksPage.getFieldGroups()
+			assertThat(asJavaIterable(permissionChecksPage.getFieldGroups
 					.map(element => element.find(By.tagName("label")))
 					.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String]("Reporter"))
 

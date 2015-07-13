@@ -38,7 +38,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 
 	@Test def shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks() {
 		val issue = createIssues.newIssue(new FieldInput(IssueFieldId.SUMMARY_FIELD, "Issue with comments"),
-			new FieldInput(IssueFieldId.PRIORITY_FIELD, ComplexIssueInputFieldValue.`with`("key", "AFER")),
+			new FieldInput(IssueFieldId.PROJECT_FIELD, ComplexIssueInputFieldValue.`with`("key", "AFER")),
 			new FieldInput(IssueFieldId.ISSUE_TYPE_FIELD, ComplexIssueInputFieldValue.`with`("id", "3")))
 		try {
 			testkit3.permissionSchemes().removeProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
