@@ -78,8 +78,8 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
         Issue restIssue = restClient2.getIssueClient().getIssue(remoteIssueKey, ImmutableList.of(IssueRestClient.Expandos.CHANGELOG)).claim();
         List<Attachment> attachments = ImmutableList.copyOf(restIssue.getAttachments());
-        checkAttachment(attachments.get(0), "document.doc", 9216, "application/msword; charset=ISO-8859-1");
-        checkAttachment(attachments.get(1), "screenshot.png", 36743, "image/png; charset=ISO-8859-1");
+        checkAttachment(attachments.get(0), "document.doc", 9216, "application/msword");
+        checkAttachment(attachments.get(1), "screenshot.png", 36743, "image/png");
 
         //after copying attachments, change history should be empty
         assertEquals("Change history should be empty as we clear it", 0, Iterables.size(restIssue.getChangelog()));
