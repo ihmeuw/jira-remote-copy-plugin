@@ -168,7 +168,7 @@
             <dependency>
                 <groupId>com.atlassian.sal</groupId>
                 <artifactId>sal-api</artifactId>
-                <version>3.0.0-m109</version>
+                <version>${my.sal.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -395,7 +395,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cpji.build.directory>target</cpji.build.directory>
         <atlassian.qunit.version>1.0.0-m5</atlassian.qunit.version>
-        <jira.version>7.0.0-QR20150617180424</jira.version>
+        <jira.version>7.0.0-QR20150630114820</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <my.sal.version>3.0.2</my.sal.version>
