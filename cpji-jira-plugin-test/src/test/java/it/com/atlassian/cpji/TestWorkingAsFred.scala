@@ -32,7 +32,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
 		val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
 
-		Poller.waitUntilFalse(permissionChecksPage.areAllIssueFieldsRetained)
+		Poller.waitUntilTrue(permissionChecksPage.areAllIssueFieldsRetained)
 		Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
