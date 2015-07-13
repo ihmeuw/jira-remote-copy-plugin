@@ -7,7 +7,7 @@ import com.atlassian.jira.project.Project;
 
 public interface CustomFieldDefaultValueEvaluationStrategy {
 
-    public void populateWithDefaultValue(final IssueInputParameters inputParameters, final CustomField customField, final Project project, final IssueType issueType);
-    public boolean hasDefaultValueDefined(final CustomField customField, final Project project, final IssueType issueType);
+    void populateWithDefaultValue(final IssueInputParameters inputParameters, final CustomField customField, final Project project, final IssueType issueType);
+    boolean hasDefaultValueDefined(final CustomField customField, final Project project, final IssueType issueType);
 
 }

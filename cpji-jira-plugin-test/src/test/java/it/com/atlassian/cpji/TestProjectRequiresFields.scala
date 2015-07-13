@@ -1,31 +1,32 @@
 package it.com.atlassian.cpji
 
-import com.atlassian.cpji.tests.pageobjects.{CopyIssueToInstanceConfirmationPage, CopyDetailsPage, SelectTargetProjectPage}
-import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
-import org.junit.{Rule, Before, Test, Assert}
-import org.junit.Assert._
-import org.hamcrest.collection.IsIterableContainingInOrder
-import org.openqa.selenium.By
-import collection.JavaConverters._
-import collection.JavaConversions._
-import com.atlassian.pageobjects.elements.query.Poller
-import com.atlassian.pageobjects.elements.Options
-import org.scalatest.junit.ShouldMatchersForJUnit
-import org.codehaus.jettison.json.JSONArray
-import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.cpji.tests.pageobjects.confirmationPage.MappingResult
+import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
+import com.atlassian.cpji.tests.rules.CreateIssues
+import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
+import com.atlassian.pageobjects.elements.Options
+import com.atlassian.pageobjects.elements.query.Poller
+import org.codehaus.jettison.json.JSONArray
 import org.hamcrest.Matchers
+import org.hamcrest.collection.IsIterableContainingInOrder
 import org.hamcrest.text.StringContainsInOrder
+import org.junit.Assert._
+import org.junit.{Assert, Before, Rule, Test}
+import org.openqa.selenium.By
+import org.scalatest.junit.ShouldMatchersForJUnit
+
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 
 class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit {
-	@Before def setUp {
+	@Before def setUp() {
 		login(jira2)
 	}
 
   @Rule def createIssues = new CreateIssues(restClient2)
 
-	@Test def testMissingRequiredFieldsAreReported {
+	@Test def testMissingRequiredFieldsAreReported() {
 		val selectTargetProjectPage: SelectTargetProjectPage = jira2
 				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
 		selectTargetProjectPage.setDestinationProject("Some Fields Required")
@@ -36,7 +37,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 		Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
-		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups()
+		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups
 				.map(element => element.find(By.tagName("label")))
 				.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String](
 			"Due Date\nRequired", "Component/s\nRequired",
@@ -45,7 +46,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
 		permissionChecksPage = permissionChecksPage.submitWithErrors
 		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
-		val errors = permissionChecksPage.getFieldGroups()
+		val errors = permissionChecksPage.getFieldGroups
 				.map(_.find(By.className("error")))
 				.filter(_.isPresent)
 				.map(element => element.getText).toIterable.asJava
@@ -56,7 +57,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 			"Labels is required."))
 	}
 
-	@Test def shouldCopyIssueWithMissingRequiredFields {
+	@Test def shouldCopyIssueWithMissingRequiredFields() {
 		val selectTargetProjectPage: SelectTargetProjectPage = jira2
 				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
 		selectTargetProjectPage.setDestinationProject("Some Fields Required")
@@ -86,7 +87,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 		assertTrue(succesfulCopyPage.isSuccessful)
 	}
 
-  @Test def shouldShowInformationWhenValueCannotBeUsed {
+  @Test def shouldShowInformationWhenValueCannotBeUsed() {
     val unmappedUser: String = "reallyStrangeUser"
 
     try{
@@ -125,7 +126,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
   }
 
-	@Test def shouldCopyIssueWithMissingRequiredCustomFields {
+	@Test def shouldCopyIssueWithMissingRequiredCustomFields() {
 		val selectTargetProjectPage: SelectTargetProjectPage = jira2
 				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
 		selectTargetProjectPage.setDestinationProject("Custom Fields Required")

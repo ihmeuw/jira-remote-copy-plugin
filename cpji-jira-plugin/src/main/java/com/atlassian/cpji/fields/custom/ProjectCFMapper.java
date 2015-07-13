@@ -14,7 +14,7 @@ import org.ofbiz.core.entity.GenericValue;
  *
  * @since v2.1
  */
-public class ProjectCFMapper extends AbstractSingleValueCFMapper<GenericValue>
+public class ProjectCFMapper extends AbstractSingleValueCFMapper<Project>
 {
 	private final ProjectManager projectManager;
 
@@ -31,9 +31,9 @@ public class ProjectCFMapper extends AbstractSingleValueCFMapper<GenericValue>
     }
 
     @Override
-    protected String convertToString(final GenericValue value)
+    protected String convertToString(final Project value)
     {
-        return value.getString("name");
+        return value.getName();
     }
 
 	@Override
