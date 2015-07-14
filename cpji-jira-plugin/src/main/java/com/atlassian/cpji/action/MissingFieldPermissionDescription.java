@@ -58,24 +58,21 @@ public class MissingFieldPermissionDescription
     }
 
     public static Predicate<MissingFieldPermissionDescription> isDestinationFieldRequired() {
-		return new Predicate<MissingFieldPermissionDescription>() {
-			@Override
-			public boolean apply(MissingFieldPermissionDescription input) {
-				Preconditions.checkNotNull(input);
-				switch(input.getValidationCode()) {
-					case FIELD_MANDATORY_NO_PERMISSION:
-					case FIELD_MANDATORY_VALUE_NOT_MAPPED:
-					case FIELD_MANDATORY_VALUE_NOT_MAPPED_USING_DEFAULT_VALUE:
-					case FIELD_MANDATORY_NO_PERMISSION_MAPPED_USING_DEFAULT_VALUE:
-					case FIELD_MANDATORY_BUT_NOT_SUPPLIED:
-					case FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE:
-						return true;
-					default:
-						return false;
+		return input -> {
+            Preconditions.checkNotNull(input);
+            switch(input.getValidationCode()) {
+                case FIELD_MANDATORY_NO_PERMISSION:
+                case FIELD_MANDATORY_VALUE_NOT_MAPPED:
+                case FIELD_MANDATORY_VALUE_NOT_MAPPED_USING_DEFAULT_VALUE:
+                case FIELD_MANDATORY_NO_PERMISSION_MAPPED_USING_DEFAULT_VALUE:
+                case FIELD_MANDATORY_BUT_NOT_SUPPLIED:
+                case FIELD_MANDATORY_BUT_NOT_SUPPLIED_USING_DEFAULT_VALUE:
+                    return true;
+                default:
+                    return false;
 
-				}
-			}
-		};
+            }
+        };
 	}
 
 }

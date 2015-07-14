@@ -19,60 +19,64 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 
-class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit {
-	@Before def setUp() {
-		login(jira2)
-	}
+class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit
+{
+  @Before def setUp()
+  {
+    login(jira2)
+  }
 
   @Rule def createIssues = new CreateIssues(restClient2)
 
-	@Test def testMissingRequiredFieldsAreReported() {
-		val selectTargetProjectPage: SelectTargetProjectPage = jira2
-				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
-		selectTargetProjectPage.setDestinationProject("Some Fields Required")
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
-		var permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+  @Test def testMissingRequiredFieldsAreReported()
+  {
+    val selectTargetProjectPage: SelectTargetProjectPage = jira2
+      .visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
+    selectTargetProjectPage.setDestinationProject("Some Fields Required")
+    val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
+    var permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
 
-		Poller.waitUntilTrue(permissionChecksPage.areAllIssueFieldsRetained)
-		Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
+    Poller.waitUntilTrue(permissionChecksPage.areAllIssueFieldsRetained)
+    Poller.waitUntilFalse(permissionChecksPage.areAllRequiredFieldsFilledIn)
 
-		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
-		assertThat(asJavaIterable(permissionChecksPage.getFieldGroups
-				.map(element => element.find(By.tagName("label")))
-				.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String](
-			"Due Date\nRequired", "Component/s\nRequired",
-			"Affects Version/s\nRequired", "Fix Version/s\nRequired", "Environment\nRequired", "Description\nRequired",
-			"Original Estimate\nRequired", "Remaining Estimate\nRequired", "Labels\nRequired"))
+    Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
+    assertThat(asJavaIterable(permissionChecksPage.getFieldGroups
+      .map(element => element.find(By.tagName("label")))
+      .map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String](
+      "Due Date\nRequired", "Component/s\nRequired",
+      "Affects Version/s\nRequired", "Fix Version/s\nRequired", "Environment\nRequired", "Description\nRequired",
+      "Original Estimate\nRequired", "Remaining Estimate\nRequired", "Labels\nRequired"))
 
-		permissionChecksPage = permissionChecksPage.submitWithErrors
-		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
-		val errors = permissionChecksPage.getFieldGroups
-				.map(_.find(By.className("error")))
-				.filter(_.isPresent)
-				.map(element => element.getText).toIterable.asJava
-		Assert.assertThat(errors, IsIterableContainingInOrder.contains[String](
-			"Due Date is required.", "Component/s is required.", "Affects Version/s is required.",
-			"Fix Version/s is required.",
-			"Environment is required.", "Description is required.", "Original Estimate is required.",
-			"Labels is required."))
-	}
+    permissionChecksPage = permissionChecksPage.submitWithErrors
+    Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
+    val errors = permissionChecksPage.getFieldGroups
+      .map(_.find(By.className("error")))
+      .filter(_.isPresent)
+      .map(element => element.getText).toIterable.asJava
+    Assert.assertThat(errors, IsIterableContainingInOrder.contains[String](
+      "Due Date is required.", "Component/s is required.", "Affects Version/s is required.",
+      "Fix Version/s is required.",
+      "Environment is required.", "Description is required.", "Original Estimate is required.",
+      "Labels is required."))
+  }
 
-	@Test def shouldCopyIssueWithMissingRequiredFields() {
-		val selectTargetProjectPage: SelectTargetProjectPage = jira2
-				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
-		selectTargetProjectPage.setDestinationProject("Some Fields Required")
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
-		val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+  @Test def shouldCopyIssueWithMissingRequiredFields()
+  {
+    val selectTargetProjectPage: SelectTargetProjectPage = jira2
+      .visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
+    selectTargetProjectPage.setDestinationProject("Some Fields Required")
+    val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
+    val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
 
-		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
+    Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
     val textFields = Map(
-      "duedate"-> "16/Jan/13",
-      "environment"-> "Mac OS X",
+      "duedate" -> "16/Jan/13",
+      "environment" -> "Mac OS X",
       "description" -> "This is a description.",
       "timetracking_originalestimate" -> "1w",
       "timetracking_remainingestimate" -> "1w"
     )
-    textFields.foreach(k=> permissionChecksPage.getMappingResultFor(k._1).typeToTextField(k._2))
+    textFields.foreach(k => permissionChecksPage.getMappingResultFor(k._1).typeToTextField(k._2))
 
     val multiSelects = Map(
       "components" -> "Core",
@@ -83,68 +87,92 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
     multiSelects.foreach(k => permissionChecksPage.getMappingResultFor(k._1).setMultiSelect(k._2))
 
 
-		val succesfulCopyPage = permissionChecksPage.copyIssue()
-		assertTrue(succesfulCopyPage.isSuccessful)
-	}
-
-  @Test def shouldShowInformationWhenValueCannotBeUsed() {
-    val unmappedUser: String = "reallyStrangeUser"
-
-    try{
-      //create temporary user which is developer
-      testkit2.usersAndGroups().addUser(unmappedUser, "rst", "Really Strange User", "really@strange.user")
-      testkit2.usersAndGroups().addUserToGroup(unmappedUser, "jira-developers")
-      //create issue and assing to user
-      val issueBuilder = new IssueInputBuilder("DNEL", 3L, "Sample issue assigned to not mappable user").setAssigneeName(unmappedUser)
-      val issue = createIssues.newIssue(issueBuilder.build())
-      //remove user from developers - he can't be assigned anymore
-      testkit2.usersAndGroups().removeUserFromGroup(unmappedUser, "jira-developers")
-
-      //test locally - display values in a hover
-      {
-        val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], issue.getId)
-        val permissionChecksPage = selectTargetProjectPage.next.next
-
-        val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
-        Poller.waitUntilTrue(assigneeRow.hasNotMappedNotify)
-        Poller.waitUntil(assigneeRow.getUnmappedNotifyText, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
-      }
-
-      //test remotely - display unmapped values as plain text
-      {
-        val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], issue.getId)
-        val permissionChecksPage = selectTargetProjectPage.setDestinationProject("Test").next.next
-
-        val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
-        Poller.waitUntil(assigneeRow.getMessage, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
-        Poller.waitUntil(permissionChecksPage.getMappingResultFor("customfield_10201").getMessage, Matchers.containsString("field does not exist in the target project"))
-      }
-
-    } finally {
-      testkit2.usersAndGroups().deleteUser(unmappedUser)
-    }
-
+    val succesfulCopyPage = permissionChecksPage.copyIssue()
+    assertTrue(succesfulCopyPage.isSuccessful)
   }
 
-	@Test def shouldCopyIssueWithMissingRequiredCustomFields() {
-		val selectTargetProjectPage: SelectTargetProjectPage = jira2
-				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
-		selectTargetProjectPage.setDestinationProject("Custom Fields Required")
-		val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
-		val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+  @Test def shouldShowInformationWhenValueCannotBeUsed()
+  {
+    val unmappedUser: String = "reallyStrangeUser"
 
-		Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
+    try
+    {
+      testkit2.projectRoles().addActors("DNEL", "Developers", null, Array("fred"))
+      try
+      {
+        //create temporary user which is developer
+        if (!testkit2.usersAndGroups().userExists(unmappedUser))
+        {
+          testkit2.usersAndGroups().addUser(unmappedUser, "rst", "Really Strange User", "really@strange.user")
+        }
+        testkit2.usersAndGroups().addUserToGroup(unmappedUser, "jira-developers")
+
+        //create issue and assing to user
+        val issueBuilder = new
+            IssueInputBuilder("DNEL", 3L, "Sample issue assigned to not mappable user").setAssigneeName(unmappedUser)
+        val issue = createIssues.newIssue(issueBuilder.build())
+
+        try
+        {
+          //remove user from developers - he can't be assigned anymore
+          testkit2.usersAndGroups().removeUserFromGroup(unmappedUser, "jira-developers")
+
+          //test locally - display values in a hover
+          {
+            val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], issue.getId)
+            val permissionChecksPage = selectTargetProjectPage.next.next
+
+            val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
+            Poller.waitUntilTrue(assigneeRow.hasNotMappedNotify)
+            Poller.waitUntil(assigneeRow.getUnmappedNotifyText, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
+          }
+
+          //test remotely - display unmapped values as plain text
+          {
+            val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], issue.getId)
+            val permissionChecksPage = selectTargetProjectPage.setDestinationProject("Test").next.next
+
+            val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
+            Poller.waitUntil(assigneeRow.getMessage, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
+            Poller.waitUntil(permissionChecksPage.getMappingResultFor("customfield_10201").getMessage, Matchers.containsString("field does not exist in the target project"))
+          }
+        }
+        finally
+        {
+          testkit2.issues.deleteIssue(issue.getKey, true)
+        }
+      }
+      finally
+      {
+        testkit2.usersAndGroups().deleteUser(unmappedUser)
+      }
+    }
+    finally
+    {
+      testkit2.projectRoles().deleteUser("DNEL", "Developers", "fred")
+    }
+  }
+
+  @Test def shouldCopyIssueWithMissingRequiredCustomFields()
+  {
+    val selectTargetProjectPage: SelectTargetProjectPage = jira2
+      .visit(classOf[SelectTargetProjectPage], new java.lang.Long(10105L))
+    selectTargetProjectPage.setDestinationProject("Custom Fields Required")
+    val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
+    val permissionChecksPage: CopyIssueToInstanceConfirmationPage = copyDetailsPage.next
+
+    Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
 
     val textFields = Map(
-      "environment"-> "Mac OS X",
+      "environment" -> "Mac OS X",
       "customfield_10004" -> "jira-administrators",
       "customfield_10005" -> "123"
     )
-    textFields.foreach(k=> permissionChecksPage.getMappingResultFor(k._1).typeToTextField(k._2))
+    textFields.foreach(k => permissionChecksPage.getMappingResultFor(k._1).typeToTextField(k._2))
     permissionChecksPage.getMappingResultFor("versions").setMultiSelect("2.0")
-		permissionChecksPage.getMappingResultFor("customfield_10006").getSelectElement.select(Options.text("beta"))
+    permissionChecksPage.getMappingResultFor("customfield_10006").getSelectElement.select(Options.text("beta"))
 
-		val successfulPage = permissionChecksPage.copyIssue()
+    val successfulPage = permissionChecksPage.copyIssue()
     assertTrue(successfulPage.isSuccessful)
 
 
@@ -154,10 +182,10 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
     copiedIssue.getFieldByName("NumberFieldWithDefault").getValue should equal(123456)
 
     val multiSelectVal = copiedIssue.getFieldByName("MultiSelectWithDefault").getValue.asInstanceOf[JSONArray]
-    val pureValues = 0 until multiSelectVal.length() map(index => multiSelectVal.getJSONObject(index).getString("value"))
+    val pureValues = 0 until multiSelectVal.length() map (index => multiSelectVal.getJSONObject(index).getString("value"))
     pureValues should have length 3
     pureValues should be eq List("one", "three", "four").toIndexedSeq
 
 
-	}
+  }
 }

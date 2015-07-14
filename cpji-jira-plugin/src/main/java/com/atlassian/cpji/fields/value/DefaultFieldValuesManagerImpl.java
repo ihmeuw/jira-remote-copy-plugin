@@ -5,6 +5,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,11 +28,8 @@ public class DefaultFieldValuesManagerImpl implements DefaultFieldValuesManager 
         if (fieldValue.getClass().isArray())
         {
             String[] strValues = (String[]) fieldValue;
-            List values = new ArrayList();
-            for (String value : strValues)
-            {
-                values.add(value);
-            }
+            List<String> values = new ArrayList<>();
+            Collections.addAll(values, strValues);
             settingsForProject.put(createKey(fieldId, issueType), values);
             log.debug("Persisted default value for field '" + fieldId + "' value ='" + fieldValue + "'");
         }
