@@ -45,9 +45,6 @@ public abstract class AbstractCopyIssueTest
 	@Rule
 	public RuleChain dirtyWarningTerminatorRule = RuleChainBuilder.forProduct(jira1).around(DirtyWarningTerminatorRule.class).build();
 
-//	@ClassRule
-//	public static EmptySystemDashboardRule emptySystemDashboardRule = new EmptySystemDashboardRule(testkit1, testkit2, testkit3);
-
 	static JiraRestClient restClient1 = getJiraRestClient(jira1);
 	static JiraRestClient restClient2 = getJiraRestClient(jira2);
 	static JiraRestClient restClient3 = getJiraRestClient(jira3);

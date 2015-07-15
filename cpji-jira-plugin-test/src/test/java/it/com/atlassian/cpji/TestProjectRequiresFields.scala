@@ -3,6 +3,7 @@ package it.com.atlassian.cpji
 import com.atlassian.cpji.tests.pageobjects.confirmationPage.MappingResult
 import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanceConfirmationPage, SelectTargetProjectPage}
 import com.atlassian.cpji.tests.rules.CreateIssues
+import com.atlassian.jira.config.properties.APKeys
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
 import com.atlassian.pageobjects.elements.Options
 import com.atlassian.pageobjects.elements.query.Poller
@@ -95,9 +96,9 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
   {
     val unmappedUser: String = "reallyStrangeUser"
 
+    testkit2.applicationProperties().setOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED, true)
     try
     {
-      testkit2.projectRoles().addActors("DNEL", "Developers", null, Array("fred"))
       try
       {
         //create temporary user which is developer
@@ -139,17 +140,17 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
         }
         finally
         {
-          testkit2.issues.deleteIssue(issue.getKey, true)
+                  testkit2.issues.deleteIssue(issue.getKey, true)
         }
       }
       finally
       {
-        testkit2.usersAndGroups().deleteUser(unmappedUser)
+              testkit2.usersAndGroups().deleteUser(unmappedUser)
       }
     }
     finally
     {
-      testkit2.projectRoles().deleteUser("DNEL", "Developers", "fred")
+      testkit2.applicationProperties().setOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED, false)
     }
   }
 

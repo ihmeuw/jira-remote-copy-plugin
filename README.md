@@ -37,6 +37,10 @@ To run CLI for each:
 
 `cd cpji-jira-plugin && atlas-mvn jira:cli -Pjira2`
 
+To install plugin in JIRA 2:
+
+`atlas-mvn amps:install -Dhttp.port=2991 -Dcontext.path=jira`
+
 Contributing to JIRA to JIRA Issue Copy
 -----------------
 
