@@ -5,6 +5,7 @@ import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceConfirmationPage;
 import com.atlassian.cpji.tests.pageobjects.CopyIssueToInstanceSuccessfulPage;
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage;
 import com.atlassian.cpji.tests.rules.CreateIssues;
+import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.jira.rest.client.api.IssueRestClient;
 import com.atlassian.jira.rest.client.api.domain.Attachment;
@@ -19,9 +20,11 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import scala.Unit;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.atlassian.cpji.tests.RawRestUtil.getIssueJson;
 import static org.hamcrest.Matchers.startsWith;
@@ -118,6 +121,13 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     }
 
     private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject, final String summary) {
+        return remoteCopy(jira, issueKey, issueId, destinationProject, summary, copyIssueToInstanceConfirmationPage -> {
+            Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllIssueFieldsRetained());
+            Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllRequiredFieldsFilledIn());
+        });
+    }
+
+    private String remoteCopy(final JiraTestedProduct jira, final String issueKey, final Long issueId, final String destinationProject, final String summary, final Consumer<CopyIssueToInstanceConfirmationPage> assertions) {
         viewIssue(jira, issueKey);
         SelectTargetProjectPage selectTargetProjectPage = jira.visit(SelectTargetProjectPage.class, issueId);
         if (destinationProject != null)
@@ -129,14 +139,12 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
 
         final CopyIssueToInstanceConfirmationPage copyIssueToInstanceConfirmationPage = copyDetailsPage.next();
 
-        Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllIssueFieldsRetained());
-        Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllRequiredFieldsFilledIn());
+        assertions.accept(copyIssueToInstanceConfirmationPage);
 
         final CopyIssueToInstanceSuccessfulPage copyIssueToInstanceSuccessfulPage = copyIssueToInstanceConfirmationPage.copyIssue();
         assertTrue(copyIssueToInstanceSuccessfulPage.isSuccessful());
 
-        final String remoteIssueKey = copyIssueToInstanceSuccessfulPage.getRemoteIssueKey();
-        return remoteIssueKey;
+        return copyIssueToInstanceSuccessfulPage.getRemoteIssueKey();
     }
 
     @Test
@@ -189,7 +197,9 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     public void testCopyIssueAssociatedWithInvalidUser() throws Exception {
         final com.atlassian.jira.testkit.client.restclient.Issue issue = testkit1.issues().getIssue("IWRU-1");
 
-        final String remoteIssueKey = remoteCopy(jira1, issue.key, Long.parseLong(issue.id), "Blah", "A test task with changed name");
+        final String remoteIssueKey = remoteCopy(jira1, issue.key, Long.parseLong(issue.id), "Blah", "A test task with changed name", copyIssueToInstanceConfirmationPage -> {
+            Poller.waitUntilTrue(copyIssueToInstanceConfirmationPage.areAllIssueFieldsRetained());
+        });
 
         // Query the remotely copied issue via REST
         final JSONObject json = getIssueJson(jira2, remoteIssueKey);
