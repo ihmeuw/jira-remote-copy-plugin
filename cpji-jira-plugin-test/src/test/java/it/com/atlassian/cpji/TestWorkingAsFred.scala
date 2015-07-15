@@ -59,7 +59,7 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 			assertThat(newIssue.getAssignee, Matchers.nullValue(classOf[BasicUser]))
 
 			val selectTargetProjectPage: SelectTargetProjectPage = jira1
-					.visit(classOf[SelectTargetProjectPage], new java.lang.Long(newIssue.getId))
+				.visit(classOf[SelectTargetProjectPage], new java.lang.Long(newIssue.getId))
 
 			selectTargetProjectPage.setDestinationProject("Blah")
 			val copyDetailsPage: CopyDetailsPage = selectTargetProjectPage.next
@@ -70,8 +70,8 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 
 			Poller.waitUntilTrue(permissionChecksPage.getFirstFieldGroup.isVisible)
 			assertThat(asJavaIterable(permissionChecksPage.getFieldGroups
-					.map(element => element.find(By.tagName("label")))
-					.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String]("Reporter"))
+				.map(element => element.find(By.tagName("label")))
+				.map(element => element.getText).toIterable), IsIterableContainingInOrder.contains[String]("Assignee", "Reporter"))
 
 			val successfulPage = permissionChecksPage.copyIssue()
 			assertTrue(successfulPage.isSuccessful)
@@ -83,7 +83,6 @@ class TestWorkingAsFred extends AbstractCopyIssueTest with JiraObjects {
 			testkit1.applicationProperties().setOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED, true)
 			testkit1.project().setProjectDefaultAssignee(10100l, true)
 		}
-
 	}
 
 
