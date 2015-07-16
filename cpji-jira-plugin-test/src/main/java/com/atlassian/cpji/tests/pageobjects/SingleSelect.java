@@ -65,9 +65,6 @@ public class SingleSelect
      *
      *
      * @return list of suggestions at any given moment
-     * @deprecated use {@link #getSuggestionsTimed()} as this method is prone to return wrong results due to race
-     * conditions. Using {@link #getSuggestionsTimed()} will enforce clients to execute timed assertions and improve
-     * reliability of the tests
      */
     @Deprecated
     public List<String> getSuggestions()
@@ -81,16 +78,6 @@ public class SingleSelect
         }
         return suggestions;
     }
-
-
-//    public TimedQuery<Iterable<String>> getSuggestionsTimed()
-//    {
-//        return Queries.forSupplier(timeouts, forFinder(getActiveLayer())
-//                .newQuery(By.className("aui-list-item-link"))
-//                .transform(PageElements.getAttribute("title"))
-//                .supplier());
-//
-//    }
 
     private PageElement getActiveLayer()
     {
