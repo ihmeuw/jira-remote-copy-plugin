@@ -207,6 +207,7 @@
         <atlassian.selenium.version>2.2.1-m02-jira-1</atlassian.selenium.version>
         <jersey.version>1.8-atlassian-16</jersey.version>
         <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
+        <rest.doc.generation.skip>true</rest.doc.generation.skip>
     </properties>
 
     <profiles>
