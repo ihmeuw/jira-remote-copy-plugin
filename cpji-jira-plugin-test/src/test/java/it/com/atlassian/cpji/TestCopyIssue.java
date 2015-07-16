@@ -41,6 +41,8 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
     private static final String JIRA2_SELECT_LIST_CF = "customfield_10006";
     private static final String JIRA2_NUMBER_FIELD_CF = "customfield_10005";
 
+    private static final String JIRA1_DATE_PICKER_CF = "customfield_10000";
+
     @Rule
     public CreateIssues createIssues = new CreateIssues(restClient1);
 
@@ -54,6 +56,9 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         final String remoteIssueKey = remoteCopy(jira1, "TST-1", 10000L);
 
         // Query the remotely copied issue via REST
+        final JSONObject json1 = getIssueJson(jira1, "TST-1");
+        final JSONObject fields1 = json1.getJSONObject("fields");
+
         final JSONObject json = getIssueJson(jira2, remoteIssueKey);
         final JSONObject fields = json.getJSONObject("fields");
 
@@ -63,7 +68,7 @@ public class TestCopyIssue extends AbstractCopyIssueTest {
         assertEquals("Blah blah blah", fields.getString("description"));
 
         // Custom fields
-        assertEquals("2011-09-30", fields.getString(JIRA2_DATE_PICKER_CF));
+        assertEquals(fields1.getString(JIRA1_DATE_PICKER_CF), fields.getString(JIRA2_DATE_PICKER_CF));
         assertEquals("jira-developers", fields.getJSONObject(JIRA2_GROUP_PICKER_CF).getString("name"));
 
         final JSONArray multiGroup = fields.getJSONArray(JIRA2_MULTI_GROUP_PICKER_CF);
