@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>4.0.3-SNAPSHOT</version>
+    <version>5.0.1</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -231,7 +230,7 @@
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git
         </developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-        <tag>HEAD</tag>
+        <tag>cpji-jira-5.0.1</tag>
     </scm>
 
     <pluginRepositories>
