@@ -25,6 +25,9 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
 {
     private static final String URL = "/secure/PermissionChecksAction.jspa";
 
+	@ElementBy(className = "copy-issue-to-instance")
+	PageElement form;
+
     @ElementBy(className = "submit")
     PageElement copyIssueButton;
 
@@ -61,11 +64,11 @@ public class CopyIssueToInstanceConfirmationPage extends AbstractJiraPage
     }
 
 	public TimedElement getFirstFieldGroup() {
-		return elementFinder.find(By.cssSelector(".field-group")).timed();
+		return form.find(By.cssSelector(".field-group")).timed();
 	}
 
 	public Iterator<PageElement> getFieldGroups() {
-		return elementFinder.findAll(By.cssSelector(".field-group")).iterator();
+		return form.findAll(By.cssSelector(".field-group")).iterator();
 	}
 
 	public CopyIssueToInstanceConfirmationPage submitWithErrors() {

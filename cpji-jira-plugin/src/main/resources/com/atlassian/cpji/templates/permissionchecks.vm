@@ -14,7 +14,7 @@
 <div id="stepped-process" class="content-container">
 	#parse("/com/atlassian/cpji/templates/steps.vm")
     <div class="content-body aui-panel">
-        <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation" >
+        <form #if ($action.isCopyingPossible()) action="CopyIssueToInstanceAction.jspa" method="post" #else action="../browse/$action.getIssueKey()" method="get" #end class="aui confirmation copy-issue-to-instance" >
             #if($action.isCopyingPossible())
                 <h2 class="formtitle">$i18n.getText('cpji.confirm.clone')</h2>
                 #if(!$action.issueFieldsThatCannotBeCopied.isEmpty() || !$action.destinationIssueFieldsThatAreRequired.isEmpty())
