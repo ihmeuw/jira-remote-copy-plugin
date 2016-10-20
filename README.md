@@ -7,9 +7,7 @@ Visit [JIRA to JIRA Issue Copy](https://marketplace.atlassian.com/plugins/com.at
 
 Raising bugs or feature requests
 -----------------
-Please raise them at https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin/issues
-
-Issues with accompaning pull requests will be processed with highier priority.
+This plugin is not officially supported. If you would like to raise a bug or feature request, please comment on this issue: https://jira.atlassian.com/browse/JRA-62759. We will periodically re-evaluate the plugin's supported status.
 
 Changing JIRA to JIRA Issue Copy
 -----------------
