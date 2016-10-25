@@ -144,13 +144,6 @@
                 <version>${jira.version}</version>
                 <scope>provided</scope>
             </dependency>
-
-            <dependency>
-                <groupId>com.atlassian.workcontext</groupId>
-                <artifactId>atlassian-work-context-doorway</artifactId>
-                <version>${work.context.version}</version>
-                <scope>provided</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -214,7 +207,6 @@
         <jersey.version>1.8-atlassian-16</jersey.version>
         <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
         <rest.doc.generation.skip>true</rest.doc.generation.skip>
-        <work.context.version>1.2.1</work.context.version>
     </properties>
 
     <profiles>
