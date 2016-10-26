@@ -28,8 +28,7 @@ public class WorkContextUtil {
     }
 
     private static <T> T runWithNewWorkContext(Supplier<T> supplier) {
-        try (WorkContextDoorway doorway = new WorkContextDoorway()) {
-            doorway.open();
+        try (WorkContextDoorway doorway = new WorkContextDoorway().open()) {
             return supplier.get();
         }
     }

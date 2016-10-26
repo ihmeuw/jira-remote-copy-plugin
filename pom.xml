@@ -149,7 +149,6 @@
                 <groupId>com.atlassian.workcontext</groupId>
                 <artifactId>atlassian-work-context-doorway</artifactId>
                 <version>${work.context.version}</version>
-                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -315,6 +315,7 @@
 		<dependency>
 			<groupId>com.atlassian.workcontext</groupId>
 			<artifactId>atlassian-work-context-doorway</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
