@@ -7,9 +7,8 @@ import com.atlassian.cpji.components.model.Projects;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.PluginInfoResource;
-import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.cpji.util.WorkContextUtil;
 import com.atlassian.fugue.Either;
-import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class RemoteJiraService {
 
@@ -75,10 +73,10 @@ public class RemoteJiraService {
         final ApplicationUser user = authenticationContext.getLoggedInUser();
         final List<Callable<T>> queries = Lists.newArrayList(
                 Iterables.transform(applicationLinks,
-                        applicationLink -> () -> {
+                        applicationLink -> () -> WorkContextUtil.runWithNewWorkContextIfAvailable(() -> {
                             ComponentAccessor.getJiraAuthenticationContext().setLoggedInUser(user);
                             return function.apply(applicationLink);
-                        })
+                        }))
         );
         try {
             return ImmutableList.copyOf(Iterables.transform(es.invokeAll(queries),

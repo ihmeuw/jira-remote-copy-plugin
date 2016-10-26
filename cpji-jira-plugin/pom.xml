@@ -312,6 +312,11 @@
 			<version>4.2.2</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.atlassian.workcontext</groupId>
+			<artifactId>atlassian-work-context-doorway</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
     <build>
