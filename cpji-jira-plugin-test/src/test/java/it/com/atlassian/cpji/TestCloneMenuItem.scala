@@ -10,6 +10,7 @@ import com.atlassian.jira.security.Permissions
 import com.atlassian.pageobjects.elements.query.Poller
 import it.com.atlassian.cpji.BackdoorHelpers._
 import org.apache.log4j.Logger
+import org.junit.Assert._
 import org.junit.{Rule, Test}
 
 /**
@@ -31,8 +32,9 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 
 
 	@Test def shouldNotDisplayLinkIfUserIsNotLoggedIn() {
+		jira1.logout()
 		val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "AN-1")
-		Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasCloneAction)
+		assertFalse(issuePage.hasClone)
 
 	}
 
@@ -49,7 +51,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
 			issuePage.getMoreActionsMenu.open()
-			Poller.waitUntilFalse(issuePage.getIssueActionsFragment.hasCloneAction)
+			assertFalse(issuePage.hasClone)
 		} catch{
 			case e: Exception => {
 				logger.error("Troubles during checking permissions", e)
@@ -65,7 +67,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 			removeProjectRolePermission(testkit1, 0, Permissions.CREATE_ISSUE, 10000)
 			login(jira1)
 			val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
-			Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
+			assertTrue(issuePage.hasRIC)
 		} finally {
 			addProjectRolePermission(testkit1, 0, Permissions.CREATE_ISSUE, 10000)
 		}
@@ -79,7 +81,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 
 			login(jira1)
 			val issuePage: ExtendedViewIssuePage = jira1.visit(classOf[ExtendedViewIssuePage], "TST-1")
-			Poller.waitUntilTrue(issuePage.getIssueActionsFragment.hasRICCloneAction)
+			assertTrue(issuePage.hasRIC)
 			issuePage.invokeRIC()
 			val selectTargetProjectPage = jira1.getPageBinder.bind(classOf[SelectTargetProjectPage], java.lang.Long.valueOf(10000L))
 			Poller.waitUntilTrue(selectTargetProjectPage.getTargetEntityWarningMessage.timed().isPresent)

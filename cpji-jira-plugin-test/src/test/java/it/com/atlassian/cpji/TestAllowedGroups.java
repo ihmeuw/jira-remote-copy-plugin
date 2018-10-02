@@ -12,6 +12,7 @@ import org.hamcrest.collection.IsIterableWithSize;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -58,7 +59,7 @@ public class TestAllowedGroups extends AbstractCopyIssueTest {
 			for(String user : ImmutableList.of("fred")) {
 				jira1.logout();
                 final ExtendedViewIssuePage issuePage = jira1.gotoLoginPage().login(user, user, ExtendedViewIssuePage.class, "TST-1");
-                Poller.waitUntilFalse(issuePage.getIssueActionsFragment().hasRICCloneAction());
+				assertFalse(issuePage.hasRIC());
                 jira1.visit(PermissionViolationPage.class, SelectTargetProjectPage.buildUrl(10000L));
 				jira1.visit(PermissionViolationPage.class, "CopyDetailsAction.jspa?id=10000&targetEntityLink=8835b6b9-5676-3de4-ad59-bbe987416662|TST");
 				final String atl_token = (String) jira1.getTester().getDriver().executeScript("return atl_token()");

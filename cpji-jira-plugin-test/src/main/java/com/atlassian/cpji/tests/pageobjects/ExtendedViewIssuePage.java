@@ -1,5 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects;
 
+import com.atlassian.jira.pageobjects.model.IssueOperation;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.binder.Init;
@@ -19,37 +20,98 @@ public class ExtendedViewIssuePage extends ViewIssuePage {
     @Inject
     protected PageElementFinder pageElementFinder;
 
-    @Inject
-    protected IssueActionsFragment issueActionsFragment;
-
-
-
-
 
     public ExtendedViewIssuePage(String issueKey) {
         super(issueKey);
     }
 
-    @Init
-    public void init()
-    {
-        issueActionsFragment = pageBinder.bind(IssueActionsFragment.class);
-    }
-
-    public IssueActionsFragment getIssueActionsFragment() {
-        return issueActionsFragment;
-    }
 
     public void invokeRIC(){
-        getIssueMenu().invoke(issueActionsFragment.getRICOperation());
+        getIssueMenu().invoke(new RemoteCopyOperation());
     }
 
     public void invokeClone(){
-        getIssueMenu().invoke(issueActionsFragment.getCloneOperation());
+        getIssueMenu().invoke(new CloneOperation());
+    }
+
+    public boolean hasRIC() {
+        return getIssueMenu().isItemPresentInMoreActionsMenu(new RemoteCopyOperation().uiName());
+    }
+
+    public boolean hasClone() {
+        return getIssueMenu().isItemPresentInMoreActionsMenu(new CloneOperation().uiName());
     }
 
     public IssueActionsDialog openDOTSection(){
         pageElementFinder.find(By.tagName("body")).type(".");
         return pageBinder.bind(IssueActionsDialog.class);
     }
+
+    static class RemoteCopyOperation implements IssueOperation
+    {
+        @Override
+        public String id()
+        {
+            return "clone-issue-ric";
+        }
+
+        @Override
+        public String uiName()
+        {
+            return "Remote Copy";
+        }
+
+        @Override
+        public String cssClass()
+        {
+            return "issueaction-clone-issue ";
+        }
+
+        @Override
+        public boolean hasShortcut()
+        {
+            return false;
+        }
+
+        @Override
+        public CharSequence shortcut()
+        {
+            return null;
+        }
+    }
+
+    static class CloneOperation implements IssueOperation
+    {
+        @Override
+        public String id()
+        {
+            return "clone-issue";
+        }
+
+        @Override
+        public String uiName()
+        {
+            return "Clone";
+        }
+
+        @Override
+        public String cssClass()
+        {
+            return "issueaction-clone-issue ";
+        }
+
+        @Override
+        public boolean hasShortcut()
+        {
+            return false;
+        }
+
+        @Override
+        public CharSequence shortcut()
+        {
+            return null;
+        }
+    }
+
+
 }
