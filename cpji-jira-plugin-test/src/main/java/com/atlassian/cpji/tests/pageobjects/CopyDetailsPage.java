@@ -73,8 +73,7 @@ public class CopyDetailsPage extends AbstractJiraPage {
 
     @Init
     public void init() {
-        final PageElement remoteIssueLinkContainer = elementFinder.find(By.id("remoteIssueLink-single-select"));
-        remoteIssueLink = pageBinder.bind(SingleSelect.class, remoteIssueLinkContainer);
+        remoteIssueLink = pageBinder.bind(SingleSelect.class, createIssueLinkGroup);
     }
 
     @Override
