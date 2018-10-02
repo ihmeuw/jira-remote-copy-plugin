@@ -9,6 +9,7 @@ import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.TimedQuery;
+import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
 import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
@@ -109,8 +110,7 @@ public class CopyDetailsPage extends AbstractJiraPage {
 
 
     public List<String> getCreateIssueLinks() {
-        remoteIssueLink.clear().triggerSuggestions();
-        return remoteIssueLink.getSuggestions();
+        return ImmutableList.copyOf(remoteIssueLink.getAvailableSuggestions());
     }
 
     public CopyDetailsPage setCreateIssueLink(RemoteIssueLinkType value) {
