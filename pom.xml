@@ -209,11 +209,11 @@
         <testkit.version>7.7.8</testkit.version>
         <test-basics.version>1.9.5</test-basics.version>
         <amps.version>6.3.16</amps.version>
-        <atlassian.selenium.version>2.2.1-m02-jira-1</atlassian.selenium.version>
+        <atlassian.selenium.version>2.5.1-jira-1</atlassian.selenium.version>
         <jersey.version>1.8-atlassian-16</jersey.version>
         <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
         <rest.doc.generation.skip>true</rest.doc.generation.skip>
-        <work.context.version>0.5.0</work.context.version>
+        <work.context.version>1.2.1</work.context.version>
     </properties>
 
     <profiles>
