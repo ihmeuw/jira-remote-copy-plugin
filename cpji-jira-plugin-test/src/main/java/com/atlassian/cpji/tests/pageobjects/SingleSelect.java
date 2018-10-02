@@ -74,7 +74,7 @@ public class SingleSelect
         final List<PageElement> suggestionsEls = layer.findAll(By.cssSelector("a.aui-list-item-link"));
         for (PageElement suggestionsEl : suggestionsEls)
         {
-            suggestions.add(suggestionsEl.getAttribute("title"));
+            suggestions.add(suggestionsEl.getText());
         }
         return suggestions;
     }
