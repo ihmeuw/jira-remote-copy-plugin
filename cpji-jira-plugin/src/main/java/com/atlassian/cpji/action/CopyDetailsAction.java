@@ -157,7 +157,7 @@ public class CopyDetailsAction extends AbstractCopyIssueAction implements Operat
                     .addParameter("remoteIssueLink", remoteIssueLink)
                     .addParameter("targetEntityLink", targetEntityLink)
                     .addParameter("atl_token", getXsrfToken());
-            return getRedirect(builder.asUrlString());
+            return getRedirect(builder.asUrlString(), true);
         }
 
     }

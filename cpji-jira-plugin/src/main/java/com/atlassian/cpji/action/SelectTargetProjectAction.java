@@ -77,7 +77,7 @@ public class SelectTargetProjectAction extends AbstractCopyIssueAction
         }
 
 		recentlyUsedProjectsManager.addProject(getLoggedInUser(), selectedEntityLink);
-        return getRedirect("/secure/CopyDetailsAction!default.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink);
+        return getRedirect("/secure/CopyDetailsAction!default.jspa?id=" + getId() + "&targetEntityLink=" + targetEntityLink, true);
     }
 
     @SuppressWarnings("unused")
