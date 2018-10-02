@@ -208,8 +208,8 @@
         <applinks.version>5.0.0</applinks.version>
         <testkit.version>7.0.53</testkit.version>
         <test-basics.version>1.9.5</test-basics.version>
-        <amps.version>6.0.1</amps.version>
-        <atlassian.selenium.version>2.2.1-m02-jira-1</atlassian.selenium.version>
+        <amps.version>6.3.15</amps.version>
+        <atlassian.selenium.version>2.5.1-jira-1</atlassian.selenium.version>
         <jersey.version>1.8-atlassian-16</jersey.version>
         <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
         <rest.doc.generation.skip>true</rest.doc.generation.skip>
