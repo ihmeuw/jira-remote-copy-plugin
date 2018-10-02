@@ -12,6 +12,7 @@ import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import com.google.common.base.Preconditions;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 
 import javax.annotation.Nonnull;
 
@@ -50,14 +51,12 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	@SuppressWarnings("unused")
 	@Init
 	public void initialize() {
+
 		entitySelection = pageBinder.bind(SingleSelect.class, targetEntityLinkContainer);
 	}
 
 	public SelectTargetProjectPage setDestinationProject(@Nonnull String name) {
-        Poller.waitUntilTrue(getTargetEntitySingleSelect().timed().isPresent());
-        if(entitySelection.type(name).isSuggestionsOpen().by(5)) {
-			entitySelection.clickSuggestion();
-		}
+        entitySelection.select(name);
 		return this;
 	}
 
