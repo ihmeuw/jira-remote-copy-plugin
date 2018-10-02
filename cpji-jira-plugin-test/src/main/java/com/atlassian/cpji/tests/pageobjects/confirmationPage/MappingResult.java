@@ -1,10 +1,9 @@
 package com.atlassian.cpji.tests.pageobjects.confirmationPage;
 
 import com.atlassian.cpji.tests.pageobjects.MultiSelectUtil;
-import com.atlassian.cpji.tests.pageobjects.SingleSelect;
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 import com.atlassian.pageobjects.PageBinder;
 import com.atlassian.pageobjects.binder.Init;
-import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.PageElementFinder;
 import com.atlassian.pageobjects.elements.SelectElement;
@@ -43,7 +42,7 @@ public class MappingResult {
     }
 
 
-    public TimedQuery<String> getMessage(){
+    public TimedQuery<String> getMessage() {
         return container.find(By.className("field-value")).timed().getText();
     }
 

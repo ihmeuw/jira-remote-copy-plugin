@@ -11,6 +11,8 @@ import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.query.TimedQuery;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
+
 
 import java.util.List;
 
@@ -130,7 +132,7 @@ public class CopyDetailsPage extends AbstractJiraPage {
                 throw new IllegalArgumentException();
         }
 
-        remoteIssueLink.type(selectedValue).clickSuggestion();
+        remoteIssueLink.select(selectedValue);
         return this;
     }
 

@@ -12,6 +12,8 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
+
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;

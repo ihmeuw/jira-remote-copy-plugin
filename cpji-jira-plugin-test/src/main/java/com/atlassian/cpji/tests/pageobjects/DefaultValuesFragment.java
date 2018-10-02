@@ -1,6 +1,6 @@
 package com.atlassian.cpji.tests.pageobjects;
 
-import com.atlassian.cpji.tests.pageobjects.SingleSelect;
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 import com.atlassian.jira.pageobjects.util.TraceContext;
 import com.atlassian.jira.pageobjects.util.Tracer;
 import com.atlassian.pageobjects.PageBinder;
