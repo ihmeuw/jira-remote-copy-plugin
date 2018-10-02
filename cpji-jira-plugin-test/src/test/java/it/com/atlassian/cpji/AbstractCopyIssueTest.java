@@ -7,6 +7,7 @@ import com.atlassian.jira.pageobjects.config.junit4.rule.RuleChainBuilder;
 import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.jira.pageobjects.pages.viewissue.ViewIssuePage;
 import com.atlassian.jira.pageobjects.setup.JiraWebDriverScreenshotRule;
+import com.atlassian.jira.pageobjects.setup.JiraWebTestRules;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.atlassian.jira.testkit.client.Backdoor;
@@ -35,15 +36,7 @@ public abstract class AbstractCopyIssueTest
 	static Backdoor testkit3 = BackdoorFactory.getBackdoor(jira3);
 
 	@Rule
-	public SessionCleanupRule sessionCleanupRule = new SessionCleanupRule();
-	@Rule
-	public WindowSizeRule maximizeWindow = new WindowSizeRule();
-	@Rule
-	public WebSudoRule webSudoRule = new WebSudoRule(testkit1, testkit2, testkit3);
-	@Rule
-	public RuleChain webDriverScreenshot = RuleChainBuilder.forProduct(jira1).around(JiraWebDriverScreenshotRule.class).build();
-	@Rule
-	public RuleChain dirtyWarningTerminatorRule = RuleChainBuilder.forProduct(jira1).around(DirtyWarningTerminatorRule.class).build();
+	public RuleChain jiraRules = JiraWebTestRules.forJira(jira1);
 
 	static JiraRestClient restClient1 = getJiraRestClient(jira1);
 	static JiraRestClient restClient2 = getJiraRestClient(jira2);
