@@ -2,12 +2,15 @@ package it.com.atlassian.cpji
 
 import org.junit.{Rule, Test}
 import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.api.domain.input.{LinkIssuesInput, IssueInputBuilder}
+import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, LinkIssuesInput}
 import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage
 import com.atlassian.cpji.tests.ScreenshotUtil
 import java.io.ByteArrayInputStream
+
 import com.atlassian.jira.rest.client.api.domain.Comment
 import org.joda.time.DateTime
+
+import scala.util.Random
 
 class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
 
@@ -21,7 +24,7 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
 
 		testkit2.attachments().disable()
 
-		val unmappedUser: String = "visualRegressionStrangeUser"
+		val unmappedUser: String = "user_"+Random.alphanumeric.take(10).mkString("")
 		try {
 
 			login(jira1)

@@ -18,6 +18,7 @@ import org.scalatest.junit.ShouldMatchersForJUnit
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import scala.util.Random
 
 
 class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects with ShouldMatchersForJUnit
@@ -94,7 +95,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
 
   @Test def shouldShowInformationWhenValueCannotBeUsed()
   {
-    val unmappedUser: String = "reallyStrangeUser"
+    val unmappedUser: String = "user_"+Random.alphanumeric.take(10).mkString("")
 
     testkit2.applicationProperties().setOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED, true)
     try
@@ -102,10 +103,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
       try
       {
         //create temporary user which is developer
-        if (!testkit2.usersAndGroups().userExists(unmappedUser))
-        {
-          testkit2.usersAndGroups().addUser(unmappedUser, "rst", "Really Strange User", "really@strange.user")
-        }
+        testkit2.usersAndGroups().addUser(unmappedUser, "rst", "Really Strange User", "really@strange.user")
         testkit2.usersAndGroups().addUserToGroup(unmappedUser, "jira-developers")
 
         //create issue and assing to user
