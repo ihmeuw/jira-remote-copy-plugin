@@ -38,7 +38,8 @@ public class MappingResult {
 
     public TimedQuery<String> getUnmappedNotifyText() {
         unmappedNotify.click();
-        return elementFinder.find(By.id("inline-dialog-unmapped-dialog-" + fieldId)).timed().getText();
+        final String fid = fieldId.endsWith("-field") ? fieldId.substring(0, fieldId.length()-"-field".length()) : fieldId;
+        return elementFinder.find(By.id("inline-dialog-unmapped-dialog-" + fid)).timed().getText();
     }
 
 

@@ -1,4 +1,6 @@
 (function ($) {
+    var SINGLESELECT_SUFFIX = "-field";
+
     $(function () {
 
         //JRA-32483 - we do not display hovers on IE 10
@@ -7,11 +9,21 @@
             return;
         }
 
+        function trimSingleSelectSuffix(target) {
+            var suffixPoxition = target.lastIndexOf(SINGLESELECT_SUFFIX);
+            if (suffixPoxition === target.length - SINGLESELECT_SUFFIX.length) {
+                return target.substr(0, suffixPoxition);
+            }
+            return target;
+        }
+
         var isWarningAdded = false;
         $(".fields-list label").each(function(){
             var labelTarget = $(this).attr("for");
+            labelTarget = trimSingleSelectSuffix(labelTarget);
+
             var unmapped = $("#unmapped-for-"+labelTarget);
-            if(unmapped.length == 1){
+            if(unmapped.length === 1){
                 isWarningAdded = true;
                 var unmappedJson = JSON.parse(unmapped.text());
                 if(unmappedJson.length > 0){

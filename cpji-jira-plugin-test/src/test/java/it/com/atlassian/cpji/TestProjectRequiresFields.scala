@@ -123,7 +123,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
             val selectTargetProjectPage: SelectTargetProjectPage = jira2.visit(classOf[SelectTargetProjectPage], issue.getId)
             val permissionChecksPage = selectTargetProjectPage.next.next
 
-            val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee")
+            val assigneeRow: MappingResult = permissionChecksPage.getMappingResultFor("assignee-field")
             Poller.waitUntilTrue(assigneeRow.hasNotMappedNotify)
             Poller.waitUntil(assigneeRow.getUnmappedNotifyText, StringContainsInOrder.stringContainsInOrder(List("values cannot be copied", unmappedUser.toUpperCase)))
           }
