@@ -46,7 +46,7 @@ class TestCopyRespectsRemotePermissions extends AbstractCopyIssueTest {
 
 	@After def tearDown() {
 		try {
-			AbstractCopyIssueTest.restClient1.getIssueClient.deleteIssue(issue.getKey, true).claim()
+//			AbstractCopyIssueTest.restClient1.getIssueClient.deleteIssue(issue.getKey, true).claim()
 		} catch {
 			case e: Exception =>
 		}

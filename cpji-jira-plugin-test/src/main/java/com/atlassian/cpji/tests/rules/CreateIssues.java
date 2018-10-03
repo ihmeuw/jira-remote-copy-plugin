@@ -53,7 +53,7 @@ public class CreateIssues extends ExternalResource {
 		if (cleanUp) {
 			for(BasicIssue issue : issues) {
 				try {
-					restClient.getIssueClient().deleteIssue(issue.getKey(), true).claim();
+//					restClient.getIssueClient().deleteIssue(issue.getKey(), true).claim();
 				} catch (Exception e) {
 					logger.error(String.format("Unable to delete issue %s", issue.getKey()), e);
 				}

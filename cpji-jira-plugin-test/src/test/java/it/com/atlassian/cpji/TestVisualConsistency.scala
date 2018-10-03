@@ -21,7 +21,7 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
 
 		testkit2.attachments().disable()
 
-		val unmappedUser: String = "reallyStrangeUser"
+		val unmappedUser: String = "visualRegressionStrangeUser"
 		try {
 
 			login(jira1)

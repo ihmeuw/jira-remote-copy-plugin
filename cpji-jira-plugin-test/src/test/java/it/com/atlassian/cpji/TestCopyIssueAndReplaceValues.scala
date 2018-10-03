@@ -4,11 +4,10 @@ import com.atlassian.cpji.tests.pageobjects.{CopyDetailsPage, CopyIssueToInstanc
 import com.atlassian.jira.pageobjects.JiraTestedProduct
 import com.atlassian.jira.pageobjects.setup.JiraWebTestRules
 import com.atlassian.jira.rest.client.api.domain.Issue
-import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, ComponentInput, VersionInput}
-import com.atlassian.pageobjects.{DefaultProductInstance, TestedProductFactory}
+import com.atlassian.jira.rest.client.api.domain.input.{ComponentInput, IssueInputBuilder, VersionInput}
 import com.atlassian.pageobjects.elements.query.Poller
+import com.atlassian.pageobjects.{DefaultProductInstance, TestedProductFactory}
 import org.junit._
-import org.scalatest.junit.ShouldMatchersForJUnit
 
 import scala.collection.JavaConversions._
 
@@ -76,8 +75,8 @@ class TestCopyIssueAndReplaceValues extends JiraObjects with org.scalatest.Match
 			fixForVersions should have size (1)
 			fixForVersions.head.getName should be === "other-version-1"
 		} finally {
-			testkit1.project().deleteProject("TOP")
-			testkit1.project().deleteProject("FROM")
+//			testkit1.project().deleteProject("TOP")
+//			testkit1.project().deleteProject("FROM")
 		}
 	}
 

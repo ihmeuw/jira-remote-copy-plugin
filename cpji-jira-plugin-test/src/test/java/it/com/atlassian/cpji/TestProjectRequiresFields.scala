@@ -140,7 +140,7 @@ class TestProjectRequiresFields extends AbstractCopyIssueTest with JiraObjects w
         }
         finally
         {
-                  testkit2.issues.deleteIssue(issue.getKey, true)
+//                  testkit2.issues.deleteIssue(issue.getKey, true)
         }
       }
       finally

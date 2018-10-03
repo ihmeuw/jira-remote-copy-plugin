@@ -58,7 +58,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 			}
 		} finally {
 			testkit3.permissionSchemes().addProjectRolePermission(0, Permissions.CREATE_ISSUE, 10000)
-			AbstractCopyIssueTest.restClient3.getIssueClient.deleteIssue(issue.getKey, true).claim()
+//			AbstractCopyIssueTest.restClient3.getIssueClient.deleteIssue(issue.getKey, true).claim()
 		}
 	}
 
