@@ -5,6 +5,7 @@ import com.atlassian.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
 import com.atlassian.qunit.test.runner.QUnitPageObjectsHelper;
 import org.apache.axis.utils.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -24,6 +25,7 @@ public class TestQunit {
         outdir = new File(location);
     }
 
+    @Ignore
     @Test
     public void runJustOurTest() throws Exception {
         QUnitPageObjectsHelper helper = new QUnitPageObjectsHelper(outdir, jira1.getPageBinder());
