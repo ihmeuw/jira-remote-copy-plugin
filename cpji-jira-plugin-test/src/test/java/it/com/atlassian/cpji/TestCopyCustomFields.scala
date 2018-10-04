@@ -16,16 +16,18 @@ class TestCopyCustomFields extends AbstractCopyIssueTest with JiraObjects {
 
 	@Test
 	def testCopyLocally() {
-		val selectTargetPage = jira2.visit(classOf[SelectTargetProjectPage], new java.lang.Long(10200))
+		val issueWeWantToCopy = testkit2.issues().getIssue("ACF-1")
+		val issueId: java.lang.Long = java.lang.Long.parseLong(issueWeWantToCopy.id)
+		val selectTargetPage = jira2.visit(classOf[SelectTargetProjectPage], issueId)
 		val copiedIssuePage = selectTargetPage.next().next().copyIssue()
 		assertTrue(copiedIssuePage.isSuccessful)
 
-		val i1 = restClient2.getIssueClient.getIssue("ACF-1").claim()
-		val i2 = restClient2.getIssueClient.getIssue(copiedIssuePage.getRemoteIssueKey).claim()
+		val sourceIssue = restClient2.getIssueClient.getIssue("ACF-1").claim()
+		val copiedIssue = restClient2.getIssueClient.getIssue(copiedIssuePage.getRemoteIssueKey).claim()
 
-		val fields1 = List(Iterables.toArray(i1.getFields, classOf[IssueField]):_*)
+		val fields1 = List(Iterables.toArray(sourceIssue.getFields, classOf[IssueField]):_*)
 				.filter(p => p.getId.startsWith("customfield_") && p.getValue != null).map(f => (f.getName, f.getValue.toString)).sortBy(_._1)
-		val fields2 = List(Iterables.toArray(i2.getFields, classOf[IssueField]):_*)
+		val fields2 = List(Iterables.toArray(copiedIssue.getFields, classOf[IssueField]):_*)
 				.filter(p => p.getId.startsWith("customfield_") && p.getValue != null).map(f => (f.getName, f.getValue.toString)).sortBy(_._1)
 		assertEquals(20, fields1.length)
 		assertEquals(fields2, fields1)
