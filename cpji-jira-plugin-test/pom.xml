@@ -129,7 +129,8 @@
                             <id>jira</id>
                             <instanceId>jira1</instanceId>
                             <version>${jira.version}</version>
-                            <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
+							<dataVersion>${jira.version}</dataVersion>
+							<dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
                             <enableFastdev>false</enableFastdev>
                             <pluginArtifacts>
@@ -161,6 +162,7 @@
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
                             <jvmDebugPort>5003</jvmDebugPort>
+							<dataVersion>${jira.version}</dataVersion>
                             <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
                             <enableFastdev>false</enableFastdev>
@@ -193,6 +195,7 @@
 							<version>${jira.version}</version>
 							<httpPort>2992</httpPort>
 							<jvmDebugPort>5004</jvmDebugPort>
+							<dataVersion>${jira.version}</dataVersion>
 							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
 							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
                             <enableFastdev>false</enableFastdev>
