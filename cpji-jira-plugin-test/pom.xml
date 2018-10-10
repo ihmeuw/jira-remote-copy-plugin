@@ -16,7 +16,7 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>cpji-jira-plugin</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
