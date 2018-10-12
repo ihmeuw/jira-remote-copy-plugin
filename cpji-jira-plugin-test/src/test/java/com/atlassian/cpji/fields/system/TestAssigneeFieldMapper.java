@@ -73,8 +73,6 @@ public class TestAssigneeFieldMapper
         when(asigneeField.getId()).thenReturn(IssueFieldConstants.ASSIGNEE);
         when(fieldManager.getField(IssueFieldConstants.ASSIGNEE)).thenReturn(asigneeField);
 
-        when(project.getLead()).thenReturn(projectLead);
-
         asigneeFieldMapper = new AssigneeFieldMapper(permissionManager, applicationProperties, fieldManager, defaultValuesManager)
         {
             @Override
@@ -101,7 +99,6 @@ public class TestAssigneeFieldMapper
     @Test
     public void mappingShouldReturnNotFoundWhenUserCannotBeMappedAndDefaulAssigneeIsNotSet()
     {
-        leaveIssuesUnassigned();
         userIsNotMapped();
 
         mapAndTest(null, AssigneeFieldMapper.InternalMappingResult.MappingResultDecision.NOT_FOUND);
@@ -119,7 +116,6 @@ public class TestAssigneeFieldMapper
     @Test
     public void mappingShouldReturnNotFoundWhenUserIsMappedAndHasNoPermission()
     {
-        leaveIssuesUnassigned();
         userIsWellMapped();
         userCannotBeAssigned();
         mapAndTest(null, AssigneeFieldMapper.InternalMappingResult.MappingResultDecision.NOT_FOUND);
@@ -136,8 +132,6 @@ public class TestAssigneeFieldMapper
         assertEquals(desiredUser, result.mappedUser);
         assertEquals(desiredDecision, result.decision);
     }
-
-    void leaveIssuesUnassigned() { when(project.getAssigneeType()).thenReturn(AssigneeTypes.UNASSIGNED); }
 
     void userIsNotMapped() { when(userMapper.mapUser(userBean)).thenReturn(null); }
 
@@ -203,7 +197,6 @@ public class TestAssigneeFieldMapper
         when(applicationProperties.getOption(APKeys.JIRA_OPTION_ALLOWUNASSIGNED)).thenReturn(false);
 
         FieldLayoutItem fieldLayoutItem = mock(FieldLayoutItem.class);
-        when(fieldLayoutItem.getOrderableField()).thenReturn(asigneeField);
         when(defaultValuesManager.hasDefaultValue(any(), any(), any())).thenReturn(false);
 
         asigneeFieldMapper.populateInputParams(userMapper, inputParams, bean, fieldLayoutItem, project, null);

@@ -1,20 +1,19 @@
 package com.atlassian.cpji.fields.system
 
-import com.atlassian.jira.issue.fields.{TimeTrackingSystemField, OrderableField, FieldManager}
-import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration
-import com.atlassian.jira.issue.{IssueFieldConstants, IssueInputParameters}
-import com.atlassian.cpji.rest.model.{TimeTrackingBean, CopyIssueBean}
-import org.mockito.Mockito._
-import org.mockito.{Matchers, Mock}
-import org.junit.{Test, Before}
-import org.mockito.Matchers._
-import org.junit.runner.RunWith
-import org.mockito.runners.MockitoJUnitRunner
 import java.lang.Long
-import com.atlassian.core.util.DateUtils
-import com.atlassian.jira.mock.component.MockComponentWorker
+
+import com.atlassian.cpji.rest.model.{CopyIssueBean, TimeTrackingBean}
+import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration
 import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.issue.fields.{FieldManager, OrderableField, TimeTrackingSystemField}
+import com.atlassian.jira.issue.{IssueFieldConstants, IssueInputParameters}
+import com.atlassian.jira.mock.component.MockComponentWorker
 import com.atlassian.jira.util.JiraDurationUtils
+import org.junit.runner.RunWith
+import org.junit.{Before, Test}
+import org.mockito.Mockito._
+import org.mockito.runners.MockitoJUnitRunner
+import org.mockito.{ArgumentMatchers, Mock}
 
 @RunWith(classOf[MockitoJUnitRunner]) class TestTimeTrackingFieldMapper {
 
@@ -40,7 +39,6 @@ import com.atlassian.jira.util.JiraDurationUtils
 		when(issueInputParameters.getActionParameters).thenReturn(actionParams)
 
 		when(timeTrackingConfiguration.enabled()).thenReturn(true)
-		when(timeTrackingConfiguration.getDefaultUnit).thenReturn(DateUtils.Duration.SECOND)
 
 		ComponentAccessor.initialiseWorker(worker)
 		worker.addMock(classOf[JiraDurationUtils], jiraDurationUtils)
@@ -51,43 +49,43 @@ import com.atlassian.jira.util.JiraDurationUtils
 
 		fire()
 
-		verify(actionParams, never()).put(anyString, any())
+		verify(actionParams, never()).put(ArgumentMatchers.anyString(), ArgumentMatchers.any())
 	}
 
 	@Test def shouldDoNothingWhenTimeTrackingBeanIsEmpty() {
 
 		testCopyIssueBean.setTimeTracking(null)
 		fire()
-		verify(actionParams, never()).put(anyString, any())
+		verify(actionParams, never()).put(ArgumentMatchers.anyString(), ArgumentMatchers.any())
 
 		prepareTimeTrackingBean(null, null, null)
 		fire()
-		verify(actionParams, never()).put(anyString, any())
+		verify(actionParams, never()).put(ArgumentMatchers.anyString(), ArgumentMatchers.any())
 	}
 
 
 	@Test def shouldSetTimeTrackingToOrignalEstimateWhenLegacyModeIsEnabled() {
 		prepareTimeTrackingBean()
 		when(timeTrackingConfiguration.getMode).thenReturn(TimeTrackingConfiguration.Mode.LEGACY)
-		when(jiraDurationUtils.getShortFormattedDuration(anyLong())).thenReturn("100")
+		when(jiraDurationUtils.getShortFormattedDuration(ArgumentMatchers.anyLong())).thenReturn("100")
 
 		fire()
 
 		verify(actionParams).put(IssueFieldConstants.TIMETRACKING, Array("100"))
-		verify(actionParams, never).put(Matchers.eq(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE), any())
-		verify(actionParams, never).put(Matchers.eq(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE), any())
+		verify(actionParams, never).put(ArgumentMatchers.eq(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE), ArgumentMatchers.any())
+		verify(actionParams, never).put(ArgumentMatchers.eq(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE), ArgumentMatchers.any())
 	}
 
 	@Test def shouldSetOriginalAndRemainingToOrignalEstimateWhenLegacyModeIsDisabled() {
 		prepareTimeTrackingBean()
 		when(timeTrackingConfiguration.getMode).thenReturn(TimeTrackingConfiguration.Mode.MODERN)
-		when(jiraDurationUtils.getShortFormattedDuration(anyLong())).thenReturn("100")
+		when(jiraDurationUtils.getShortFormattedDuration(ArgumentMatchers.anyLong())).thenReturn("100")
 
 		fire()
 
 		verify(actionParams).put(TimeTrackingSystemField.TIMETRACKING_ORIGINALESTIMATE, Array("100"))
 		verify(actionParams).put(TimeTrackingSystemField.TIMETRACKING_REMAININGESTIMATE, Array("100"))
-		verify(actionParams, never).put(Matchers.eq(IssueFieldConstants.TIMETRACKING), any())
+		verify(actionParams, never).put(ArgumentMatchers.eq(IssueFieldConstants.TIMETRACKING), ArgumentMatchers.any())
 	}
 
 

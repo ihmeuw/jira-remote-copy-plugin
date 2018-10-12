@@ -286,7 +286,6 @@ public class TestCopyIssueService {
         final String key = "KEY-" + id.toString();
         when(issue.getKey()).thenReturn(key);
         when(issueService.getIssue(currentUser, id)).thenReturn(new IssueService.IssueResult(issue));
-        when(issueService.getIssue(currentUser, key)).thenReturn(new IssueService.IssueResult(issue));
         return issue;
     }
 

@@ -48,6 +48,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Objects;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertSame;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -178,12 +180,7 @@ public class TestLocalJiraProxy {
 
         localJiraProxy.copyIssue(bean);
 
-        ArgumentMatcher<CopyIssueBean> containsParentIssueId = new ArgumentMatcher<CopyIssueBean>() {
-            @Override
-            public boolean matches(Object argument) {
-                return ((CopyIssueBean)argument).getTargetParentId() == 123L;
-            }
-        };
+        ArgumentMatcher<CopyIssueBean> containsParentIssueId = argument -> argument.getTargetParentId() == 123L;
 
         verify(copyIssueService).copyIssue(argThat(containsParentIssueId));
 
@@ -261,7 +258,7 @@ public class TestLocalJiraProxy {
         verify(issueLinkManager).createIssueLink(2L, 1L, 0L, null, currentUser);
     }
 
-    private static class RemoteIssueMatcherByRefs extends ArgumentMatcher<RemoteIssueLink>{
+    private static class RemoteIssueMatcherByRefs implements ArgumentMatcher<RemoteIssueLink> {
 
         private final Long id;
         private final Long issueId;
@@ -274,12 +271,13 @@ public class TestLocalJiraProxy {
         }
 
         @Override
-        public boolean matches(Object o) {
-            RemoteIssueLink link = (RemoteIssueLink) o;
+        public boolean matches(RemoteIssueLink link) {
             if( link == null)
                 return false;
 
-            return id == link.getId() && issueId == link.getIssueId() && globalId == link.getGlobalId();
+            return Objects.equals(id, link.getId())
+                    && Objects.equals(issueId, link.getIssueId())
+                    && Objects.equals(globalId, link.getGlobalId());
         }
     }
 

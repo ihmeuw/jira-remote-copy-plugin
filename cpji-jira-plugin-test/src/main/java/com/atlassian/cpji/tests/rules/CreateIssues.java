@@ -5,7 +5,6 @@ import com.atlassian.jira.rest.client.api.domain.BasicIssue;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.input.FieldInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
-import com.atlassian.util.concurrent.Promise;
 import com.google.common.collect.Lists;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
