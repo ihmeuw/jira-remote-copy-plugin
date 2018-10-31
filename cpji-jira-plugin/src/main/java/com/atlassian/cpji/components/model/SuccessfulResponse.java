@@ -1,6 +1,6 @@
 package com.atlassian.cpji.components.model;
 
-import com.atlassian.fugue.Either;
+import io.atlassian.fugue.Either;
 
 /**
  * Simple result that means nothing more than "OK"

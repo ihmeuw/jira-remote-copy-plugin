@@ -18,7 +18,7 @@ import com.atlassian.cpji.fields.value.CachingUserMapper;
 import com.atlassian.cpji.fields.value.UserMappingManager;
 import com.atlassian.cpji.rest.model.*;
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.fugue.Pair;
+import io.atlassian.fugue.Pair;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.link.IssueLinkService;
 import com.atlassian.jira.bc.issue.link.RemoteIssueLinkService;
@@ -286,7 +286,6 @@ public class TestCopyIssueService {
         final String key = "KEY-" + id.toString();
         when(issue.getKey()).thenReturn(key);
         when(issueService.getIssue(currentUser, id)).thenReturn(new IssueService.IssueResult(issue));
-        when(issueService.getIssue(currentUser, key)).thenReturn(new IssueService.IssueResult(issue));
         return issue;
     }
 

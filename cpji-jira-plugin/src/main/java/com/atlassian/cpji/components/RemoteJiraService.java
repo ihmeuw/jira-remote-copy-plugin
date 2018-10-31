@@ -7,9 +7,6 @@ import com.atlassian.cpji.components.model.Projects;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.PluginInfoResource;
-import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.fugue.Either;
-import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -17,6 +14,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.atlassian.fugue.Either;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -25,7 +23,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class RemoteJiraService {
 
@@ -64,6 +61,29 @@ public class RemoteJiraService {
 
     }
 
+    @Nonnull
+    public Iterable<Either<NegativeResponseStatus, Projects>> getProjects() {
+
+        return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, Projects>>() {
+            @Override
+            public Either<NegativeResponseStatus, Projects> onInvocationException(Exception e) {
+                return Either.left(NegativeResponseStatus.communicationFailed(JiraLocation.LOCAL));
+            }
+
+            @Override
+            public Either<NegativeResponseStatus, Projects> apply(JiraProxy input) {
+                Either<NegativeResponseStatus, PluginVersion> version = input.isPluginInstalled();
+                if (version.isLeft())
+                    return Either.left(version.left().get());
+
+                if (version.right().get().getResult().equals(PluginInfoResource.PLUGIN_VERSION)) {
+                    return input.getProjects();
+                } else {
+                    return Either.left(NegativeResponseStatus.unsupportedVersion(input.getJiraLocation()));
+                }
+            }
+        });
+    }
 
     private interface FunctionWithFallback<T> extends Function<JiraProxy, T> {
         T onInvocationException(Exception e);
@@ -75,7 +95,7 @@ public class RemoteJiraService {
         final ApplicationUser user = authenticationContext.getLoggedInUser();
         final List<Callable<T>> queries = Lists.newArrayList(
                 Iterables.transform(applicationLinks,
-                        applicationLink -> () -> {
+                        applicationLink -> (Callable<T>) () -> {
                             ComponentAccessor.getJiraAuthenticationContext().setLoggedInUser(user);
                             return function.apply(applicationLink);
                         })
@@ -95,31 +115,6 @@ public class RemoteJiraService {
         } finally {
             es.shutdown();
         }
-    }
-
-
-    @Nonnull
-    public Iterable<Either<NegativeResponseStatus, Projects>> getProjects() {
-
-        return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, Projects>>() {
-            @Override
-            public Either<NegativeResponseStatus, Projects> onInvocationException(Exception e) {
-                return Either.left(NegativeResponseStatus.communicationFailed(JiraLocation.LOCAL));
-            }
-
-            @Override
-            public Either<NegativeResponseStatus, Projects> apply(JiraProxy input) {
-                Either<NegativeResponseStatus, PluginVersion> version = input.isPluginInstalled();
-                if(version.isLeft())
-                    return Either.left(version.left().get());
-
-                if(version.right().get().getResult().equals(PluginInfoResource.PLUGIN_VERSION)){
-                    return input.getProjects();
-                } else {
-                    return Either.left(NegativeResponseStatus.unsupportedVersion(input.getJiraLocation()));
-                }
-            }
-        });
     }
 
 }

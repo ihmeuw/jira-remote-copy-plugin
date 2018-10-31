@@ -14,8 +14,8 @@ import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.fugue.Either;
-import com.atlassian.fugue.Pair;
+import io.atlassian.fugue.Either;
+import io.atlassian.fugue.Pair;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.AttachmentError;
@@ -47,6 +47,8 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Objects;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertSame;
@@ -178,16 +180,9 @@ public class TestLocalJiraProxy {
 
         localJiraProxy.copyIssue(bean);
 
-        ArgumentMatcher<CopyIssueBean> containsParentIssueId = new ArgumentMatcher<CopyIssueBean>() {
-            @Override
-            public boolean matches(Object argument) {
-                return ((CopyIssueBean)argument).getTargetParentId() == 123L;
-            }
-        };
+        ArgumentMatcher<CopyIssueBean> containsParentIssueId = argument -> argument.getTargetParentId() == 123L;
 
         verify(copyIssueService).copyIssue(argThat(containsParentIssueId));
-
-
     }
 
 
@@ -261,7 +256,7 @@ public class TestLocalJiraProxy {
         verify(issueLinkManager).createIssueLink(2L, 1L, 0L, null, currentUser);
     }
 
-    private static class RemoteIssueMatcherByRefs extends ArgumentMatcher<RemoteIssueLink>{
+    private static class RemoteIssueMatcherByRefs implements ArgumentMatcher<RemoteIssueLink> {
 
         private final Long id;
         private final Long issueId;
@@ -274,12 +269,13 @@ public class TestLocalJiraProxy {
         }
 
         @Override
-        public boolean matches(Object o) {
-            RemoteIssueLink link = (RemoteIssueLink) o;
+        public boolean matches(RemoteIssueLink link) {
             if( link == null)
                 return false;
 
-            return id == link.getId() && issueId == link.getIssueId() && globalId == link.getGlobalId();
+            return Objects.equals(id, link.getId())
+                    && Objects.equals(issueId, link.getIssueId())
+                    && Objects.equals(globalId, link.getGlobalId());
         }
     }
 
@@ -317,19 +313,6 @@ public class TestLocalJiraProxy {
         assertEquals("myBase/browse/myIssue", result);
     }
 
-//
-//    private <T,F> void test(T service, F serviceResult, Function<T, F> serviceCall, Function<LocalJiraProxy, Either<NegativeResponseStatus, F>> proxyCall, Exception thrownException){
-//        when(serviceCall.apply(service)).thenReturn(serviceResult);
-//        F result = extractRight(proxyCall.apply(localJiraProxy));
-//        assertSame(serviceResult, result);
-//
-//        when(serviceCall.apply(service)).thenThrow(thrownException);
-//        NegativeResponseStatus response = extractLeft(proxyCall.apply(localJiraProxy));
-//        response.getErrorCollection()
-//
-//    }
-
-
     private NegativeResponseStatus verifyFailure(Either<NegativeResponseStatus, ?> either){
         return EitherTestingUtils.verifyFailure(either, localJiraProxy.getJiraLocation());
     }
@@ -337,7 +320,6 @@ public class TestLocalJiraProxy {
     private NegativeResponseStatus verifyFailure(Either<NegativeResponseStatus, ?> either, ErrorCollection errors){
         return EitherTestingUtils.verifyFailure(either, errors, localJiraProxy.getJiraLocation());
     }
-
 
     private SuccessfulResponse verifySuccess(Either<NegativeResponseStatus, SuccessfulResponse> either){
         return EitherTestingUtils.verifySuccess(either, localJiraProxy.getJiraLocation());
@@ -347,12 +329,8 @@ public class TestLocalJiraProxy {
         return EitherTestingUtils.extractResult(either, localJiraProxy.getJiraLocation());
     }
 
-
     private <T> T extractRight(Either<NegativeResponseStatus, T > either){
         return EitherTestingUtils.extractRight(either);
     }
-
-
-
 
 }

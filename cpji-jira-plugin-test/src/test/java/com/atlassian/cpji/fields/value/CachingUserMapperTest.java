@@ -1,7 +1,6 @@
 package com.atlassian.cpji.fields.value;
 
 import com.atlassian.cpji.rest.model.UserBean;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -10,6 +9,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -20,19 +20,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- *
  * @since v3.1
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CachingUserMapperTest {
 
-    @MockitoAnnotations.Mock
+    @Mock
     private UserBean userBean;
 
-    @MockitoAnnotations.Mock
+    @Mock
     private ApplicationUser user;
 
-    @MockitoAnnotations.Mock
+    @Mock
     private Multimap<String, ApplicationUser> multimap;
 
     private CachingUserMapper cachingUserMapper;
@@ -43,41 +42,40 @@ public class CachingUserMapperTest {
         cachingUserMapper = new CachingUserMapper(Collections.EMPTY_LIST);
     }
 
-	/*
-	 * https://jdog.atlassian.net/browse/JRADEV-21621 CachingUserMapper breaks when user has empty name, email or full name
-	 */
-	@Test
-	public void testCachingUserMapperIgnoresNullOrEmptyValues()
-	{
-		{
+    /*
+     * https://jdog.atlassian.net/browse/JRADEV-21621 CachingUserMapper breaks when user has empty name, email or full name
+     */
+    @Test
+    public void testCachingUserMapperIgnoresNullOrEmptyValues() {
+        {
             ApplicationUser user1 = mock(ApplicationUser.class);
-			when(user1.getName()).thenReturn("username");
-			when(user1.getDisplayName()).thenReturn("fullName");
-			when(user1.getEmailAddress()).thenReturn("email");
-			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
-		}
+            when(user1.getName()).thenReturn("username");
+            when(user1.getDisplayName()).thenReturn("fullName");
+            when(user1.getEmailAddress()).thenReturn("email");
+            new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
+        }
 
-		{
+        {
             ApplicationUser user1 = mock(ApplicationUser.class);
-			when(user1.getDisplayName()).thenReturn("fullName");
-			when(user1.getEmailAddress()).thenReturn("email");
-			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
-		}
+            when(user1.getDisplayName()).thenReturn("fullName");
+            when(user1.getEmailAddress()).thenReturn("email");
+            new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
+        }
 
-		{
+        {
             ApplicationUser user1 = mock(ApplicationUser.class);
-			when(user1.getName()).thenReturn("username");
-			when(user1.getEmailAddress()).thenReturn("email");
-			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
-		}
+            when(user1.getName()).thenReturn("username");
+            when(user1.getEmailAddress()).thenReturn("email");
+            new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
+        }
 
-		{
+        {
             ApplicationUser user1 = mock(ApplicationUser.class);
-			when(user1.getName()).thenReturn("username");
-			when(user1.getDisplayName()).thenReturn("fullName");
-			new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
-		}
-	}
+            when(user1.getName()).thenReturn("username");
+            when(user1.getDisplayName()).thenReturn("fullName");
+            new CachingUserMapper(Lists.<ApplicationUser>newArrayList(user1));
+        }
+    }
 
     @Test
     public void testGetUsersByEmailWhenEmailIsNull() throws Exception {
@@ -92,6 +90,7 @@ public class CachingUserMapperTest {
         final Multimap<String, ApplicationUser> usersByEmail = cachingUserMapper.getUsersByEmail(userBean, multimap);
         Assert.assertNull(usersByEmail);
     }
+
     @Test
     public void testGetUsersByEmailWhenEmailIsPresent() throws Exception {
         when(userBean.getEmail()).thenReturn("test@domain.com");

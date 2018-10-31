@@ -1,8 +1,8 @@
 package com.atlassian.cpji.components;
 
 import com.atlassian.cpji.fields.FieldLayoutItemsRetriever;
-import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.FieldMapperFactory;
+import com.atlassian.cpji.fields.SystemFieldMapper;
 import com.atlassian.cpji.fields.ValidationCode;
 import com.atlassian.cpji.fields.custom.CustomFieldMapper;
 import com.atlassian.cpji.fields.value.UserMappingManager;
@@ -14,7 +14,6 @@ import com.atlassian.cpji.rest.model.CustomFieldPermissionBean;
 import com.atlassian.cpji.rest.model.TimeTrackingBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.cpji.rest.model.VersionBean;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.ServiceOutcome;
 import com.atlassian.jira.bc.issue.vote.VoteService;
 import com.atlassian.jira.bc.issue.worklog.TimeTrackingConfiguration;
@@ -53,7 +52,12 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang.StringUtils;
 import org.ofbiz.core.entity.GenericValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO: Document this class / interface here

@@ -12,7 +12,7 @@ import com.atlassian.cpji.rest.model.*;
 import com.atlassian.cpji.util.IssueLinkClient;
 import com.atlassian.cpji.util.ResponseUtil;
 import com.atlassian.cpji.util.RestResponse;
-import com.atlassian.fugue.Either;
+import io.atlassian.fugue.Either;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.attachment.Attachment;

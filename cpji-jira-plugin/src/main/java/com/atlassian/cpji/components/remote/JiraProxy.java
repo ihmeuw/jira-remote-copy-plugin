@@ -5,7 +5,7 @@ import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.CopyIssueBean;
 import com.atlassian.cpji.rest.model.FieldPermissionsBean;
 import com.atlassian.cpji.rest.model.IssueCreationResultBean;
-import com.atlassian.fugue.Either;
+import io.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.attachment.Attachment;
 import com.atlassian.jira.issue.link.IssueLinkType;

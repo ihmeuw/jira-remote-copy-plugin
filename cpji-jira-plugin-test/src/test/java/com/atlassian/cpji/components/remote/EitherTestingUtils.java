@@ -4,7 +4,7 @@ import com.atlassian.cpji.components.model.JiraLocation;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.ResultWithJiraLocation;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
-import com.atlassian.fugue.Either;
+import io.atlassian.fugue.Either;
 import com.atlassian.jira.util.ErrorCollection;
 
 import static junit.framework.Assert.*;

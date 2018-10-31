@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream
 
 import com.atlassian.cpji.CopyIssueProcess
 import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.api.domain.{Issue, IssueFieldId, Comment}
-import com.atlassian.jira.rest.client.api.domain.input.{LinkIssuesInput, ComplexIssueInputFieldValue, FieldInput}
+import com.atlassian.jira.rest.client.api.domain.{Comment, Issue, IssueFieldId}
+import com.atlassian.jira.rest.client.api.domain.input.{ComplexIssueInputFieldValue, FieldInput, LinkIssuesInput}
 import com.atlassian.pageobjects.elements.query.Poller
 import org.hamcrest.core.IsCollectionContaining
 import org.joda.time.DateTime

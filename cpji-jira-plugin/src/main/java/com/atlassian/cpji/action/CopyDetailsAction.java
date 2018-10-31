@@ -10,7 +10,6 @@ import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
 import com.atlassian.cpji.util.IssueLinkCopier;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
@@ -34,6 +33,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.*;
 import com.opensymphony.util.TextUtils;
+import io.atlassian.fugue.Either;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collection;

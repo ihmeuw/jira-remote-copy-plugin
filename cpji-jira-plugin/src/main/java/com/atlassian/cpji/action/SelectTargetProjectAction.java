@@ -8,7 +8,6 @@ import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.PluginVersion;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
@@ -17,6 +16,7 @@ import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.atlassian.fugue.Either;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
