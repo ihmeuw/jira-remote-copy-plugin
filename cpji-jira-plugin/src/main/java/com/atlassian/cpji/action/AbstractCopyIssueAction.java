@@ -5,7 +5,6 @@ import com.atlassian.cpji.components.CopyIssuePermissionManager;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.config.SubTaskManager;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.exception.IssueNotFoundException;
@@ -18,6 +17,7 @@ import com.atlassian.jira.web.action.issue.AbstractIssueSelectAction;
 import com.atlassian.plugin.webresource.WebResourceManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import io.atlassian.fugue.Either;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;

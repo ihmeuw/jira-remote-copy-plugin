@@ -26,6 +26,41 @@
         <url>http://www.atlassian.com</url>
     </organization>
 
+    <properties>
+        <jdkLevel>1.8</jdkLevel>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <cpji.build.directory>target</cpji.build.directory>
+        <jira.version>8.0.0-QR-20181025063203</jira.version>
+        <jira.compile.version>${jira.version}</jira.compile.version>
+        <jira.data.version>${jira.version}</jira.data.version>
+        <spring.version>5.0.7.RELEASE</spring.version>
+        <guava.version>26.0-jre</guava.version>
+        <commons.lang3.version>3.8</commons.lang3.version>
+        <apache.httpclient.version>4.5.5</apache.httpclient.version>
+        <apache.httpcore.version>4.4.9</apache.httpcore.version>
+        <apache.httpasyncclient.version>4.1</apache.httpasyncclient.version>
+        <atlassian.httpclient.version>2.0.0-m1</atlassian.httpclient.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <jsr305.version>3.0.2</jsr305.version>
+        <my.sal.version>4.0.0-ccaebc10</my.sal.version>
+        <rest.version>6.0.0-985fbb15</rest.version>
+        <jackson.version>1.9.13-atlassian-3</jackson.version>
+        <jersey.version>1.19.4</jersey.version>
+        <jaxb.version>2.3.0</jaxb.version>
+        <applinks.version>6.0.0-a0372472</applinks.version>
+        <atlassian.event.version>4.0.0-3937a39</atlassian.event.version>
+        <atlassian.qunit.version>1.0.4</atlassian.qunit.version>
+        <testkit.version>8.0.2-481a183</testkit.version>
+        <test-basics.version>1.9.5</test-basics.version>
+        <amps.version>6.3.21-fe201d257</amps.version>
+        <atlassian.selenium.version>2.5.1-jira-1</atlassian.selenium.version>
+        <jersey.version>1.19.4</jersey.version>
+        <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
+        <rest.doc.generation.skip>true</rest.doc.generation.skip>
+        <jira.rest.client.version>5.1.0-476bd700</jira.rest.client.version>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -177,28 +212,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <jdkLevel>1.8</jdkLevel>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <cpji.build.directory>target</cpji.build.directory>
-        <atlassian.qunit.version>1.0.0-m5</atlassian.qunit.version>
-        <jira.version>8.0.0-m0014</jira.version>
-        <jira.compile.version>${jira.version}</jira.compile.version>
-        <jira.data.version>${jira.version}</jira.data.version>
-        <my.sal.version>3.0.2</my.sal.version>
-        <rest.version>3.0.0-m012</rest.version>
-        <applinks.version>5.0.0</applinks.version>
-        <testkit.version>8.0.1</testkit.version>
-        <test-basics.version>1.9.5</test-basics.version>
-        <amps.version>6.3.16</amps.version>
-        <atlassian.selenium.version>2.5.1-jira-1</atlassian.selenium.version>
-        <jersey.version>1.8-atlassian-16</jersey.version>
-        <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
-        <rest.doc.generation.skip>true</rest.doc.generation.skip>
-        <jira.rest.client.version>5.1.0</jira.rest.client.version>
-    </properties>
 
     <profiles>
         <profile>

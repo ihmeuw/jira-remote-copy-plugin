@@ -7,7 +7,6 @@ import com.atlassian.cpji.components.model.Projects;
 import com.atlassian.cpji.components.remote.JiraProxy;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 import com.atlassian.cpji.rest.PluginInfoResource;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.ApplicationUser;
@@ -15,6 +14,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.atlassian.fugue.Either;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -61,40 +61,6 @@ public class RemoteJiraService {
 
     }
 
-
-    private interface FunctionWithFallback<T> extends Function<JiraProxy, T> {
-        T onInvocationException(Exception e);
-    }
-
-    private <T> Iterable<T> executeForEveryJira(final FunctionWithFallback<T> function) {
-        final ExecutorService es = Executors.newFixedThreadPool(THREADS);
-        final Iterable<JiraProxy> applicationLinks = jiraProxyFactory.getAllJiraProxies();
-        final ApplicationUser user = authenticationContext.getLoggedInUser();
-        final List<Callable<T>> queries = Lists.newArrayList(
-                Iterables.transform(applicationLinks,
-                        applicationLink -> () -> {
-                            ComponentAccessor.getJiraAuthenticationContext().setLoggedInUser(user);
-                            return function.apply(applicationLink);
-                        })
-        );
-        try {
-            return ImmutableList.copyOf(Iterables.transform(es.invokeAll(queries),
-                    eitherFuture -> {
-                        try {
-                            return eitherFuture.get();
-                        } catch (Exception e) {
-                            return function.onInvocationException(e);
-                        }
-                    }));
-        } catch (Exception e) {
-            log.warn("Threads were interrupted during Application Links request", e);
-            return Collections.emptyList();
-        } finally {
-            es.shutdown();
-        }
-    }
-
-
     @Nonnull
     public Iterable<Either<NegativeResponseStatus, Projects>> getProjects() {
 
@@ -117,6 +83,38 @@ public class RemoteJiraService {
                 }
             }
         });
+    }
+
+    private interface FunctionWithFallback<T> extends Function<JiraProxy, T> {
+        T onInvocationException(Exception e);
+    }
+
+    private <T> Iterable<T> executeForEveryJira(final FunctionWithFallback<T> function) {
+        final ExecutorService es = Executors.newFixedThreadPool(THREADS);
+        final Iterable<JiraProxy> applicationLinks = jiraProxyFactory.getAllJiraProxies();
+        final ApplicationUser user = authenticationContext.getLoggedInUser();
+        final List<Callable<T>> queries = Lists.newArrayList(
+                Iterables.transform(applicationLinks,
+                        applicationLink -> (Callable<T>) () -> {
+                            ComponentAccessor.getJiraAuthenticationContext().setLoggedInUser(user);
+                            return function.apply(applicationLink);
+                        })
+        );
+        try {
+            return ImmutableList.copyOf(Iterables.transform(es.invokeAll(queries),
+                    eitherFuture -> {
+                        try {
+                            return eitherFuture.get();
+                        } catch (Exception e) {
+                            return function.onInvocationException(e);
+                        }
+                    }));
+        } catch (Exception e) {
+            log.warn("Threads were interrupted during Application Links request", e);
+            return Collections.emptyList();
+        } finally {
+            es.shutdown();
+        }
     }
 
 }

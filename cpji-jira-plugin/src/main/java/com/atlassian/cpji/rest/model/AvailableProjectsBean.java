@@ -3,14 +3,14 @@ package com.atlassian.cpji.rest.model;
 import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.Projects;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
-import com.atlassian.fugue.Either;
-import com.atlassian.fugue.Eithers;
 import com.atlassian.jira.rest.client.api.domain.BasicProject;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import io.atlassian.fugue.Either;
+import io.atlassian.fugue.Eithers;
 
 import java.util.List;
 import javax.annotation.Nonnull;

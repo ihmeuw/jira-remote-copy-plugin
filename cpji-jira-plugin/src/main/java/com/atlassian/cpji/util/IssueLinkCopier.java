@@ -4,7 +4,6 @@ import com.atlassian.cpji.components.model.NegativeResponseStatus;
 import com.atlassian.cpji.components.model.SimplifiedIssueLinkType;
 import com.atlassian.cpji.components.model.SuccessfulResponse;
 import com.atlassian.cpji.components.remote.JiraProxy;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.link.IssueLink;
 import com.atlassian.jira.issue.link.IssueLinkManager;
@@ -15,9 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
-
-import javax.annotation.Nullable;
-import java.util.List;
+import io.atlassian.fugue.Either;
 
 /**
  * Orchestrates copying local and remote links

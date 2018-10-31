@@ -1,6 +1,5 @@
 package com.atlassian.cpji.conditions;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractJiraCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
 import com.atlassian.jira.user.ApplicationUser;

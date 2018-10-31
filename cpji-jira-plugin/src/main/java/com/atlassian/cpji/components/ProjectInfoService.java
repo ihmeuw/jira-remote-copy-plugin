@@ -7,7 +7,6 @@ import com.atlassian.cpji.rest.model.CopyInformationBean;
 import com.atlassian.cpji.rest.model.IssueFieldBean;
 import com.atlassian.cpji.rest.model.IssueTypeBean;
 import com.atlassian.cpji.rest.model.UserBean;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
 import com.atlassian.jira.issue.fields.config.manager.IssueTypeSchemeManager;

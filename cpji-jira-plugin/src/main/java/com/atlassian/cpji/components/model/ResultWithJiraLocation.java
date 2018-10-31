@@ -1,6 +1,6 @@
 package com.atlassian.cpji.components.model;
 
-import com.atlassian.fugue.Either;
+import io.atlassian.fugue.Either;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.Nonnull;

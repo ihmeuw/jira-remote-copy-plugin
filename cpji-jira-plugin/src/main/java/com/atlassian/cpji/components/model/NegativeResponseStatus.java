@@ -1,10 +1,10 @@
 package com.atlassian.cpji.components.model;
 
 import com.atlassian.cpji.rest.model.ErrorBean;
-import com.atlassian.fugue.Either;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Predicate;
+import io.atlassian.fugue.Either;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

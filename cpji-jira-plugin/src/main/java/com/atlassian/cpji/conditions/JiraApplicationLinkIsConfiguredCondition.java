@@ -2,7 +2,6 @@ package com.atlassian.cpji.conditions;
 
 import com.atlassian.applinks.api.ApplicationLinkService;
 import com.atlassian.applinks.api.application.jira.JiraApplicationType;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractIssueCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
