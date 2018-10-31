@@ -21,19 +21,19 @@ You can use [Atlassian Plugin SDK](http://confluence.atlassian.com/display/DEVNE
 
 To run pre-configured JIRA instances in debug mode use:
 
-`cd cpji-jira-plugin && atlas-mvn amps:debug -DinstanceId=jira1 -Pjira1`
+`cd cpji-jira-plugin && mvn amps:debug -DinstanceId=jira1 -Pjira1`
 
-`cd cpji-jira-plugin && atlas-mvn amps:debug -DinstanceId=jira2 -Pjira2`
+`cd cpji-jira-plugin && mvn amps:debug -DinstanceId=jira2 -Pjira2`
 
 To run integration tests use:
 
-`cd cpji-jira-plugin-test && atlas-mvn amps:integration-test -DtestGroups=jira-tests`
+`cd cpji-jira-plugin-test && mvn amps:integration-test -DtestGroups=jira-tests`
 
 To run CLI for each:
 
-`cd cpji-jira-plugin && atlas-mvn jira:cli -Pjira1`
+`cd cpji-jira-plugin && mvn jira:cli -Pjira1`
 
-`cd cpji-jira-plugin && atlas-mvn jira:cli -Pjira2`
+`cd cpji-jira-plugin && mvn jira:cli -Pjira2`
 
 To install plugin in JIRA 2:
 

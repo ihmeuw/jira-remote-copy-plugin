@@ -25,8 +25,8 @@ class TestCopyIssueAndReplaceValues extends JiraObjects with org.scalatest.Match
 	}
 
 	@Test def testFillMissingValuesAndCopy() {
-		val fromKey = "FROM"
-		val toKey = "TOP"
+		val fromKey = "COPYFROM"
+		val toKey = "COPYTO"
 
 		testkit1.project().addProject("From project", fromKey, "admin")
 		testkit1.project().addProject("To project", toKey, "admin")
@@ -75,8 +75,8 @@ class TestCopyIssueAndReplaceValues extends JiraObjects with org.scalatest.Match
 			fixForVersions should have size (1)
 			fixForVersions.head.getName should be === "other-version-1"
 		} finally {
-//			testkit1.project().deleteProject("TOP")
-//			testkit1.project().deleteProject("FROM")
+			testkit1.project().deleteProject(fromKey)
+			testkit1.project().deleteProject(toKey)
 		}
 	}
 
