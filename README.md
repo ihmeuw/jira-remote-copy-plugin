@@ -54,3 +54,8 @@ To create a successful pull request:
 * raise a pull request
 
 We'll be happy to incorporate your changes.
+
+Which branch should I target?
+-----------------
+- Jira 8.x - `master`
+- Jira 7.x - `jira-7`
