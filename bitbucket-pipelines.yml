@@ -15,6 +15,9 @@ pipelines:
           caches:
             - maven
           script:
+            - set -euf
+            - pipe: atlassian/artifactory-sidekick:v1
+            - source .artifactory/activate.sh
             - mvn -B verify --file pom.xml
           after-script:
               # Collect checkstyle results, if any, and convert to Bitbucket Code Insights.
