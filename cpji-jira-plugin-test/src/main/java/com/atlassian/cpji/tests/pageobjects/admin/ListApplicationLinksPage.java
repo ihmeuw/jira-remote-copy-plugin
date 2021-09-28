@@ -11,6 +11,7 @@ import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import com.atlassian.pageobjects.elements.timeout.Timeouts;
+import com.atlassian.webdriver.utils.element.ElementIsVisible;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -91,7 +92,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 	public DeleteDialog clickDelete(String name) {
 		Preconditions.checkNotNull(name);
 		final By by = By.xpath(String.format("//td[preceding-sibling::td[. = '%s']]//a[@class='app-delete-link']", name));
-		driver.waitUntilElementIsVisible(by);
+		webDriverPoller.waitUntil(new ElementIsVisible(by));
 		elementFinder.find(by).click();
 		return pageBinder.bind(DeleteDialog.class);
 	}
@@ -128,7 +129,7 @@ public class ListApplicationLinksPage extends AbstractJiraPage {
 			final PageElement deleteButton = Iterables.get(Iterables
 					.filter(dialog.findAll(locator),
 							PageElements.isVisible()), 0);
-			driver.waitUntil(PageElements.isEnabled(locator));
+			webDriverPoller.waitUntil(PageElements.isEnabled(locator));
 			deleteButton.click();
 			return this;
 		}

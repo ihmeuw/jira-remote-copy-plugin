@@ -106,6 +106,10 @@
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.atlassian.httpclient</groupId>
+					<artifactId>atlassian-httpclient-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -269,6 +273,12 @@
 			<artifactId>atlassian-httpclient-apache-httpcomponents</artifactId>
 			<version>0.13.2</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.atlassian.httpclient</groupId>
+					<artifactId>atlassian-httpclient-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -295,7 +305,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-amps-plugin</artifactId>
+                <artifactId>amps-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
@@ -307,8 +317,8 @@
                             <version>${jira.version}</version>
                             <httpPort>2990</httpPort>
                             <jvmDebugPort>5002</jvmDebugPort>
-                            <dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
+                            <dataPath>${project.basedir}/src/test/amps/8191-home-jira1.zip</dataPath>
+							<jvmArgs>-Xmx768m -Xms384m -XX:MaxPermSize=300m</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.jira.tests</groupId>
@@ -328,8 +338,8 @@
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
                             <jvmDebugPort>5003</jvmDebugPort>
-                            <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
+                            <dataPath>${project.basedir}/src/test/amps/8191-home-jira2.zip</dataPath>
+							<jvmArgs>-Xmx768m -Xms384m -XX:MaxPermSize=300m</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.jira.tests</groupId>
@@ -349,8 +359,8 @@
 							<version>${jira.version}</version>
 							<httpPort>2992</httpPort>
 							<jvmDebugPort>5004</jvmDebugPort>
-							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m</jvmArgs>
+							<dataPath>${project.basedir}/src/test/amps/8191-home-jira3.zip</dataPath>
+							<jvmArgs>-Xmx768m -Xms384m -XX:MaxPermSize=300m</jvmArgs>
 							<pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.jira.tests</groupId>
@@ -400,7 +410,7 @@
 							   <configuration>
 								   <artifacts>
 									   <artifact>
-										   <file>${project.basedir}/passedArtifacts/${build.finalName}.jar</file>
+										   <file>${project.basedir}/passedArtifacts/${project.build.finalName}.jar</file>
 										   <type>jar</type>
 									   </artifact>
 								   </artifacts>

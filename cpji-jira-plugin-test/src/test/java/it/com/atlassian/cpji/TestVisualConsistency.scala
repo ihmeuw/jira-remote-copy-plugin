@@ -1,15 +1,14 @@
 package it.com.atlassian.cpji
 
-import org.junit.{Rule, Test}
-import com.atlassian.cpji.tests.rules.CreateIssues
-import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, LinkIssuesInput}
-import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage
 import com.atlassian.cpji.tests.ScreenshotUtil
-import java.io.ByteArrayInputStream
-
+import com.atlassian.cpji.tests.pageobjects.SelectTargetProjectPage
+import com.atlassian.cpji.tests.rules.CreateIssues
 import com.atlassian.jira.rest.client.api.domain.Comment
+import com.atlassian.jira.rest.client.api.domain.input.{IssueInputBuilder, LinkIssuesInput}
 import org.joda.time.DateTime
+import org.junit.{Rule, Test}
 
+import java.io.ByteArrayInputStream
 import scala.util.Random
 
 class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
@@ -17,7 +16,7 @@ class TestVisualConsistency extends AbstractCopyIssueTest with JiraObjects {
 	@Rule def createIssues = new CreateIssues(restClient1)
 
 	def takeScreenshot(message: String) {
-		ScreenshotUtil.attemptScreenshot(jira1.getTester.getDriver.getDriver, "VisualConsistency - " + message)
+		ScreenshotUtil.attemptScreenshot(jira1.getTester.getDriver, "VisualConsistency - " + message)
 	}
 
 	@Test def testTakeScreenshotsForEveryStep() {

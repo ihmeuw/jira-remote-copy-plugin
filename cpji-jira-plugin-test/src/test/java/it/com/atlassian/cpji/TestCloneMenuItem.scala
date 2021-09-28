@@ -47,7 +47,7 @@ class TestCloneMenuItem extends AbstractCopyIssueTest with JiraObjects {
 			login(jira3)
 
 			jira3.visit(classOf[ListApplicationLinksPage])
-			ScreenshotUtil.attemptScreenshot(jira3.getTester.getDriver.getDriver, "shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks - applicationLinks")
+			ScreenshotUtil.attemptScreenshot(jira3.getTester.getDriver, "shouldNotDisplayIfUserHasNoPermissionToCreateIssuesAndThereAreNoApplicationLinks - applicationLinks")
 
 			val issuePage: ExtendedViewIssuePage = jira3.visit(classOf[ExtendedViewIssuePage], issue.getKey)
 			issuePage.getMoreActionsMenu.open()

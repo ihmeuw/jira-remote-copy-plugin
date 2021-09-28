@@ -108,7 +108,7 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-amps-plugin</artifactId>
+                <artifactId>amps-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
@@ -130,9 +130,9 @@
                             <instanceId>jira1</instanceId>
                             <version>${jira.version}</version>
 							<dataVersion>${jira.version}</dataVersion>
-							<dataPath>${project.basedir}/src/test/amps/jira1-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
-                            <enableFastdev>false</enableFastdev>
+							<dataPath>${project.basedir}/src/test/amps/8191-home-jira1.zip</dataPath>
+							<jvmArgs>-Xmx768m -Xms384m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
+                            <enableQuickReload>false</enableQuickReload>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -162,10 +162,11 @@
                             <version>${jira.version}</version>
                             <httpPort>2991</httpPort>
                             <jvmDebugPort>5003</jvmDebugPort>
+							<ajpPort>8010</ajpPort>
 							<dataVersion>${jira.version}</dataVersion>
-                            <dataPath>${project.basedir}/src/test/amps/jira2-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
-                            <enableFastdev>false</enableFastdev>
+                            <dataPath>${project.basedir}/src/test/amps/8191-home-jira2.zip</dataPath>
+							<jvmArgs>-Xmx768m -Xms384m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
+							<enableQuickReload>false</enableQuickReload>
                             <pluginArtifacts>
                                 <pluginArtifact>
                                     <groupId>com.atlassian.cpji</groupId>
@@ -195,10 +196,11 @@
 							<version>${jira.version}</version>
 							<httpPort>2992</httpPort>
 							<jvmDebugPort>5004</jvmDebugPort>
+							<ajpPort>8011</ajpPort>
 							<dataVersion>${jira.version}</dataVersion>
-							<dataPath>${project.basedir}/src/test/amps/jira3-generated-test-resources.zip</dataPath>
-							<jvmArgs>-Xmx768m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
-                            <enableFastdev>false</enableFastdev>
+							<dataPath>${project.basedir}/src/test/amps/8191-home-jira3.zip</dataPath>
+							<jvmArgs>-Xmx768m -Xms384m -XX:MaxPermSize=300m -Datlassian.plugins.enable.wait=300</jvmArgs>
+							<enableQuickReload>false</enableQuickReload>
                             <pluginArtifacts>
 								<pluginArtifact>
 									<groupId>com.atlassian.cpji</groupId>

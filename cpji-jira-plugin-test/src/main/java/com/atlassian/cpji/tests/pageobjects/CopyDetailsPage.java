@@ -1,6 +1,7 @@
 package com.atlassian.cpji.tests.pageobjects;
 
 import com.atlassian.cpji.action.RemoteIssueLinkType;
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.CheckboxElement;
@@ -12,8 +13,7 @@ import com.atlassian.pageobjects.elements.query.TimedQuery;
 import com.google.common.collect.ImmutableList;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
-import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
-
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.List;
 
@@ -161,12 +161,11 @@ public class CopyDetailsPage extends AbstractJiraPage {
 
     public void showNotCopiedAttachmentsList() {
         PageElement lozenge = copyAttachmentsNotice.find(By.className("aui-lozenge"));
-        lozenge.click();
+        new Actions(driver).moveToElement(lozenge.asWebElement()).click().build().perform();
     }
 
-
     public TimedQuery<String> getNotCopiedAttachmentsList() {
-        return elementFinder.find(By.cssSelector("#inline-dialog-attachments-popup ul")).timed().getText();
+        return elementFinder.find(By.className("aui-inline-dialog-contents")).timed().getText();
     }
 
     public CopyDetailsPage enterNewSummary(String summary) {
