@@ -1,20 +1,22 @@
 package com.atlassian.cpji.fields.value;
 
 import com.atlassian.cpji.rest.model.UserBean;
+import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.dbc.Assertions;
-
-import static com.google.common.collect.Collections2.filter;
 
 /**
  * @since v2.0
  */
 public class UserMappingManager {
     private final UserManager userManager;
+    private final UserSearchService userSearchService;
 
-    public UserMappingManager(final UserManager userManager) {
+    public UserMappingManager(final UserManager userManager,
+                              final UserSearchService userSearchService) {
         this.userManager = userManager;
+        this.userSearchService = userSearchService;
     }
 
     public UserBean createUserBean(final String userKey) {
@@ -25,6 +27,6 @@ public class UserMappingManager {
     }
 
     public CachingUserMapper getUserMapper() {
-        return new CachingUserMapper(filter(userManager.getUsers(), ApplicationUser::isActive));
+        return new CachingUserMapper(userSearchService);
     }
 }
