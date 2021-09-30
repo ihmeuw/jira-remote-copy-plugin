@@ -15,6 +15,8 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -22,6 +24,8 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CachingUserMapperTest {
+
+    private static final int MAPPED_USERS_OVER_CACHE_LIMIT = 1001;
 
     @Mock
     private UserBean userBean;
@@ -116,5 +120,35 @@ public class CachingUserMapperTest {
         when(userSearchService.getUserByName(null, userName)).thenReturn(user);
         ApplicationUser result = cachingUserMapper.mapUser(userBean);
         assertEquals(user, result);
+    }
+
+    @Test
+    public void testMapUserUsesFullCacheProperlyWithLimitation() throws Exception {
+
+        // Fill the whole cache with mapping execution
+        for (int i = 0; i < MAPPED_USERS_OVER_CACHE_LIMIT; i++) {
+            String email = String.valueOf(i);
+            ApplicationUser user = mock(ApplicationUser.class);
+            when(user.isActive()).thenReturn(true);
+            when(userSearchService.findUsersByEmail(email)).thenReturn(Collections.singletonList(user));
+            when(userBean.getEmail()).thenReturn(String.valueOf(i));
+
+            cachingUserMapper.mapUser(userBean);
+        }
+
+        String emailOfFirstUser = "0";
+        when(userSearchService.findUsersByEmail(emailOfFirstUser)).thenReturn(Collections.singletonList(user));
+        when(userBean.getEmail()).thenReturn(emailOfFirstUser);
+        cachingUserMapper.mapUser(userBean);
+
+        // Check the eldest (first) user was once removed from cache due to cache size limitations,
+        // so the service was called two times for him.
+        verify(userSearchService, times(2))
+                .findUsersByEmail(emailOfFirstUser);
+
+        // The newer user (second) is still in cache so only the service was called only once
+        String emailOfSecondUser = "1";
+        verify(userSearchService, times(1))
+                .findUsersByEmail(emailOfSecondUser);
     }
 }
