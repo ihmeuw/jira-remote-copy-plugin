@@ -23,15 +23,12 @@ import static java.util.Objects.requireNonNull;
 public class CachingUserMapper {
 	private static final Logger log = Logger.getLogger(CachingUserMapper.class);
 
-	private final UserSearchService userSearchService;
-
-	protected final CachedExtractor usersByEmail, usersByFullName, usersByUserName;
+	private final CachedExtractor usersByEmailExtractor, usersByFullNameExtractor, usersByUserNameExtractor;
 
 	public CachingUserMapper(UserSearchService userSearchService) {
-		this.userSearchService = userSearchService;
-		usersByEmail = new UsersByEmailExtractor(userSearchService);
-		usersByFullName = new UsersByFullNameExtractor(userSearchService);
-		usersByUserName = new UsersByUserNameExtractor(userSearchService);
+		usersByEmailExtractor = new UsersByEmailExtractor(userSearchService);
+		usersByFullNameExtractor = new UsersByFullNameExtractor(userSearchService);
+		usersByUserNameExtractor = new UsersByUserNameExtractor(userSearchService);
 	}
 
 	/**
@@ -44,27 +41,27 @@ public class CachingUserMapper {
 	 * @return mapped ApplicationUser or null if not found relevant one
 	 */
 	@Nullable
-	public ApplicationUser mapUser(UserBean userBean) {
+	public ApplicationUser mapUser(@Nullable UserBean userBean) {
 		if (userBean == null) {
 			return null;
 		}
 
 		// filter by email
-		Collection<ApplicationUser> resultSet = usersByEmail.getBy(userBean.getEmail());
+		Collection<ApplicationUser> resultSet = usersByEmailExtractor.getBy(userBean.getEmail());
 		if (resultSet.size() == 1) {
 			return getUserFoundByEmail(userBean, resultSet);
 		}
 
 		// filter by full name
 		UsersMap processedUsers = groupUsers(resultSet, ApplicationUser::getDisplayName);
-		resultSet = getBy(processedUsers, usersByFullName, userBean.getFullName());
+		resultSet = getBy(processedUsers, usersByFullNameExtractor, userBean.getFullName());
 		if (resultSet.size() == 1) {
 			return getUserFoundByFullName(userBean, resultSet);
 		}
 
 		// filter by username
 		processedUsers = groupUsers(resultSet, ApplicationUser::getUsername);
-		resultSet = getBy(processedUsers, usersByUserName, userBean.getUserName());
+		resultSet = getBy(processedUsers, usersByUserNameExtractor, userBean.getUserName());
 		if (resultSet.size() == 1) {
 			return getUserFoundByUserName(userBean, resultSet);
 		}
@@ -103,17 +100,18 @@ public class CachingUserMapper {
 	/**
 	 * Groups users by given supplier.
 	 *
-	 * Eg. For supplier `ApplicationUser::getUsername` the returned map will group users by username.
-	 * Username will be a key and the relevant users will be strored in collection as a value.
+	 * Eg. For function `ApplicationUser::getUsername` the returned map will group users by username.
+	 * Username will be a key and the relevant users will be stored in collection as a value.
 	 *
 	 * @param users collection of users to group
-	 * @param supplier
+	 * @param function expression representing the way of grouping by
 	 * @return map of users
 	 */
 	@Nonnull
-	private UsersMap groupUsers(Collection<ApplicationUser> users, Function<ApplicationUser, String> supplier) {
+	private UsersMap groupUsers(@Nonnull Collection<ApplicationUser> users,
+								@Nonnull Function<ApplicationUser, String> function) {
 		UsersMap processedUsers = new UsersMap();
-		users.forEach(user -> addToCollection(processedUsers, supplier.apply(user), user));
+		users.forEach(user -> addToCollection(processedUsers, function.apply(user), user));
 		return processedUsers;
 	}
 
@@ -123,7 +121,8 @@ public class CachingUserMapper {
 	}
 
 	@Nonnull
-	private ApplicationUser getUserFoundByEmail(UserBean userBean, Collection<ApplicationUser> resultSet) {
+	private ApplicationUser getUserFoundByEmail(@Nonnull UserBean userBean,
+												@Nonnull Collection<ApplicationUser> resultSet) {
 		ApplicationUser user = requireNonNull(resultSet.iterator().next());
 		log.debug(String.format(
 				"Mapped remote user by email: '%s' and email: '%s' to local user with user name: '%s'",
@@ -132,7 +131,8 @@ public class CachingUserMapper {
 	}
 
 	@Nonnull
-	private ApplicationUser getUserFoundByFullName(UserBean userBean, Collection<ApplicationUser> resultSet) {
+	private ApplicationUser getUserFoundByFullName(@Nonnull UserBean userBean,
+												   @Nonnull Collection<ApplicationUser> resultSet) {
 		ApplicationUser user = requireNonNull(resultSet.iterator().next());
 		log.debug(String.format(
 				"Mapped remote user by full name: '%s' and email: '%s' to local user with user name: '%s'",
@@ -141,7 +141,8 @@ public class CachingUserMapper {
 	}
 
 	@Nonnull
-	private ApplicationUser getUserFoundByUserName(UserBean userBean, Collection<ApplicationUser> resultSet) {
+	private ApplicationUser getUserFoundByUserName(@Nonnull UserBean userBean,
+												   @Nonnull Collection<ApplicationUser> resultSet) {
 		ApplicationUser user = requireNonNull(resultSet.iterator().next());
 		log.debug(String.format(
 				"Mapped remote user by user name: '%s' and email: '%s' to local user with user name: '%s'",

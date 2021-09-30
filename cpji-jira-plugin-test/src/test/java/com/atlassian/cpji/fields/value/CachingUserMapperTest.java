@@ -64,6 +64,7 @@ public class CachingUserMapperTest {
         String email = "test@domain.com";
         when(userBean.getEmail()).thenReturn(email);
         ApplicationUser user = mock(ApplicationUser.class);
+        when(user.isActive()).thenReturn(true);
         when(userSearchService.findUsersByEmail(email)).thenReturn(Collections.singletonList(user));
         ApplicationUser result = cachingUserMapper.mapUser(userBean);
         assertEquals(user, result);
@@ -87,6 +88,7 @@ public class CachingUserMapperTest {
     public void testMapUserWhenFullNameIsPresent() throws Exception {
         final String fullName = "Jon Sample";
         when(userBean.getFullName()).thenReturn(fullName);
+        when(user.isActive()).thenReturn(true);
         when(userSearchService.findUsersByFullName(fullName)).thenReturn(Collections.singletonList(user));
         ApplicationUser result = cachingUserMapper.mapUser(userBean);
         assertEquals(user, result);
@@ -110,6 +112,7 @@ public class CachingUserMapperTest {
     public void testMapUserWhenUserNameIsPresent() throws Exception {
         final String userName = "someuser";
         when(userBean.getUserName()).thenReturn(userName);
+        when(user.isActive()).thenReturn(true);
         when(userSearchService.getUserByName(null, userName)).thenReturn(user);
         ApplicationUser result = cachingUserMapper.mapUser(userBean);
         assertEquals(user, result);

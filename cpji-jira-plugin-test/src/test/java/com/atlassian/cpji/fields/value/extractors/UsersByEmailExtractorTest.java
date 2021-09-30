@@ -15,7 +15,6 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,11 +37,22 @@ public class UsersByEmailExtractorTest {
 
     @Test
     void testGetByWhenEmailIsPresent() {
+        when(user.isActive()).thenReturn(true);
         String email = "email@localhost";
         when(userSearchService.findUsersByEmail(email)).thenReturn(Collections.singletonList(user));
 
         Collection<ApplicationUser> result = extractor.getBy(email);
         assertThat(result, contains(user));
+    }
+
+    @Test
+    void testGetByWhenEmailIsPresentButInactive() {
+        when(user.isActive()).thenReturn(false);
+        String email = "email@localhost";
+        when(userSearchService.findUsersByEmail(email)).thenReturn(Collections.singletonList(user));
+
+        Collection<ApplicationUser> result = extractor.getBy(email);
+        assertThat(result, empty());
     }
 
     @Test
@@ -59,6 +69,7 @@ public class UsersByEmailExtractorTest {
 
     @Test
     void testGetByFetchedFromCacheAfterFirstTimeWhenEmailIsPresent() {
+        when(user.isActive()).thenReturn(true);
         String email = "email@localhost";
         when(userSearchService.findUsersByEmail(email)).thenReturn(Collections.singletonList(user));
 
@@ -66,7 +77,7 @@ public class UsersByEmailExtractorTest {
         extractor.getBy(email);
         Collection<ApplicationUser> result = extractor.getBy(email);
 
-        verify(userSearchService, times(1)).findUsersByEmail(email);
+        verify(userSearchService).findUsersByEmail(email);
         assertThat(result, contains(user));
     }
 }

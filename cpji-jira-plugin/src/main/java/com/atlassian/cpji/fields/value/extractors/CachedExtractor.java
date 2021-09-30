@@ -6,11 +6,13 @@ import com.atlassian.jira.user.ApplicationUser;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
- * Abstract layer for extracting Users from cache (if present) or directly via service.
+ * Abstract layer for extracting users from cache (if present) or directly via service.
  */
 public abstract class CachedExtractor {
 
@@ -23,23 +25,33 @@ public abstract class CachedExtractor {
     }
 
     /**
-     * Extracts users from cache if present. Otherwise, fetches directly via service.
-     * @param phrase key to fetch users
-     * @return collection of ApplicationUser
+     * Extracts active users from cache if present. Otherwise, fetches directly via service.
+     *
+     * @param phrase exact key used to fetch users
+     * @return collection of active ApplicationUser
      */
     @Nonnull
-    public Collection<ApplicationUser> getBy(String phrase) {
+    public Collection<ApplicationUser> getBy(@Nullable String phrase) {
         if (StringUtils.isBlank(phrase)) {
             return Collections.emptyList();
         }
         Collection<ApplicationUser> cachedUsers = usersMap.get(phrase);
         if (cachedUsers == null) {
-            Collection<ApplicationUser> users = fetchUsersDirectly(phrase);
+            Collection<ApplicationUser> users = filterActive(fetchUsersDirectly(phrase));
             usersMap.put(phrase, users);
             return users;
         }
         return cachedUsers;
     }
 
-    protected abstract Collection<ApplicationUser> fetchUsersDirectly(String phrase);
+    @Nonnull
+    protected abstract Collection<ApplicationUser> fetchUsersDirectly(@Nonnull String phrase);
+
+    @Nonnull
+    protected Collection<ApplicationUser> filterActive(@Nonnull Collection<ApplicationUser> users) {
+        return users
+                .stream()
+                .filter(ApplicationUser::isActive)
+                .collect(Collectors.toList());
+    }
 }

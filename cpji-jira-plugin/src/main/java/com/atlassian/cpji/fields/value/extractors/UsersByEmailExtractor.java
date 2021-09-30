@@ -4,6 +4,7 @@ import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 
 public class UsersByEmailExtractor extends CachedExtractor {
@@ -12,8 +13,9 @@ public class UsersByEmailExtractor extends CachedExtractor {
         super(userSearchService);
     }
 
+    @Nonnull
     @Override
-    protected Collection<ApplicationUser> fetchUsersDirectly(String phrase) {
+    protected Collection<ApplicationUser> fetchUsersDirectly(@Nonnull String phrase) {
         return Lists.newArrayList(userSearchService.findUsersByEmail(phrase));
     }
 }

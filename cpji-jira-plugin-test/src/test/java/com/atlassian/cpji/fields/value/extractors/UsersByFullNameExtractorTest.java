@@ -15,7 +15,6 @@ import java.util.Collections;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,11 +37,22 @@ public class UsersByFullNameExtractorTest {
 
     @Test
     void testGetByWhenFullNameIsPresent() {
+        when(user.isActive()).thenReturn(true);
         String fullName = "Full Name";
         when(userSearchService.findUsersByFullName(fullName)).thenReturn(Collections.singletonList(user));
 
         Collection<ApplicationUser> result = extractor.getBy(fullName);
         assertThat(result, contains(user));
+    }
+
+    @Test
+    void testGetByWhenFullNameIsPresentButInactive() {
+        when(user.isActive()).thenReturn(false);
+        String fullName = "Full Name";
+        when(userSearchService.findUsersByFullName(fullName)).thenReturn(Collections.singletonList(user));
+
+        Collection<ApplicationUser> result = extractor.getBy(fullName);
+        assertThat(result, empty());
     }
 
     @Test
@@ -59,6 +69,7 @@ public class UsersByFullNameExtractorTest {
 
     @Test
     void testGetByFetchedFromCacheAfterFirstTimeWhenFullNameIsPresent() {
+        when(user.isActive()).thenReturn(true);
         String fullName = "Full Name";
         when(userSearchService.findUsersByFullName(fullName)).thenReturn(Collections.singletonList(user));
 
@@ -66,7 +77,7 @@ public class UsersByFullNameExtractorTest {
         extractor.getBy(fullName);
         Collection<ApplicationUser> result = extractor.getBy(fullName);
 
-        verify(userSearchService, times(1)).findUsersByFullName(fullName);
+        verify(userSearchService).findUsersByFullName(fullName);
         assertThat(result, contains(user));
     }
 }
