@@ -1,7 +1,7 @@
 package com.atlassian.cpji.tests.pageobjects;
 
+import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 import com.atlassian.jira.pageobjects.pages.AbstractJiraPage;
-import com.atlassian.jira.pageobjects.pages.JiraLoginPage;
 import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.ElementBy;
 import com.atlassian.pageobjects.elements.PageElement;
@@ -9,10 +9,10 @@ import com.atlassian.pageobjects.elements.query.Conditions;
 import com.atlassian.pageobjects.elements.query.Poller;
 import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
+import com.atlassian.webdriver.utils.element.ElementIsVisible;
 import com.google.common.base.Preconditions;
 import org.hamcrest.Matchers;
 import org.openqa.selenium.By;
-import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 
 import javax.annotation.Nonnull;
 
@@ -91,7 +91,7 @@ public class SelectTargetProjectPage extends AbstractJiraPage
 	public void clickOAuthApproval(String applicationId) {
 		Preconditions.checkNotNull(applicationId);
 		By link = By.cssSelector(String.format("a[data-application-id=%s]", applicationId));
-		driver.waitUntilElementIsVisible(link);
+		webDriverPoller.waitUntil(new ElementIsVisible(link));
 		elementFinder.find(link).click();
 	}
 

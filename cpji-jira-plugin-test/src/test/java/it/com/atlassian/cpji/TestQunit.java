@@ -4,7 +4,7 @@ import com.atlassian.jira.pageobjects.JiraTestedProduct;
 import com.atlassian.pageobjects.DefaultProductInstance;
 import com.atlassian.pageobjects.TestedProductFactory;
 import com.atlassian.qunit.test.runner.QUnitPageObjectsHelper;
-import org.apache.axis.utils.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 

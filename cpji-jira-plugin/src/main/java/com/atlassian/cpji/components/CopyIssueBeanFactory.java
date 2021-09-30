@@ -139,12 +139,12 @@ public class CopyIssueBeanFactory {
 				}
 			} else if (orderableField instanceof ReporterSystemField && StringUtils
 					.isNotBlank(issueToCopy.getReporterId())) {
-				copyIssueBean.setReporter(userMappingManager.createUserBean(issueToCopy.getReporterId()));
+				copyIssueBean.setReporter(userMappingManager.createUserBean(issueToCopy.getReporter().getKey()));
 			} else if (orderableField instanceof EnvironmentSystemField) {
 				copyIssueBean.setEnvironment(issueToCopy.getEnvironment());
 			} else if (orderableField instanceof AssigneeSystemField && StringUtils
 					.isNotBlank(issueToCopy.getAssigneeId())) {
-				copyIssueBean.setAssignee(userMappingManager.createUserBean(issueToCopy.getAssigneeId()));
+				copyIssueBean.setAssignee(userMappingManager.createUserBean(issueToCopy.getAssignee().getKey()));
 			} else if (orderableField instanceof DescriptionSystemField) {
 				copyIssueBean.setDescription(issueToCopy.getDescription());
 			} else if (orderableField instanceof DueDateSystemField) {
@@ -214,7 +214,7 @@ public class CopyIssueBeanFactory {
 			final List<CommentBean> commentBeans = new ArrayList<CommentBean>();
 
 			for (Comment comment : comments) {
-				UserBean userBean = userMappingManager.createUserBean(comment.getAuthor());
+				UserBean userBean = userMappingManager.createUserBean(comment.getAuthorApplicationUser().getKey());
 				if (userBean != null) {
 					final CommentBean commentBean = new CommentBean(comment.getBody(), userBean,
 							(comment.getRoleLevel() == null) ? null : comment.getRoleLevel().getName(),

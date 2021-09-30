@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>closedsource-pom</artifactId>
-        <version>5.0.21</version>
+        <version>5.0.29</version>
     </parent>
 
     <groupId>com.atlassian.cpji</groupId>
@@ -31,34 +31,34 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cpji.build.directory>target</cpji.build.directory>
-        <jira.version>8.0.0-m0020</jira.version>
+        <!--Downgrading Jira version requires a change in used datasets. See <dataPath> properties in specific module poms.-->
+        <jira.version>8.19.1</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
-        <spring.version>5.0.7.RELEASE</spring.version>
+        <spring.version>5.1.18.RELEASE</spring.version>
         <guava.version>26.0-jre</guava.version>
-        <commons.lang3.version>3.8</commons.lang3.version>
-        <apache.httpclient.version>4.5.5</apache.httpclient.version>
-        <apache.httpcore.version>4.4.9</apache.httpcore.version>
+        <commons.lang3.version>3.9</commons.lang3.version>
+        <apache.httpclient.version>4.5.13</apache.httpclient.version>
+        <apache.httpcore.version>4.4.12</apache.httpcore.version>
         <apache.httpasyncclient.version>4.1</apache.httpasyncclient.version>
-        <atlassian.httpclient.version>2.0.0-m1</atlassian.httpclient.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <atlassian.httpclient.version>2.1.5</atlassian.httpclient.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <my.sal.version>4.0.0-ccaebc10</my.sal.version>
-        <rest.version>6.0.0-985fbb15</rest.version>
-        <jackson.version>1.9.13-atlassian-3</jackson.version>
+        <my.sal.version>4.2.3</my.sal.version>
+        <atlassian.rest.version>6.1.11</atlassian.rest.version>
+        <jackson.version>1.9.13-atlassian-6</jackson.version>
         <jersey.version>1.19.4</jersey.version>
         <jaxb.version>2.3.0</jaxb.version>
-        <applinks.version>6.0.0-a0372472</applinks.version>
-        <atlassian.event.version>4.0.0-3937a39</atlassian.event.version>
+        <applinks.version>8.0.8</applinks.version>
+        <atlassian.event.version>4.0.4</atlassian.event.version>
         <atlassian.qunit.version>1.0.4</atlassian.qunit.version>
-        <testkit.version>8.0.2-481a183</testkit.version>
-        <test-basics.version>1.9.5</test-basics.version>
-        <amps.version>6.3.21-fe201d257</amps.version>
-        <atlassian.selenium.version>2.5.1-jira-1</atlassian.selenium.version>
+        <testkit.version>8.1.36</testkit.version>
+        <amps.version>8.2.3</amps.version>
+        <atlassian.selenium.version>3.2.6</atlassian.selenium.version>
         <jersey.version>1.19.4</jersey.version>
-        <failOnMilestoneOrReleaseCandidateDeps>false</failOnMilestoneOrReleaseCandidateDeps>
+        <failOnMilestoneOrReleaseCandidateDeps>true</failOnMilestoneOrReleaseCandidateDeps>
         <rest.doc.generation.skip>true</rest.doc.generation.skip>
-        <jira.rest.client.version>5.1.0-476bd700</jira.rest.client.version>
+        <jira.rest.client.version>5.2.2</jira.rest.client.version>
     </properties>
 
     <dependencyManagement>
@@ -107,6 +107,10 @@
                         <groupId>commons-httpclient</groupId>
                         <artifactId>commons-httpclient</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>io.atlassian.util.concurrent</groupId>
+                        <artifactId>atlassian-util-concurrent</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -131,7 +135,7 @@
             <dependency>
                 <groupId>com.atlassian.plugins.rest</groupId>
                 <artifactId>atlassian-rest-common</artifactId>
-                <version>${rest.version}</version>
+                <version>${atlassian.rest.version}</version>
                 <scope>provided</scope>
                 <exclusions>
                     <exclusion>
@@ -152,11 +156,27 @@
                 <groupId>com.atlassian.jira</groupId>
                 <artifactId>jira-rest-java-client-api</artifactId>
                 <version>${jira.rest.client.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.atlassian.util.concurrent</groupId>
+                        <artifactId>atlassian-util-concurrent</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.atlassian.httpclient</groupId>
+                        <artifactId>atlassian-httpclient-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.atlassian.jira</groupId>
                 <artifactId>jira-rest-java-client-core</artifactId>
                 <version>${jira.rest.client.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>io.atlassian.util.concurrent</groupId>
+                        <artifactId>atlassian-util-concurrent</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jettison</groupId>
