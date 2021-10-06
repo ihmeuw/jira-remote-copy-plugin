@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.1.0</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -254,7 +254,7 @@
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git
         </developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-        <tag>HEAD</tag>
+        <tag>cpji-jira-6.1.0</tag>
     </scm>
 
     <pluginRepositories>
