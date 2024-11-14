@@ -14,7 +14,7 @@ import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.link.IssueLinkType;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.web.action.issue.AbstractIssueSelectAction;
-import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.webresource.api.WebResourceManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import io.atlassian.fugue.Either;

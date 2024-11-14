@@ -10,6 +10,13 @@
         <param name="atlassian-data-center-compatible">true</param>
 	</plugin-info>
 
+	<velocity-allowlist key="velocity-allowlist" name="Velocity Allowlist">
+        <description key="plugin.cpji.velocity.allowlist">
+            Velocity templates can use these Java methods
+        </description>
+        <method>org.apache.commons.lang3.StringUtils#isNotBlank(java.lang.CharSequence)</method>
+    </velocity-allowlist>
+
     <web-item key="remote-copy" i18n-name-key="cpji.operation.name" name="Copy this issue" section="operations-operations" weight="20">
         <label key="cpji.operation.name"/>
         <tooltip key="cpji.operation.name"/>
@@ -108,6 +115,9 @@
 
 	<resource key="cpji.i18n" name="cpji.i18n" type="i18n" location="com.atlassian.cpji.cpji"/>
 
+	<rest-migration key="rest-migration-key">
+		<rest-v2/>
+	</rest-migration>
 	<rest key="copy-issue-rest-end-point" path="/copyissue" version="1.0">
 		<description>
 			The rest endpoint are used to copy one issue from one JIRA instance to another.
@@ -124,7 +134,7 @@
 	</component-import>
 
 	<component-import key="jaxbJsonMarshaller">
-		<interface>com.atlassian.plugins.rest.common.json.JaxbJsonMarshaller</interface>
+		<interface>com.atlassian.plugins.rest.api.json.JaxbJsonMarshaller</interface>
 	</component-import>
 
 	<web-resource key="global">

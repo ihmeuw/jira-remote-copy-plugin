@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>9.0.0</version>
+    <version>10.0.0</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -32,7 +32,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cpji.build.directory>target</cpji.build.directory>
         <!--Downgrading Jira version requires a change in used datasets. See <dataPath> properties in specific module poms.-->
-        <jira.version>9.2.0</jira.version>
+        <jira.version>10.1.1</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <spring.version>5.1.18.RELEASE</spring.version>
@@ -45,9 +45,9 @@
         <slf4j.version>1.7.30</slf4j.version>
         <jsr305.version>3.0.2</jsr305.version>
         <my.sal.version>4.2.3</my.sal.version>
-        <atlassian.rest.version>6.1.11</atlassian.rest.version>
-        <jackson.version>1.9.13-atlassian-6</jackson.version>
-        <jersey.version>1.19.4</jersey.version>
+        <atlassian.rest.version>8.0.6</atlassian.rest.version>
+        <jackson.version>2.18.1</jackson.version>
+        <jersey.version>2.45</jersey.version>
         <jaxb.version>2.3.0</jaxb.version>
         <applinks.version>8.0.8</applinks.version>
         <atlassian.event.version>4.0.4</atlassian.event.version>
@@ -55,7 +55,6 @@
         <testkit.version>8.1.36</testkit.version>
         <amps.version>8.2.3</amps.version>
         <atlassian.selenium.version>3.2.6</atlassian.selenium.version>
-        <jersey.version>1.19.4</jersey.version>
         <failOnMilestoneOrReleaseCandidateDeps>true</failOnMilestoneOrReleaseCandidateDeps>
         <rest.doc.generation.skip>true</rest.doc.generation.skip>
         <jira.rest.client.version>5.2.2</jira.rest.client.version>
@@ -127,21 +126,17 @@
 
             <!-- REST dependencies-->
             <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>jsr311-api</artifactId>
-                <version>1.1.1</version>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>4.0.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.atlassian.plugins.rest</groupId>
-                <artifactId>atlassian-rest-common</artifactId>
+                <artifactId>atlassian-rest-v2-api</artifactId>
                 <version>${atlassian.rest.version}</version>
                 <scope>provided</scope>
                 <exclusions>
-                    <exclusion>
-                        <groupId>javax.ws.rs</groupId>
-                        <artifactId>jsr311-api</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>com.sun.jersey</groupId>
                         <artifactId>jersey-core</artifactId>
@@ -199,6 +194,12 @@
                 <version>${jira.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>2.0.1</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -254,7 +255,7 @@
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git
         </developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-        <tag>cpji-jira-9.0.0</tag>
+        <tag>cpji-jira-10.0.0</tag>
     </scm>
 
     <pluginRepositories>

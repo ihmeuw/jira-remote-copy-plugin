@@ -12,6 +12,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import javax.inject.Inject;
+
 
 /**
  *
@@ -25,6 +27,7 @@ public class RemotesResource {
 	private final RemoteJiraService remoteJiraService;
     private final JiraProxyFactory jiraProxyFactory;
 
+	@Inject
 	public RemotesResource(RemoteJiraService remoteJiraService, JiraProxyFactory jiraProxyFactory) {
 		this.remoteJiraService = remoteJiraService;
         this.jiraProxyFactory = jiraProxyFactory;

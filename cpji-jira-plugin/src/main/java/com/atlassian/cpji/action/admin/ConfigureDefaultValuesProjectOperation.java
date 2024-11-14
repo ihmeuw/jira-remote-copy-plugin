@@ -9,7 +9,7 @@ import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.action.util.CalendarResourceIncluder;
-import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.webresource.api.WebResourceManager;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Locale;

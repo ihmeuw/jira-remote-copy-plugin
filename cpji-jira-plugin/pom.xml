@@ -6,7 +6,7 @@
     <parent>
         <artifactId>cpji-jira</artifactId>
         <groupId>com.atlassian.cpji</groupId>
-		<version>9.0.0</version>
+		<version>10.0.0</version>
     </parent>
 
     <artifactId>cpji-jira-plugin</artifactId>
@@ -25,12 +25,12 @@
 		</dependency>
 		<!-- REST dependencies-->
 		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>jsr311-api</artifactId>
+			<groupId>jakarta.ws.rs</groupId>
+			<artifactId>jakarta.ws.rs-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.plugins.rest</groupId>
-			<artifactId>atlassian-rest-common</artifactId>
+			<artifactId>atlassian-rest-v2-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
@@ -116,6 +116,10 @@
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-view-issue-plugin</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>jakarta.inject</groupId>
+			<artifactId>jakarta.inject-api</artifactId>
+		</dependency>
 
 		<!-- enforcing right scopes -->
 		<dependency>
@@ -125,14 +129,14 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
 			<version>${jackson.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 			<scope>provided</scope>
 		</dependency>
@@ -233,21 +237,21 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-jaxrs</artifactId>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
 			<version>${jackson.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-xc</artifactId>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jaxb-annotations</artifactId>
 			<version>${jackson.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-json</artifactId>
-			<version>${jersey.version}</version>
+			<version>1.19.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

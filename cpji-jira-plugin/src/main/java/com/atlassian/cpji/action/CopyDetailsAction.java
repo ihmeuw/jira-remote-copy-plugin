@@ -27,7 +27,7 @@ import com.atlassian.jira.issue.operation.IssueOperation;
 import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.util.UrlBuilder;
-import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.webresource.api.WebResourceManager;
 import com.atlassian.util.concurrent.LazyReference;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
