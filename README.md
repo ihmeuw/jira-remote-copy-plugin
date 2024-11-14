@@ -1,3 +1,7 @@
+This is a fork of the jira-remote-copy-plugin by Atlassian Labs. The purpose of this fork is to keep supporting issue remote copy functionality for Jira 9 and Jira 10.
+
+----------------
+
 JIRA to JIRA Issue Copy
 ============
 
