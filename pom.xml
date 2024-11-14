@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>6.1.1-SNAPSHOT</version>
+    <version>9.0.0</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -32,7 +32,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cpji.build.directory>target</cpji.build.directory>
         <!--Downgrading Jira version requires a change in used datasets. See <dataPath> properties in specific module poms.-->
-        <jira.version>8.19.1</jira.version>
+        <jira.version>9.2.0</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <spring.version>5.1.18.RELEASE</spring.version>
@@ -219,7 +219,7 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>sandbox-maven-plugin</artifactId>
-                <version>2.0.1</version>
+                <version>3.0-m12</version>
                 <executions>
                     <execution>
                         <id>enable-sandbox</id>
@@ -254,7 +254,7 @@
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git
         </developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-        <tag>HEAD</tag>
+        <tag>cpji-jira-9.0.0</tag>
     </scm>
 
     <pluginRepositories>

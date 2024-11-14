@@ -45,6 +45,9 @@ import java.util.Map;
  *
  * @since v1.4
  */
+import com.atlassian.jira.security.request.RequestMethod;
+import com.atlassian.jira.security.request.SupportedMethods;
+@SupportedMethods({RequestMethod.GET})
 public class CopyDetailsAction extends AbstractCopyIssueAction implements OperationContext
 {
     private String remoteUserName;

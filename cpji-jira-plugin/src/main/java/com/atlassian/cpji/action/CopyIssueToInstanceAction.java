@@ -69,6 +69,9 @@ import java.util.regex.Pattern;
 
 /**
  */
+import com.atlassian.jira.security.request.RequestMethod;
+import com.atlassian.jira.security.request.SupportedMethods;
+@SupportedMethods({RequestMethod.GET, RequestMethod.POST})
 public class CopyIssueToInstanceAction extends AbstractCopyIssueAction implements OperationContext {
 	private String copiedIssueKey;
 	private final Map fieldValuesHolder = Maps.newHashMap();
