@@ -34,6 +34,9 @@ import java.util.List;
 /**
  * @since v1.4
  */
+import com.atlassian.jira.security.request.RequestMethod;
+import com.atlassian.jira.security.request.SupportedMethods;
+@SupportedMethods({RequestMethod.GET, RequestMethod.POST})
 public class ConfigureCopyIssuesAdminAction extends RequiredFieldsAwareAction {
     private final IssueCreationHelperBean issueCreationHelperBean;
     private final FieldLayoutItemsRetriever fieldLayoutItemsRetriever;

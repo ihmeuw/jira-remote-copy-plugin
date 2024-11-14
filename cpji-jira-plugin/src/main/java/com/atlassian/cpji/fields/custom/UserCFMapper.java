@@ -45,7 +45,7 @@ public class UserCFMapper extends AbstractSingleValueCFMapper<ApplicationUser>
     @Override
     protected boolean isValidValue(final String value, final CustomField customField, final Project project, final IssueType issueType)
     {
-		return userManager.getUser(value) != null;
+		return userManager.getUserByName(value) != null;
     }
 
     @Override

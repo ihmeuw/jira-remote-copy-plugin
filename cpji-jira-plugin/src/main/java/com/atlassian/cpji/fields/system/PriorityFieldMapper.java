@@ -83,7 +83,7 @@ public class PriorityFieldMapper extends AbstractSystemFieldMapper implements Is
     {
         try
         {
-            return Iterables.find(constantsManager.getPriorityObjects(), new Predicate<Priority>()
+            return Iterables.find(constantsManager.getPriorities(), new Predicate<Priority>()
             {
                 public boolean apply(final Priority input)
                 {
@@ -93,7 +93,7 @@ public class PriorityFieldMapper extends AbstractSystemFieldMapper implements Is
         }
         catch (NoSuchElementException ex)
         {
-            return constantsManager.getDefaultPriorityObject();
+            return constantsManager.getDefaultPriority();
         }
     }
 }
