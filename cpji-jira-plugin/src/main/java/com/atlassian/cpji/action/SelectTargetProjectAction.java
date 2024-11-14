@@ -13,7 +13,7 @@ import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.issue.fields.layout.field.FieldLayoutManager;
 import com.atlassian.jira.issue.link.IssueLinkTypeManager;
 import com.atlassian.jira.security.xsrf.RequiresXsrfCheck;
-import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.webresource.api.WebResourceManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.atlassian.fugue.Either;

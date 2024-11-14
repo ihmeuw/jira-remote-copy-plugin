@@ -20,6 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.inject.Inject;
 
 @Path("project")
 @Consumes ({ MediaType.APPLICATION_JSON })
@@ -31,6 +32,7 @@ public class ProjectResource {
     private final JiraBaseUrls baseUrls;
     private final ProjectInfoService projectInfoService;
 
+    @Inject
     public ProjectResource(final JiraAuthenticationContext jiraAuthenticationContext, final PermissionManager permissionManager,
 			final JiraBaseUrls baseUrls, ProjectInfoService projectInfoService) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;

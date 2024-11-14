@@ -14,6 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.inject.Inject;
 
 
 /**
@@ -29,6 +30,7 @@ public class CopyIssueResource
 
     private static final Logger log = Logger.getLogger(CopyIssueResource.class);
 
+    @Inject
     public CopyIssueResource(final CopyIssueService copyIssueService)
     {
         this.copyIssueService = copyIssueService;

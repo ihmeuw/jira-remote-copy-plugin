@@ -54,7 +54,7 @@ public class DefaultCopyIssueConfigurationManager
 
     private CommentSecurityLevel findCommentSecurityLevel(final CommentSecurityLevel commentSecurityLevel, Project project)
     {
-        if (commentSecurityLevel.isGroupLevel() && visibilityValidator.isGroupVisiblityEnabled())
+        if (commentSecurityLevel.isGroupLevel() && visibilityValidator.isGroupVisibilityEnabled())
         {
             Collection<Group> groupsForUser = groupManager.getGroupsForUser(jiraAuthenticationContext.getLoggedInUser().getName());
             try
@@ -103,7 +103,7 @@ public class DefaultCopyIssueConfigurationManager
     public List<CommentSecurityLevel> getSecurityLevels(Project project)
     {
         final List<CommentSecurityLevel> commentSecurityLevels = new ArrayList<CommentSecurityLevel>();
-        if (visibilityValidator.isGroupVisiblityEnabled())
+        if (visibilityValidator.isGroupVisibilityEnabled())
         {
             Collection<Group> groupsForUser = groupManager.getGroupsForUser(jiraAuthenticationContext.getLoggedInUser().getName());
             if (!groupsForUser.isEmpty())

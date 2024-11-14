@@ -16,7 +16,7 @@ import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.util.BuildUtilsInfo;
 import com.atlassian.jira.util.SimpleErrorCollection;
 import com.atlassian.jira.web.action.issue.IssueCreationHelperBean;
-import com.atlassian.plugin.webresource.WebResourceManager;
+import com.atlassian.webresource.api.WebResourceManager;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;

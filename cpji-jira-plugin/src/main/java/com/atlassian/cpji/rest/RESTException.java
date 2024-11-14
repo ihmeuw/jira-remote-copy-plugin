@@ -2,12 +2,15 @@ package com.atlassian.cpji.rest;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.inject.Inject;
+
 
 /**
  * @since v1.0
  */
 public class RESTException extends WebApplicationException
 {
+    @Inject
     public RESTException(final Response.Status status, final String... errors)
     {
         super(createResponse(status, errors));

@@ -1,6 +1,6 @@
 package com.atlassian.cpji.rest;
 
-import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
+import com.atlassian.annotations.security.AnonymousSiteAccess;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -24,7 +24,7 @@ public class PluginInfoResource
     public static final String PLUGIN_VERSION = "3.0";
 
     @GET
-    @AnonymousAllowed
+    @AnonymousSiteAccess
     public Response pluginInfo()
     {
         return Response.ok(PLUGIN_INSTALLED + " " + PLUGIN_VERSION).build();
@@ -32,7 +32,7 @@ public class PluginInfoResource
 
     @GET
     @Path(RESOURCE_VERSION_PATH)
-    @AnonymousAllowed
+    @AnonymousSiteAccess
     public Response pluginVersion()
     {
         return Response.ok(PLUGIN_VERSION).build();
