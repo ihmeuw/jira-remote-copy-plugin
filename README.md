@@ -37,21 +37,6 @@ To install plugin in JIRA 2:
 
 `atlas-mvn amps:install -Dhttp.port=2991 -Dcontext.path=jira`
 
-Contributing to JIRA to JIRA Issue Copy
------------------
-
-You are free to modify the plugin under [Apache 2 license](LICENSE) terms.
-
-To create a successful pull request:
-
-* raise an issue with a description of the change you want to make
-* fork the repository
-* change the plugin
-* add new or modify tests so they will cover your changes
-* make sure all integration tests pass
-* raise a pull request
-
-We'll be happy to incorporate your changes.
 
 Which branch should I target?
 -----------------
@@ -68,3 +53,13 @@ Latest Release
 > This release is compatible with Jira 10.x
 - [cpji-jira-9.0.0](https://github.com/ihmeuw/jira-remote-copy-plugin/releases/tag/cpji-jira-9.0.0)
 > This release is compatible with Jira 9.x
+ 
+Contributing to JIRA to JIRA Issue Copy
+-----------------
+
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md)
+
+Code of Conduct
+-----------------
+
+Refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
