@@ -20,4 +20,3 @@ This fork primarily aims to support our environment’s applications. Consequent
 * Submit a pull request.
 
 If the change aligns with our scope, we’ll review it and merge it into the main branch.
-

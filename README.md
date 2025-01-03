@@ -53,7 +53,7 @@ Latest Release
 > This release is compatible with Jira 10.x
 - [cpji-jira-9.0.0](https://github.com/ihmeuw/jira-remote-copy-plugin/releases/tag/cpji-jira-9.0.0)
 > This release is compatible with Jira 9.x
- 
+
 Contributing to JIRA to JIRA Issue Copy
 -----------------
 
@@ -63,3 +63,8 @@ Code of Conduct
 -----------------
 
 Refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+
+Security
+-----------------
+
+Refer to [SECURITY.md](SECURITY.md)
