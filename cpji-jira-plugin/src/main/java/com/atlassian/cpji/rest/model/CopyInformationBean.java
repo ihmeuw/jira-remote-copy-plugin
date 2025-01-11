@@ -2,6 +2,7 @@ package com.atlassian.cpji.rest.model;
 
 import com.google.common.collect.Lists;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -33,6 +34,9 @@ public class CopyInformationBean {
 
 	@XmlElement
 	private UserBean user;
+
+	@XmlElement
+	private UserBean remoteUser;
 
 	@XmlElement
 	private boolean hasCreateLinksPermission;
