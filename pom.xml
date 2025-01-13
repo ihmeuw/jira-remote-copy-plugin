@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>10.0.0</version>
+    <version>10.1.0</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -32,7 +32,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cpji.build.directory>target</cpji.build.directory>
         <!--Downgrading Jira version requires a change in used datasets. See <dataPath> properties in specific module poms.-->
-        <jira.version>10.1.1</jira.version>
+        <jira.version>10.3.1</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
         <spring.version>5.1.18.RELEASE</spring.version>
