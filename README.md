@@ -7,12 +7,6 @@ JIRA to JIRA Issue Copy
 
 The JIRA to JIRA Issue Copy was created to make it possible to copy issues between different JIRA servers. It also adds an ability to copy issues between projects which is more flexible than JIRA's Clone action.
 
-Visit [JIRA to JIRA Issue Copy](https://marketplace.atlassian.com/plugins/com.atlassian.cpji.cpji-jira-plugin) on Atlassian Marketplace to learn more. 
-
-Raising bugs or feature requests
------------------
-This plugin is not officially supported. If you would like to raise a bug or feature request, please comment on this issue: https://jira.atlassian.com/browse/JRA-62759. We will periodically re-evaluate the plugin's supported status.
-
 Changing JIRA to JIRA Issue Copy
 -----------------
 
@@ -43,23 +37,34 @@ To install plugin in JIRA 2:
 
 `atlas-mvn amps:install -Dhttp.port=2991 -Dcontext.path=jira`
 
-Contributing to JIRA to JIRA Issue Copy
------------------
-
-You are free to modify the plugin under [Apache 2 license](LICENSE) terms.
-
-To create a successful pull request:
-
-* raise an issue with a description of the change you want to make
-* fork the repository
-* change the plugin
-* add new or modify tests so they will cover your changes
-* make sure all integration tests pass
-* raise a pull request
-
-We'll be happy to incorporate your changes.
 
 Which branch should I target?
 -----------------
-- Jira 8.x - `master`
-- Jira 7.x - `jira-7`
+
+- Latest - `main`
+- Jira 10.x - `jira-10`
+- Jira 9.x - `jira-9`
+- Jira 8.x - `jira-8`
+
+Latest Release
+-----------------
+
+- [cpji-jira-10.0.0](https://github.com/ihmeuw/jira-remote-copy-plugin/releases/tag/cpji-jira-10.0.0)
+> This release is compatible with Jira 10.x
+- [cpji-jira-9.0.0](https://github.com/ihmeuw/jira-remote-copy-plugin/releases/tag/cpji-jira-9.0.0)
+> This release is compatible with Jira 9.x
+
+Contributing to JIRA to JIRA Issue Copy
+-----------------
+
+Refer to [CONTRIBUTING.md](CONTRIBUTING.md)
+
+Code of Conduct
+-----------------
+
+Refer to [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+
+Security
+-----------------
+
+Refer to [SECURITY.md](SECURITY.md)
