@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.atlassian.pom</groupId>
         <artifactId>closedsource-pom</artifactId>
-        <version>5.0.29</version>
+        <version>5.2.40</version>
     </parent>
 
     <groupId>com.atlassian.cpji</groupId>
@@ -204,6 +204,18 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.atlassian.maven.plugins</groupId>
+                    <artifactId>artifactory-staging-maven-plugin</artifactId>
+                    <version>3.0.4</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
