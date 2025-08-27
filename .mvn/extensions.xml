@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
-    <!-- Empty extensions file to prevent problematic extensions from loading -->
+    <!-- Override the problematic artifactory staging plugin with a non-existent version -->
+    <extension>
+        <groupId>com.atlassian.maven.plugins</groupId>
+        <artifactId>artifactory-staging-maven-plugin</artifactId>
+        <version>999.999.999</version>
+    </extension>
 </extensions>
