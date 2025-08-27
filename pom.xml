@@ -4,12 +4,6 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.atlassian.pom</groupId>
-        <artifactId>closedsource-pom</artifactId>
-        <version>5.0.29</version>
-    </parent>
-
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
     <version>10.1.1</version>
