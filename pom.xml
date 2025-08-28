@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>10.1.0</version>
+    <version>10.1.1</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
         <spring.version>5.1.18.RELEASE</spring.version>
         <guava.version>26.0-jre</guava.version>
         <commons.lang3.version>3.9</commons.lang3.version>
-        <apache.httpclient.version>4.5.13</apache.httpclient.version>
+        <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <apache.httpcore.version>4.4.12</apache.httpcore.version>
         <apache.httpasyncclient.version>4.1</apache.httpasyncclient.version>
         <atlassian.httpclient.version>2.1.5</atlassian.httpclient.version>
@@ -58,6 +58,7 @@
         <failOnMilestoneOrReleaseCandidateDeps>true</failOnMilestoneOrReleaseCandidateDeps>
         <rest.doc.generation.skip>true</rest.doc.generation.skip>
         <jira.rest.client.version>5.2.2</jira.rest.client.version>
+        <jettison.version>1.5.4</jettison.version>
     </properties>
 
     <dependencyManagement>
@@ -176,7 +177,7 @@
             <dependency>
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
-                <version>1.1</version>
+                <version>${jettison.version}</version>
                 <scope>compile</scope>
             </dependency>
 
@@ -185,7 +186,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.0</version>
+                <version>4.5.14</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -257,19 +258,5 @@
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
         <tag>cpji-jira-10.0.0</tag>
     </scm>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala</id>
-            <name>Scala Tools</name>
-            <url>http://scala-tools.org/repo-releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
 </project>
