@@ -17,7 +17,7 @@ import com.atlassian.webresource.api.WebResourceManager;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.atlassian.fugue.Either;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.List;

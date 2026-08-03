@@ -190,7 +190,7 @@
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
                 <version>${jettison.version}</version>
-                <scope>compile</scope>
+                <scope>provided</scope>
             </dependency>
 
             <!-- Remote Issue Links dependencies -->

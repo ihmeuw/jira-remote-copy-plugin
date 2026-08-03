@@ -22,9 +22,9 @@ public class RESTException extends WebApplicationException
         return Response.status(status).entity(errors).cacheControl(never()).build();
     }
 
-    public static javax.ws.rs.core.CacheControl never()
+    public static jakarta.ws.rs.core.CacheControl never()
     {
-        javax.ws.rs.core.CacheControl cacheNever = new javax.ws.rs.core.CacheControl();
+        jakarta.ws.rs.core.CacheControl cacheNever = new jakarta.ws.rs.core.CacheControl();
         cacheNever.setNoStore(true);
         cacheNever.setNoCache(true);
 

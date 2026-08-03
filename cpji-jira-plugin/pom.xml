@@ -37,6 +37,17 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>shibboleth</id>
+			<name>Shibboleth Repository</name>
+			<url>https://build.shibboleth.net/maven/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -56,6 +67,10 @@
 			<exclusions>
 				<exclusion>
 					<groupId>net.sf.ehcache</groupId>
+					<artifactId>ehcache</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.ehcache</groupId>
 					<artifactId>ehcache</artifactId>
 				</exclusion>
 			</exclusions>
@@ -156,6 +171,16 @@
 		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- enforcing right scopes -->

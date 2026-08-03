@@ -1,8 +1,8 @@
 package com.atlassian.cpji.action;
 
 import com.atlassian.cpji.components.model.JiraLocation;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
 *
