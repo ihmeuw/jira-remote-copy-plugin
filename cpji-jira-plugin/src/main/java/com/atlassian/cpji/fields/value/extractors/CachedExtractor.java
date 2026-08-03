@@ -5,8 +5,8 @@ import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.user.ApplicationUser;
 import org.apache.commons.lang.StringUtils;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;

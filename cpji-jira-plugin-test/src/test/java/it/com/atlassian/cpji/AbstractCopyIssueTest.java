@@ -20,7 +20,7 @@ import org.junit.Rule;
 import org.junit.rules.RuleChain;
 
 import java.net.URI;
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @since v2.1

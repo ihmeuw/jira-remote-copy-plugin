@@ -2,7 +2,7 @@ package com.atlassian.cpji.util;
 
 import com.atlassian.jira.util.ErrorCollection;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Represents a response from a JIRA REST resource.

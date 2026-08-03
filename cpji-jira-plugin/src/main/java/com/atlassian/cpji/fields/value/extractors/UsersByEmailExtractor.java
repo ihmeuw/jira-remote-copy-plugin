@@ -4,7 +4,7 @@ import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.user.ApplicationUser;
 import com.google.common.collect.Lists;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.Collection;
 
 public class UsersByEmailExtractor extends CachedExtractor {

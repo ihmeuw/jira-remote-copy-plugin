@@ -3,9 +3,9 @@ package com.atlassian.cpji.rest.model;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.annotation.Nullable;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.Collection;
 
 /**

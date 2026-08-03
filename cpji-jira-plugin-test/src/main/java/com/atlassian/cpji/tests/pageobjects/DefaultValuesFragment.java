@@ -10,7 +10,7 @@ import com.atlassian.pageobjects.elements.PageElement;
 import com.atlassian.pageobjects.elements.PageElementFinder;
 import org.openqa.selenium.By;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class DefaultValuesFragment
 {

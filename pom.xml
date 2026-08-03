@@ -12,7 +12,7 @@
 
     <groupId>com.atlassian.cpji</groupId>
     <artifactId>cpji-jira</artifactId>
-    <version>10.1.1</version>
+    <version>11.0.0</version>
     <name>Remote copying of issues - Parent POM</name>
     <packaging>pom</packaging>
 
@@ -27,15 +27,15 @@
     </organization>
 
     <properties>
-        <jdkLevel>1.8</jdkLevel>
+        <jdkLevel>21</jdkLevel>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cpji.build.directory>target</cpji.build.directory>
         <!--Downgrading Jira version requires a change in used datasets. See <dataPath> properties in specific module poms.-->
-        <jira.version>10.3.1</jira.version>
+        <jira.version>11.3.8</jira.version>
         <jira.compile.version>${jira.version}</jira.compile.version>
         <jira.data.version>${jira.version}</jira.data.version>
-        <spring.version>5.1.18.RELEASE</spring.version>
+        <spring.version>6.1.14</spring.version>
         <guava.version>26.0-jre</guava.version>
         <commons.lang3.version>3.9</commons.lang3.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
@@ -130,6 +130,18 @@
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
                 <version>4.0.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>4.0.2</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>3.0.0</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -256,7 +268,7 @@
         <developerConnection>scm:git:ssh://git@bitbucket.org/atlassianlabs/jira-remote-copy-plugin.git
         </developerConnection>
         <url>https://bitbucket.org/atlassianlabs/jira-remote-copy-plugin</url>
-        <tag>cpji-jira-10.0.0</tag>
+        <tag>cpji-jira-11.0.0</tag>
     </scm>
 
 </project>

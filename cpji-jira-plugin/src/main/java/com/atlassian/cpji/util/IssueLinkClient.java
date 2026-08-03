@@ -26,8 +26,8 @@ import com.atlassian.sal.api.net.ReturningResponseHandler;
 import org.apache.log4j.Logger;
 
 import java.util.Iterator;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * Component for create (remote) issue links.

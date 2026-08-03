@@ -6,7 +6,7 @@ import com.google.common.base.Predicate;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * TODO: Document this class / interface here

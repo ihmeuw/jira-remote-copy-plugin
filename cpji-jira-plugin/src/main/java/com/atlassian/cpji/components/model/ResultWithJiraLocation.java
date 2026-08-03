@@ -3,7 +3,7 @@ package com.atlassian.cpji.components.model;
 import io.atlassian.fugue.Either;
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * @since v2.1
