@@ -67,6 +67,7 @@ public class RemoteJiraService {
         return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, Projects>>() {
             @Override
             public Either<NegativeResponseStatus, Projects> onInvocationException(Exception e) {
+                log.error("Failed to get projects from remote Jira", e);
                 return Either.left(NegativeResponseStatus.communicationFailed(JiraLocation.LOCAL));
             }
 

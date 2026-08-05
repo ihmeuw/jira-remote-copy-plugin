@@ -15,6 +15,14 @@
             Velocity templates can use these Java methods
         </description>
         <method>org.apache.commons.lang3.StringUtils#isNotBlank(java.lang.CharSequence)</method>
+        <method>com.atlassian.cpji.action.Option#getValue()</method>
+        <method>com.atlassian.cpji.action.Option#isSelected()</method>
+        <method>com.atlassian.cpji.action.Option#getLabel()</method>
+        <method>com.atlassian.cpji.action.MissingFieldPermissionDescription#canCopyIssue()</method>
+        <method>com.atlassian.cpji.action.MissingFieldPermissionDescription#getFieldId()</method>
+        <method>com.atlassian.cpji.action.MissingFieldPermissionDescription#getFieldName()</method>
+        <method>com.atlassian.cpji.action.MissingFieldPermissionDescription#getValidationMessage()</method>
+        <method>com.atlassian.cpji.action.MissingFieldPermissionDescription#getUnmappedValues()</method>
     </velocity-allowlist>
 
     <web-item key="remote-copy" i18n-name-key="cpji.operation.name" name="Copy this issue" section="operations-operations" weight="20">
