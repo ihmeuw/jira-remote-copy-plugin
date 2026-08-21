@@ -13,9 +13,9 @@ import io.atlassian.fugue.Either;
 import io.atlassian.fugue.Eithers;
 
 import java.util.List;
-import javax.annotation.Nonnull;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.annotation.Nonnull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  *

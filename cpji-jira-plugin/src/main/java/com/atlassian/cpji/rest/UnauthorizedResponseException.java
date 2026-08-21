@@ -1,7 +1,7 @@
 package com.atlassian.cpji.rest;
 
 import com.atlassian.sal.api.net.ResponseException;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * Exception that's thrown when the response contains the status code 401 Unauthorized.

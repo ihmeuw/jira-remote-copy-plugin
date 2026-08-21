@@ -3,11 +3,11 @@ package com.atlassian.cpji.components.model;
 import com.atlassian.applinks.api.ApplicationLink;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import org.codehaus.jackson.annotate.JsonCreator;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @since v3.0

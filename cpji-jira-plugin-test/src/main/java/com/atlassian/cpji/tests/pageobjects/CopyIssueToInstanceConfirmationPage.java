@@ -15,7 +15,7 @@ import org.openqa.selenium.By;
 import com.atlassian.jira.pageobjects.components.fields.SingleSelect;
 
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.Iterator;
 
 /**

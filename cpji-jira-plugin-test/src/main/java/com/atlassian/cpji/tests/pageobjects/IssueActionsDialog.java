@@ -9,7 +9,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import org.openqa.selenium.By;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * @since v3.0

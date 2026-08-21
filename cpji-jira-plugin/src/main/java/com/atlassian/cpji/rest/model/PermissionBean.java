@@ -2,9 +2,9 @@ package com.atlassian.cpji.rest.model;
 
 import com.google.common.base.Preconditions;
 
-import javax.annotation.Nonnull;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.annotation.Nonnull;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 /**

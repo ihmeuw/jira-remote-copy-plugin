@@ -2,7 +2,7 @@ package com.atlassian.cpji.rest.model;
 
 import com.atlassian.cpji.util.DateUtil;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.Date;
 
 /**

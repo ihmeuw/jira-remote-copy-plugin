@@ -2,8 +2,8 @@ package com.atlassian.cpji.rest.model;
 
 import com.atlassian.jira.rest.client.api.domain.BasicProject;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="project")
 public class ProjectBean {

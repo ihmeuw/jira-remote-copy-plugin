@@ -1,8 +1,8 @@
 package com.atlassian.cpji.rest;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.inject.Inject;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.inject.Inject;
 
 
 /**
@@ -22,9 +22,9 @@ public class RESTException extends WebApplicationException
         return Response.status(status).entity(errors).cacheControl(never()).build();
     }
 
-    public static javax.ws.rs.core.CacheControl never()
+    public static jakarta.ws.rs.core.CacheControl never()
     {
-        javax.ws.rs.core.CacheControl cacheNever = new javax.ws.rs.core.CacheControl();
+        jakarta.ws.rs.core.CacheControl cacheNever = new jakarta.ws.rs.core.CacheControl();
         cacheNever.setNoStore(true);
         cacheNever.setNoCache(true);
 

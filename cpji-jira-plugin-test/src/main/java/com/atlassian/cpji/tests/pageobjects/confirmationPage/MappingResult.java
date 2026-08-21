@@ -10,7 +10,7 @@ import com.atlassian.pageobjects.elements.SelectElement;
 import com.atlassian.pageobjects.elements.query.TimedQuery;
 import org.openqa.selenium.By;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 public class MappingResult {
     private final String fieldId;

@@ -7,7 +7,7 @@ import com.atlassian.pageobjects.binder.Init;
 import com.atlassian.pageobjects.elements.PageElementFinder;
 import org.openqa.selenium.By;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * @since v3.0

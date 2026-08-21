@@ -8,7 +8,7 @@ import com.atlassian.pageobjects.elements.query.TimedCondition;
 import com.atlassian.pageobjects.elements.timeout.TimeoutType;
 import com.atlassian.pageobjects.elements.timeout.Timeouts;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 /**
  * This page object represents basic search page. Unforutnately it is not possible to use {@link com.atlassian.jira.pageobjects.navigator.BasicSearch}

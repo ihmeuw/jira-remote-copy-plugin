@@ -6,8 +6,8 @@ import com.atlassian.jira.util.SimpleErrorCollection;
 import com.google.common.base.Predicate;
 import io.atlassian.fugue.Either;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * @since v5.2

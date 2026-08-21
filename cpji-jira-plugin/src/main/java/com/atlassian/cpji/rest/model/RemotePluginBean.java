@@ -3,10 +3,10 @@ package com.atlassian.cpji.rest.model;
 import com.atlassian.cpji.components.model.ResultWithJiraLocation;
 import com.atlassian.cpji.components.remote.JiraProxyFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  *

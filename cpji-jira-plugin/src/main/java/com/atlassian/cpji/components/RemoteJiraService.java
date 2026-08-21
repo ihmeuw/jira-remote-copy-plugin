@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import io.atlassian.fugue.Either;
 import org.apache.log4j.Logger;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -67,6 +67,7 @@ public class RemoteJiraService {
         return executeForEveryJira(new FunctionWithFallback<Either<NegativeResponseStatus, Projects>>() {
             @Override
             public Either<NegativeResponseStatus, Projects> onInvocationException(Exception e) {
+                log.error("Failed to get projects from remote Jira", e);
                 return Either.left(NegativeResponseStatus.communicationFailed(JiraLocation.LOCAL));
             }
 
